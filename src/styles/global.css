@@ -13,7 +13,8 @@ body {
 }
 
 a {
-  color: var(--color-accent-cyan);
+  color: var(--color-link);
+  text-decoration: underline;
 }
 
 a:focus {
@@ -120,7 +121,7 @@ a:focus {
 
 .button--accent {
   background: linear-gradient(135deg, var(--color-accent-orange), var(--color-accent-cyan));
-  color: var(--color-bg);
+  color: var(--color-text-on-accent);
 }
 
 .button--ghost {

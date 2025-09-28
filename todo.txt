@@ -4,3 +4,5 @@
 [x] Implement validation and logging utilities
 [x] Provide automated bootstrap and CI scripts
 [x] Document usage instructions for laypersons
+[x] Add automated contrast audit and integrate into pipelines
+[x] Document global color and contrast guidance with external references

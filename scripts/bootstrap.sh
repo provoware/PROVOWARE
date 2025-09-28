@@ -21,6 +21,7 @@ commands=(
   "node scripts/format.js"
   "node scripts/lint.js"
   "node scripts/test.js"
+  "node scripts/contrast.js"
   "node scripts/accessibility.js"
 )
 

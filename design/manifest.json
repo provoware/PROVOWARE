@@ -87,8 +87,10 @@
         "--color-border": "#25345a",
         "--color-text-primary": "#f7f9ff",
         "--color-text-secondary": "#a9b7d7",
+        "--color-text-on-accent": "#0b1221",
         "--color-accent-orange": "#f79a32",
         "--color-accent-cyan": "#36c1cd",
+        "--color-link": "#36c1cd",
         "--color-status-success": "#31d0aa",
         "--color-status-warning": "#f7c948",
         "--color-status-error": "#f35f64"
@@ -100,8 +102,10 @@
         "--color-border": "#d7deef",
         "--color-text-primary": "#1b2439",
         "--color-text-secondary": "#475072",
+        "--color-text-on-accent": "#061227",
         "--color-accent-orange": "#d97816",
         "--color-accent-cyan": "#1b8e97",
+        "--color-link": "#10606f",
         "--color-status-success": "#11876f",
         "--color-status-warning": "#d6951c",
         "--color-status-error": "#c23a40"
@@ -113,8 +117,10 @@
         "--color-border": "#ffffff",
         "--color-text-primary": "#ffffff",
         "--color-text-secondary": "#ededed",
+        "--color-text-on-accent": "#000000",
         "--color-accent-orange": "#ff8c00",
         "--color-accent-cyan": "#00ffff",
+        "--color-link": "#00ffff",
         "--color-status-success": "#00ff99",
         "--color-status-warning": "#ffff00",
         "--color-status-error": "#ff0044"
@@ -123,6 +129,95 @@
   },
   "accessibility": {
     "minimumContrastRatio": 4.5,
+    "colorContrast": [
+      {
+        "theme": "dark",
+        "pairs": [
+          {
+            "foreground": "--color-text-primary",
+            "background": "--color-bg",
+            "computedRatio": 17.77,
+            "minimum": 7
+          },
+          {
+            "foreground": "--color-text-secondary",
+            "background": "--color-bg",
+            "computedRatio": 9.3,
+            "minimum": 4.5
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-orange",
+            "computedRatio": 8.57,
+            "minimum": 4.5
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-cyan",
+            "computedRatio": 8.61,
+            "minimum": 4.5
+          }
+        ]
+      },
+      {
+        "theme": "light",
+        "pairs": [
+          {
+            "foreground": "--color-text-primary",
+            "background": "--color-bg",
+            "computedRatio": 14.31,
+            "minimum": 7
+          },
+          {
+            "foreground": "--color-text-secondary",
+            "background": "--color-bg",
+            "computedRatio": 7.31,
+            "minimum": 4.5
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-orange",
+            "computedRatio": 5.92,
+            "minimum": 4.5
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-cyan",
+            "computedRatio": 4.77,
+            "minimum": 4.5
+          },
+          {
+            "foreground": "--color-link",
+            "background": "--color-bg",
+            "computedRatio": 6.65,
+            "minimum": 4.5
+          }
+        ]
+      },
+      {
+        "theme": "high-contrast",
+        "pairs": [
+          {
+            "foreground": "--color-text-primary",
+            "background": "--color-bg",
+            "computedRatio": 21,
+            "minimum": 7
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-orange",
+            "computedRatio": 9,
+            "minimum": 7
+          },
+          {
+            "foreground": "--color-text-on-accent",
+            "background": "--color-accent-cyan",
+            "computedRatio": 16.75,
+            "minimum": 7
+          }
+        ]
+      }
+    ],
     "focusVisible": true,
     "keyboardNavigation": true,
     "reducedMotion": {
@@ -138,7 +233,19 @@
         "contentinfo"
       ],
       "skipLink": true
-    }
+    },
+    "references": [
+      {
+        "title": "WCAG 2.2 Success Criterion 1.4.3 Contrast (Minimum)",
+        "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+        "note": "Empfiehlt mindestens 4.5:1 für Fließtext und 3:1 für große Überschriften."
+      },
+      {
+        "title": "Material Design 3 – Color Guidance",
+        "url": "https://m3.material.io/styles/color/overview",
+        "note": "Beschreibt, wie Kontrast, Markenfarben und Oberflächen harmonisch eingesetzt werden."
+      }
+    ]
   },
   "testing": {
     "linting": "scripts/lint.js",

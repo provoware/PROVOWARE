@@ -12,8 +12,10 @@
   --color-border: #25345a;
   --color-text-primary: #f7f9ff;
   --color-text-secondary: #a9b7d7;
+  --color-text-on-accent: #0b1221;
   --color-accent-orange: #f79a32;
   --color-accent-cyan: #36c1cd;
+  --color-link: #36c1cd;
   --color-status-success: #31d0aa;
   --color-status-warning: #f7c948;
   --color-status-error: #f35f64;
@@ -29,8 +31,10 @@
   --color-border: #d7deef;
   --color-text-primary: #1b2439;
   --color-text-secondary: #475072;
+  --color-text-on-accent: #061227;
   --color-accent-orange: #d97816;
   --color-accent-cyan: #1b8e97;
+  --color-link: #10606f;
   --color-status-success: #11876f;
   --color-status-warning: #d6951c;
   --color-status-error: #c23a40;
@@ -46,8 +50,10 @@
   --color-border: #ffffff;
   --color-text-primary: #ffffff;
   --color-text-secondary: #ededed;
+  --color-text-on-accent: #000000;
   --color-accent-orange: #ff8c00;
   --color-accent-cyan: #00ffff;
+  --color-link: #00ffff;
   --color-status-success: #00ff99;
   --color-status-warning: #ffff00;
   --color-status-error: #ff0044;

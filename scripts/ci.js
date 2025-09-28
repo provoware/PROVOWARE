@@ -23,6 +23,7 @@ const steps = [
   () => runCommand('node', ['scripts/format.js']),
   () => runCommand('node', ['scripts/lint.js']),
   () => runCommand('node', ['scripts/test.js']),
+  () => runCommand('node', ['scripts/contrast.js']),
   () => runCommand('node', ['scripts/accessibility.js'])
 ];
 
