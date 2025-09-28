@@ -1,0 +1,3 @@
+- ein ToDo-Punkt abarbeiten
+- analysiere fehlenden teil und vervollständige einen
+- Prüfe und fixe
