@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de" data-debug="false" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PROVOWARE Steuerzentrale</title>
+    <link rel="stylesheet" href="styles/global.css" />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Zum Hauptinhalt springen</a>
+    <header class="app-header" role="banner">
+      <h1 style="position: absolute; left: -9999px;">PROVOWARE Hauptmodul</h1>
+    </header>
+    <div class="app-shell" role="presentation">
+      <nav class="app-nav" aria-label="Globale Navigation">
+        <h2 style="font-size: 18px;">Navigation</h2>
+        <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 12px;">
+          <li><button class="button button--ghost" data-action="open-dashboard">Dashboard</button></li>
+          <li><button class="button button--ghost" data-action="modules">Module</button></li>
+          <li><button class="button button--ghost" data-action="databases">Datenbanken</button></li>
+          <li><button class="button button--ghost" data-action="automation">Automationen</button></li>
+        </ul>
+        <section class="panel__section" aria-live="polite" style="margin-top: 24px;">
+          <h3>Status</h3>
+          <p class="status status--success">
+            <span class="status__dot"></span>
+            System bereit
+          </p>
+        </section>
+      </nav>
+
+      <main id="main" class="app-main" role="main">
+        <article class="card" data-card="overview">
+          <header>
+            <p class="card__meta">Monitoring</p>
+            <h2 class="card__title">Systemüberblick</h2>
+          </header>
+          <p>
+            Live-Anzeige der Kernmetriken mit Fokus auf Auslastung, aktive Module und Sicherheitsstatus.
+          </p>
+          <div class="alert alert--info" role="status">
+            Selbstheilung aktiv – Fehler werden automatisch korrigiert.
+          </div>
+          <button class="button button--accent" data-action="open-monitoring">Monitoring öffnen</button>
+        </article>
+
+        <article class="card" data-card="modules">
+          <header>
+            <p class="card__meta">Module</p>
+            <h2 class="card__title">Modulverwaltung</h2>
+          </header>
+          <p>Verwalte Untermodule, prüfe Abhängigkeiten und starte Neuinstallationen sicher.</p>
+          <button class="button button--ghost" data-action="add-module">Neues Modul hinzufügen</button>
+        </article>
+
+        <article class="card" data-card="databases">
+          <header>
+            <p class="card__meta">Daten</p>
+            <h2 class="card__title">Datenbankübersicht</h2>
+          </header>
+          <p>Erstelle Datenbanken mit geprüften Standards und automatischer Absicherung.</p>
+          <button class="button button--accent" data-action="new-database">Neue Datenbank erstellen</button>
+        </article>
+
+        <article class="card" data-card="reports">
+          <header>
+            <p class="card__meta">Berichte</p>
+            <h2 class="card__title">Auswertungen &amp; Logs</h2>
+          </header>
+          <p>Greife auf Prüfberichte, Logs und Lernempfehlungen für Laien zu.</p>
+          <button class="button button--ghost" data-action="view-logs">Logs anzeigen</button>
+        </article>
+      </main>
+
+      <aside class="app-sidebar" role="complementary" aria-label="Schnelleinstellungen">
+        <section class="panel">
+          <div class="panel__section" role="group" aria-labelledby="theme-options">
+            <h3 id="theme-options">Farbschema</h3>
+            <label for="theme-select">Theme wählen</label>
+            <select id="theme-select" name="theme">
+              <option value="dark">Dunkel</option>
+              <option value="light">Hell</option>
+              <option value="high-contrast">Hoher Kontrast</option>
+            </select>
+          </div>
+
+          <div class="panel__section" role="group" aria-labelledby="debug-options">
+            <h3 id="debug-options">Debug-Modus</h3>
+            <label for="debug-toggle" class="status status--warning">
+              <span class="status__dot"></span>
+              <span>Debug aktivieren</span>
+            </label>
+            <input type="checkbox" id="debug-toggle" name="debug" />
+            <p class="card__meta">Zeigt Layoutkonturen und Konsolenlogs zur Fehlersuche.</p>
+          </div>
+
+          <form class="panel__section" data-form="self-heal" aria-describedby="self-heal-hint">
+            <h3>Self-Repair (Selbstheilung)</h3>
+            <p id="self-heal-hint" class="card__meta">
+              Überprüft Module, löst Abhängigkeiten und repariert Fehler automatisch.
+            </p>
+            <fieldset>
+              <legend>Aktion wählen</legend>
+              <label for="self-heal-scope">Bereich</label>
+              <select id="self-heal-scope" name="scope" required>
+                <option value="global">Gesamtsystem</option>
+                <option value="module">Einzelnes Modul</option>
+                <option value="database">Datenbank</option>
+              </select>
+              <label for="self-heal-notes">Hinweis (optional)</label>
+              <input id="self-heal-notes" name="notes" type="text" placeholder="Kurze Beschreibung" aria-describedby="self-heal-hint" />
+            </fieldset>
+            <button class="button button--accent" type="submit">Prüfung starten</button>
+            <output name="result" role="status" aria-live="polite"></output>
+          </form>
+
+          <section class="panel__section" aria-live="polite" data-module="suggestions">
+            <h3>Laien-Tipps</h3>
+            <ul id="suggestion-list" style="padding-left: 16px;"></ul>
+          </section>
+        </section>
+      </aside>
+    </div>
+    <footer role="contentinfo" style="padding: 24px; text-align: center; color: var(--color-text-secondary);">
+      © 2024 PROVOWARE – Einheitliche Standards und maximale Barrierefreiheit
+    </footer>
+    <script type="module" src="scripts/app.js"></script>
+  </body>
+</html>

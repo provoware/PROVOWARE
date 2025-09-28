@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PROVOWARE Design Language",
+  "description": "Global Design, Accessibility, and Layout baseline derived from reference dashboard artwork.",
+  "layout": {
+    "grid": {
+      "columns": 3,
+      "columnDistribution": [
+        "navigation",
+        "workspace",
+        "inspector"
+      ],
+      "gutter": "16px",
+      "maxContentWidth": "1440px",
+      "breakpoints": {
+        "desktop": "min-width: 1200px",
+        "tablet": "min-width: 768px",
+        "mobile": "max-width: 767px"
+      }
+    },
+    "navigation": {
+      "width": "280px",
+      "background": "var(--color-surface-01)",
+      "padding": "24px",
+      "role": "navigation",
+      "ariaLabel": "Globale Steuerung"
+    },
+    "workspace": {
+      "display": "grid",
+      "cardMinWidth": "240px",
+      "gridGap": "12px",
+      "padding": "24px"
+    },
+    "sidebar": {
+      "width": "320px",
+      "background": "var(--color-surface-02)",
+      "padding": "24px",
+      "role": "complementary",
+      "ariaLabel": "Schnelleinstellungen"
+    }
+  },
+  "typography": {
+    "fontFamilyPrimary": "'Inter', 'Segoe UI', Roboto, sans-serif",
+    "scale": {
+      "heading-1": {
+        "size": "32px",
+        "lineHeight": "40px",
+        "weight": 700
+      },
+      "heading-2": {
+        "size": "24px",
+        "lineHeight": "32px",
+        "weight": 600
+      },
+      "heading-3": {
+        "size": "20px",
+        "lineHeight": "28px",
+        "weight": 600
+      },
+      "body": {
+        "size": "16px",
+        "lineHeight": "24px",
+        "weight": 400
+      },
+      "small": {
+        "size": "14px",
+        "lineHeight": "20px",
+        "weight": 400
+      }
+    }
+  },
+  "radii": {
+    "card": "12px",
+    "button": "10px",
+    "input": "12px"
+  },
+  "shadows": {
+    "card": "0 16px 24px rgba(0, 0, 0, 0.25)",
+    "focus": "0 0 0 3px rgba(54, 193, 205, 0.45)"
+  },
+  "tokens": {
+    "color": {
+      "dark": {
+        "--color-bg": "#0b1221",
+        "--color-surface-01": "#131b2e",
+        "--color-surface-02": "#1d2740",
+        "--color-border": "#25345a",
+        "--color-text-primary": "#f7f9ff",
+        "--color-text-secondary": "#a9b7d7",
+        "--color-accent-orange": "#f79a32",
+        "--color-accent-cyan": "#36c1cd",
+        "--color-status-success": "#31d0aa",
+        "--color-status-warning": "#f7c948",
+        "--color-status-error": "#f35f64"
+      },
+      "light": {
+        "--color-bg": "#f3f6ff",
+        "--color-surface-01": "#ffffff",
+        "--color-surface-02": "#f0f4ff",
+        "--color-border": "#d7deef",
+        "--color-text-primary": "#1b2439",
+        "--color-text-secondary": "#475072",
+        "--color-accent-orange": "#d97816",
+        "--color-accent-cyan": "#1b8e97",
+        "--color-status-success": "#11876f",
+        "--color-status-warning": "#d6951c",
+        "--color-status-error": "#c23a40"
+      },
+      "highContrast": {
+        "--color-bg": "#000000",
+        "--color-surface-01": "#0f0f0f",
+        "--color-surface-02": "#1a1a1a",
+        "--color-border": "#ffffff",
+        "--color-text-primary": "#ffffff",
+        "--color-text-secondary": "#ededed",
+        "--color-accent-orange": "#ff8c00",
+        "--color-accent-cyan": "#00ffff",
+        "--color-status-success": "#00ff99",
+        "--color-status-warning": "#ffff00",
+        "--color-status-error": "#ff0044"
+      }
+    }
+  },
+  "accessibility": {
+    "minimumContrastRatio": 4.5,
+    "focusVisible": true,
+    "keyboardNavigation": true,
+    "reducedMotion": {
+      "property": "prefers-reduced-motion",
+      "fallback": "no animation"
+    },
+    "aria": {
+      "landmarks": [
+        "banner",
+        "navigation",
+        "main",
+        "complementary",
+        "contentinfo"
+      ],
+      "skipLink": true
+    }
+  },
+  "testing": {
+    "linting": "scripts/lint.js",
+    "unit": "scripts/test.js",
+    "accessibility": "scripts/accessibility.js"
+  }
+}
