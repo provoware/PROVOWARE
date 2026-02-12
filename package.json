@@ -1,0 +1,22 @@
+{
+  "name": "provoware",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PROVOWARE Hauptmodul mit Design-Manifest, automatischer Prüfung und Themes.",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "lint": "node scripts/lint.js",
+    "test": "node scripts/test.js",
+    "format": "node scripts/format.js",
+    "check:contrast": "node scripts/contrast.js",
+    "check:accessibility": "node scripts/accessibility.js",
+    "ci": "node scripts/ci.js"
+  },
+  "keywords": [
+    "design",
+    "dashboard",
+    "barrierefrei"
+  ],
+  "author": "",
+  "license": "MIT"
+}
