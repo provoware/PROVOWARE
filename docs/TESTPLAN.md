@@ -3,10 +3,10 @@
 ## L0 – Struktur und Syntax
 
 - erwartete Dateien vorhanden
-- JSON parsebar
-- IDs eindeutig
+- JSON und JSON-Schemata parsebar
 - Projektschema-Zielversion `1.2.0`
-- Projekt-, Berichts- und Speichermodule in korrekter Reihenfolge geladen
+- Projektpaketschema `1.0.0`
+- Projekt-, Transfer-, A11y-, Berichts- und Speichermodule in korrekter Reihenfolge geladen
 - JavaScript syntaktisch gültig
 - keine externen Laufzeitadressen
 
@@ -14,32 +14,45 @@
 python3 scripts/validate.py
 ```
 
-## L1 – Daten-, Speicher-, Berichts- und Mehrprojektvertrag
+## L1 – Reine Verträge
 
-### Mehrprojektverwaltung
+### Projekttransfer
 
-- alte Projekte ohne Lebenszyklusdatensatz gelten als aktiv
-- Projektname besitzt 3 bis 80 Zeichen
-- Projekt-ID ist eindeutig und schemafähig
-- neues Projekt startet mit leerem Antwortobjekt
-- Duplikat erhält neue ID und Revision 1
-- Umbenennen erzeugt eine neue Revision
-- Archiv und Papierkorb werden getrennt vom Projektschema gespeichert
-- archivierte Projekte können nicht direkt geöffnet werden
-- endgültiges Löschen ist nur im Papierkorb möglich
-- exakter Projektname ist Pflicht
-- alle vier IndexedDB-Stores werden bei endgültiger Löschung in einer Transaktion einbezogen
-- Snapshots und Protokolle werden nur für die gewählte Projekt-ID entfernt
-- Projektwechsel wartet auf ausstehende Speicherung
-- nach Archivierung oder Papierkorb des aktuellen Projekts existiert ein aktives Ersatzprojekt
+- Exportpaket enthält Herkunft, Revision, Schema, Katalogversion und Projektstand
+- Paketprüfsumme stimmt mit dem stabil serialisierten Kern überein
+- Dateigröße über zwei MiB wird blockiert
+- ungültiges JSON wird blockiert
+- manipulierte Prüfsumme wird blockiert
+- Legacy-Projekt `1.0.0` oder `1.1.0` wird ausschließlich über die Migrationsmatrix vorbereitet
+- unbekannte Frage-IDs werden blockiert
+- ungültige Antwortwerte werden blockiert
+- vorhandene Projekt-ID wird erkannt
+- Grundfelder sowie gleiche, geänderte, zusätzliche und fehlende Antworten werden verglichen
+- identischer Projektstand bietet keine unnötige Übernahme an
+- bei ID-Kollision ist neue ID die sichere Empfehlung
+- Archiv- und Papierkorbprojekte besitzen keinen Ersetzungsmodus
+- Ersetzen verlangt aktives Projekt, exakten Namen und separates Häkchen
+- Vorher-Sicherung `pre-import-backup` ist im dauerhaften Ablauf vorhanden
+
+### Zugänglichkeit
+
+- alle Hauptdialoge besitzen gültiges `aria-labelledby`
+- Schaltflächen und Formularfelder besitzen zugängliche Namen
+- oberster Dialog wird als Fokusgrenze erkannt
+- Tab und Umschalt+Tab bleiben im Dialog
+- Escape wird zuerst über `cancel` an den obersten Dialog geleitet
+- Auslöser je Dialog wird gespeichert
+- Fokus kehrt nach Schließen zurück
+- Pfeiltasten, Home und Ende werden für markierte Listen verarbeitet
+- automatisierte Grundprüfung erkennt doppelte IDs, fehlende Beschriftungen und positive `tabindex`-Werte
 
 ### Bestehende Verträge
 
+- Mehrprojekt-Lebenszyklus und projektbezogene Löschung
 - Migrationsmatrix `1.0.0 → 1.1.0 → 1.2.0`
 - transaktionale Speicherung und unveränderliche Snapshots
 - Quota- und Abbruchhaken nur im Testmodus
 - gemeinsames Berichtsmodell für vier Renderer
-- formatübergreifende Rückverfolgbarkeit
 
 ```bash
 pytest -q tests/unit tests/integration tests/smoke/test_index.py
@@ -65,27 +78,35 @@ Prüft Desktop und Mobil:
 python3 tests/smoke/run_project_management_smoke.py
 ```
 
+Prüft Desktop und Mobil den vollständigen Projektlebenszyklus von Neuanlage bis sicherer Löschung.
+
+## L2 – Projekttransfer und Zugänglichkeit
+
+```bash
+python3 tests/smoke/run_transfer_accessibility_smoke.py
+```
+
 Prüft Desktop und Mobil:
 
-1. Projektübersicht öffnen.
-2. aktuelles Projekt erkennen.
-3. neues Projekt anlegen.
-4. leeren Antwortstand bestätigen.
-5. Projekt umbenennen und Revision 2 prüfen.
-6. Projekt duplizieren.
-7. neue ID und Revision 1 prüfen.
-8. Bericht dem Duplikat zuordnen.
-9. Projekt archivieren.
-10. Archivprojekt wiederherstellen.
-11. Projekt in Papierkorb verschieben.
-12. falschen Löschname blockieren.
-13. exakten Namen plus Bestätigung verlangen.
-14. Projekt endgültig entfernen.
-15. aktuelles Papierkorbprojekt sicher verlassen.
-16. ursprüngliches unabhängiges Projekt erhalten.
-17. horizontales Überlaufen ausschließen.
+1. automatisierte Barrierefreiheits-Grundprüfung ohne Fehler,
+2. Fokus innerhalb des geöffneten Projektmanagers,
+3. Pfeiltastennavigation zwischen Projektaktionen,
+4. erstes Escape schließt eine Unteraktion,
+5. zweites Escape schließt den Dialog,
+6. Fokus kehrt zum tatsächlichen Auslöser zurück,
+7. Umschalt+Tab bleibt im Transferdialog,
+8. manipulierte Prüfsumme wird sichtbar blockiert,
+9. gültige Projekt-ID-Kollision wird erkannt,
+10. geänderte Antworten und Konfliktzahl werden angezeigt,
+11. neue Projekt-ID ist sichere Standardoption,
+12. Ersetzen bleibt bewusste Alternative,
+13. falscher Bestätigungsname blockiert,
+14. exakter Name plus Häkchen schaltet Ersetzen frei,
+15. neue ID benötigt keine Ersetzungsbestätigung,
+16. geprüfter Import wird als eigenes Projekt geöffnet,
+17. horizontales Überlaufen ist ausgeschlossen.
 
-Jeder Lauf verwendet eindeutige Testprojekt-IDs und bereinigt seine Testprojekte abschließend.
+Der reale Lauf verwendet eindeutige Projekt-IDs und bereinigt importierte Testprojekte. Der eingebettete Fallback verwendet einen funktionsgleichen flüchtigen Persistenzadapter.
 
 ## L2 – Speicherfehlerszenarien
 
@@ -101,23 +122,23 @@ Prüft Quota, Transaktionsabbruch, beschädigte Snapshots und Legacy-Migration.
 python3 scripts/validate.py --browser
 ```
 
-Der Gesamtvalidator führt die drei Browsergruppen in dieser Reihenfolge aus:
+Der Gesamtvalidator führt vier Browsergruppen aus:
 
 1. Workflow, Bericht und Snapshot-Oberfläche
 2. Mehrprojektverwaltung
-3. Speicherfehler und Migration
+3. Projekttransfer und Zugänglichkeit
+4. Speicherfehler und Migration
 
 ## GitHub Actions
 
-Die schnelle CI führt L0 und L1 ohne Browserinstallation aus. Die drei Browsergruppen bleiben getrennte Release-Gates, damit kleine Änderungen nicht durch schwere GUI-Läufe verlangsamt werden.
+Die schnelle CI führt L0 und L1 ohne Browserinstallation aus. Die vier Browsergruppen bleiben getrennte Release-Gates, damit kleine Änderungen nicht durch schwere GUI-Läufe verlangsamt werden.
 
 ## Besonderheit isolierter Prüfumgebungen
 
-Blockiert eine Umgebung lokale Browsernavigation administrativ, verwenden die Runner einen ausdrücklich gemeldeten eingebetteten Adapter. Dieser prüft dieselbe Oberfläche und Lebenszykluslogik, ersetzt aber keine endgültige reale IndexedDB-Abnahme unter Kubuntu.
+Blockiert eine Umgebung lokale Browsernavigation administrativ, verwenden die Runner einen ausdrücklich gemeldeten eingebetteten Adapter. Dieser prüft dieselbe Oberfläche und Fachlogik, ersetzt aber keine endgültige reale IndexedDB- oder Screenreader-Abnahme unter Kubuntu.
 
 ## Noch offen
 
-- reale Kubuntu-Ausführung aller drei Browsergruppen
-- reale Screenreader-Abnahme
-- Projekt-JSON-Export und Import
+- reale Kubuntu-Ausführung aller vier Browsergruppen
+- reale Screenreader-Abnahme mit Orca und ergänzend NVDA oder VoiceOver
 - Ein-Datei-Release-Abnahme
