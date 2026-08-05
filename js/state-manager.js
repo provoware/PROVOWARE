@@ -25,9 +25,7 @@
       };
     }
 
-    getState() {
-      return structuredClone(this.state);
-    }
+    getState() { return structuredClone(this.state); }
 
     update(patch, message = "") {
       this.state = { ...this.state, ...patch };
@@ -39,9 +37,7 @@
       return () => this.listeners.delete(listener);
     }
 
-    setProjectId(projectId) {
-      this.update({ projectId }, "Projektkennung gesetzt.");
-    }
+    setProjectId(projectId) { this.update({ projectId }, "Projektkennung gesetzt."); }
 
     setCatalogs({ questions, rules, templates, prompts, dataMode }) {
       const firstQuestion = questions.questions[0];
@@ -59,15 +55,19 @@
       this.update({ answers: { ...this.state.answers, [questionId]: value } }, "Antwort übernommen.");
     }
 
-    setCurrentQuestion(questionId) {
-      this.update({ currentQuestionId: questionId }, "Frage gewechselt.");
-    }
+    setCurrentQuestion(questionId) { this.update({ currentQuestionId: questionId }, "Frage gewechselt."); }
 
     setTheme(theme) {
       this.update({ theme: theme === "light" ? "light" : "dark" }, "Theme gewechselt.");
     }
 
     restoreProject(payload, metadata = {}) {
+      const source = metadata.source || null;
+      const message = source === "manual-recovery"
+        ? "Snapshot manuell wiederhergestellt."
+        : source === "recovery"
+          ? "Letzter gültiger Snapshot wiederhergestellt."
+          : "Gespeicherter Projektstand geladen.";
       this.update({
         answers: payload.answers || {},
         currentQuestionId: payload.currentQuestionId || this.state.currentQuestionId,
@@ -75,8 +75,8 @@
         projectName: payload.name || this.state.projectName,
         createdAt: payload.createdAt || this.state.createdAt,
         revision: metadata.revision || 0,
-        restoredFrom: metadata.source || null
-      }, metadata.source === "recovery" ? "Letzter gültiger Snapshot wiederhergestellt." : "Gespeicherter Projektstand geladen.");
+        restoredFrom: source
+      }, message);
     }
 
     setStorageStatus(storageStatus, revision = this.state.revision, restoredFrom = this.state.restoredFrom) {
