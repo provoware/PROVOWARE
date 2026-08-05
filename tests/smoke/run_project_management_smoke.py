@@ -18,14 +18,15 @@ ROOT = Path(__file__).resolve().parents[2]
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable")
 SCRIPT_ORDER = [
     "js/migration-engine.js", "js/storage-engine.js", "js/project-repository.js",
-    "js/state-manager.js", "js/workflow-engine.js", "js/rule-engine.js",
-    "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js",
-    "js/project-manager.js", "js/report-manager.js", "js/storage-manager.js",
+    "js/project-transfer.js", "js/state-manager.js", "js/workflow-engine.js",
+    "js/rule-engine.js", "js/validation-engine.js", "js/report-generator.js",
+    "js/ui/app-ui.js", "js/accessibility.js", "js/project-manager.js",
+    "js/project-transfer-manager.js", "js/report-manager.js", "js/storage-manager.js",
     "js/app.js", "tests/smoke/project-management-smoke.js"
 ]
 STYLE_ORDER = [
     "css/variables.css", "css/themes.css", "css/layout.css", "css/components.css",
-    "css/project-manager.css"
+    "css/project-manager.css", "css/project-transfer.css"
 ]
 
 
