@@ -109,4 +109,16 @@
   }
 
   namespace.state = new StateManager();
+
+  function loadTemplateManager() {
+    if (document.querySelector('script[data-provoware-template-manager="true"]')) return;
+    const script = document.createElement("script");
+    script.src = "js/template-manager.js";
+    script.async = false;
+    script.dataset.provowareTemplateManager = "true";
+    script.addEventListener("error", () => console.error("Die lokale Vorlagenverwaltung konnte nicht geladen werden."), { once: true });
+    document.head.append(script);
+  }
+
+  loadTemplateManager();
 })();
