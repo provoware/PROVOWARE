@@ -18,6 +18,33 @@
     for (const id of IDS) elements[id] = document.getElementById(id);
   }
 
+  function installSecurityGuard() {
+    const original = namespace.persistence?.applyImport;
+    if (typeof original !== "function" || original.__provowareGuarded) return;
+    const guarded = async function (candidatePreview, mode) {
+      if (!candidatePreview?.valid || !candidatePreview.checksumValid || candidatePreview.errors?.length) {
+        throw new Error("Der Import wurde nicht durch eine fehlerfreie Sicherheitsvorschau freigegeben.");
+      }
+      if (!candidatePreview.allowedModes?.includes(mode)) {
+        throw new Error("Die gewählte Importart ist für diesen Projektstand nicht freigegeben.");
+      }
+      if (mode === "replace") {
+        if (candidatePreview.existingProject?.lifecycle?.state !== "active") {
+          throw new Error("Nur ein aktives Projekt darf ersetzt werden.");
+        }
+        if (elements["transfer-replace-checkbox"]?.checked !== true) {
+          throw new Error("Die separate Bestätigung für das Ersetzen fehlt.");
+        }
+        if (elements["transfer-replace-name"]?.value !== candidatePreview.existingProject?.name) {
+          throw new Error("Der eingegebene Projektname stimmt nicht exakt mit dem vorhandenen Projekt überein.");
+        }
+      }
+      return original(candidatePreview, mode);
+    };
+    Object.defineProperty(guarded, "__provowareGuarded", { value: true });
+    namespace.persistence.applyImport = guarded;
+  }
+
   function setStatus(message, kind = "info") {
     elements["transfer-status"].textContent = message;
     elements["transfer-status"].dataset.kind = kind;
@@ -94,7 +121,7 @@
         list.append(createListItem(`${answer.questionId}: lokal „${answer.currentLabel}“, Import „${answer.importedLabel}“.`, "warning"));
       }
       for (const answer of preview.comparison.answers.added) {
-        list.append(createListItem(`${answer.questionId}: im Import zusätzlich „${answer.importedLabel}“.`, "success"));
+        list.append(createListItem(`${answer.questionId}: im Import zusätzlich „${answer.importedLabel || String(answer.importedValue)}“.`, "success"));
       }
       for (const answer of preview.comparison.answers.missing) {
         list.append(createListItem(`${answer.questionId}: nur lokal vorhanden „${answer.currentLabel}“.`, "warning"));
@@ -238,6 +265,7 @@
 
   function initialize() {
     cacheElements();
+    installSecurityGuard();
     elements["project-transfer-button"].addEventListener("click", openManager);
     elements["transfer-close-button"].addEventListener("click", closeManager);
     elements["transfer-export-button"].addEventListener("click", exportCurrent);
