@@ -5,7 +5,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def test_index_contains_accessible_core_regions():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
-    for marker in ("<header", "<main", "<nav", "<section", "<aside", "<footer", 'aria-live="polite"'):
+    for marker in (
+        "<header", "<main", "<nav", "<section", "<aside", "<footer", "<dialog",
+        'aria-live="polite"', 'id="storage-manager-button"', 'id="snapshot-confirm"'
+    ):
         assert marker in html
 
 
