@@ -20,6 +20,7 @@ PROVOWARE/
 │   └── themes.css
 ├── js/
 │   ├── app.js
+│   ├── migration-engine.js
 │   ├── storage-engine.js
 │   ├── storage-manager.js
 │   ├── state-manager.js
@@ -40,13 +41,21 @@ PROVOWARE/
 ├── tests/
 │   ├── unit/
 │   │   ├── test_catalogs.py
-│   │   └── test_storage_contract.py
+│   │   ├── test_storage_contract.py
+│   │   ├── test_migration_matrix.py
+│   │   └── test_storage_failures.py
 │   ├── integration/test_structure.py
 │   ├── smoke/
 │   │   ├── test_index.py
 │   │   ├── browser-smoke.js
-│   │   └── run_browser_smoke.py
-│   └── fixtures/project-valid.json
+│   │   ├── run_browser_smoke.py
+│   │   ├── failure-harness.html
+│   │   ├── storage-failure-smoke.js
+│   │   └── run_storage_failure_smoke.py
+│   └── fixtures/
+│       ├── project-v1.0.0.json
+│       ├── project-v1.1.0.json
+│       └── project-valid.json
 ├── scripts/
 │   ├── build.py
 │   ├── validate.py
@@ -61,21 +70,22 @@ PROVOWARE/
 
 ## Verantwortlichkeiten
 
-- `storage-engine.js`: einzige Schicht für IndexedDB, Revisionen, Prüfsummen, Snapshots, Aufbewahrung und Wiederherstellung
+- `migration-engine.js`: reine, schrittweise und testbare Projektschema-Matrix ohne IndexedDB-Zugriffe
+- `storage-engine.js`: einzige Schicht für IndexedDB, Transaktionen, Revisionen, Prüfsummen, Migration, Aufbewahrung und Wiederherstellung
 - `storage-manager.js`: grafische Liste, Vorschau, Bestätigung und Benutzeraktionen ohne direkte Datenbanktransaktionen
 - `state-manager.js`: laufender Anwendungszustand ohne direkte Datenbankzugriffe
-- `app.js`: koordiniert Autospeicherung, Aufbewahrung und Übergabe zwischen Zustand und Speicher
-- `browser-smoke.js`: praktische Oberflächenabnahme einschließlich Speicherverwaltung
-- `run_browser_smoke.py`: Desktop-/Mobil-Runner mit realem Modus und klar gemeldetem Fallback
+- `app.js`: koordiniert Autospeicherung, Migration, Aufbewahrung und Übergabe zwischen Zustand und Speicher
+- `storage-failure-smoke.js`: reproduzierbare Quota-, Abbruch-, Korruptions- und Legacy-Szenarien
 
 ## Regeln
 
 1. Keine Fachlogik direkt in `index.html`, sofern sie als Modul testbar ist.
-2. Die Storage-Engine ist allein für IndexedDB-Transaktionen verantwortlich.
-3. Snapshots werden unveränderlich mit `add` angelegt.
-4. Eine Wiederherstellung erzeugt immer eine neue Revision.
-5. Die Aufbewahrung darf den letzten gültigen Sicherheitsstand nicht löschen.
-6. Generierte Dateien nie manuell pflegen.
-7. Datenkataloge und Schemata benötigen eindeutige IDs und Versionsnummern.
-8. Browser-Smoke-Tests verwenden eindeutige Testprojekt-IDs.
-9. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
+2. Jede Projektschema-Version benötigt einen expliziten Einzelschritt zur direkt folgenden Version.
+3. Migrationen dürfen keinen unkontrollierten Direktsprung verwenden.
+4. Die Storage-Engine ist allein für IndexedDB-Transaktionen verantwortlich.
+5. Legacy-Originale werden nicht überschrieben; migrierte Stände entstehen als neue Revisionen.
+6. Hauptstand, Sicherung, migrierte Snapshots, Metadaten und Protokolle müssen atomar geschrieben werden.
+7. Snapshots werden unveränderlich mit `add` angelegt.
+8. Eine Wiederherstellung erzeugt immer eine neue Revision.
+9. Fehlerinjektion ist nur mit `window.__PROVOWARE_TESTING__ === true` zulässig.
+10. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
