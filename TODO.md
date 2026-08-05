@@ -21,7 +21,7 @@
 - [x] Mehrprojektverwaltung mit Übersicht, Wechsel, Archiv und Papierkorb ergänzen.
 - [x] Sicheren Projekt-JSON-Export, reine Importvorschau und Konfliktbehandlung entwickeln.
 - [x] Dialog-, Fokus-, Escape- und Pfeiltastennavigation mit automatisierter Grundprüfung härten.
-- [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
+- [x] Datengetriebene Projektvorlagen und lokale Profilverwaltung mit vollständiger Vorschau ergänzen.
 - [ ] Reale Screenreader-Abnahme mit Orca und ergänzend NVDA oder VoiceOver durchführen.
 
 ## P2 – Qualität und Release
@@ -33,6 +33,7 @@
 - [x] Sicherheits- und Barrierefreiheits-Grundprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
 - [x] SHA-256-Buildmanifest vorbereiten.
+- [ ] Kryptografischen SHA-256-Fingerabdruck und optional signierbares Projektpaket-Manifest ergänzen.
 - [ ] Ein-Datei-Build und finale Release-Checkliste erstellen.
 
 ## Abnahmeregel
