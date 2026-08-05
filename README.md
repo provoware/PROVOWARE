@@ -2,9 +2,9 @@
 
 ## Projektstatus
 
-Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow, versionierter IndexedDB, grafischer Speicherverwaltung und schrittweiser Projektschema-Migration.
+Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow, versionierter IndexedDB, grafischer Speicherverwaltung, schrittweiser Projektschema-Migration und einem formatneutralen Berichtsgenerator.
 
-**Version:** 0.5.0  
+**Version:** 0.6.0  
 **Phase:** belastbarer P1-Prototyp  
 **Zielplattform:** aktuelle Chromium- und Firefox-Browser unter Linux
 
@@ -30,14 +30,45 @@ Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-K
 - helles und dunkles Theme
 - versionierte IndexedDB mit vier getrennten Stores
 - transaktionales Speichern von Hauptstand, Snapshot, Metadaten und Protokolleintrag
-- unveränderliche Snapshots mit fortlaufender Revision und Prüfsumme
-- automatischer Rückfall auf den jüngsten gültigen Snapshot
-- grafische Snapshot-Liste, JSON-Vorschau und kontrollierte Wiederherstellung
-- konfigurierbare Aufbewahrungsgrenze von 5 bis 200 Snapshots
-- Schutz des letzten gültigen Sicherheitsstands
-- schrittweise Migration von Projektschema `1.0.0` und `1.1.0` auf `1.2.0`
-- Vorher-Sicherung und Migrationsprotokoll innerhalb derselben Transaktion
+- unveränderliche Snapshots mit Prüfsumme und automatischem Rückfall
+- grafische Snapshot-Liste, Vorschau und kontrollierte Wiederherstellung
+- Aufbewahrungsgrenze von 5 bis 200 Snapshots mit Schutz des letzten gültigen Sicherheitsstands
+- schrittweise Migration `1.0.0 → 1.1.0 → 1.2.0`
+- Vorher-Sicherung und Migrationsprotokoll in derselben Transaktion
 - reproduzierbare Quota-, Abbruch- und beschädigte-Snapshot-Szenarien
+- gemeinsames Berichtsmodell mit Anforderungen, Architektur, Risiken, Tests, Abnahme, Meilensteinen und offenen Entscheidungen
+- Berichtexport als Markdown, eigenständiges Offline-HTML, TXT und JSON
+- schnelle GitHub-Actions-CI für Struktur, Schemata, Unit-Tests und JavaScript-Syntax
+
+## Berichtsmodell
+
+Über **„Bericht prüfen und exportieren“** wird aus dem aktuellen Projektstand ein einziges formatneutrales Modell erzeugt.
+
+Enthalten sind:
+
+- Projektbeschreibung und Status
+- bestätigte Entscheidungen
+- Anforderungen mit eindeutigen IDs
+- Architekturprinzipien, Komponenten und Datenfluss
+- Konflikte und offene Pflichtentscheidungen als Risiken
+- Normal- und Fehlerfalltests je Anforderung
+- Abnahmekriterien
+- Meilensteine
+- offene Entscheidungen
+- Rückverfolgbarkeit von Frage zu Anforderung, Test und Abnahme
+
+Alle vier Ausgabeformate verwenden exakt dieses Modell. Dadurch können Kennungen und Inhalte nicht unabhängig voneinander auseinanderlaufen.
+
+### Exportformate
+
+| Format | Zweck |
+|---|---|
+| Markdown | Weiterbearbeitung in GitHub, Typora oder Dokumentationen |
+| Offline-HTML | eigenständig öffnbarer, druckbarer Bericht ohne externe Ressourcen |
+| TXT | kompakte universelle Textfassung |
+| JSON | maschinenlesbares Berichtsmodell für spätere Werkzeuge |
+
+Vor jedem Export wird das Modell neu erzeugt und validiert. Unvollständige Projekte dürfen exportiert werden, bleiben aber eindeutig als `incomplete` oder bei kritischem Konflikt als `blocked` markiert.
 
 ## Migrationsmatrix
 
@@ -47,37 +78,7 @@ Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-K
 | `1.1.0` | Fragenkatalogversion und Validierungszeitpunkt ergänzen | `1.2.0` |
 | `1.2.0` | keine Änderung | `1.2.0` |
 
-Direktsprünge werden nicht verwendet. Jeder Schritt wird einzeln ausgeführt und protokolliert.
-
-Vor der Nutzung eines älteren Hauptstands geschieht innerhalb einer einzigen IndexedDB-Transaktion:
-
-1. unveränderte Vorher-Sicherung anlegen,
-2. vorhandene Legacy-Snapshots als Original erhalten,
-3. migrierte Snapshot-Kopien erzeugen,
-4. neuen Hauptstand mit Schema `1.2.0` schreiben,
-5. Metadaten und jeden Migrationsschritt protokollieren.
-
-Scheitert ein Teil, wird die gesamte Transaktion zurückgerollt.
-
-## Projektschema 1.2.0
-
-Neu verbindlich sind:
-
-- `questionCatalogVersion`
-- `lastValidatedAt`
-
-Damit bleibt nachvollziehbar, gegen welchen Fragenkatalog ein Projekt zuletzt geprüft wurde.
-
-## Fehler- und Rückfalltests
-
-Der separate Speicherfehlertest simuliert auf normalen Browsern:
-
-- `QuotaExceededError` vor dem Schreiben,
-- Transaktionsabbruch nach dem Schreiben des Hauptstands,
-- mehrere beschädigte neuere Snapshots,
-- Migration eines `1.1.0`-Hauptstands mit `1.0.0`- und `1.1.0`-Snapshots.
-
-Bei Quota und Abbruch müssen Revision und Snapshotanzahl unverändert bleiben. Originale Legacy-Snapshots dürfen durch Migrationen nicht überschrieben werden.
+Direktsprünge werden nicht verwendet. Legacy-Originale bleiben erhalten; migrierte Kopien, Hauptstand, Metadaten und Protokolle werden transaktional geschrieben.
 
 ## Prüfungen
 
@@ -95,12 +96,27 @@ Komplett einschließlich beider Browser-Smoke-Gruppen:
 python3 scripts/validate.py --browser
 ```
 
-Blockiert eine isolierte Umgebung lokale Navigation administrativ, melden die Runner dies ausdrücklich und führen einen eingebetteten Logik-/UI-Fallback aus. Dieser ersetzt keine spätere reale IndexedDB-Abnahme auf einem normalen Kubuntu-System.
+Der Haupt-Smoke prüft zusätzlich Berichtsmodell, sechs abgeleitete Anforderungen, zwölf Testfälle, Konfliktrisiko, Rückverfolgbarkeit sowie Markdown-, HTML- und JSON-Vorschau auf Desktop und Mobil.
+
+## GitHub Actions
+
+`.github/workflows/ci.yml` läuft bei Pushes und Pull Requests auf `main` sowie manuell.
+
+Automatisch geprüft werden:
+
+- Projektstruktur und Dateipfade
+- JSON-Schemata
+- Migrationsmatrix
+- Speicher- und Berichtsverträge
+- Unit- und Integrationsprüfungen
+- JavaScript-Syntax
+
+Browser-, Quota- und echte IndexedDB-Tests bleiben bewusst getrennte Release-Gates, damit die schnelle CI konstruktiv und zuverlässig bleibt.
 
 ## Datenschutz und Offline-Betrieb
 
-Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände bleiben lokal im Browser. Browserdaten können durch manuelle Browserbereinigung verloren gehen; ein geprüfter JSON-Export folgt in einer späteren Iteration.
+Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände und erzeugte Berichte bleiben lokal im Browser. Das exportierte HTML enthält ausschließlich eingebettetes CSS und keine externen Laufzeitressourcen.
 
 ## Nächster Schritt
 
-Den Berichtsgenerator auf ein gemeinsames Berichtsmodell umstellen und vollständige Ausgaben als Markdown, eigenständiges HTML, TXT und JSON erzeugen.
+Eine echte Projektverwaltung mit mehreren Projekten, Projektübersicht, Umbenennen, Duplizieren, Archiv, Papierkorb und sicherem JSON-Import entwickeln.
