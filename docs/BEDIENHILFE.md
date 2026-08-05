@@ -16,6 +16,31 @@ Alternativ kann `index.html` direkt geöffnet werden. Dann kann der Browser getr
 - „Empfehlung übernehmen“ setzt den empfohlenen Wert.
 - Rechts erscheinen Entscheidungen, Hinweise und die Planvorschau.
 
+## Bericht prüfen und exportieren
+
+1. Rechts auf **„Bericht prüfen und exportieren“** klicken.
+2. Oben den Projektstatus und die Zahlen zu Anforderungen, Risiken, Tests und offenen Entscheidungen ansehen.
+3. Unter **„Vorschauformat“** Markdown, Offline-HTML, Text oder JSON auswählen.
+4. Die Vorschau kontrollieren.
+5. Das gewünschte Format herunterladen.
+
+Vor jedem Download wird der Bericht neu aus dem aktuellen Projektstand erzeugt und geprüft.
+
+### Status im Bericht
+
+- **complete:** alle Fragen beantwortet und kein kritischer Konflikt aktiv
+- **incomplete:** mindestens eine Entscheidung ist noch offen
+- **blocked:** mindestens ein kritischer Konflikt ist aktiv
+
+Ein unvollständiger oder blockierter Bericht darf bewusst exportiert werden. Offene Punkte und Risiken bleiben darin sichtbar und werden nicht versteckt.
+
+### Welches Format ist sinnvoll?
+
+- **Markdown:** für GitHub, Typora und weitere Bearbeitung
+- **Offline-HTML:** zum Öffnen, Lesen und Drucken ohne Internet
+- **TXT:** für einfache Textprogramme und universellen Austausch
+- **JSON:** für spätere Werkzeuge, automatische Verarbeitung und Datenprüfung
+
 ## Speicherstände verwalten
 
 1. Rechts auf **„Speicherstände verwalten“** klicken.
@@ -49,9 +74,9 @@ Nach **„Grenze anwenden“** werden ältere Überschüsse entfernt. Der jüngs
 
 - Tab und Umschalt+Tab wechseln Bedienelemente.
 - Enter oder Leertaste aktiviert Schaltflächen und Auswahlfelder.
-- Escape schließt die Speicherverwaltung.
+- Escape schließt Bericht oder Speicherverwaltung.
 - Nach dem Schließen kehrt der Fokus zur öffnenden Schaltfläche zurück.
 
 ## Datenschutz
 
-Alle Projektstände bleiben lokal in IndexedDB. Eine manuelle Browserdaten-Bereinigung kann sie löschen. Ein unabhängiger JSON-Sicherungsexport ist noch offen.
+Projektstände bleiben lokal in IndexedDB. Berichte werden lokal im Browser erzeugt. Das Offline-HTML enthält keine externen Dateien oder Netzverbindungen. Eine manuelle Browserdaten-Bereinigung kann gespeicherte Projekte löschen; ein unabhängiger Projekt-JSON-Import und Wiederimport ist noch offen.
