@@ -45,16 +45,20 @@
     const payload = namespace.storage.createPayload(namespace.state.getState());
     let snapshots = [syntheticSnapshot(3, payload, "autosave"), syntheticSnapshot(2, payload)];
     let restored = false;
+    let retentionLimit = 30;
     namespace.persistence.getStorageOverview = async () => ({
       diagnostics: { project: { revision: 3 }, recoveryCount: restored ? 1 : 0 },
       snapshots,
-      retentionLimit: 30
+      retentionLimit
     });
     namespace.persistence.createSnapshot = async () => {
       snapshots = [syntheticSnapshot(4, payload), ...snapshots];
       return { revision: 4 };
     };
-    namespace.persistence.setRetention = async value => ({ limit: Number(value), deleted: 0, retained: snapshots.length });
+    namespace.persistence.setRetention = async value => {
+      retentionLimit = Number(value);
+      return { limit: retentionLimit, deleted: 0, retained: snapshots.length };
+    };
     namespace.persistence.restoreSnapshot = async snapshotId => {
       const snapshot = snapshots.find(item => item.snapshotId === snapshotId);
       restored = true;
