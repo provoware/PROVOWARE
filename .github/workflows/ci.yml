@@ -1,0 +1,63 @@
+name: Schnelle Qualitätsprüfung
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quick-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Struktur, Schemata und Unit-Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Node.js 20 einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Entwicklungsabhängigkeiten installieren
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Struktur, JSON-Schemata und Offline-Vertrag prüfen
+        run: python scripts/validate.py
+
+      - name: Migrationsmatrix, Speicher- und Berichtsverträge prüfen
+        run: python -m pytest -q tests/unit tests/integration tests/smoke/test_index.py
+
+      - name: JavaScript-Syntax separat bestätigen
+        shell: bash
+        run: find js tests/smoke -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Prüfergebnis zusammenfassen
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Schnelle Qualitätsprüfung'
+            echo
+            echo '- Struktur und JSON-Schemata'
+            echo '- Migrationsmatrix und Unit-Tests'
+            echo '- JavaScript-Syntax'
+            echo
+            echo 'Browser-, Quota- und echte IndexedDB-Tests sind bewusst separate Release-Gates.'
+          } >> "$GITHUB_STEP_SUMMARY"
