@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.1.0",
+  "projectId": "migration-demo",
+  "name": "Migration Demo",
+  "answers": {
+    "platform.offline": "yes",
+    "data.storage": "local"
+  },
+  "currentQuestionId": "data.storage",
+  "theme": "dark",
+  "createdAt": "2026-08-01T00:00:00Z",
+  "updatedAt": "2026-08-02T00:00:00Z"
+}
