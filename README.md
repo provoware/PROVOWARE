@@ -2,9 +2,9 @@
 
 ## Projektstatus
 
-Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow, versionierter IndexedDB und grafischer Speicherverwaltung.
+Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow, versionierter IndexedDB, grafischer Speicherverwaltung und schrittweiser Projektschema-Migration.
 
-**Version:** 0.4.0  
+**Version:** 0.5.0  
 **Phase:** belastbarer P1-Prototyp  
 **Zielplattform:** aktuelle Chromium- und Firefox-Browser unter Linux
 
@@ -18,7 +18,7 @@ python3 -m http.server 8080
 
 Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-Kataloge und erlaubt reguläre IndexedDB-Speicherung.
 
-### Direkt öffnen
+### Direkter Start
 
 `index.html` kann per Doppelklick geöffnet werden. Blockiert der Browser getrennte JSON-Dateien unter `file://`, verwendet die Oberfläche sichtbar den eingebauten Beispieldatensatz. Es werden keine Daten ins Internet übertragen.
 
@@ -32,44 +32,52 @@ Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-K
 - transaktionales Speichern von Hauptstand, Snapshot, Metadaten und Protokolleintrag
 - unveränderliche Snapshots mit fortlaufender Revision und Prüfsumme
 - automatischer Rückfall auf den jüngsten gültigen Snapshot
-- grafische Liste aller Snapshots mit Revision, Zeitpunkt, Speichergrund und Prüfergebnis
-- JSON-Vorschau vor jeder manuellen Wiederherstellung
-- Wiederherstellung erst nach ausdrücklicher Bestätigung und immer als neue Revision
-- manueller Sicherheitsstand auf Knopfdruck
+- grafische Snapshot-Liste, JSON-Vorschau und kontrollierte Wiederherstellung
 - konfigurierbare Aufbewahrungsgrenze von 5 bis 200 Snapshots
-- Schutz des letzten gültigen Sicherheitsstands bei der Bereinigung
+- Schutz des letzten gültigen Sicherheitsstands
+- schrittweise Migration von Projektschema `1.0.0` und `1.1.0` auf `1.2.0`
+- Vorher-Sicherung und Migrationsprotokoll innerhalb derselben Transaktion
+- reproduzierbare Quota-, Abbruch- und beschädigte-Snapshot-Szenarien
 
-## Speicherverwaltung
+## Migrationsmatrix
 
-Über **„Speicherstände verwalten“** öffnet sich ein modaler Arbeitsbereich.
+| Ausgang | Schritt | Ergebnis |
+|---|---|---|
+| `1.0.0` | Standardtheme, aktuelle Frage und Zeitstempel normalisieren | `1.1.0` |
+| `1.1.0` | Fragenkatalogversion und Validierungszeitpunkt ergänzen | `1.2.0` |
+| `1.2.0` | keine Änderung | `1.2.0` |
 
-1. Snapshot auswählen.
-2. Revision, Zeitpunkt, Speichergrund und Gültigkeit prüfen.
-3. Gespeicherte Antworten und Einstellungen in der Vorschau kontrollieren.
-4. Bestätigungsfeld aktivieren.
-5. Snapshot als neue Revision wiederherstellen.
+Direktsprünge werden nicht verwendet. Jeder Schritt wird einzeln ausgeführt und protokolliert.
 
-Die ursprüngliche Revision bleibt unverändert erhalten. Eine Wiederherstellung überschreibt keinen historischen Snapshot.
+Vor der Nutzung eines älteren Hauptstands geschieht innerhalb einer einzigen IndexedDB-Transaktion:
 
-## Aufbewahrungsregel
+1. unveränderte Vorher-Sicherung anlegen,
+2. vorhandene Legacy-Snapshots als Original erhalten,
+3. migrierte Snapshot-Kopien erzeugen,
+4. neuen Hauptstand mit Schema `1.2.0` schreiben,
+5. Metadaten und jeden Migrationsschritt protokollieren.
 
-Die Standardgrenze beträgt 30 Snapshots. Zulässig sind 5 bis 200.
+Scheitert ein Teil, wird die gesamte Transaktion zurückgerollt.
 
-Beim Aufräumen bleiben erhalten:
+## Projektschema 1.2.0
 
-- die neuesten Revisionen innerhalb der Grenze,
-- zusätzlich zwingend der jüngste gültige Sicherheitsstand.
+Neu verbindlich sind:
 
-Ist dieser Sicherheitsstand älter als die normale Grenze, ersetzt er den ältesten regulären Platz. Die Grenze wird dadurch nicht überschritten.
+- `questionCatalogVersion`
+- `lastValidatedAt`
 
-## IndexedDB-Struktur
+Damit bleibt nachvollziehbar, gegen welchen Fragenkatalog ein Projekt zuletzt geprüft wurde.
 
-| Store | Zweck |
-|---|---|
-| `projects` | aktueller Projektstand |
-| `snapshots` | unveränderliche Revisionsstände |
-| `meta` | Schema-, Revisions-, Aufbewahrungs- und Speicherinformationen |
-| `migrationLog` | Upgrades, Speicherungen, Wiederherstellungen und Bereinigungen |
+## Fehler- und Rückfalltests
+
+Der separate Speicherfehlertest simuliert auf normalen Browsern:
+
+- `QuotaExceededError` vor dem Schreiben,
+- Transaktionsabbruch nach dem Schreiben des Hauptstands,
+- mehrere beschädigte neuere Snapshots,
+- Migration eines `1.1.0`-Hauptstands mit `1.0.0`- und `1.1.0`-Snapshots.
+
+Bei Quota und Abbruch müssen Revision und Snapshotanzahl unverändert bleiben. Originale Legacy-Snapshots dürfen durch Migrationen nicht überschrieben werden.
 
 ## Prüfungen
 
@@ -78,15 +86,16 @@ python3 -m pip install -r requirements.txt
 python3 scripts/validate.py
 pytest -q
 python3 tests/smoke/run_browser_smoke.py
+python3 tests/smoke/run_storage_failure_smoke.py
 ```
 
-Komplett einschließlich Browser-Smoke:
+Komplett einschließlich beider Browser-Smoke-Gruppen:
 
 ```bash
 python3 scripts/validate.py --browser
 ```
 
-Der Browser-Smoke prüft zusätzlich Snapshot-Liste, Vorschau, Bestätigung, Wiederherstellung und Aufbewahrungsgrenze auf Desktop und Mobil. Blockiert eine isolierte Umgebung lokale Navigation administrativ, wird ein ausdrücklich gemeldeter eingebetteter UI-Fallback ausgeführt.
+Blockiert eine isolierte Umgebung lokale Navigation administrativ, melden die Runner dies ausdrücklich und führen einen eingebetteten Logik-/UI-Fallback aus. Dieser ersetzt keine spätere reale IndexedDB-Abnahme auf einem normalen Kubuntu-System.
 
 ## Datenschutz und Offline-Betrieb
 
@@ -94,4 +103,4 @@ Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände 
 
 ## Nächster Schritt
 
-Eine echte Migrationsmatrix für mehrere Projektschemata und reproduzierbare Fehlerfälle ergänzen. Danach folgt der vollständige Berichtsgenerator für Markdown, HTML, TXT und JSON.
+Den Berichtsgenerator auf ein gemeinsames Berichtsmodell umstellen und vollständige Ausgaben als Markdown, eigenständiges HTML, TXT und JSON erzeugen.
