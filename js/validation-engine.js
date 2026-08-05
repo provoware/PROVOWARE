@@ -19,11 +19,16 @@
     return errors;
   }
 
+  function isIsoDateTime(value) {
+    return typeof value === "string" && Number.isFinite(Date.parse(value));
+  }
+
   function validateStoredProject(payload, catalog) {
     const errors = [];
     if (!payload || typeof payload !== "object" || Array.isArray(payload)) return ["Der Projektstand ist kein gültiges Objekt."];
-    if (payload.schemaVersion !== "1.1.0") errors.push("Die Projektschema-Version wird nicht unterstützt.");
+    if (payload.schemaVersion !== "1.2.0") errors.push("Die Projektschema-Version wird nicht unterstützt.");
     if (typeof payload.projectId !== "string" || !/^[a-z0-9][a-z0-9._-]{2,63}$/.test(payload.projectId)) errors.push("Die Projekt-ID ist ungültig.");
+    if (typeof payload.name !== "string" || !payload.name.trim()) errors.push("Der Projektname fehlt.");
     if (!payload.answers || typeof payload.answers !== "object" || Array.isArray(payload.answers)) errors.push("Die Antworten besitzen kein gültiges Objektformat.");
     const questions = new Map((catalog?.questions || []).map(question => [question.id, question]));
     for (const [questionId, value] of Object.entries(payload.answers || {})) {
@@ -36,6 +41,10 @@
     }
     if (payload.currentQuestionId !== null && payload.currentQuestionId !== undefined && !questions.has(payload.currentQuestionId)) errors.push("Die aktuelle Frage existiert nicht im Fragenkatalog.");
     if (!["dark", "light"].includes(payload.theme)) errors.push("Das gespeicherte Theme ist ungültig.");
+    if (typeof payload.questionCatalogVersion !== "string" || !payload.questionCatalogVersion) errors.push("Die Fragenkatalogversion fehlt.");
+    if (!isIsoDateTime(payload.createdAt) || !isIsoDateTime(payload.updatedAt) || !isIsoDateTime(payload.lastValidatedAt)) {
+      errors.push("Mindestens ein Zeitstempel ist ungültig.");
+    }
     return errors;
   }
 
