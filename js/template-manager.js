@@ -25,8 +25,22 @@
     });
   }
 
+  function loadStyle(relativePath, marker) {
+    if (document.querySelector(`link[data-template-style="${marker}"]`)) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = new URL(relativePath, base).href;
+      link.dataset.templateStyle = marker;
+      link.addEventListener("load", resolve, { once: true });
+      link.addEventListener("error", () => reject(new Error(`${relativePath} konnte nicht geladen werden.`)), { once: true });
+      document.head.append(link);
+    });
+  }
+
   async function start() {
     try {
+      await loadStyle("../css/template-manager.css", "main");
       for (const [index, modulePath] of DATA_MODULES.entries()) await load(modulePath, `catalog-${index + 1}`);
       await load("template-core.js", "core");
       await load("template-catalog-adapter.js", "catalog-adapter");
