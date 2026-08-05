@@ -10,16 +10,20 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/project-manager.css">
+  <link rel="stylesheet" href="css/project-transfer.css">
   <script defer src="js/migration-engine.js"></script>
   <script defer src="js/storage-engine.js"></script>
   <script defer src="js/project-repository.js"></script>
+  <script defer src="js/project-transfer.js"></script>
   <script defer src="js/state-manager.js"></script>
   <script defer src="js/workflow-engine.js"></script>
   <script defer src="js/rule-engine.js"></script>
   <script defer src="js/validation-engine.js"></script>
   <script defer src="js/report-generator.js"></script>
   <script defer src="js/ui/app-ui.js"></script>
+  <script defer src="js/accessibility.js"></script>
   <script defer src="js/project-manager.js"></script>
+  <script defer src="js/project-transfer-manager.js"></script>
   <script defer src="js/report-manager.js"></script>
   <script defer src="js/storage-manager.js"></script>
   <script defer src="js/app.js"></script>
@@ -29,7 +33,7 @@
 
   <header class="app-header">
     <div>
-      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.7.0</p>
+      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.8.0</p>
       <h1>Entwicklungsplan-Assistent</h1>
       <p class="subtitle">Schritt für Schritt von der Idee zum prüfbaren Plan.</p>
     </div>
@@ -80,6 +84,7 @@
         <div><dt>Hinweise</dt><dd id="rule-count">0</dd></div>
       </dl>
       <button id="project-manager-button" type="button" class="button button-primary button-wide" title="Projekte anlegen, wechseln, archivieren und wiederherstellen">Projekte verwalten</button>
+      <button id="project-transfer-button" type="button" class="button button-secondary button-wide" title="Aktuelles Projekt als geprüftes JSON sichern oder eine Projektdatei vor dem Import kontrollieren">Projekt sichern oder importieren</button>
       <button id="report-manager-button" type="button" class="button button-secondary button-wide">Bericht prüfen und exportieren</button>
       <button id="storage-manager-button" type="button" class="button button-secondary button-wide">Speicherstände verwalten</button>
       <section aria-labelledby="decision-title"><h3 id="decision-title">Entscheidungen</h3><ul id="decision-list" class="summary-list"></ul></section>
@@ -133,7 +138,7 @@
         <div><dt>Papierkorb</dt><dd id="project-trash-count">0</dd></div>
       </dl>
 
-      <ul id="project-list" class="project-list" aria-label="Gespeicherte Projekte"></ul>
+      <ul id="project-list" class="project-list" aria-label="Gespeicherte Projekte" data-arrow-navigation="vertical"></ul>
 
       <section id="project-action-panel" class="project-action-panel" aria-labelledby="project-action-title" hidden>
         <div>
@@ -148,13 +153,87 @@
           <input id="project-action-checkbox" type="checkbox">
           <span>Ich bestätige, dass das Projekt einschließlich aller Snapshots, Metadaten und Protokolle endgültig gelöscht werden darf.</span>
         </label>
-        <div class="project-action-actions">
+        <div class="project-action-actions" data-arrow-navigation="horizontal">
           <button id="project-action-confirm" type="button" class="button button-primary" disabled>Aktion ausführen</button>
           <button id="project-action-cancel" type="button" class="button button-secondary">Abbrechen</button>
         </div>
       </section>
 
       <p id="project-manager-status" class="dialog-status" role="status" aria-live="polite">Projektverwaltung bereit.</p>
+    </div>
+  </dialog>
+
+  <dialog id="transfer-dialog" class="storage-dialog" aria-labelledby="transfer-dialog-title">
+    <div class="dialog-shell">
+      <header class="dialog-header">
+        <div>
+          <p class="eyebrow">Lokale Projektsicherung</p>
+          <h2 id="transfer-dialog-title">Projekt sichern oder importieren</h2>
+          <p id="transfer-dialog-help" class="subtitle">Ein Import schreibt niemals sofort. Paket, Prüfsumme, Schema, Projekt-ID, Fragen und Antworten werden zuerst vollständig angezeigt.</p>
+        </div>
+        <button id="transfer-close-button" type="button" class="button button-secondary" aria-label="Projekttransfer schließen">Schließen</button>
+      </header>
+
+      <section class="transfer-toolbar" aria-label="Projekt exportieren oder Importdatei auswählen">
+        <button id="transfer-export-button" type="button" class="button button-primary" data-initial-focus>Aktuelles Projekt als JSON sichern</button>
+        <label class="transfer-file-control" for="transfer-file">
+          <span>PROVOWARE-Projektdatei auswählen</span>
+          <input id="transfer-file" type="file" accept="application/json,.json" aria-describedby="transfer-file-help">
+          <small id="transfer-file-help">Maximal zwei MiB. Die Datei wird zunächst ausschließlich lokal gelesen.</small>
+        </label>
+        <button id="transfer-reset-button" type="button" class="button button-secondary">Auswahl zurücksetzen</button>
+      </section>
+
+      <p id="transfer-empty" class="empty-state">Wähle eine PROVOWARE-Projektdatei aus. Die Datei wird zunächst ausschließlich gelesen und geprüft.</p>
+
+      <div id="transfer-preview" hidden>
+        <dl class="storage-stats">
+          <div><dt>Paketschema</dt><dd id="transfer-package-version">–</dd></div>
+          <div><dt>Prüfsumme</dt><dd><span id="transfer-checksum-status" class="badge badge-neutral">nicht geprüft</span></dd></div>
+          <div><dt>Projektschema</dt><dd id="transfer-schema-status">–</dd></div>
+          <div><dt>Projekt-ID</dt><dd id="transfer-project-id">–</dd></div>
+          <div><dt>Lokal vorhanden</dt><dd id="transfer-existing-status">–</dd></div>
+          <div><dt>Konflikte</dt><dd id="transfer-conflict-count">0</dd></div>
+        </dl>
+
+        <div class="transfer-grid">
+          <section class="transfer-checks" aria-labelledby="transfer-checks-title">
+            <h3 id="transfer-checks-title">Sicherheits- und Datenprüfung</h3>
+            <ul id="transfer-error-list" class="transfer-list"></ul>
+          </section>
+          <section class="transfer-differences" aria-labelledby="transfer-differences-title">
+            <h3 id="transfer-differences-title">Änderungen gegenüber lokalem Projekt</h3>
+            <ul id="transfer-change-list" class="transfer-list"></ul>
+          </section>
+        </div>
+
+        <section class="transfer-mode-panel" aria-labelledby="transfer-mode-title">
+          <h3 id="transfer-mode-title">Übernahmeart</h3>
+          <label class="transfer-mode-control" for="transfer-mode">
+            <span>Importart auswählen</span>
+            <select id="transfer-mode" disabled>
+              <option value="">Zuerst Datei prüfen</option>
+            </select>
+          </label>
+          <p id="transfer-mode-help" class="subtitle"></p>
+
+          <div id="transfer-replace-confirmation" class="transfer-confirmation" hidden>
+            <label class="transfer-confirmation-field" for="transfer-replace-name">
+              <span>Vorhandenen Projektnamen exakt eingeben</span>
+              <input id="transfer-replace-name" type="text" maxlength="80" autocomplete="off">
+            </label>
+            <label>
+              <input id="transfer-replace-checkbox" type="checkbox">
+              <span>Ich bestätige das Ersetzen nach Anlage einer unveränderten Vorher-Sicherung.</span>
+            </label>
+          </div>
+
+          <button id="transfer-apply-button" type="button" class="button button-primary" disabled>Geprüften Import anwenden</button>
+        </section>
+      </div>
+
+      <p id="transfer-audit-result" class="audit-result" role="status" aria-live="polite">Barrierefreiheits-Grundprüfung noch nicht ausgeführt.</p>
+      <p id="transfer-status" class="dialog-status" role="status" aria-live="polite">Projekttransfer bereit.</p>
     </div>
   </dialog>
 
@@ -195,7 +274,7 @@
         <pre id="report-preview-content" class="report-preview snapshot-json"></pre>
       </section>
 
-      <section id="report-export-buttons" class="storage-toolbar" aria-label="Bericht herunterladen">
+      <section id="report-export-buttons" class="storage-toolbar" aria-label="Bericht herunterladen" data-arrow-navigation="horizontal">
         <button type="button" class="button button-primary" data-report-format="markdown">Markdown herunterladen</button>
         <button type="button" class="button button-secondary" data-report-format="html">Offline-HTML herunterladen</button>
         <button type="button" class="button button-secondary" data-report-format="text">TXT herunterladen</button>
@@ -229,7 +308,7 @@
         <div><dt>Wiederherstellungen</dt><dd id="storage-recovery-count">0</dd></div>
       </dl>
       <div class="storage-grid">
-        <section aria-labelledby="snapshot-list-title"><h3 id="snapshot-list-title">Gespeicherte Revisionen</h3><ul id="snapshot-list" class="snapshot-list"></ul></section>
+        <section aria-labelledby="snapshot-list-title"><h3 id="snapshot-list-title">Gespeicherte Revisionen</h3><ul id="snapshot-list" class="snapshot-list" data-arrow-navigation="vertical"></ul></section>
         <section class="snapshot-preview-panel" aria-labelledby="snapshot-preview-title">
           <div id="snapshot-preview-empty" class="empty-state">Wähle links einen Snapshot aus. Erst danach werden Details und Wiederherstellung freigeschaltet.</div>
           <div id="snapshot-preview" hidden>
