@@ -5,9 +5,35 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 ## [Unreleased]
 
 ### Geplant
-- vollständiger Berichtsgenerator
+- Mehrprojektverwaltung
 - Projekt- und Vorlagenverwaltung
 - reale Kubuntu-Abnahme der IndexedDB-Fehlerfälle
+
+## [0.6.0] – 2026-08-05
+
+### Hinzugefügt
+- gemeinsames, formatneutrales Berichtsmodell `1.0.0`
+- Anforderungen mit eindeutigen Kennungen und Quellenfragen
+- Architekturprinzipien, Komponenten, Entscheidungen und Datenfluss
+- Risiken aus Regelkonflikten und offenen Pflichtentscheidungen
+- Normal- und Fehlerfalltests je Anforderung
+- Abnahmekriterien, Meilensteine und offene Entscheidungen
+- vollständige Rückverfolgbarkeit von Frage zu Anforderung, Test und Abnahme
+- Exporte als Markdown, eigenständiges Offline-HTML, TXT und JSON
+- grafische Berichtsvorschau mit Vorprüfung und Formatwechsel
+- Unit-Vertragstest für Modell und alle vier Renderer
+- Browser-Smoke für Berichtsvorschau, Konsistenz und Rückverfolgbarkeit
+- `.github/workflows/ci.yml` für schnelle Push-, Pull-Request- und manuelle Prüfungen
+
+### Geändert
+- Buildversion auf `0.6.0` angehoben
+- bestehende Markdown-Vorschau verwendet jetzt dasselbe Berichtsmodell wie die Exporte
+- HTML-Ausgabe enthält ausschließlich eingebettetes CSS und keine externen Laufzeitressourcen
+- Projektstruktur- und HTML-Smoke-Verträge um Bericht und CI erweitert
+
+### Behoben
+- Berichtsformate können keine voneinander abweichenden IDs oder Abschnittsstände mehr erzeugen
+- ein fehlerhafter Dateileseraufruf im zwischenzeitlichen Buildskript wurde vor Abschluss korrigiert
 
 ## [0.5.0] – 2026-08-05
 
@@ -18,21 +44,7 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 - migrierte Snapshot-Kopien ohne Überschreiben der Originale
 - Protokolleinträge für jeden Migrationsschritt und den Abschluss
 - Projektschema `1.2.0` mit Fragenkatalogversion und Validierungszeitpunkt
-- Legacy-Prüfdaten für Schema `1.0.0` und `1.1.0`
-- Unit-Tests für Migrationspfade, Idempotenz und Fehlerverträge
 - Browser-Szenarien für Quota, Transaktionsabbruch und beschädigte Snapshot-Reihen
-- testexklusive Fehlerinjektion mit Schutz gegen Nutzung im normalen Betrieb
-
-### Geändert
-- IndexedDB-Version auf `2` angehoben
-- Buildversion auf `0.5.0` angehoben
-- Wiederherstellung migriert alte Snapshots vor ihrer erneuten Nutzung
-- Aufbewahrung erkennt auch migrierbare Legacy-Sicherheitsstände
-- Gesamtvalidator führt beide Browser-Smoke-Gruppen über `--browser` aus
-
-### Behoben
-- Quota- und Abbruchfehler können keinen halbfertigen Hauptstand hinterlassen
-- beschädigte neuere Snapshots verdecken keinen älteren gültigen Stand
 
 ## [0.4.0] – 2026-08-05
 
