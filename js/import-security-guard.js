@@ -16,10 +16,15 @@
       if (preview.existingProject?.lifecycle?.state !== "active") {
         throw new Error("Nur ein aktives Projekt darf ersetzt werden.");
       }
-      if (confirmation.confirmed !== true) {
+      const exactName = confirmation.exactName
+        ?? document.getElementById("transfer-replace-name")?.value
+        ?? "";
+      const confirmed = confirmation.confirmed === true
+        || document.getElementById("transfer-replace-checkbox")?.checked === true;
+      if (!confirmed) {
         throw new Error("Die separate Bestätigung für das Ersetzen fehlt.");
       }
-      if (confirmation.exactName !== preview.existingProject?.name) {
+      if (exactName !== preview.existingProject?.name) {
         throw new Error("Der eingegebene Projektname stimmt nicht exakt mit dem vorhandenen Projekt überein.");
       }
     }
