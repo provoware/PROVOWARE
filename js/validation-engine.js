@@ -1,6 +1,10 @@
 (() => {
   "use strict";
   const namespace = window.Provoware = window.Provoware || {};
+  const PROJECT_FIELDS = new Set([
+    "schemaVersion", "projectId", "name", "answers", "currentQuestionId", "theme",
+    "questionCatalogVersion", "createdAt", "updatedAt", "lastValidatedAt"
+  ]);
 
   function validateQuestionCatalog(catalog) {
     const errors = [];
@@ -26,6 +30,8 @@
   function validateStoredProject(payload, catalog) {
     const errors = [];
     if (!payload || typeof payload !== "object" || Array.isArray(payload)) return ["Der Projektstand ist kein gültiges Objekt."];
+    const unknownFields = Object.keys(payload).filter(key => !PROJECT_FIELDS.has(key));
+    if (unknownFields.length) errors.push(`Unbekannte Projektfelder: ${unknownFields.join(", ")}.`);
     if (payload.schemaVersion !== "1.2.0") errors.push("Die Projektschema-Version wird nicht unterstützt.");
     if (typeof payload.projectId !== "string" || !/^[a-z0-9][a-z0-9._-]{2,63}$/.test(payload.projectId)) errors.push("Die Projekt-ID ist ungültig.");
     if (typeof payload.name !== "string" || !payload.name.trim()) errors.push("Der Projektname fehlt.");
