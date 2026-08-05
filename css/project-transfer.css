@@ -1,0 +1,102 @@
+.transfer-toolbar,
+.transfer-mode-panel,
+.transfer-confirmation {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+}
+
+.transfer-toolbar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+}
+
+.transfer-file-control,
+.transfer-mode-control,
+.transfer-confirmation-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.transfer-toolbar input[type="file"],
+.transfer-mode-panel select,
+.transfer-confirmation input[type="text"] {
+  min-height: 2.75rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+}
+
+.transfer-grid {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.8fr) minmax(22rem, 1.4fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.transfer-checks,
+.transfer-differences {
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+}
+
+.transfer-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.transfer-list li[data-kind="error"] { color: var(--color-danger); }
+.transfer-list li[data-kind="warning"] { color: var(--color-warning); }
+.transfer-list li[data-kind="success"] { color: var(--color-success); }
+
+.transfer-confirmation {
+  border-color: var(--color-danger);
+}
+
+.transfer-confirmation label:last-of-type {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.transfer-confirmation input[type="checkbox"] {
+  margin-top: 0.25rem;
+  accent-color: var(--color-danger);
+}
+
+.audit-result {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 0.25rem solid var(--color-border);
+  background: var(--color-surface-strong);
+  border-radius: var(--radius-small);
+}
+
+.audit-result[data-kind="success"] { border-left-color: var(--color-success); }
+.audit-result[data-kind="error"] { border-left-color: var(--color-danger); }
+
+@media (max-width: 58rem) {
+  .transfer-toolbar,
+  .transfer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 32rem) {
+  .transfer-toolbar .button,
+  .transfer-mode-panel .button {
+    width: 100%;
+  }
+}
