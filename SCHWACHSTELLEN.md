@@ -21,7 +21,7 @@
 | S-015 | Projektwechsel | nicht abgeschlossene Änderungen könnten beim schnellen Wechsel verloren gehen | letzter Bearbeitungsstand des Ausgangsprojekts wäre unvollständig | geplantes Autosave stoppen und serielle Speicherkette vor dem Laden des Zielprojekts abschließen | Kontrolliert |
 | S-016 | Duplikate | eine Kopie übernimmt bewusst alle fachlichen Antworten | vertrauliche Inhalte können unbeabsichtigt kopiert werden | Kopie eindeutig benennen und neue ID sichtbar anzeigen | Beobachtung |
 | S-017 | Paketprüfsumme | die kompakte Prüfsumme ist nicht kryptografisch signiert | ein gezielter Angreifer könnte Inhalt und Prüfsumme gemeinsam verändern | Paket immer zusätzlich schema- und fachlich validieren; später optional kryptografische Signatur ergänzen | Kontrolliert |
-| S-018 | Import-Ersetzen | bewusstes Ersetzen verändert den aktiven Projektstand | falsche Auswahl könnte gewünschte lokale Änderungen verdrängen | neue ID als Standard, aktive Ziele בלבד, exakter Name, separates Häkchen und `pre-import-backup` | Kontrolliert |
+| S-018 | Import-Ersetzen | bewusstes Ersetzen verändert den aktiven Projektstand | falsche Auswahl könnte gewünschte lokale Änderungen verdrängen | neue ID als Standard, nur aktive Ziele, exakter Name, separates Häkchen und `pre-import-backup` | Kontrolliert |
 | S-019 | Importgröße | sehr große JSON-Dateien könnten Speicher und Oberfläche belasten | Browser könnte langsam oder instabil reagieren | Dateigröße vor `file.text()` auf zwei MiB begrenzen | Kontrolliert |
 | S-020 | Importdaten | unbekannte Fragen oder Werte könnten den Zustand inkonsistent machen | Berichte und Workflow wären unzuverlässig | unbekannte IDs und nicht katalogisierte Werte blockieren | Kontrolliert |
 
