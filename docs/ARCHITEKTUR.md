@@ -2,25 +2,53 @@
 
 ## Ziel
 
-Der Prototyp trennt Darstellung, Zustand, Workflow, Regeln, Validierung und Berichte. Keine Fachlogik liegt direkt in `index.html`.
+Die Anwendung trennt Oberfläche, Zustand, Workflow, Regeln, Validierung, Berichte und Speicherung. Keine Fachlogik liegt direkt in `index.html`.
 
 ## Laufzeitfluss
 
 ```text
 index.html
-  → app.js lädt Datenkataloge
-  → validation-engine.js prüft Grundstruktur
-  → state-manager.js hält den Sitzungszustand
-  → workflow-engine.js bestimmt aktuelle Frage und Phase
-  → rule-engine.js wertet Bedingungen aus
-  → report-generator.js erzeugt die Planvorschau
-  → ui/app-ui.js rendert Oberfläche und Status
+  → storage-engine.js stellt die IndexedDB-API bereit
+  → state-manager.js hält den laufenden Projektzustand
+  → workflow-engine.js bestimmt Fragen und Phasen
+  → validation-engine.js prüft Kataloge und Projektstände
+  → app-ui.js rendert Workflow und Status
+  → storage-manager.js rendert Snapshot-Liste und Vorschau
+  → app.js koordiniert Laden, Autospeichern, Aufbewahrung und Wiederherstellung
 ```
 
-## Offline-Verhalten
+## Speichergrenzen
 
-Beim empfohlenen lokalen HTTP-Start werden die JSON-Dateien aus `data/` geladen. Blockiert ein Browser lokale `fetch()`-Aufrufe beim Doppelklick, verwendet die Anwendung einen eingebauten Beispieldatensatz und kennzeichnet diesen Modus sichtbar.
+### `storage-engine.js`
 
-## Nächste Architekturgrenze
+- kennt IndexedDB und alle Stores
+- erzeugt Revisionen und Prüfsummen
+- schreibt Hauptstand, Snapshot, Metadaten und Protokoll transaktional
+- liest und bewertet Snapshots
+- plant und vollzieht Aufbewahrung
+- stellt gültige Snapshots als neue Revision wieder her
 
-Die folgende Iteration ergänzt IndexedDB hinter einer eigenen Speicherschicht. UI und Workflow dürfen nicht direkt auf Browserdatenbanken zugreifen.
+### `storage-manager.js`
+
+- kennt keine IndexedDB-Transaktionen
+- fordert Daten ausschließlich über `namespace.persistence` an
+- zeigt Gültigkeit und Inhalte an
+- verlangt eine ausdrückliche Bestätigung
+- übergibt nur die gewählte Snapshot-ID an die Anwendung
+
+### `app.js`
+
+- serialisiert Autosave-Vorgänge
+- verhindert doppelte Speicherung während einer Wiederherstellung
+- führt nach erfolgreichem Speichern die Aufbewahrungsprüfung aus
+- setzt den wiederhergestellten Zustand kontrolliert in den State-Manager
+
+## Aufbewahrungsalgorithmus
+
+1. Snapshots nach Revision absteigend sortieren.
+2. jüngsten gültigen Snapshot als Sicherheitsstand bestimmen.
+3. regulär die neuesten Snapshots bis zur Grenze behalten.
+4. liegt der Sicherheitsstand außerhalb, ersetzt er den ältesten regulären Platz.
+5. nur die übrigen Snapshot-IDs in einer Schreibtransaktion löschen.
+
+Die konfigurierte Grenze wird dadurch nicht überschritten.
