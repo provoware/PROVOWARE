@@ -10,100 +10,106 @@ Alternativ kann `index.html` direkt geöffnet werden. Dann kann der Browser getr
 
 ## Aktuelles Projekt erkennen
 
-Der Name des aktuell geöffneten Projekts steht oben im Header. Alle Antworten, Snapshots und Berichte beziehen sich ausschließlich auf dieses Projekt.
+Der Name des aktuell geöffneten Projekts steht oben im Header. Alle Antworten, Snapshots, Exporte und Berichte beziehen sich ausschließlich auf dieses Projekt.
 
 ## Projekte verwalten
 
 Rechts auf **„Projekte verwalten“** klicken.
 
-Die Übersicht zeigt:
+Die Übersicht zeigt Projektname, Projekt-ID, Status, Revision, Antwortzahl, Speicherzeitpunkt und Projektschema. Mit Suche und Statusfilter lassen sich aktive Projekte, Archiv und Papierkorb getrennt anzeigen.
 
-- Projektname und Projekt-ID
-- Status
-- Revision
-- Anzahl gespeicherter Antworten
-- letzten Speicherzeitpunkt
-- Projektschema
-- Kennzeichnung des aktuell geöffneten Projekts
+Unterstützt werden:
 
-Mit dem Suchfeld kann nach Name oder Projekt-ID gesucht werden. Der Statusfilter zeigt aktive Projekte, Archiv, Papierkorb oder alle Projekte.
+- neues Projekt
+- Projekt öffnen
+- umbenennen
+- duplizieren
+- archivieren
+- in den Papierkorb verschieben
+- wiederherstellen
+- endgültig löschen
 
-## Neues Projekt
+Endgültiges Löschen verlangt den exakten Projektnamen und eine separate Bestätigung.
 
-1. Unter **„Neues Projekt“** einen verständlichen Namen eingeben.
-2. **„Projekt anlegen“** drücken.
-3. Die Projektverwaltung schließt sich.
-4. Das neue Projekt wird sofort geöffnet.
+## Projekt als JSON sichern
 
-Ein neues Projekt beginnt ohne Antworten und besitzt eine eigene Projekt-ID, Revision 1 und eigene Snapshots.
+1. **„Projekt sichern oder importieren“** öffnen.
+2. **„Aktuelles Projekt als JSON sichern“** drücken.
+3. Die erzeugte Datei an einem unabhängigen Ort aufbewahren.
 
-## Projekt öffnen
+Das Paket enthält Projekt-ID, Namen, Revision, Schema, Fragenkatalogversion, vollständigen Projektstand und Prüfsumme.
 
-Nur aktive Projekte können direkt geöffnet werden. Bei einem anderen aktiven Projekt auf **„Öffnen“** klicken.
+Die Prüfsumme erkennt typische Beschädigungen. Sie ist keine kryptografische Signatur und beweist nicht, von wem die Datei stammt.
 
-Vor dem Wechsel speichert die Anwendung ausstehende Änderungen des bisherigen Projekts. Danach wird ausschließlich der gewählte Projektstand geladen.
+## Projektdatei prüfen
 
-## Projekt umbenennen
+1. **„Projekt sichern oder importieren“** öffnen.
+2. Über das Dateifeld eine `.json`-Datei auswählen.
+3. Die Datei wird zunächst nur lokal gelesen.
+4. Prüfergebnis vollständig ansehen.
 
-1. Beim aktiven Projekt **„Umbenennen“** drücken.
-2. Neuen Namen kontrollieren oder eingeben.
-3. **„Umbenennen“** bestätigen.
+Geprüft werden:
 
-Der neue Name wird als neue Revision gespeichert. Frühere Snapshots behalten den damals verwendeten Namen.
+- Dateigröße bis zwei MiB
+- JSON-Syntax
+- Paketschema
+- Prüfsumme
+- Projektschema und notwendige Migration
+- Projekt-ID und Name
+- Frage-IDs
+- Antwortwerte
+- vorhandenes lokales Projekt
+- Änderungen und Konflikte
 
-## Projekt duplizieren
+Der Import bleibt gesperrt, solange ein Fehler angezeigt wird.
 
-1. **„Duplizieren“** drücken.
-2. Namen der Kopie festlegen.
-3. **„Kopie erstellen“** bestätigen.
+## Importvorschau verstehen
 
-Die Kopie übernimmt Antworten und Einstellungen, besitzt aber eine neue Projekt-ID, Revision 1, eigene Snapshots und eigene Berichte.
+### Prüfsumme
 
-## Archiv
+- **gültig:** Paketkern entspricht der gespeicherten Prüfsumme
+- **ungültig:** Datei wurde beschädigt oder verändert; Import bleibt gesperrt
 
-**„Archivieren“** entfernt ein Projekt aus der aktiven Arbeitsliste, ohne Daten zu löschen.
+### Projektschema
 
-Zum Zurückholen:
+Eine Anzeige wie `1.1.0 → 1.2.0` bedeutet, dass der Import vor der Übernahme schrittweise im Arbeitsspeicher migriert wird.
 
-1. Filter **„Archiv“** wählen.
-2. Beim Projekt **„Wiederherstellen“** drücken.
+### Lokal vorhanden
 
-Das Projekt wird wieder aktiv und kann anschließend geöffnet werden.
+Steht dort ein Projektname mit Revision, existiert bereits ein Projekt mit derselben ID.
 
-## Papierkorb
+### Konflikte
 
-**„In Papierkorb“** markiert das Projekt für mögliche Wiederherstellung oder endgültige Löschung. Projektstand und Snapshots bleiben zunächst vollständig erhalten.
+Die Vorschau nennt:
 
-Zum Zurückholen:
+- geänderte Grundfelder
+- abweichende Antworten
+- nur im Import vorhandene Antworten
+- nur lokal vorhandene Antworten
 
-1. Filter **„Papierkorb“** wählen.
-2. **„Wiederherstellen“** drücken.
+## Importart auswählen
 
-## Endgültig löschen
+### Projekt-ID beibehalten
 
-Diese Aktion ist nicht rückgängig zu machen.
+Nur verfügbar, wenn die importierte ID lokal noch frei ist.
 
-1. Projekt zuerst in den Papierkorb verschieben.
-2. Filter **„Papierkorb“** wählen.
-3. **„Endgültig löschen“** drücken.
-4. Den vollständigen Projektnamen exakt eingeben.
-5. Das separate Bestätigungsfeld aktivieren.
-6. **„Endgültig löschen“** drücken.
+### Als unabhängiges neues Projekt importieren
 
-Ein falscher Name, fehlende Bestätigung oder ein Projekt außerhalb des Papierkorbs blockiert die Löschung.
+Empfohlene Standardwahl bei einer ID-Kollision. Das importierte Projekt erhält eine neue ID; das lokale Projekt bleibt unverändert.
 
-Gelöscht werden ausschließlich die Daten dieses Projekts:
+### Vorhandenes Projekt ersetzen
 
-- aktueller Stand
-- Snapshots
-- Aufbewahrungs- und Lebenszyklusmetadaten
-- Ereignis- und Migrationsprotokolle
+Nur bei einem aktiven vorhandenen Projekt verfügbar.
 
-Andere Projekte bleiben unberührt.
+Vor der Freigabe:
 
-## Aktuelles Projekt archivieren oder verschieben
+1. lokalen Projektnamen exakt eingeben,
+2. separates Bestätigungsfeld aktivieren,
+3. Vorschau nochmals kontrollieren.
 
-Wird das gerade geöffnete Projekt archiviert oder in den Papierkorb verschoben, öffnet die Anwendung automatisch ein anderes aktives Projekt. Existiert keines, wird ein neues leeres Projekt angelegt.
+Die Anwendung legt zuerst eine unveränderte Sicherheitsrevision `pre-import-backup` an. Erst danach wird der importierte Stand gespeichert.
+
+Archivierte Projekte und Papierkorbprojekte können nicht ersetzt werden.
 
 ## Workflow
 
@@ -133,13 +139,31 @@ Projekt-ID und Revision im Bericht entsprechen immer dem aktuell geöffneten Pro
 
 Snapshots werden nur für das aktuell geöffnete Projekt angezeigt.
 
-## Tastatur
+## Tastaturbedienung
 
-- Tab und Umschalt+Tab wechseln Bedienelemente.
-- Enter aktiviert Schaltflächen und Formulare.
-- Escape schließt zuerst eine offene Projektaktion, danach den Dialog.
-- Nach dem Schließen kehrt der Fokus zur öffnenden Schaltfläche zurück.
+### Dialoge
+
+- Tab wechselt zum nächsten Element im obersten Dialog.
+- Umschalt+Tab wechselt zum vorherigen Element.
+- Am letzten beziehungsweise ersten Element bleibt der Fokus im Dialog und springt zyklisch weiter.
+- Escape schließt zuerst eine offene Unteraktion und danach den Dialog.
+- Nach dem Schließen kehrt der Fokus zur tatsächlich verwendeten Auslöseschaltfläche zurück.
+
+### Listen und Aktionsgruppen
+
+In Projektliste, Snapshot-Liste und markierten Aktionsgruppen:
+
+- Pfeil nach unten oder rechts: nächster Eintrag
+- Pfeil nach oben oder links: vorheriger Eintrag
+- Home: erster Eintrag
+- Ende: letzter Eintrag
+
+### Barrierefreiheits-Grundprüfung
+
+Beim Öffnen des Transferdialogs wird eine automatisierte Grundprüfung ausgeführt. Sie meldet die Zahl technischer Fehler und Hinweise.
+
+Diese Prüfung ersetzt keine reale Screenreader-Abnahme. Für eine endgültige Freigabe sind Orca unter Kubuntu und ergänzend NVDA oder VoiceOver praktisch zu prüfen.
 
 ## Datenschutz
 
-Alle Projekte bleiben lokal in IndexedDB. Eine Browserdaten-Bereinigung kann sie löschen. Ein geprüfter Projekt-JSON-Export und Import-Assistent ist der nächste geplante Sicherungsschritt.
+Alle Projekte bleiben lokal in IndexedDB. Importdateien werden nur nach ausdrücklicher Dateiauswahl gelesen. Eine Browserdaten-Bereinigung kann lokale Projekte löschen; regelmäßige JSON-Sicherungen sollten außerhalb des Browserprofils gespeichert werden.
