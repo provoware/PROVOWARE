@@ -1,5 +1,6 @@
 # Der Anwendungskern funktioniert ohne Python-Laufzeit und ohne externe Pakete.
-# Python wird ausschließlich für optionale Entwicklungs-, Prüf- und Build-Skripte verwendet.
+# Python-Pakete werden ausschließlich für Entwicklung, Prüfung und Build verwendet.
 
 jsonschema>=4.23,<5
 pytest>=8.3,<9
+playwright>=1.54,<2
