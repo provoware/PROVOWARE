@@ -10,12 +10,14 @@
     "answers",
     "currentQuestionId",
     "theme",
+    "questionCatalogVersion",
     "createdAt",
-    "updatedAt"
+    "updatedAt",
+    "lastValidatedAt"
   ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": { "const": "1.1.0" },
+    "schemaVersion": { "const": "1.2.0" },
     "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$" },
     "name": { "type": "string", "minLength": 1, "maxLength": 120 },
     "answers": {
@@ -24,7 +26,9 @@
     },
     "currentQuestionId": { "type": ["string", "null"] },
     "theme": { "enum": ["dark", "light"] },
+    "questionCatalogVersion": { "type": "string", "minLength": 1, "maxLength": 40 },
     "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" }
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "lastValidatedAt": { "type": "string", "format": "date-time" }
   }
 }
