@@ -84,10 +84,17 @@ tampered.project.name = "Manipuliert";
 const tamperedPreview = transfer.preparePreview(tampered, catalog, existing);
 if (tamperedPreview.valid || tamperedPreview.checksumValid) throw new Error("Manipulierte Prüfsumme wurde akzeptiert.");
 
+const inconsistent = structuredClone(packageData);
+inconsistent.source.projectId = "abweichende-herkunft";
+inconsistent.checksum = checksum(transfer.coreFromPackage(inconsistent));
+const inconsistentPreview = transfer.preparePreview(inconsistent, catalog, null);
+if (inconsistentPreview.valid || !inconsistentPreview.errors.some(error => error.includes("Projekt-ID"))) {
+  throw new Error("Abweichende Herkunfts-ID wurde nicht blockiert.");
+}
+
 const unknown = structuredClone(packageData);
 unknown.project.answers["q.unknown"] = "evil";
-const unknownCore = transfer.coreFromPackage(unknown);
-unknown.checksum = checksum(unknownCore);
+unknown.checksum = checksum(transfer.coreFromPackage(unknown));
 const unknownPreview = transfer.preparePreview(unknown, catalog, null);
 if (unknownPreview.valid || !unknownPreview.answerInspection.unknownQuestionIds.includes("q.unknown")) throw new Error("Unbekannte Frage-ID wurde nicht blockiert.");
 
@@ -96,6 +103,15 @@ invalidValue.project.answers["q.one"] = "invalid";
 invalidValue.checksum = checksum(transfer.coreFromPackage(invalidValue));
 const invalidPreview = transfer.preparePreview(invalidValue, catalog, null);
 if (invalidPreview.valid || invalidPreview.answerInspection.invalidAnswerValues.length !== 1) throw new Error("Ungültiger Antwortwert wurde nicht blockiert.");
+
+const longName = structuredClone(packageData);
+longName.project.name = "X".repeat(80);
+longName.source.projectName = longName.project.name;
+longName.checksum = checksum(transfer.coreFromPackage(longName));
+const longNamePreview = transfer.preparePreview(longName, catalog, existing);
+if (!longNamePreview.valid || longNamePreview.suggestedNewName.length > 80 || !longNamePreview.suggestedNewName.endsWith(" – Import")) {
+  throw new Error("Langer Importname wurde nicht sicher gekürzt.");
+}
 
 const legacy = structuredClone(packageData);
 legacy.project = {
@@ -123,7 +139,9 @@ console.log(JSON.stringify({
   conflictCount: conflictPreview.comparison.conflictCount,
   legacySteps: legacyPreview.migrationSteps.length,
   blockedUnknown: unknownPreview.errors.length,
-  blockedInvalid: invalidPreview.errors.length
+  blockedInvalid: invalidPreview.errors.length,
+  blockedInconsistent: inconsistentPreview.errors.length,
+  suggestedNameLength: longNamePreview.suggestedNewName.length
 }));
 '''
     completed = subprocess.run(
@@ -140,6 +158,8 @@ def test_project_package_checksum_migration_and_conflicts():
     assert result["legacySteps"] == 1
     assert result["blockedUnknown"] >= 1
     assert result["blockedInvalid"] >= 1
+    assert result["blockedInconsistent"] >= 1
+    assert result["suggestedNameLength"] <= 80
 
 
 def test_transfer_ui_requires_read_only_preview_and_replace_confirmation():
@@ -150,6 +170,7 @@ def test_transfer_ui_requires_read_only_preview_and_replace_confirmation():
     assert 'mode === "replace"' in manager
     assert 'transfer-replace-checkbox' in manager
     assert 'transfer-replace-name' in manager
+    assert 'replace(/ – Import$/, "")' in manager
     assert '"pre-import-backup"' in app
     assert "inspectImportPackage" in app
     assert "applyImport" in app
