@@ -42,7 +42,7 @@
       let preparedPreview = candidatePreview;
       if (mode === "new" && candidatePreview.suggestedNewName) {
         preparedPreview = structuredClone(candidatePreview);
-        preparedPreview.payload.name = candidatePreview.suggestedNewName;
+        preparedPreview.payload.name = candidatePreview.suggestedNewName.replace(/ – Import$/, "");
       }
       return original(preparedPreview, mode);
     };
