@@ -17,7 +17,8 @@
 - [x] Grafische Snapshot-Liste, Vorschau und manuelle Wiederherstellung ergänzen.
 - [x] Konfigurierbare Snapshot-Aufbewahrung mit Schutz des letzten gültigen Sicherheitsstands umsetzen.
 - [x] Schrittweise Migrationsmatrix `1.0.0 → 1.1.0 → 1.2.0` mit Vorher-Sicherung entwickeln.
-- [ ] Berichtsgenerator für Markdown, HTML, TXT und JSON entwickeln.
+- [x] Gemeinsames Berichtsmodell und Exporte als Markdown, Offline-HTML, TXT und JSON entwickeln.
+- [ ] Mehrprojektverwaltung mit Übersicht, Archiv und Papierkorb ergänzen.
 - [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
 - [ ] Importvorschau und Konfliktbehandlung entwickeln.
 - [ ] Tastatur- und Screenreader-Bedienung vollständig prüfen.
@@ -26,6 +27,7 @@
 
 - [x] Unit-, Integrations- und Browser-Smoke-Grundtests ergänzen.
 - [x] Quota-, Transaktionsabbruch- und beschädigte-Snapshot-Tests ergänzen.
+- [x] Schnelle GitHub-Actions-CI für Struktur, Schemata, Unit-Tests und JavaScript-Syntax ergänzen.
 - [ ] Reale IndexedDB-Fehlerabnahme unter Kubuntu dokumentieren.
 - [ ] Sicherheits- und Barrierefreiheitsprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
