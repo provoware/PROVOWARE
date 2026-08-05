@@ -60,6 +60,9 @@
     if (packageData.packageSchemaVersion !== PACKAGE_SCHEMA_VERSION) {
       errors.push(`Nicht unterstützte Paketschema-Version: ${packageData.packageSchemaVersion || "fehlt"}.`);
     }
+    if (typeof packageData.applicationVersion !== "string" || !packageData.applicationVersion.trim()) {
+      errors.push("Die Anwendungsversion des Exportpakets fehlt.");
+    }
     if (!packageData.project || typeof packageData.project !== "object" || Array.isArray(packageData.project)) {
       errors.push("Der Projektbereich fehlt oder ist ungültig.");
     }
@@ -68,6 +71,21 @@
     }
     if (typeof packageData.exportedAt !== "string" || !Number.isFinite(Date.parse(packageData.exportedAt))) {
       errors.push("Der Exportzeitpunkt fehlt oder ist ungültig.");
+    }
+    if (packageData.source && packageData.project) {
+      if (packageData.source.projectId !== packageData.project.projectId) {
+        errors.push("Projekt-ID in Exportherkunft und Projektstand stimmen nicht überein.");
+      }
+      if (packageData.source.projectName !== packageData.project.name) {
+        errors.push("Projektname in Exportherkunft und Projektstand stimmen nicht überein.");
+      }
+      if (packageData.source.projectSchemaVersion !== packageData.project.schemaVersion) {
+        errors.push("Projektschema in Exportherkunft und Projektstand stimmen nicht überein.");
+      }
+      if (packageData.project.questionCatalogVersion
+          && packageData.source.questionCatalogVersion !== packageData.project.questionCatalogVersion) {
+        errors.push("Fragenkatalogversion in Exportherkunft und Projektstand stimmen nicht überein.");
+      }
     }
     if (typeof packageData.checksum !== "string" || !packageData.checksum) {
       errors.push("Die Paketprüfsumme fehlt.");
@@ -112,7 +130,11 @@
         fields: [],
         answers: {
           same: [], changed: [],
-          added: Object.entries(imported.answers || {}).map(([questionId, importedValue]) => ({ questionId, importedValue })),
+          added: Object.entries(imported.answers || {}).map(([questionId, importedValue]) => ({
+            questionId,
+            importedValue,
+            importedLabel: valueLabel(questionMap(catalog).get(questionId), importedValue)
+          })),
           missing: []
         },
         conflictCount: 0
@@ -152,6 +174,12 @@
       answers,
       conflictCount
     };
+  }
+
+  function recommendedNewName(name) {
+    const suffix = " – Import";
+    const base = String(name || "Importiertes Projekt").trim().slice(0, 80 - suffix.length).trim();
+    return `${base || "Projekt"}${suffix}`;
   }
 
   function recommendation(preview) {
@@ -206,6 +234,7 @@
       migrationRequired: prepared.migrated,
       migrationSteps: clone(prepared.steps),
       payload: prepared.payload ? clone(prepared.payload) : null,
+      suggestedNewName: recommendedNewName(prepared.payload?.name || packageData.project?.name),
       existingProject: existingProject ? clone(existingProject.summary || existingProject) : null,
       answerInspection,
       comparison,
@@ -242,6 +271,7 @@
     compareProjects,
     inspectAnswers,
     coreFromPackage,
+    recommendedNewName,
     safeFilename
   };
 })();
