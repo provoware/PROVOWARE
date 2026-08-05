@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 TARGET = DIST / "provoware-entwicklungsplan-prototyp"
-ARCHIVE_BASE = DIST / "PROVOWARE_Entwicklungsplan_Prototyp_0.2.0"
+ARCHIVE_BASE = DIST / "PROVOWARE_Entwicklungsplan_Prototyp_0.8.0"
 
 
 def main():
