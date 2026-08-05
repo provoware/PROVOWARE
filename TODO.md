@@ -19,9 +19,10 @@
 - [x] Schrittweise Migrationsmatrix `1.0.0 → 1.1.0 → 1.2.0` mit Vorher-Sicherung entwickeln.
 - [x] Gemeinsames Berichtsmodell und Exporte als Markdown, Offline-HTML, TXT und JSON entwickeln.
 - [x] Mehrprojektverwaltung mit Übersicht, Wechsel, Archiv und Papierkorb ergänzen.
+- [x] Sicheren Projekt-JSON-Export, reine Importvorschau und Konfliktbehandlung entwickeln.
+- [x] Dialog-, Fokus-, Escape- und Pfeiltastennavigation mit automatisierter Grundprüfung härten.
 - [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
-- [ ] Sicheren Projekt-JSON-Export, Importvorschau und Konfliktbehandlung entwickeln.
-- [ ] Tastatur- und Screenreader-Bedienung vollständig prüfen.
+- [ ] Reale Screenreader-Abnahme mit Orca und ergänzend NVDA oder VoiceOver durchführen.
 
 ## P2 – Qualität und Release
 
@@ -29,7 +30,7 @@
 - [x] Quota-, Transaktionsabbruch- und beschädigte-Snapshot-Tests ergänzen.
 - [x] Schnelle GitHub-Actions-CI für Struktur, Schemata, Unit-Tests und JavaScript-Syntax ergänzen.
 - [ ] Reale IndexedDB-Fehlerabnahme unter Kubuntu dokumentieren.
-- [ ] Sicherheits- und Barrierefreiheitsprüfung dokumentieren.
+- [x] Sicherheits- und Barrierefreiheits-Grundprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
 - [x] SHA-256-Buildmanifest vorbereiten.
 - [ ] Ein-Datei-Build und finale Release-Checkliste erstellen.
