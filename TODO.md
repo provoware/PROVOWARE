@@ -14,7 +14,9 @@
 
 - [x] Workflow-Navigation und mehrschichtige Beispiel-Fragenansicht entwickeln.
 - [x] Versionierte IndexedDB mit transaktionalen Snapshots und automatischem Rückfall implementieren.
-- [ ] Autosave-Aufbewahrung, manuelle Snapshot-Auswahl und Speicherdiagnose ausbauen.
+- [x] Grafische Snapshot-Liste, Vorschau und manuelle Wiederherstellung ergänzen.
+- [x] Konfigurierbare Snapshot-Aufbewahrung mit Schutz des letzten gültigen Sicherheitsstands umsetzen.
+- [ ] Migrationsmatrix über mehrere Projektschemata entwickeln.
 - [ ] Berichtsgenerator für Markdown, HTML, TXT und JSON entwickeln.
 - [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
 - [ ] Importvorschau und Konfliktbehandlung entwickeln.
@@ -23,7 +25,7 @@
 ## P2 – Qualität und Release
 
 - [x] Unit-, Integrations- und Browser-Smoke-Grundtests ergänzen.
-- [ ] Migrationsmatrix und Wiederherstellung über mehrere Schemaversionen prüfen.
+- [ ] Quota-, Transaktionsabbruch- und beschädigte-Snapshot-Tests erweitern.
 - [ ] Sicherheits- und Barrierefreiheitsprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
 - [x] SHA-256-Buildmanifest vorbereiten.
