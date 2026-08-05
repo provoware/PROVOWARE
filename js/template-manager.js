@@ -45,7 +45,9 @@
       await load("template-core.js", "core");
       await load("template-catalog-adapter.js", "catalog-adapter");
       await load("template-ui.js", "ui");
+      await load("template-ui-fixes.js", "ui-fixes");
       namespace.templateProfilesUi.boot();
+      namespace.templateProfilesUiFixes.apply();
     } catch (error) {
       console.error("Vorlagenverwaltung konnte nicht gestartet werden.", error);
       const live = document.getElementById("live-status");
