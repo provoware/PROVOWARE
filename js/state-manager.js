@@ -13,7 +13,15 @@
         answers: {},
         currentQuestionId: null,
         dataMode: "loading",
-        validationErrors: []
+        validationErrors: [],
+        projectId: "default-project",
+        projectName: "PROVOWARE Entwicklungsplan",
+        schemaVersion: "1.1.0",
+        theme: "dark",
+        storageStatus: "checking",
+        revision: 0,
+        restoredFrom: null,
+        createdAt: new Date().toISOString()
       };
     }
 
@@ -29,6 +37,10 @@
     subscribe(listener) {
       this.listeners.add(listener);
       return () => this.listeners.delete(listener);
+    }
+
+    setProjectId(projectId) {
+      this.update({ projectId }, "Projektkennung gesetzt.");
     }
 
     setCatalogs({ questions, rules, templates, prompts, dataMode }) {
@@ -49,6 +61,26 @@
 
     setCurrentQuestion(questionId) {
       this.update({ currentQuestionId: questionId }, "Frage gewechselt.");
+    }
+
+    setTheme(theme) {
+      this.update({ theme: theme === "light" ? "light" : "dark" }, "Theme gewechselt.");
+    }
+
+    restoreProject(payload, metadata = {}) {
+      this.update({
+        answers: payload.answers || {},
+        currentQuestionId: payload.currentQuestionId || this.state.currentQuestionId,
+        theme: payload.theme || "dark",
+        projectName: payload.name || this.state.projectName,
+        createdAt: payload.createdAt || this.state.createdAt,
+        revision: metadata.revision || 0,
+        restoredFrom: metadata.source || null
+      }, metadata.source === "recovery" ? "Letzter gültiger Snapshot wiederhergestellt." : "Gespeicherter Projektstand geladen.");
+    }
+
+    setStorageStatus(storageStatus, revision = this.state.revision, restoredFrom = this.state.restoredFrom) {
+      this.update({ storageStatus, revision, restoredFrom }, "Speicherstatus aktualisiert.");
     }
 
     setValidationErrors(errors) {
