@@ -18,8 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable")
 SCRIPT_ORDER = [
     "js/storage-engine.js", "js/state-manager.js", "js/workflow-engine.js", "js/rule-engine.js",
-    "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js", "js/app.js",
-    "tests/smoke/browser-smoke.js"
+    "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js", "js/storage-manager.js",
+    "js/app.js", "tests/smoke/browser-smoke.js"
 ]
 STYLE_ORDER = ["css/variables.css", "css/themes.css", "css/layout.css", "css/components.css"]
 
