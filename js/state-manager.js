@@ -79,7 +79,9 @@
               ? "Neues Projekt geöffnet."
               : source === "project-duplicated"
                 ? "Projektkopie geöffnet."
-                : "Gespeicherter Projektstand geladen.";
+                : source === "project-imported"
+                  ? "Importiertes Projekt geöffnet."
+                  : "Gespeicherter Projektstand geladen.";
       this.update({
         projectId: payload.projectId || this.state.projectId,
         projectName: payload.name || this.state.projectName,
