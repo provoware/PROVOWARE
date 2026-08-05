@@ -28,10 +28,10 @@ body {
 
 .header-status {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(4, auto);
   gap: var(--space-2) var(--space-3);
   align-items: center;
-  min-width: min(100%, 28rem);
+  min-width: min(100%, 36rem);
 }
 
 .header-status progress,
@@ -90,7 +90,7 @@ body {
 
 @media (max-width: 48rem) {
   .app-header { align-items: stretch; flex-direction: column; }
-  .header-status { grid-template-columns: 1fr; }
+  .header-status { grid-template-columns: 1fr; min-width: 0; }
   .workspace { grid-template-columns: 1fr; }
   .phase-panel, .summary-panel { position: static; max-height: none; }
   .phase-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
