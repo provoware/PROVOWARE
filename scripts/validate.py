@@ -12,18 +12,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_FILES = [
+    ".github/workflows/ci.yml",
     "README.md", "TODO.md", "CHANGELOG.md", "SCHWACHSTELLEN.md", "AGENTS.md",
     "UPGRADEPOOL.md", "PROJEKTORDNERSTRUKTUR.md", "requirements.txt", "index.html",
-    "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css",
-    "js/app.js", "js/migration-engine.js", "js/storage-engine.js", "js/storage-manager.js",
-    "js/state-manager.js", "js/workflow-engine.js", "js/rule-engine.js", "js/validation-engine.js",
-    "js/report-generator.js", "js/ui/app-ui.js",
+    "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css", "css/project-manager.css",
+    "js/app.js", "js/migration-engine.js", "js/storage-engine.js", "js/project-repository.js",
+    "js/project-manager.js", "js/storage-manager.js", "js/state-manager.js", "js/workflow-engine.js",
+    "js/rule-engine.js", "js/validation-engine.js", "js/report-generator.js", "js/report-manager.js",
+    "js/ui/app-ui.js",
     "data/questions.json", "data/rules.json", "data/templates.json", "data/prompts.json",
     "schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json",
     "tests/unit/test_catalogs.py", "tests/unit/test_storage_contract.py",
     "tests/unit/test_migration_matrix.py", "tests/unit/test_storage_failures.py",
+    "tests/unit/test_report_generator.py", "tests/unit/test_project_management.py",
     "tests/integration/test_structure.py", "tests/smoke/test_index.py",
     "tests/smoke/browser-smoke.js", "tests/smoke/run_browser_smoke.py",
+    "tests/smoke/project-management-smoke.js", "tests/smoke/run_project_management_smoke.py",
     "tests/smoke/storage-failure-smoke.js", "tests/smoke/run_storage_failure_smoke.py",
     "tests/smoke/failure-harness.html",
     "tests/fixtures/project-v1.0.0.json", "tests/fixtures/project-v1.1.0.json",
@@ -106,11 +110,19 @@ def validate_html_references():
     missing = [ref for ref in local_references if not (ROOT / ref).is_file()]
     assert not missing, f"Fehlende HTML-Verweise: {missing}"
     order = [
-        'src="js/migration-engine.js"', 'src="js/storage-engine.js"', 'src="js/state-manager.js"',
-        'src="js/ui/app-ui.js"', 'src="js/storage-manager.js"', 'src="js/app.js"'
+        'src="js/migration-engine.js"', 'src="js/storage-engine.js"',
+        'src="js/project-repository.js"', 'src="js/state-manager.js"',
+        'src="js/report-generator.js"', 'src="js/ui/app-ui.js"',
+        'src="js/project-manager.js"', 'src="js/report-manager.js"',
+        'src="js/storage-manager.js"', 'src="js/app.js"'
     ]
     positions = [html.index(marker) for marker in order]
-    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Migration und Speicherverwaltung ist ungültig."
+    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Projekt-, Berichts- und Speicherverwaltung ist ungültig."
+    for marker in (
+        'id="project-manager-button"', 'id="project-dialog"', 'id="project-new-form"',
+        'id="project-filter"', 'id="project-action-checkbox"', 'id="current-project-name"'
+    ):
+        assert marker in html, f"Mehrprojekt-Oberfläche fehlt: {marker}"
 
 
 def validate_javascript_syntax():
@@ -121,6 +133,7 @@ def validate_javascript_syntax():
     paths = [
         *sorted((ROOT / "js").rglob("*.js")),
         ROOT / "tests" / "smoke" / "browser-smoke.js",
+        ROOT / "tests" / "smoke" / "project-management-smoke.js",
         ROOT / "tests" / "smoke" / "storage-failure-smoke.js",
     ]
     for path in paths:
@@ -141,6 +154,24 @@ def validate_storage_contract():
     assert "snapshot-confirm" in manager and "selectedSnapshot?.valid" in manager
 
 
+def validate_project_contract():
+    repository = (ROOT / "js" / "project-repository.js").read_text(encoding="utf-8")
+    manager = (ROOT / "js" / "project-manager.js").read_text(encoding="utf-8")
+    app = (ROOT / "js" / "app.js").read_text(encoding="utf-8")
+    for state in ("active", "archive", "trash"):
+        assert f'"{state}"' in repository, f"Projektstatus fehlt: {state}"
+    for operation in ("createProject", "renameProject", "duplicateProject", "setLifecycle", "permanentDelete"):
+        assert operation in repository, f"Projektoperation fehlt: {operation}"
+    assert 'String(expectedName || "") !== actualName' in repository
+    assert 'lifecycleActionAllowed(lifecycle.state, "delete")' in repository
+    assert 'snapshots.index("projectId")' in repository and 'migrations.index("projectId")' in repository
+    assert 'transaction(Object.values(namespace.storage.STORES), "readwrite")' in repository
+    assert "settlePendingSave" in app and "activateFallback" in app
+    assert "listProjects" in app and "openProject" in app and "deleteProject" in app
+    assert 'value !== pendingAction.project.name' in manager
+    assert 'project-action-checkbox' in manager
+
+
 def validate_no_remote_runtime_assets():
     runtime_paths = [ROOT / "index.html", *sorted((ROOT / "css").glob("*.css")), *sorted((ROOT / "js").rglob("*.js"))]
     for path in runtime_paths:
@@ -150,6 +181,7 @@ def validate_no_remote_runtime_assets():
 
 def run_browser_smoke():
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_browser_smoke.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_project_management_smoke.py")], check=True)
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_storage_failure_smoke.py")], check=True)
 
 
@@ -165,6 +197,7 @@ def main():
         ("HTML-Verweise", validate_html_references),
         ("JavaScript-Syntax", validate_javascript_syntax),
         ("Speichervertrag", validate_storage_contract),
+        ("Mehrprojektvertrag", validate_project_contract),
         ("Offline-Laufzeit", validate_no_remote_runtime_assets),
     ]
     for label, check in checks:
