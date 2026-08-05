@@ -32,8 +32,10 @@
   function migrate100To110(payload, context) {
     const now = context.now;
     return {
-      ...clone(payload),
       schemaVersion: "1.1.0",
+      projectId: payload.projectId,
+      name: typeof payload.name === "string" && payload.name.trim() ? payload.name : "PROVOWARE Entwicklungsplan",
+      answers: clone(payload.answers),
       currentQuestionId: payload.currentQuestionId ?? null,
       theme: payload.theme === "light" ? "light" : "dark",
       createdAt: isoOrFallback(payload.createdAt, now),
@@ -43,13 +45,18 @@
 
   function migrate110To120(payload, context) {
     return {
-      ...clone(payload),
       schemaVersion: TARGET_SCHEMA_VERSION,
+      projectId: payload.projectId,
+      name: typeof payload.name === "string" && payload.name.trim() ? payload.name : "PROVOWARE Entwicklungsplan",
+      answers: clone(payload.answers),
+      currentQuestionId: payload.currentQuestionId ?? null,
+      theme: payload.theme === "light" ? "light" : "dark",
       questionCatalogVersion: typeof payload.questionCatalogVersion === "string" && payload.questionCatalogVersion
         ? payload.questionCatalogVersion
         : context.catalogVersion,
-      lastValidatedAt: context.now,
-      updatedAt: context.now
+      createdAt: isoOrFallback(payload.createdAt, context.now),
+      updatedAt: context.now,
+      lastValidatedAt: context.now
     };
   }
 
