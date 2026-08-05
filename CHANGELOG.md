@@ -5,42 +5,63 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 ## [Unreleased]
 
 ### Geplant
-- sicherer Projekt-JSON-Export und Import-Assistent
 - Projektvorlagen und Profile
 - reale Kubuntu-Abnahme der IndexedDB-Fehlerfälle
+- reale Screenreader-Abnahme
+- Ein-Datei-Release
+
+## [0.8.0] – 2026-08-05
+
+### Hinzugefügt
+- `js/project-transfer.js` als reiner Projektpaket-, Prüf- und Vergleichskern
+- `js/project-transfer-manager.js` als grafischer Export- und Import-Assistent
+- `schemas/project-package.schema.json` für Projektpakete `1.0.0`
+- `css/project-transfer.css` für responsive Importvorschau und Konfliktdarstellung
+- Projekt-JSON-Export mit Herkunft, Revision, Schema, Katalogversion und Prüfsumme
+- Dateigrößenlimit von zwei MiB
+- rein lesende Importvorschau vor jeder Speicherung
+- schrittweise Migration importierter Projektschemata `1.0.0` und `1.1.0`
+- Prüfung bekannter Frage-IDs und zulässiger Antwortwerte
+- Vergleich von Projektgrundfeldern und Antworten
+- Erkennung identischer Projekte und bestehender Projekt-IDs
+- Import mit freier Original-ID oder neuer unabhängiger ID
+- bewusstes Ersetzen eines aktiven Projekts mit Vorher-Sicherung
+- `js/accessibility.js` als zentrale Dialog- und Tastaturschicht
+- Fokusfalle im obersten Dialog
+- Escape-Hierarchie für Unteraktionen und Dialoge
+- Fokus-Rückkehr zum tatsächlichen Auslöser
+- Pfeiltastennavigation mit Home und Ende
+- automatisierte Barrierefreiheits-Grundprüfung
+- Unit-Tests für Transfer, Prüfsumme, Migration, Konflikte und Zugänglichkeitsverträge
+- eigener Desktop-/Mobil-Smoke für Transfer und Dialogbedienung
+
+### Geändert
+- Buildversion auf `0.8.0` angehoben
+- alle eingebetteten Browser-Runner verwenden dieselbe Modul- und CSS-Reihenfolge wie die Anwendung
+- Gesamtvalidator führt vier getrennte Browsergruppen aus
+- Projekt-, Bericht- und Speicherlisten sind für Pfeiltastennavigation markiert
+- TODO trennt automatisierte Grundprüfung und reale Screenreader-Abnahme
+
+### Sicherheitsverbesserungen
+- manipulierte oder beschädigte Paketprüfsummen blockieren den Import
+- unbekannte Fragen und ungültige Antwortwerte blockieren den Import
+- bei ID-Konflikten ist eine neue Projekt-ID die sichere Standardempfehlung
+- Archiv- und Papierkorbprojekte dürfen nicht ersetzt werden
+- Ersetzen verlangt exakten Projektnamen und separate Bestätigung
+- vor dem Ersetzen wird `pre-import-backup` als unveränderte Sicherheitsrevision angelegt
+- Importdateien werden ausschließlich nach ausdrücklicher lokaler Dateiauswahl gelesen
+
+### Einschränkung
+- die Paketprüfsumme dient der Erkennung unbeabsichtigter Änderungen; sie ist keine kryptografische Signatur oder Herkunftsbestätigung
+- die automatisierte Barrierefreiheitsprüfung ersetzt keine reale Orca-, NVDA- oder VoiceOver-Abnahme
 
 ## [0.7.0] – 2026-08-05
 
 ### Hinzugefügt
-- `js/project-repository.js` als getrennte Mehrprojekt-Persistenzschicht
-- `js/project-manager.js` als grafische Projektübersicht
-- `css/project-manager.css` für responsive Desktop- und Mobilansicht
-- Lebenszykluszustände `active`, `archive` und `trash`
-- Suche und Statusfilter für gespeicherte Projekte
-- Neuanlage leerer Projekte mit eindeutiger Projekt-ID
-- Umbenennen als neue Projekt-Revision
-- Duplizieren mit eigener ID, eigener Revision und unabhängigen Snapshots
-- Archivieren und Wiederherstellen
-- Papierkorb und kontrollierte Wiederherstellung
-- endgültiges Löschen mit exakter Namenseingabe und separater Bestätigung
-- transaktionales Entfernen von Projektstand, Snapshots, Metadaten und Protokollen
-- automatischer Wechsel auf ein anderes aktives Projekt
-- automatisches Ersatzprojekt, falls kein weiteres aktives Projekt vorhanden ist
-- Unit-Vertragstest für Projektlebenszyklus und Löschumfang
-- eigener Desktop-/Mobil-Browser-Smoke für den vollständigen Projektlebenszyklus
-
-### Geändert
-- Buildversion auf `0.7.0` angehoben
-- aktueller Projektname wird im Header angezeigt
-- Berichte verwenden stets Projekt-ID und Revision des geöffneten Projekts
-- Autospeicherung wird vor Projektwechseln seriell abgeschlossen
-- Gesamtvalidator führt drei getrennte Browsergruppen aus
-
-### Sicherheitsverbesserungen
-- archivierte Projekte und Papierkorbprojekte können nicht direkt bearbeitet werden
-- endgültiges Löschen ist ausschließlich im Papierkorb erlaubt
-- ein falscher Projektname oder fehlende Bestätigung blockiert die Löschung
-- projektspezifische Daten werden ausschließlich nach Projekt-ID entfernt
+- vollständige Mehrprojektverwaltung
+- Projektlebenszyklus `active`, `archive` und `trash`
+- Suche, Filter, Neuanlage, Umbenennen, Duplizieren, Archiv, Papierkorb und sicheres Löschen
+- unabhängige Projekt-Revisionen, Snapshots und Berichte
 
 ## [0.6.0] – 2026-08-05
 
