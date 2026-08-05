@@ -23,7 +23,9 @@ Projektschema `1.2.0` enthält:
 | `1.1.0` | Fragenkatalogversion und Validierungszeitpunkt | `1.2.0` |
 | `1.2.0` | keine | keine Migration |
 
-## Aktueller Projekt-Datensatz
+## Persistenz
+
+### Aktueller Projekt-Datensatz
 
 ```text
 projects
@@ -35,7 +37,7 @@ projects
     └── reason
 ```
 
-## Snapshot
+### Snapshot
 
 ```text
 snapshots
@@ -51,9 +53,7 @@ snapshots
 
 Snapshots werden ausschließlich mit `add` erzeugt. Eine vorhandene Snapshot-ID kann dadurch nicht still überschrieben werden.
 
-## Migrationsstände
-
-Mögliche Speichergründe:
+### Migrationsstände
 
 - `pre-migration-backup`: unveränderter Hauptstand vor der Migration
 - `snapshot-migration`: migrierte Kopie eines Legacy-Snapshots
@@ -61,40 +61,67 @@ Mögliche Speichergründe:
 
 Legacy-Originale bleiben erhalten. Eine migrierte Kopie verweist über `sourceSnapshotId` auf ihre Quelle.
 
-## Metadaten
+## Berichtsmodell 1.0.0
+
+Das Berichtsmodell wird nicht separat gepflegt. Es wird bei Vorschau oder Export aus dem aktuellen Projektzustand, dem Fragenkatalog und den aktiven Regeln neu erzeugt.
+
+```text
+report
+├── modelVersion
+├── generatedAt
+├── project
+│   ├── id
+│   ├── name
+│   ├── schemaVersion
+│   ├── questionCatalogVersion
+│   ├── revision
+│   ├── progress
+│   └── status
+├── summary
+├── decisions[]
+├── requirements[]
+├── architecture
+│   ├── principles[]
+│   ├── components[]
+│   ├── decisions[]
+│   └── dataFlow[]
+├── risks[]
+├── testCases[]
+├── acceptanceCriteria[]
+├── milestones[]
+├── openDecisions[]
+└── traceability[]
+```
+
+### Kennungen
+
+- `DEC-###`: bestätigte Entscheidung
+- `REQ-###`: abgeleitete Anforderung
+- `ADR-###`: Architekturentscheidung
+- `RISK-###`: Risiko oder offener Konflikt
+- `TEST-###`: Normal- oder Fehlerfalltest
+- `AC-###`: Abnahmekriterium
+- `MS-##`: Meilenstein
+- `OPEN-###`: offene Entscheidung
+
+### Rückverfolgbarkeit
+
+Jeder Eintrag verbindet:
+
+```text
+Frage-ID → Anforderungs-ID → Testfall-IDs → Abnahmekriterium-ID
+```
+
+Renderer dürfen diese Beziehungen nicht neu berechnen oder verändern. Markdown, HTML, TXT und JSON verwenden dieselben Modellobjekte.
+
+## Metadaten und Ereignisse
 
 Der Store `meta` enthält:
 
 - `project:<projectId>` für letzte Revision, Schema und Speichergrund
 - `retention:<projectId>` für Aufbewahrungsgrenze und Änderungszeitpunkt
 
-## Migrations- und Ereignisprotokoll
-
-`migrationLog` dokumentiert:
-
-- Datenbank-Upgrades
-- Speicherungen
-- automatische und manuelle Wiederherstellungen
-- `schema-migration-step` für jeden Einzelschritt
-- `schema-migration-complete` für den atomaren Abschluss
-- geänderte Aufbewahrungsgrenzen
-- Snapshot-Bereinigungen
-
-Jeder Migrationsschritt enthält Ausgangs- und Zielversion sowie Projekt, Revision und gegebenenfalls Quell-Snapshot.
-
-## Prüfergebnis eines Snapshots
-
-Die Oberfläche beziehungsweise Storage-API leitet ab:
-
-- `checksumValid`
-- `schemaValid`
-- `valid`
-- `sourceSchemaVersion`
-- `targetSchemaVersion`
-- `migrationRequired`
-- `migrationSteps`
-- Validierungsfehler
-- Kennzeichnung als jüngster gültiger Sicherheitsstand
+`migrationLog` dokumentiert Datenbank-Upgrades, Speicherungen, Wiederherstellungen, Migrationsschritte, Aufbewahrungsänderungen und Bereinigungen.
 
 ## Wiederherstellung
 
