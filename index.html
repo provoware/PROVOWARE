@@ -9,14 +9,17 @@
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/project-manager.css">
   <script defer src="js/migration-engine.js"></script>
   <script defer src="js/storage-engine.js"></script>
+  <script defer src="js/project-repository.js"></script>
   <script defer src="js/state-manager.js"></script>
   <script defer src="js/workflow-engine.js"></script>
   <script defer src="js/rule-engine.js"></script>
   <script defer src="js/validation-engine.js"></script>
   <script defer src="js/report-generator.js"></script>
   <script defer src="js/ui/app-ui.js"></script>
+  <script defer src="js/project-manager.js"></script>
   <script defer src="js/report-manager.js"></script>
   <script defer src="js/storage-manager.js"></script>
   <script defer src="js/app.js"></script>
@@ -26,11 +29,12 @@
 
   <header class="app-header">
     <div>
-      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.6.0</p>
+      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.7.0</p>
       <h1>Entwicklungsplan-Assistent</h1>
       <p class="subtitle">Schritt für Schritt von der Idee zum prüfbaren Plan.</p>
     </div>
     <div class="header-status" aria-label="Projektstatus">
+      <span id="current-project-name" class="badge badge-info" title="Aktuelles Projekt">PROVOWARE Entwicklungsplan</span>
       <span id="data-mode" class="badge badge-info">Daten werden geladen</span>
       <span id="storage-status" class="badge badge-neutral">Speicher wird geprüft</span>
       <span id="status-badge" class="badge badge-warning">Unvollständig</span>
@@ -75,7 +79,8 @@
         <div><dt>Offen</dt><dd id="open-count">6</dd></div>
         <div><dt>Hinweise</dt><dd id="rule-count">0</dd></div>
       </dl>
-      <button id="report-manager-button" type="button" class="button button-primary button-wide">Bericht prüfen und exportieren</button>
+      <button id="project-manager-button" type="button" class="button button-primary button-wide" title="Projekte anlegen, wechseln, archivieren und wiederherstellen">Projekte verwalten</button>
+      <button id="report-manager-button" type="button" class="button button-secondary button-wide">Bericht prüfen und exportieren</button>
       <button id="storage-manager-button" type="button" class="button button-secondary button-wide">Speicherstände verwalten</button>
       <section aria-labelledby="decision-title"><h3 id="decision-title">Entscheidungen</h3><ul id="decision-list" class="summary-list"></ul></section>
       <section aria-labelledby="rule-title"><h3 id="rule-title">Hinweise und Konflikte</h3><ul id="rule-list" class="summary-list"></ul></section>
@@ -87,6 +92,71 @@
     <p id="live-status" role="status" aria-live="polite">Prototyp wird gestartet.</p>
     <button id="theme-button" type="button" class="button button-secondary" aria-pressed="false">Helles Theme</button>
   </footer>
+
+  <dialog id="project-dialog" class="storage-dialog" aria-labelledby="project-dialog-title">
+    <div class="dialog-shell">
+      <header class="dialog-header">
+        <div>
+          <p class="eyebrow">Getrennte Projektstände</p>
+          <h2 id="project-dialog-title">Projekte verwalten</h2>
+          <p class="subtitle">Jedes Projekt besitzt eine eigene ID, eigene Revisionen, Snapshots, Aufbewahrungsgrenze und Berichte.</p>
+        </div>
+        <button id="project-close-button" type="button" class="button button-secondary" aria-label="Projektverwaltung schließen">Schließen</button>
+      </header>
+
+      <section class="project-toolbar" aria-label="Projektübersicht filtern und erweitern">
+        <form id="project-new-form" class="project-new-form">
+          <label for="project-new-name">Neues Projekt</label>
+          <input id="project-new-name" name="projectName" type="text" minlength="3" maxlength="80" required placeholder="Zum Beispiel: Offline-Medienwerkzeug">
+          <button type="submit" class="button button-primary">Projekt anlegen</button>
+        </form>
+        <label class="project-control" for="project-search">
+          <span>Projekt suchen</span>
+          <input id="project-search" type="search" placeholder="Name oder Projekt-ID">
+        </label>
+        <label class="project-control" for="project-filter">
+          <span>Status anzeigen</span>
+          <select id="project-filter">
+            <option value="active">Aktive Projekte</option>
+            <option value="archive">Archiv</option>
+            <option value="trash">Papierkorb</option>
+            <option value="all">Alle Projekte</option>
+          </select>
+        </label>
+        <button id="project-refresh-button" type="button" class="button button-secondary">Liste aktualisieren</button>
+      </section>
+
+      <dl class="storage-stats project-counts">
+        <div><dt>Gesamt</dt><dd id="project-total-count">0</dd></div>
+        <div><dt>Aktiv</dt><dd id="project-active-count">0</dd></div>
+        <div><dt>Archiv</dt><dd id="project-archive-count">0</dd></div>
+        <div><dt>Papierkorb</dt><dd id="project-trash-count">0</dd></div>
+      </dl>
+
+      <ul id="project-list" class="project-list" aria-label="Gespeicherte Projekte"></ul>
+
+      <section id="project-action-panel" class="project-action-panel" aria-labelledby="project-action-title" hidden>
+        <div>
+          <h3 id="project-action-title">Projektaktion</h3>
+          <p id="project-action-help" class="subtitle"></p>
+        </div>
+        <label class="project-action-field" for="project-action-input">
+          <span id="project-action-label">Projektname</span>
+          <input id="project-action-input" type="text" maxlength="80" autocomplete="off">
+        </label>
+        <label id="project-action-checkbox-label" class="project-delete-confirmation" hidden>
+          <input id="project-action-checkbox" type="checkbox">
+          <span>Ich bestätige, dass das Projekt einschließlich aller Snapshots, Metadaten und Protokolle endgültig gelöscht werden darf.</span>
+        </label>
+        <div class="project-action-actions">
+          <button id="project-action-confirm" type="button" class="button button-primary" disabled>Aktion ausführen</button>
+          <button id="project-action-cancel" type="button" class="button button-secondary">Abbrechen</button>
+        </div>
+      </section>
+
+      <p id="project-manager-status" class="dialog-status" role="status" aria-live="polite">Projektverwaltung bereit.</p>
+    </div>
+  </dialog>
 
   <dialog id="report-dialog" class="storage-dialog" aria-labelledby="report-dialog-title">
     <div class="dialog-shell">
