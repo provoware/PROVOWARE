@@ -19,8 +19,8 @@ BROWSERS = ("chromium", "chromium-browser", "google-chrome", "google-chrome-stab
 SCRIPT_ORDER = [
     "js/migration-engine.js", "js/storage-engine.js", "js/state-manager.js",
     "js/workflow-engine.js", "js/rule-engine.js", "js/validation-engine.js",
-    "js/report-generator.js", "js/ui/app-ui.js", "js/storage-manager.js",
-    "js/app.js", "tests/smoke/browser-smoke.js"
+    "js/report-generator.js", "js/ui/app-ui.js", "js/report-manager.js",
+    "js/storage-manager.js", "js/app.js", "tests/smoke/browser-smoke.js"
 ]
 STYLE_ORDER = ["css/variables.css", "css/themes.css", "css/layout.css", "css/components.css"]
 
