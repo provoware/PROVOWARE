@@ -35,6 +35,11 @@
     return namespace.validation.validateStoredProject(payload, state.catalog);
   }
 
+  function currentMigrationContext() {
+    const state = namespace.state.getState();
+    return namespace.storage.migrationContext(state.catalog?.catalogVersion || "1.0.0");
+  }
+
   async function persistNow(reason = "autosave") {
     if (!storageReady) return null;
     const state = namespace.state.getState();
@@ -46,7 +51,8 @@
     const retention = await namespace.storage.pruneSnapshots(
       state.projectId,
       limit,
-      candidate => storedProjectValidator(candidate).length === 0
+      storedProjectValidator,
+      currentMigrationContext()
     );
     namespace.state.setStorageStatus("saved", result.revision, result.source);
     return { ...result, retention };
@@ -56,7 +62,8 @@
     if (!storageReady || autosaveSuspended > 0 || [
       "Speicherstatus aktualisiert.", "Datenkataloge geladen.", "Daten geprüft.",
       "Projektkennung gesetzt.", "Gespeicherter Projektstand geladen.",
-      "Letzter gültiger Snapshot wiederhergestellt.", "Snapshot manuell wiederhergestellt."
+      "Letzter gültiger Snapshot wiederhergestellt.", "Snapshot manuell wiederhergestellt.",
+      "Projektstand schrittweise migriert."
     ].includes(message)) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
@@ -80,7 +87,8 @@
     const state = namespace.state.getState();
     return namespace.storage.getStorageOverview(
       state.projectId,
-      payload => storedProjectValidator(payload).length === 0
+      storedProjectValidator,
+      currentMigrationContext()
     );
   }
 
@@ -95,7 +103,8 @@
     const result = await namespace.storage.pruneSnapshots(
       state.projectId,
       limit,
-      payload => storedProjectValidator(payload).length === 0
+      storedProjectValidator,
+      currentMigrationContext()
     );
     return { ...result, limit };
   }
@@ -110,11 +119,12 @@
         return namespace.storage.restoreSnapshot(
           state.projectId,
           snapshotId,
-          payload => storedProjectValidator(payload).length === 0
+          storedProjectValidator,
+          currentMigrationContext()
         );
       });
       const result = await saveChain;
-      namespace.state.restoreProject(result.payload, { revision: result.revision, source: "manual-recovery" });
+      namespace.state.restoreProject(result.payload, { revision: result.revision, source: "manual-recovery", migratedFrom: result.migratedFrom });
       namespace.state.setStorageStatus("recovered", result.revision, "manual-recovery");
       return result;
     } finally {
@@ -127,12 +137,13 @@
     await namespace.storage.open();
     const restored = await namespace.storage.loadLatestValid(
       state.projectId,
-      payload => storedProjectValidator(payload).length === 0
+      storedProjectValidator,
+      currentMigrationContext()
     );
     if (restored) namespace.state.restoreProject(restored.payload, restored);
     storageReady = true;
     namespace.state.setStorageStatus(
-      restored?.source === "recovery" ? "recovered" : "ready",
+      restored?.source === "recovery" || restored?.source === "migration" ? "recovered" : "ready",
       restored?.revision || 0,
       restored?.source || null
     );
@@ -143,7 +154,8 @@
       await namespace.storage.pruneSnapshots(
         state.projectId,
         limit,
-        payload => storedProjectValidator(payload).length === 0
+        storedProjectValidator,
+        currentMigrationContext()
       );
     }
   }
