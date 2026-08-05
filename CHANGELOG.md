@@ -4,9 +4,47 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 
 ## [Unreleased]
 
+### Hinzugefügt
+- modulare, datengetriebene Projektvorlagenverwaltung
+- sechs Projektarten: Offline-HTML, Linux-Desktop, Medienverarbeitung, Dateiorganisation, Songwriting/Audio und Mobile PWA
+- je drei geprüfte Profile pro Projektart; insgesamt 18 integrierte Profile
+- vollständige Antwortsets für alle sechs Pflichtfragen
+- verbindlicher Abgleich deklarierter und tatsächlich ausgelöster Regeln
+- Vorschau aller Antwortunterschiede gegenüber dem aktuell geöffneten Projekt
+- sichtbare Architekturvorschläge, Ordnerstrukturen, Berichtsvorgaben, Qualitätsgates, Meilensteine und Sonderfälle
+- blockierte Projektanlage bis zur ausdrücklichen Prüfung der Vorschau
+- zusätzliche Bestätigung bei kritischen Regelkonflikten
+- unveränderliche integrierte Profile
+- lokale eigene Profile im vorhandenen Metadaten-Store
+- eigenes Profil aus einem vollständig beantworteten Projekt erstellen
+- eigene Profile umbenennen, duplizieren, exportieren, importieren und löschen
+- Profilpaket `1.0.0` mit Prüfsumme und Größenbegrenzung auf 512 KiB
+- Vorlagenherkunft eines neuen Projekts als getrennte Metadaten
+- modularer Vorlagenindex `data/templates.json` mit sechs getrennten Datenmodulen
+- Unit-Vertrag für 6 Vorlagen, 18 Profile, 108 gültige Antwortzuordnungen und reale Regelauswertung
+- Desktop-/Mobil-Smoke für Vorschau, Projektanlage und vollständigen eigenen Profillebenszyklus
+
+### Sicherheitsverbesserungen
+- kein Profil darf eine Pflichtfrage auslassen
+- unbekannte Frage-IDs und ungültige Antwortwerte blockieren das Profil
+- behauptete Regelauswirkungen müssen exakt mit dem realen Regelkern übereinstimmen
+- integrierte Profile mit kritischem Konflikt werden im Katalogvertrag abgelehnt
+- vor der Projektanlage wird der Profilfingerabdruck erneut verglichen
+- Vorlagenprojekte erhalten immer eine neue unabhängige Projekt-ID
+- Projekt- und Profilmetadaten bleiben voneinander getrennt
+- manipulierte Profilpakete werden über die Prüfsumme blockiert
+- Löschen eines eigenen Profils verändert keine bestehenden Projekte
+- Profilimport ist auch vollständig per Tastatur erreichbar
+- Theme-Farben verwenden die verbindlichen `--color-*`-Variablen
+
+### Geändert
+- `data/templates.json` von einer unvollständigen Beispielvorlage auf einen modularen Katalogindex `2.0.0` umgestellt
+- `schemas/template.schema.json` auf den Modulindexvertrag umgestellt
+- Releaseversion bleibt bis zur erneuten vollständigen Releaseabnahme bei `0.8.0`
+
 ### Geplant
-- Projektvorlagen und Profile
-- reale Kubuntu-Abnahme der IndexedDB-Fehlerfälle
+- kryptografischer SHA-256-Fingerabdruck und optional signierbares Projektpaket-Manifest
+- reale Kubuntu-Abnahme aller Browser- und IndexedDB-Gruppen
 - reale Screenreader-Abnahme
 - Ein-Datei-Release
 
@@ -29,23 +67,10 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 - bewusstes Ersetzen eines aktiven Projekts mit Vorher-Sicherung
 - Revisionsabgleich unmittelbar vor dem Ersetzen
 - `js/accessibility.js` als zentrale Dialog- und Tastaturschicht
-- Fokusfalle im obersten Dialog
-- Escape-Hierarchie für Unteraktionen und Dialoge
-- Fokus-Rückkehr zum tatsächlichen Auslöser
-- Pfeiltastennavigation mit Home und Ende
+- Fokusfalle, Escape-Hierarchie, Fokus-Rückkehr und Pfeiltastennavigation
 - automatisierte Barrierefreiheits-Grundprüfung
-- Unit-Tests für Transfer, Prüfsumme, Migration, Konflikte, Revisionsschutz und Zugänglichkeitsverträge
+- Unit-Tests für Transfer, Migration, Konflikte, Revisionsschutz und Zugänglichkeitsverträge
 - automatischer Versionsabgleich zwischen Oberfläche, Build, Transferpaket und Release-ZIP
-- eigener Desktop-/Mobil-Smoke für Transfer und Dialogbedienung
-
-### Geändert
-- Build- und Releaseversion auf `0.8.0` angehoben
-- veralteter Release-Dateiname `0.2.0` korrigiert
-- lange Projektnamen werden vor dem sichtbaren Suffix `– Import` sicher auf höchstens 80 Zeichen begrenzt
-- alle eingebetteten Browser-Runner verwenden dieselbe Modul- und CSS-Reihenfolge wie die Anwendung
-- Gesamtvalidator führt vier getrennte Browsergruppen aus
-- Projekt-, Bericht- und Speicherlisten sind für Pfeiltastennavigation markiert
-- TODO trennt automatisierte Grundprüfung und reale Screenreader-Abnahme
 
 ### Sicherheitsverbesserungen
 - manipulierte oder beschädigte Paketprüfsummen blockieren den Import
@@ -55,12 +80,11 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 - Archiv- und Papierkorbprojekte dürfen nicht ersetzt werden
 - Ersetzen verlangt exakten Projektnamen und separate Bestätigung
 - hat sich die lokale Revision seit der Vorschau verändert, wird das Ersetzen blockiert
-- vor dem Ersetzen wird `pre-import-backup` als unveränderte Sicherheitsrevision angelegt
-- Importdateien werden ausschließlich nach ausdrücklicher lokaler Dateiauswahl gelesen
+- vor dem Ersetzen wird `pre-import-backup` angelegt
 
-### Einschränkung
-- die Paketprüfsumme dient der Erkennung unbeabsichtigter Änderungen; sie ist keine kryptografische Signatur oder Herkunftsbestätigung
-- die automatisierte Barrierefreiheitsprüfung ersetzt keine reale Orca-, NVDA- oder VoiceOver-Abnahme
+### Einschränkungen
+- die Paketprüfsumme ist keine kryptografische Signatur oder Herkunftsbestätigung
+- die automatisierte Barrierefreiheitsprüfung ersetzt keine reale Screenreader-Abnahme
 
 ## [0.7.0] – 2026-08-05
 
