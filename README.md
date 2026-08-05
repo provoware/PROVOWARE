@@ -2,110 +2,69 @@
 
 ## Projektstatus
 
-Das Repository enthält jetzt einen kleinen, startbaren und vollständig lokalen HTML-Prototypen. Die Oberfläche, JavaScript-Logik, Datenkataloge und JSON-Schemata sind getrennt aufgebaut.
+Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow und versionierter IndexedDB-Speicherung.
 
-**Version:** 0.2.0 – Architekturprototyp  
-**Ziel:** laienoptimierter Assistent für belastbare Entwicklungspläne  
-**Grundsatz:** kleine, prüfbare und reversible Entwicklungsschritte
+**Version:** 0.3.0  
+**Phase:** belastbarer P0-Prototyp und Beginn der P1-Kernfunktionen  
+**Zielplattform:** aktuelle Chromium- und Firefox-Browser unter Linux
 
-## Zweck
+## Start
 
-Das Tool führt Nutzer durch wichtige Projektentscheidungen. Jede Antwort kann später in Anforderungen, Risiken, Testfälle, Ordnerstrukturen und Entwicklungsberichte überführt werden.
+### Direkt öffnen
 
-## Schnellstart
+`index.html` im Browser öffnen. Falls der Browser getrennte JSON-Dateien unter `file://` blockiert, verwendet die Oberfläche sichtbar den eingebauten Beispieldatensatz.
 
-### Empfohlen: lokaler Browserstart
+### Empfohlener lokaler Start
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Danach im Browser öffnen:
+Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-Kataloge und erlaubt reguläre IndexedDB-Speicherung.
 
-```text
-http://localhost:8080
-```
+## Aktueller Funktionsumfang
 
-Damit werden die getrennten JSON-Datenkataloge direkt geladen.
+- sechs mehrschichtig erklärte Entwicklungsfragen in vier Phasen
+- Empfehlungsschaltfläche, Fortschritt und Live-Zusammenfassung
+- Konflikterkennung für widersprüchliche Offline-/Cloud-Entscheidungen
+- helles und dunkles Theme
+- versionierte IndexedDB mit vier getrennten Stores
+- transaktionales Speichern von Hauptstand, Snapshot, Metadaten und Protokolleintrag
+- unveränderliche Snapshots mit fortlaufender Revision
+- Prüfsumme für Hauptstand und Snapshots
+- automatischer Rückfall auf den jüngsten gültigen Snapshot
+- sichtbarer Speicherstatus mit Revision und Wiederherstellungshinweis
 
-### Direkter Offline-Start
+## IndexedDB-Struktur
 
-`index.html` kann auch per Doppelklick geöffnet werden. Falls der Browser lokale JSON-Zugriffe blockiert, verwendet der Prototyp automatisch einen eingebauten, klar gekennzeichneten Beispieldatensatz. Es werden keine Daten ins Internet übertragen.
-
-## Aktuell enthalten
-
-- semantischer Header mit Fortschritt und Statusampel
-- Workflow-Navigation mit vier Beispielphasen
-- mehrschichtige Fragenkarte
-- einfache Erklärungen, Beispiel, Pro, Contra, Alternative und Empfehlung
-- Live-Zusammenfassung und offene Entscheidungen
-- regelbasierte Hinweise und Konflikterkennung
-- getrennte CSS-, JavaScript-, Daten- und Schemadateien
-- Tastaturbedienung und sichtbarer Fokus
-- lokale Validierungs-, Test-, Build- und Release-Skripte
-- keine Cloud-, CDN- oder externen Laufzeitabhängigkeiten
-
-## Projektstruktur
-
-Die verbindliche Struktur steht in `PROJEKTORDNERSTRUKTUR.md`.
-
-Wichtige Bereiche:
-
-| Bereich | Zweck |
+| Store | Zweck |
 |---|---|
-| `index.html` | semantische Grundoberfläche |
-| `css/` | Design-Tokens, Layout, Komponenten und Themes |
-| `js/` | Zustand, Workflow, Regeln, Validierung und UI |
-| `data/` | versionierte Fragen, Regeln, Vorlagen und Prompts |
-| `schemas/` | maschinenlesbare Datenverträge |
-| `tests/` | Unit-, Integrations- und Smoke-Prüfungen |
-| `scripts/` | Validierung, Build und Release |
-| `docs/` | Architektur, Datenmodell, Testplan und Bedienhilfe |
-| `dist/` | ausschließlich generierte Release-Ausgaben |
+| `projects` | aktueller Projektstand |
+| `snapshots` | unveränderliche Revisionsstände |
+| `meta` | Schema-, Revisions- und Speicherinformationen |
+| `migrationLog` | Datenbank-Upgrades, Speicherungen und Wiederherstellungen |
 
-## Prüfung
-
-Optionale Python-Werkzeuge installieren:
+## Prüfungen
 
 ```bash
 python3 -m pip install -r requirements.txt
-```
-
-Struktur, JSON, Schemata und Verweise prüfen:
-
-```bash
 python3 scripts/validate.py
-```
-
-Tests ausführen:
-
-```bash
 pytest -q
+python3 tests/smoke/run_browser_smoke.py
 ```
 
-Modulares Ausgabepaket erzeugen:
+Komplett einschließlich Browser-Smoke:
 
 ```bash
-python3 scripts/build.py
+python3 scripts/validate.py --browser
 ```
 
-ZIP-Release erzeugen:
+Der Browser-Smoke prüft Desktop und Mobil, alle sechs Fragen, Phasennavigation, Empfehlung, Fortschritt, Theme, Konfliktampel und Überlauf. Auf normalen Systemen läuft er über einen lokalen HTTP-Server und prüft auch die echte IndexedDB-Wiederherstellung. Blockiert eine isolierte Umgebung lokale Navigation administrativ, wird ein ausdrücklich gemeldeter eingebetteter UI-Fallback ausgeführt.
 
-```bash
-python3 scripts/release.py
-```
+## Datenschutz und Offline-Betrieb
 
-## Entwicklungsprinzipien
+Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände bleiben lokal im Browser. Ein späterer Export muss vor dem Schreiben validiert und in einer Vorschau angezeigt werden.
 
-- offline-first; keine verpflichtenden Cloud- oder CDN-Abhängigkeiten
-- datengetriebene Fragen-, Regel- und Berichtssysteme
-- verständliche Hilfetexte mit Beispiel, Pro, Contra, Alternative und Empfehlung
-- Vorvalidierung, Vorschau, sichere Ausführung und Nachprüfung
-- Tastaturbedienung, sichtbarer Fokus und Screenreader-Beschriftungen
-- keine zerstörerischen Änderungen ohne Sicherung oder nachvollziehbaren Commit
+## Nächster Schritt
 
-## Statusanzeige
-
-- **Erledigt:** Grundstruktur, Minimalprototyp, erste Datenkataloge, Schemata und lokale Prüfungen
-- **Offen:** IndexedDB, vollständiger Berichtsgenerator, Projektverwaltung, Import und umfassende Barrierefreiheitsabnahme
-- **Nächster Schritt:** lokale Projektpersistenz mit versioniertem IndexedDB-Schema entwickeln
+Autosave-Steuerung, Snapshot-Aufbewahrungsregeln und eine sichtbare Wiederherstellungsverwaltung mit manueller Auswahl älterer gültiger Stände entwickeln.
