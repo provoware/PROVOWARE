@@ -2,13 +2,14 @@
   "use strict";
   const namespace = window.Provoware = window.Provoware || {};
   const DB_NAME = "provoware-entwicklungsplan";
-  const DB_VERSION = 1;
-  const PROJECT_SCHEMA_VERSION = "1.1.0";
+  const DB_VERSION = 2;
+  const PROJECT_SCHEMA_VERSION = namespace.migrations?.TARGET_SCHEMA_VERSION || "1.2.0";
   const DEFAULT_RETENTION_LIMIT = 30;
   const MIN_RETENTION_LIMIT = 5;
   const MAX_RETENTION_LIMIT = 200;
   const STORES = Object.freeze({ projects: "projects", snapshots: "snapshots", meta: "meta", migrations: "migrationLog" });
   let databasePromise = null;
+  let testFault = null;
 
   function requestToPromise(request) {
     return new Promise((resolve, reject) => {
@@ -49,6 +50,42 @@
     const parsed = Number.parseInt(value, 10);
     if (!Number.isFinite(parsed)) return DEFAULT_RETENTION_LIMIT;
     return Math.min(MAX_RETENTION_LIMIT, Math.max(MIN_RETENTION_LIMIT, parsed));
+  }
+
+  function makeStorageError(name, message) {
+    if (typeof DOMException === "function") return new DOMException(message, name);
+    const error = new Error(message);
+    error.name = name;
+    return error;
+  }
+
+  function normalizeStorageError(error) {
+    if (error?.name === "QuotaExceededError") {
+      return makeStorageError("QuotaExceededError", "Der lokale Browserspeicher ist voll. Es wurden keine unvollständigen Daten übernommen.");
+    }
+    if (error?.name === "AbortError") {
+      return makeStorageError("AbortError", "Die Speichertransaktion wurde vollständig abgebrochen. Der vorherige Stand bleibt erhalten.");
+    }
+    return error instanceof Error ? error : new Error(String(error));
+  }
+
+  function setTestFault(name = null) {
+    if (window.__PROVOWARE_TESTING__ !== true) throw new Error("Fehlerinjektion ist ausschließlich im Testmodus erlaubt.");
+    testFault = name;
+  }
+
+  function injectTestFault(name, transaction) {
+    if (testFault !== name) return;
+    testFault = null;
+    const error = name === "quota-before-write"
+      ? makeStorageError("QuotaExceededError", "Simulierter voller Browserspeicher.")
+      : makeStorageError("AbortError", "Simulierter Transaktionsabbruch.");
+    try { transaction.abort(); } catch (_ignored) {}
+    throw error;
+  }
+
+  function migrationContext(catalogVersion = "1.0.0") {
+    return { catalogVersion, now: new Date().toISOString() };
   }
 
   function open() {
@@ -95,8 +132,10 @@
       answers: clone(state.answers || {}),
       currentQuestionId: state.currentQuestionId || null,
       theme: state.theme === "light" ? "light" : "dark",
+      questionCatalogVersion: state.catalog?.catalogVersion || "1.0.0",
       createdAt: state.createdAt || now,
-      updatedAt: now
+      updatedAt: now,
+      lastValidatedAt: now
     };
   }
 
@@ -110,15 +149,16 @@
     return Array.isArray(result) ? result.length === 0 : result === true;
   }
 
-  function inspectSnapshot(record, validator) {
+  function prepareRecord(record, validator, context = {}) {
     const checksumValid = validChecksum(record);
-    const validationResult = checksumValid && typeof validator === "function" ? validator(record.payload) : true;
-    const validationErrors = Array.isArray(validationResult)
-      ? validationResult
-      : validationResult === true
-        ? []
-        : ["Projektschema oder Antwortwerte sind ungültig."];
-    const schemaValid = checksumValid && validationErrors.length === 0;
+    const prepared = checksumValid
+      ? namespace.migrations.preparePayload(record.payload, validator, context)
+      : { payload: null, migrated: false, sourceVersion: record?.payload?.schemaVersion || null, targetVersion: PROJECT_SCHEMA_VERSION, steps: [], valid: false, validationErrors: ["Prüfsumme ungültig."] };
+    return { checksumValid, ...prepared };
+  }
+
+  function inspectSnapshot(record, validator, context = {}) {
+    const prepared = prepareRecord(record, validator, context);
     return {
       snapshotId: record.snapshotId,
       projectId: record.projectId,
@@ -126,35 +166,71 @@
       savedAt: record.savedAt,
       reason: record.reason,
       checksum: record.checksum,
-      checksumValid,
-      schemaValid,
-      valid: checksumValid && schemaValid,
-      validationErrors,
-      payload: clone(record.payload)
+      checksumValid: prepared.checksumValid,
+      schemaValid: prepared.valid,
+      valid: prepared.checksumValid && prepared.valid,
+      validationErrors: prepared.validationErrors,
+      payload: prepared.payload ? clone(prepared.payload) : clone(record.payload),
+      originalPayload: clone(record.payload),
+      sourceSchemaVersion: prepared.sourceVersion,
+      targetSchemaVersion: prepared.targetVersion,
+      migrationRequired: prepared.migrated,
+      migrationSteps: clone(prepared.steps)
     };
   }
 
-  async function saveProject(payload, reason = "autosave") {
+  function addMigrationSteps(store, projectId, steps, details = {}) {
+    for (const step of steps || []) {
+      store.add({
+        projectId,
+        type: "schema-migration-step",
+        fromVersion: step.from,
+        toVersion: step.to,
+        createdAt: new Date().toISOString(),
+        ...details
+      });
+    }
+  }
+
+  async function saveProject(payload, reason = "autosave", options = {}) {
     const database = await open();
     const transaction = database.transaction(Object.values(STORES), "readwrite");
     const done = transactionToPromise(transaction);
-    const projects = transaction.objectStore(STORES.projects);
-    const snapshots = transaction.objectStore(STORES.snapshots);
-    const meta = transaction.objectStore(STORES.meta);
-    const migrations = transaction.objectStore(STORES.migrations);
-    const current = await requestToPromise(projects.get(payload.projectId));
-    const revision = Math.max(0, Number(current?.revision || 0)) + 1;
-    const savedAt = new Date().toISOString();
-    const safePayload = clone(payload);
-    const recordChecksum = checksum(safePayload);
-    const projectRecord = { id: payload.projectId, revision, payload: safePayload, checksum: recordChecksum, savedAt, reason };
-    const snapshotRecord = { snapshotId: `${payload.projectId}:${String(revision).padStart(12, "0")}`, projectId: payload.projectId, revision, payload: safePayload, checksum: recordChecksum, savedAt, reason };
-    projects.put(projectRecord);
-    snapshots.add(snapshotRecord);
-    meta.put({ key: `project:${payload.projectId}`, projectId: payload.projectId, revision, schemaVersion: payload.schemaVersion, savedAt, lastReason: reason });
-    migrations.add({ projectId: payload.projectId, type: reason.includes("recovery") ? "recovery" : "save", revision, schemaVersion: payload.schemaVersion, createdAt: savedAt, reason });
-    await done;
-    return { revision, savedAt, snapshotId: snapshotRecord.snapshotId, source: reason.includes("recovery") ? "recovery" : "current" };
+    try {
+      const projects = transaction.objectStore(STORES.projects);
+      const snapshots = transaction.objectStore(STORES.snapshots);
+      const meta = transaction.objectStore(STORES.meta);
+      const migrations = transaction.objectStore(STORES.migrations);
+      const current = await requestToPromise(projects.get(payload.projectId));
+      const revision = Math.max(0, Number(current?.revision || 0)) + 1;
+      const savedAt = new Date().toISOString();
+      const safePayload = clone(payload);
+      const recordChecksum = checksum(safePayload);
+      const projectRecord = { id: payload.projectId, revision, payload: safePayload, checksum: recordChecksum, savedAt, reason };
+      const snapshotRecord = {
+        snapshotId: `${payload.projectId}:${String(revision).padStart(12, "0")}`,
+        projectId: payload.projectId,
+        revision,
+        payload: safePayload,
+        checksum: recordChecksum,
+        savedAt,
+        reason,
+        sourceSnapshotId: options.sourceSnapshotId || null
+      };
+      injectTestFault("quota-before-write", transaction);
+      projects.put(projectRecord);
+      injectTestFault("abort-after-project-put", transaction);
+      snapshots.add(snapshotRecord);
+      meta.put({ key: `project:${payload.projectId}`, projectId: payload.projectId, revision, schemaVersion: payload.schemaVersion, savedAt, lastReason: reason });
+      migrations.add({ projectId: payload.projectId, type: reason.includes("recovery") ? "recovery" : "save", revision, schemaVersion: payload.schemaVersion, createdAt: savedAt, reason });
+      addMigrationSteps(migrations, payload.projectId, options.migrationSteps, { revision, sourceSnapshotId: options.sourceSnapshotId || null });
+      await done;
+      return { revision, savedAt, snapshotId: snapshotRecord.snapshotId, source: reason.includes("recovery") ? "recovery" : "current" };
+    } catch (error) {
+      try { transaction.abort(); } catch (_ignored) {}
+      await done.catch(() => {});
+      throw normalizeStorageError(error);
+    }
   }
 
   async function readProjectAndSnapshots(projectId) {
@@ -174,39 +250,172 @@
     return fallback ? { record: fallback, source: "snapshot" } : null;
   }
 
-  async function loadLatestValid(projectId, validator) {
-    const { current, snapshots } = await readProjectAndSnapshots(projectId);
-    const selected = selectLatestValidRecord(current, snapshots, validator);
-    if (!selected) return null;
-    if (selected.source === "current") return { payload: clone(selected.record.payload), revision: selected.record.revision, source: "current" };
-    const recovery = await saveProject(selected.record.payload, "automatic-recovery");
-    return { payload: clone(selected.record.payload), revision: recovery.revision, source: "recovery", recoveredRevision: selected.record.revision };
+  function selectLatestUsableRecord(current, snapshots, validator, context = {}) {
+    const candidates = [
+      ...(current ? [{ record: current, source: "current" }] : []),
+      ...[...(snapshots || [])].sort((left, right) => right.revision - left.revision).map(record => ({ record, source: "snapshot" }))
+    ];
+    for (const candidate of candidates) {
+      const prepared = prepareRecord(candidate.record, validator, context);
+      if (prepared.checksumValid && prepared.valid) return { ...candidate, prepared };
+    }
+    return null;
   }
 
-  async function listSnapshots(projectId, validator) {
+  async function migrateProjectAndSnapshots(projectId, validator, context = {}) {
+    const { current, snapshots } = await readProjectAndSnapshots(projectId);
+    const selected = selectLatestUsableRecord(current, snapshots, validator, context);
+    if (!selected?.prepared.migrated) return null;
+
+    const legacySnapshots = snapshots
+      .map(record => ({ record, prepared: prepareRecord(record, validator, context) }))
+      .filter(item => item.prepared.checksumValid && item.prepared.valid && item.prepared.migrated);
+    const database = await open();
+    const transaction = database.transaction(Object.values(STORES), "readwrite");
+    const done = transactionToPromise(transaction);
+    try {
+      const projects = transaction.objectStore(STORES.projects);
+      const snapshotStore = transaction.objectStore(STORES.snapshots);
+      const meta = transaction.objectStore(STORES.meta);
+      const migrations = transaction.objectStore(STORES.migrations);
+      let revision = Math.max(Number(current?.revision || 0), ...snapshots.map(item => Number(item.revision || 0)), 0);
+      const createdAt = new Date().toISOString();
+
+      injectTestFault("quota-before-write", transaction);
+      for (const item of legacySnapshots) {
+        revision += 1;
+        const migratedPayload = clone(item.prepared.payload);
+        const migratedChecksum = checksum(migratedPayload);
+        snapshotStore.add({
+          snapshotId: `${projectId}:${String(revision).padStart(12, "0")}`,
+          projectId,
+          revision,
+          payload: migratedPayload,
+          checksum: migratedChecksum,
+          savedAt: createdAt,
+          reason: "snapshot-migration",
+          sourceSnapshotId: item.record.snapshotId
+        });
+        addMigrationSteps(migrations, projectId, item.prepared.steps, { revision, sourceSnapshotId: item.record.snapshotId });
+      }
+
+      if (selected.source === "current") {
+        revision += 1;
+        const originalPayload = clone(selected.record.payload);
+        snapshotStore.add({
+          snapshotId: `${projectId}:${String(revision).padStart(12, "0")}`,
+          projectId,
+          revision,
+          payload: originalPayload,
+          checksum: checksum(originalPayload),
+          savedAt: createdAt,
+          reason: "pre-migration-backup",
+          sourceRevision: selected.record.revision
+        });
+      }
+
+      revision += 1;
+      const targetPayload = clone(selected.prepared.payload);
+      const targetChecksum = checksum(targetPayload);
+      const targetSnapshotId = `${projectId}:${String(revision).padStart(12, "0")}`;
+      projects.put({ id: projectId, revision, payload: targetPayload, checksum: targetChecksum, savedAt: createdAt, reason: "schema-migration" });
+      injectTestFault("abort-after-project-put", transaction);
+      snapshotStore.add({
+        snapshotId: targetSnapshotId,
+        projectId,
+        revision,
+        payload: targetPayload,
+        checksum: targetChecksum,
+        savedAt: createdAt,
+        reason: "schema-migration",
+        sourceSnapshotId: selected.source === "snapshot" ? selected.record.snapshotId : null
+      });
+      meta.put({ key: `project:${projectId}`, projectId, revision, schemaVersion: PROJECT_SCHEMA_VERSION, savedAt: createdAt, lastReason: "schema-migration" });
+      migrations.add({
+        projectId,
+        type: "schema-migration-complete",
+        source: selected.source,
+        sourceRevision: selected.record.revision,
+        sourceSchemaVersion: selected.prepared.sourceVersion,
+        targetSchemaVersion: PROJECT_SCHEMA_VERSION,
+        revision,
+        createdAt
+      });
+      addMigrationSteps(migrations, projectId, selected.prepared.steps, { revision, source: selected.source });
+      await done;
+      return {
+        payload: targetPayload,
+        revision,
+        source: "migration",
+        migratedFrom: selected.prepared.sourceVersion,
+        migrationSteps: clone(selected.prepared.steps),
+        snapshotId: targetSnapshotId
+      };
+    } catch (error) {
+      try { transaction.abort(); } catch (_ignored) {}
+      await done.catch(() => {});
+      throw normalizeStorageError(error);
+    }
+  }
+
+  async function loadLatestValid(projectId, validator, context = {}) {
+    const migrated = await migrateProjectAndSnapshots(projectId, validator, context);
+    if (migrated) return migrated;
+    const { current, snapshots } = await readProjectAndSnapshots(projectId);
+    const selected = selectLatestUsableRecord(current, snapshots, validator, context);
+    if (!selected) return null;
+    if (selected.source === "current" && !selected.prepared.migrated) {
+      return { payload: clone(selected.prepared.payload), revision: selected.record.revision, source: "current" };
+    }
+    const recovery = await saveProject(selected.prepared.payload, "automatic-recovery", {
+      sourceSnapshotId: selected.record.snapshotId || null,
+      migrationSteps: selected.prepared.steps
+    });
+    return {
+      payload: clone(selected.prepared.payload),
+      revision: recovery.revision,
+      source: "recovery",
+      recoveredRevision: selected.record.revision,
+      migratedFrom: selected.prepared.migrated ? selected.prepared.sourceVersion : null
+    };
+  }
+
+  async function listSnapshots(projectId, validator, context = {}) {
     const { snapshots } = await readProjectAndSnapshots(projectId);
-    const inspected = snapshots.map(record => inspectSnapshot(record, validator));
+    const inspected = snapshots.map(record => inspectSnapshot(record, validator, context));
     const safetySnapshot = inspected.find(snapshot => snapshot.valid) || null;
     return inspected.map(snapshot => ({ ...snapshot, isSafetySnapshot: snapshot.snapshotId === safetySnapshot?.snapshotId }));
   }
 
-  async function restoreSnapshot(projectId, snapshotId, validator) {
+  async function restoreSnapshot(projectId, snapshotId, validator, context = {}) {
     const database = await open();
     const transaction = database.transaction(STORES.snapshots, "readonly");
     const done = transactionToPromise(transaction);
     const record = await requestToPromise(transaction.objectStore(STORES.snapshots).get(snapshotId));
     await done;
     if (!record || record.projectId !== projectId) throw new Error("Der ausgewählte Snapshot gehört nicht zu diesem Projekt.");
-    const inspected = inspectSnapshot(record, validator);
+    const inspected = inspectSnapshot(record, validator, context);
     if (!inspected.valid) throw new Error(`Snapshot ist nicht wiederherstellbar: ${inspected.validationErrors.join(" ") || "Prüfsumme ungültig."}`);
-    const saved = await saveProject(inspected.payload, "manual-recovery");
-    return { ...saved, payload: clone(inspected.payload), restoredSnapshotId: snapshotId, restoredRevision: inspected.revision };
+    const saved = await saveProject(inspected.payload, "manual-recovery", {
+      sourceSnapshotId: snapshotId,
+      migrationSteps: inspected.migrationSteps
+    });
+    return {
+      ...saved,
+      payload: clone(inspected.payload),
+      restoredSnapshotId: snapshotId,
+      restoredRevision: inspected.revision,
+      migratedFrom: inspected.migrationRequired ? inspected.sourceSchemaVersion : null
+    };
   }
 
-  function planRetention(snapshots, requestedLimit, validator) {
+  function planRetention(snapshots, requestedLimit, validator, context = {}) {
     const limit = normalizeRetentionLimit(requestedLimit);
     const ordered = [...(snapshots || [])].sort((left, right) => right.revision - left.revision);
-    const safety = ordered.find(record => validChecksum(record) && validatorAccepts(record.payload, validator)) || null;
+    const safety = ordered.find(record => {
+      const prepared = prepareRecord(record, validator, context);
+      return prepared.checksumValid && prepared.valid;
+    }) || null;
     const keep = ordered.slice(0, limit);
     if (safety && !keep.some(record => record.snapshotId === safety.snapshotId)) {
       const replaceIndex = keep.length - 1;
@@ -243,9 +452,9 @@
     return limit;
   }
 
-  async function pruneSnapshots(projectId, requestedLimit, validator) {
+  async function pruneSnapshots(projectId, requestedLimit, validator, context = {}) {
     const { snapshots } = await readProjectAndSnapshots(projectId);
-    const plan = planRetention(snapshots, requestedLimit, validator);
+    const plan = planRetention(snapshots, requestedLimit, validator, context);
     if (!plan.deleteIds.length) return { ...plan, deleted: 0, retained: snapshots.length };
     const database = await open();
     const transaction = database.transaction([STORES.snapshots, STORES.meta, STORES.migrations], "readwrite");
@@ -272,12 +481,20 @@
     const logsRequest = requestToPromise(transaction.objectStore(STORES.migrations).index("projectId").getAll(projectId));
     const [project, snapshots, meta, logs] = await Promise.all([projectRequest, snapshotsRequest, metaRequest, logsRequest]);
     await done;
-    return { project, snapshotCount: snapshots.length, meta, logCount: logs.length, recoveryCount: logs.filter(item => item.type === "recovery").length };
+    return {
+      project,
+      snapshotCount: snapshots.length,
+      meta,
+      logCount: logs.length,
+      recoveryCount: logs.filter(item => item.type === "recovery").length,
+      migrationCount: logs.filter(item => item.type === "schema-migration-complete").length,
+      migrationSteps: logs.filter(item => item.type === "schema-migration-step")
+    };
   }
 
-  async function getStorageOverview(projectId, validator) {
+  async function getStorageOverview(projectId, validator, context = {}) {
     const [diagnostics, snapshots, retentionLimit] = await Promise.all([
-      getDiagnostics(projectId), listSnapshots(projectId, validator), getRetentionLimit(projectId)
+      getDiagnostics(projectId), listSnapshots(projectId, validator, context), getRetentionLimit(projectId)
     ]);
     return { diagnostics, snapshots, retentionLimit };
   }
@@ -286,7 +503,8 @@
     DB_NAME, DB_VERSION, PROJECT_SCHEMA_VERSION, DEFAULT_RETENTION_LIMIT, MIN_RETENTION_LIMIT,
     MAX_RETENTION_LIMIT, STORES, open, createPayload, saveProject, loadLatestValid, listSnapshots,
     restoreSnapshot, getRetentionLimit, setRetentionLimit, pruneSnapshots, getDiagnostics,
-    getStorageOverview, checksum, inspectSnapshot, selectLatestValidRecord, planRetention,
-    normalizeRetentionLimit
+    getStorageOverview, migrateProjectAndSnapshots, checksum, inspectSnapshot, selectLatestValidRecord,
+    selectLatestUsableRecord, planRetention, normalizeRetentionLimit, normalizeStorageError,
+    setTestFault, migrationContext
   };
 })();
