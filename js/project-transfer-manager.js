@@ -39,7 +39,12 @@
           throw new Error("Der eingegebene Projektname stimmt nicht exakt mit dem vorhandenen Projekt überein.");
         }
       }
-      return original(candidatePreview, mode);
+      let preparedPreview = candidatePreview;
+      if (mode === "new" && candidatePreview.suggestedNewName) {
+        preparedPreview = structuredClone(candidatePreview);
+        preparedPreview.payload.name = candidatePreview.suggestedNewName;
+      }
+      return original(preparedPreview, mode);
     };
     Object.defineProperty(guarded, "__provowareGuarded", { value: true });
     namespace.persistence.applyImport = guarded;
@@ -141,7 +146,7 @@
   function modeHelp(mode) {
     if (!preview) return "";
     if (mode === "preserve") return "Die Projekt-ID ist frei. Der Import wird als eigenständiges aktives Projekt mit Revision 1 gespeichert.";
-    if (mode === "new") return "Eine neue Projekt-ID wird erzeugt. Das lokale Projekt mit gleicher ID bleibt vollständig unverändert.";
+    if (mode === "new") return `Eine neue Projekt-ID wird erzeugt. Das lokale Projekt bleibt unverändert. Neuer Name: „${preview.suggestedNewName}“.`;
     if (mode === "replace") return `Vor dem Ersetzen wird für „${preview.existingProject?.name || preview.payload?.name}“ eine ausdrückliche Vorher-Sicherung als neue Revision angelegt.`;
     return preview.recommendation?.reason || "Wähle eine sichere Importart.";
   }
