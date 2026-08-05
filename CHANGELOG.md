@@ -21,22 +21,27 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 - Dateigrößenlimit von zwei MiB
 - rein lesende Importvorschau vor jeder Speicherung
 - schrittweise Migration importierter Projektschemata `1.0.0` und `1.1.0`
+- Prüfung konsistenter Herkunfts-ID, Projektname, Projektschema und Katalogversion
 - Prüfung bekannter Frage-IDs und zulässiger Antwortwerte
 - Vergleich von Projektgrundfeldern und Antworten
 - Erkennung identischer Projekte und bestehender Projekt-IDs
 - Import mit freier Original-ID oder neuer unabhängiger ID
 - bewusstes Ersetzen eines aktiven Projekts mit Vorher-Sicherung
+- Revisionsabgleich unmittelbar vor dem Ersetzen
 - `js/accessibility.js` als zentrale Dialog- und Tastaturschicht
 - Fokusfalle im obersten Dialog
 - Escape-Hierarchie für Unteraktionen und Dialoge
 - Fokus-Rückkehr zum tatsächlichen Auslöser
 - Pfeiltastennavigation mit Home und Ende
 - automatisierte Barrierefreiheits-Grundprüfung
-- Unit-Tests für Transfer, Prüfsumme, Migration, Konflikte und Zugänglichkeitsverträge
+- Unit-Tests für Transfer, Prüfsumme, Migration, Konflikte, Revisionsschutz und Zugänglichkeitsverträge
+- automatischer Versionsabgleich zwischen Oberfläche, Build, Transferpaket und Release-ZIP
 - eigener Desktop-/Mobil-Smoke für Transfer und Dialogbedienung
 
 ### Geändert
-- Buildversion auf `0.8.0` angehoben
+- Build- und Releaseversion auf `0.8.0` angehoben
+- veralteter Release-Dateiname `0.2.0` korrigiert
+- lange Projektnamen werden vor dem sichtbaren Suffix `– Import` sicher auf höchstens 80 Zeichen begrenzt
 - alle eingebetteten Browser-Runner verwenden dieselbe Modul- und CSS-Reihenfolge wie die Anwendung
 - Gesamtvalidator führt vier getrennte Browsergruppen aus
 - Projekt-, Bericht- und Speicherlisten sind für Pfeiltastennavigation markiert
@@ -44,10 +49,12 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 
 ### Sicherheitsverbesserungen
 - manipulierte oder beschädigte Paketprüfsummen blockieren den Import
+- widersprüchliche Herkunfts- und Projektmetadaten blockieren den Import
 - unbekannte Fragen und ungültige Antwortwerte blockieren den Import
 - bei ID-Konflikten ist eine neue Projekt-ID die sichere Standardempfehlung
 - Archiv- und Papierkorbprojekte dürfen nicht ersetzt werden
 - Ersetzen verlangt exakten Projektnamen und separate Bestätigung
+- hat sich die lokale Revision seit der Vorschau verändert, wird das Ersetzen blockiert
 - vor dem Ersetzen wird `pre-import-backup` als unveränderte Sicherheitsrevision angelegt
 - Importdateien werden ausschließlich nach ausdrücklicher lokaler Dateiauswahl gelesen
 
