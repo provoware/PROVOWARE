@@ -2,17 +2,13 @@
 
 ## Projektstatus
 
-Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow und versionierter IndexedDB-Speicherung.
+Das Repository enthält einen startbaren, vollständig lokalen HTML-Prototyp mit datengetriebenem Fragenworkflow, versionierter IndexedDB und grafischer Speicherverwaltung.
 
-**Version:** 0.3.0  
-**Phase:** belastbarer P0-Prototyp und Beginn der P1-Kernfunktionen  
+**Version:** 0.4.0  
+**Phase:** belastbarer P1-Prototyp  
 **Zielplattform:** aktuelle Chromium- und Firefox-Browser unter Linux
 
 ## Start
-
-### Direkt öffnen
-
-`index.html` im Browser öffnen. Falls der Browser getrennte JSON-Dateien unter `file://` blockiert, verwendet die Oberfläche sichtbar den eingebauten Beispieldatensatz.
 
 ### Empfohlener lokaler Start
 
@@ -22,6 +18,10 @@ python3 -m http.server 8080
 
 Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-Kataloge und erlaubt reguläre IndexedDB-Speicherung.
 
+### Direkt öffnen
+
+`index.html` kann per Doppelklick geöffnet werden. Blockiert der Browser getrennte JSON-Dateien unter `file://`, verwendet die Oberfläche sichtbar den eingebauten Beispieldatensatz. Es werden keine Daten ins Internet übertragen.
+
 ## Aktueller Funktionsumfang
 
 - sechs mehrschichtig erklärte Entwicklungsfragen in vier Phasen
@@ -30,10 +30,37 @@ Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-K
 - helles und dunkles Theme
 - versionierte IndexedDB mit vier getrennten Stores
 - transaktionales Speichern von Hauptstand, Snapshot, Metadaten und Protokolleintrag
-- unveränderliche Snapshots mit fortlaufender Revision
-- Prüfsumme für Hauptstand und Snapshots
+- unveränderliche Snapshots mit fortlaufender Revision und Prüfsumme
 - automatischer Rückfall auf den jüngsten gültigen Snapshot
-- sichtbarer Speicherstatus mit Revision und Wiederherstellungshinweis
+- grafische Liste aller Snapshots mit Revision, Zeitpunkt, Speichergrund und Prüfergebnis
+- JSON-Vorschau vor jeder manuellen Wiederherstellung
+- Wiederherstellung erst nach ausdrücklicher Bestätigung und immer als neue Revision
+- manueller Sicherheitsstand auf Knopfdruck
+- konfigurierbare Aufbewahrungsgrenze von 5 bis 200 Snapshots
+- Schutz des letzten gültigen Sicherheitsstands bei der Bereinigung
+
+## Speicherverwaltung
+
+Über **„Speicherstände verwalten“** öffnet sich ein modaler Arbeitsbereich.
+
+1. Snapshot auswählen.
+2. Revision, Zeitpunkt, Speichergrund und Gültigkeit prüfen.
+3. Gespeicherte Antworten und Einstellungen in der Vorschau kontrollieren.
+4. Bestätigungsfeld aktivieren.
+5. Snapshot als neue Revision wiederherstellen.
+
+Die ursprüngliche Revision bleibt unverändert erhalten. Eine Wiederherstellung überschreibt keinen historischen Snapshot.
+
+## Aufbewahrungsregel
+
+Die Standardgrenze beträgt 30 Snapshots. Zulässig sind 5 bis 200.
+
+Beim Aufräumen bleiben erhalten:
+
+- die neuesten Revisionen innerhalb der Grenze,
+- zusätzlich zwingend der jüngste gültige Sicherheitsstand.
+
+Ist dieser Sicherheitsstand älter als die normale Grenze, ersetzt er den ältesten regulären Platz. Die Grenze wird dadurch nicht überschritten.
 
 ## IndexedDB-Struktur
 
@@ -41,8 +68,8 @@ Danach `http://localhost:8080` öffnen. Dieser Modus lädt die getrennten JSON-K
 |---|---|
 | `projects` | aktueller Projektstand |
 | `snapshots` | unveränderliche Revisionsstände |
-| `meta` | Schema-, Revisions- und Speicherinformationen |
-| `migrationLog` | Datenbank-Upgrades, Speicherungen und Wiederherstellungen |
+| `meta` | Schema-, Revisions-, Aufbewahrungs- und Speicherinformationen |
+| `migrationLog` | Upgrades, Speicherungen, Wiederherstellungen und Bereinigungen |
 
 ## Prüfungen
 
@@ -59,12 +86,12 @@ Komplett einschließlich Browser-Smoke:
 python3 scripts/validate.py --browser
 ```
 
-Der Browser-Smoke prüft Desktop und Mobil, alle sechs Fragen, Phasennavigation, Empfehlung, Fortschritt, Theme, Konfliktampel und Überlauf. Auf normalen Systemen läuft er über einen lokalen HTTP-Server und prüft auch die echte IndexedDB-Wiederherstellung. Blockiert eine isolierte Umgebung lokale Navigation administrativ, wird ein ausdrücklich gemeldeter eingebetteter UI-Fallback ausgeführt.
+Der Browser-Smoke prüft zusätzlich Snapshot-Liste, Vorschau, Bestätigung, Wiederherstellung und Aufbewahrungsgrenze auf Desktop und Mobil. Blockiert eine isolierte Umgebung lokale Navigation administrativ, wird ein ausdrücklich gemeldeter eingebetteter UI-Fallback ausgeführt.
 
 ## Datenschutz und Offline-Betrieb
 
-Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände bleiben lokal im Browser. Ein späterer Export muss vor dem Schreiben validiert und in einer Vorschau angezeigt werden.
+Der Anwendungskern enthält keine CDN-, Cloud- oder Netzpflicht. Projektstände bleiben lokal im Browser. Browserdaten können durch manuelle Browserbereinigung verloren gehen; ein geprüfter JSON-Export folgt in einer späteren Iteration.
 
 ## Nächster Schritt
 
-Autosave-Steuerung, Snapshot-Aufbewahrungsregeln und eine sichtbare Wiederherstellungsverwaltung mit manueller Auswahl älterer gültiger Stände entwickeln.
+Eine echte Migrationsmatrix für mehrere Projektschemata und reproduzierbare Fehlerfälle ergänzen. Danach folgt der vollständige Berichtsgenerator für Markdown, HTML, TXT und JSON.
