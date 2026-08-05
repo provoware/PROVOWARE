@@ -37,7 +37,7 @@ def main():
             shutil.copy2(source, destination)
 
     manifest = {
-        "buildVersion": "0.6.0",
+        "buildVersion": "0.7.0",
         "files": [
             {"path": str(path.relative_to(TARGET)), "sha256": sha256(path), "size": path.stat().st_size}
             for path in sorted(TARGET.rglob("*")) if path.is_file()
