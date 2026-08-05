@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = (ROOT / "js" / "storage-engine.js").read_text(encoding="utf-8")
+MANAGER = (ROOT / "js" / "storage-manager.js").read_text(encoding="utf-8")
 
 
 def test_storage_uses_required_object_stores():
@@ -21,3 +22,20 @@ def test_recovery_and_integrity_contract_exist():
     assert "selectLatestValidRecord" in SOURCE
     assert "automatic-recovery" in SOURCE
     assert "loadLatestValid" in SOURCE
+    assert "restoreSnapshot" in SOURCE
+    assert '"manual-recovery"' in SOURCE
+
+
+def test_retention_preserves_a_valid_safety_snapshot():
+    assert "planRetention" in SOURCE
+    assert "safetySnapshotId" in SOURCE
+    assert "keepIds" in SOURCE
+    assert "MIN_RETENTION_LIMIT = 5" in SOURCE
+    assert "MAX_RETENTION_LIMIT = 200" in SOURCE
+
+
+def test_graphical_manager_requires_preview_and_confirmation():
+    assert "renderPreview" in MANAGER
+    assert "snapshot-confirm" in MANAGER
+    assert "snapshot-restore-button" in MANAGER
+    assert "selectedSnapshot?.valid" in MANAGER
