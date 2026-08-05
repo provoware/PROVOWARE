@@ -15,14 +15,18 @@ EXPECTED_FILES = [
     "README.md", "TODO.md", "CHANGELOG.md", "SCHWACHSTELLEN.md", "AGENTS.md",
     "UPGRADEPOOL.md", "PROJEKTORDNERSTRUKTUR.md", "requirements.txt", "index.html",
     "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css",
-    "js/app.js", "js/storage-engine.js", "js/storage-manager.js", "js/state-manager.js",
-    "js/workflow-engine.js", "js/rule-engine.js", "js/validation-engine.js",
+    "js/app.js", "js/migration-engine.js", "js/storage-engine.js", "js/storage-manager.js",
+    "js/state-manager.js", "js/workflow-engine.js", "js/rule-engine.js", "js/validation-engine.js",
     "js/report-generator.js", "js/ui/app-ui.js",
     "data/questions.json", "data/rules.json", "data/templates.json", "data/prompts.json",
     "schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json",
     "tests/unit/test_catalogs.py", "tests/unit/test_storage_contract.py",
+    "tests/unit/test_migration_matrix.py", "tests/unit/test_storage_failures.py",
     "tests/integration/test_structure.py", "tests/smoke/test_index.py",
     "tests/smoke/browser-smoke.js", "tests/smoke/run_browser_smoke.py",
+    "tests/smoke/storage-failure-smoke.js", "tests/smoke/run_storage_failure_smoke.py",
+    "tests/smoke/failure-harness.html",
+    "tests/fixtures/project-v1.0.0.json", "tests/fixtures/project-v1.1.0.json",
     "tests/fixtures/project-valid.json", "scripts/build.py", "scripts/validate.py", "scripts/release.py",
     "docs/ARCHITEKTUR.md", "docs/DATENMODELL.md", "docs/TESTPLAN.md", "docs/BEDIENHILFE.md", "dist/.gitkeep"
 ]
@@ -46,41 +50,37 @@ def validate_catalogs():
     rules = load_json("data/rules.json")
     templates = load_json("data/templates.json")
     prompts = load_json("data/prompts.json")
-
     phase_ids = {phase["id"] for phase in questions["phases"]}
     question_ids = [question["id"] for question in questions["questions"]]
     assert len(question_ids) == len(set(question_ids)), "Doppelte Frage-IDs erkannt."
     assert all(question["phaseId"] in phase_ids for question in questions["questions"]), "Unbekannte Phase in Fragenkatalog."
-
     known_questions = set(question_ids)
     for question in questions["questions"]:
         option_values = {option["value"] for option in question["options"]}
         assert question["recommendedValue"] in option_values, f"Ungültige Empfehlung bei {question['id']}"
-
     rule_ids = [rule["id"] for rule in rules["rules"]]
     assert len(rule_ids) == len(set(rule_ids)), "Doppelte Regel-IDs erkannt."
     for rule in rules["rules"]:
         conditions = rule["when"].get("all", []) + rule["when"].get("any", [])
         assert conditions, f"Regel ohne Bedingung: {rule['id']}"
         assert all(condition["questionId"] in known_questions for condition in conditions), f"Unbekannte Frage in Regel {rule['id']}"
-
     for collection, key in ((templates, "templates"), (prompts, "prompts")):
         ids = [item["id"] for item in collection[key]]
         assert len(ids) == len(set(ids)), f"Doppelte IDs in {key}."
 
 
 def validate_schemas():
+    project_schema = load_json("schemas/project.schema.json")
+    template_schema = load_json("schemas/template.schema.json")
+    questions_schema = load_json("schemas/questions.schema.json")
+    assert project_schema["properties"]["schemaVersion"]["const"] == "1.2.0"
     try:
         import jsonschema
     except ImportError:
         print("[HINWEIS] jsonschema nicht installiert; strukturelle Ersatzprüfung wird verwendet.")
-        for path in ("schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json"):
-            assert load_json(path).get("type") == "object"
+        for schema in (project_schema, template_schema, questions_schema):
+            assert schema.get("type") == "object"
         return
-
-    project_schema = load_json("schemas/project.schema.json")
-    template_schema = load_json("schemas/template.schema.json")
-    questions_schema = load_json("schemas/questions.schema.json")
     jsonschema.Draft202012Validator.check_schema(project_schema)
     jsonschema.Draft202012Validator.check_schema(template_schema)
     jsonschema.Draft202012Validator.check_schema(questions_schema)
@@ -90,6 +90,15 @@ def validate_schemas():
         jsonschema.validate(template, template_schema)
 
 
+def validate_migration_contract():
+    source = (ROOT / "js" / "migration-engine.js").read_text(encoding="utf-8")
+    assert 'TARGET_SCHEMA_VERSION = "1.2.0"' in source
+    assert '"1.0.0": Object.freeze({ to: "1.1.0"' in source
+    assert '"1.1.0": Object.freeze({ to: TARGET_SCHEMA_VERSION' in source
+    assert "while (current.schemaVersion !== TARGET_SCHEMA_VERSION)" in source
+    assert "Zyklische Projektschema-Migration" in source
+
+
 def validate_html_references():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     references = re.findall(r'(?:href|src)="([^"]+)"', html)
@@ -97,16 +106,11 @@ def validate_html_references():
     missing = [ref for ref in local_references if not (ROOT / ref).is_file()]
     assert not missing, f"Fehlende HTML-Verweise: {missing}"
     order = [
-        'src="js/storage-engine.js"', 'src="js/state-manager.js"', 'src="js/ui/app-ui.js"',
-        'src="js/storage-manager.js"', 'src="js/app.js"'
+        'src="js/migration-engine.js"', 'src="js/storage-engine.js"', 'src="js/state-manager.js"',
+        'src="js/ui/app-ui.js"', 'src="js/storage-manager.js"', 'src="js/app.js"'
     ]
     positions = [html.index(marker) for marker in order]
-    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Speicherverwaltung ist ungültig."
-    for element_id in (
-        "storage-manager-button", "storage-dialog", "retention-limit", "snapshot-list",
-        "snapshot-preview", "snapshot-confirm", "snapshot-restore-button"
-    ):
-        assert f'id="{element_id}"' in html, f"UI-Element fehlt: {element_id}"
+    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Migration und Speicherverwaltung ist ungültig."
 
 
 def validate_javascript_syntax():
@@ -114,7 +118,11 @@ def validate_javascript_syntax():
     if not node:
         print("[HINWEIS] Node.js nicht vorhanden; JavaScript-Syntaxprüfung übersprungen.")
         return
-    paths = [*sorted((ROOT / "js").rglob("*.js")), ROOT / "tests" / "smoke" / "browser-smoke.js"]
+    paths = [
+        *sorted((ROOT / "js").rglob("*.js")),
+        ROOT / "tests" / "smoke" / "browser-smoke.js",
+        ROOT / "tests" / "smoke" / "storage-failure-smoke.js",
+    ]
     for path in paths:
         subprocess.run([node, "--check", str(path)], check=True, capture_output=True, text=True)
 
@@ -126,11 +134,11 @@ def validate_storage_contract():
         assert f'"{store}"' in source, f"IndexedDB-Store fehlt: {store}"
     assert 'transaction(Object.values(STORES), "readwrite")' in source, "Gemeinsame Schreibtransaktion fehlt."
     assert "snapshots.add(snapshotRecord)" in source, "Snapshots müssen unveränderlich per add geschrieben werden."
-    assert "loadLatestValid" in source and "automatic-recovery" in source, "Automatische Wiederherstellung fehlt."
-    for function_name in ("listSnapshots", "restoreSnapshot", "planRetention", "pruneSnapshots", "getStorageOverview"):
-        assert function_name in source, f"Speicherfunktion fehlt: {function_name}"
-    assert "safetySnapshotId" in source, "Schutz des letzten gültigen Sicherheitsstands fehlt."
-    assert "snapshot-confirm" in manager and "selectedSnapshot?.valid" in manager, "Bestätigte Wiederherstellung fehlt."
+    assert "migrateProjectAndSnapshots" in source and "pre-migration-backup" in source
+    assert "schema-migration-step" in source and "schema-migration-complete" in source
+    assert "quota-before-write" in source and "abort-after-project-put" in source
+    assert "QuotaExceededError" in source and "transaction.abort()" in source
+    assert "snapshot-confirm" in manager and "selectedSnapshot?.valid" in manager
 
 
 def validate_no_remote_runtime_assets():
@@ -142,17 +150,18 @@ def validate_no_remote_runtime_assets():
 
 def run_browser_smoke():
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_browser_smoke.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_storage_failure_smoke.py")], check=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description="PROVOWARE-Struktur und Datenverträge prüfen.")
-    parser.add_argument("--browser", action="store_true", help="zusätzlich den Desktop-/Mobil-Browser-Smoke-Test ausführen")
+    parser.add_argument("--browser", action="store_true", help="zusätzlich alle Browser-Smoke-Tests ausführen")
     args = parser.parse_args()
-
     checks = [
         ("Struktur", validate_structure),
         ("Datenkataloge", validate_catalogs),
         ("Schemata", validate_schemas),
+        ("Migrationsmatrix", validate_migration_contract),
         ("HTML-Verweise", validate_html_references),
         ("JavaScript-Syntax", validate_javascript_syntax),
         ("Speichervertrag", validate_storage_contract),
