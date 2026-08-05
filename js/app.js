@@ -103,21 +103,23 @@
   async function restoreSnapshot(snapshotId) {
     if (!storageReady) throw new Error("Der lokale Speicher ist nicht verfügbar.");
     clearTimeout(saveTimer);
-    await saveChain;
-    const state = namespace.state.getState();
-    const result = await namespace.storage.restoreSnapshot(
-      state.projectId,
-      snapshotId,
-      payload => storedProjectValidator(payload).length === 0
-    );
     autosaveSuspended += 1;
     try {
+      saveChain = saveChain.then(async () => {
+        const state = namespace.state.getState();
+        return namespace.storage.restoreSnapshot(
+          state.projectId,
+          snapshotId,
+          payload => storedProjectValidator(payload).length === 0
+        );
+      });
+      const result = await saveChain;
       namespace.state.restoreProject(result.payload, { revision: result.revision, source: "manual-recovery" });
       namespace.state.setStorageStatus("recovered", result.revision, "manual-recovery");
+      return result;
     } finally {
       autosaveSuspended -= 1;
     }
-    return result;
   }
 
   async function startStorage() {
