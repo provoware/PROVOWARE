@@ -1,43 +1,62 @@
 # Testplan
 
-## L0 – bei jeder Daten- oder Strukturänderung
+## L0 – Struktur und Syntax
 
 - erwartete Dateien vorhanden
 - JSON parsebar
 - IDs eindeutig
 - Regelverweise gültig
 - HTML-Verweise vorhanden
-- JavaScript syntaktisch gültig, sofern Node.js verfügbar
+- Storage-Engine wird vor dem State-Manager geladen
+- JavaScript syntaktisch gültig
 - keine externen Laufzeitadressen
-
-Befehl:
 
 ```bash
 python3 scripts/validate.py
 ```
 
-## L1 – betroffene Logik
+## L1 – Daten- und Speichervertrag
 
-- Frageempfehlungen verweisen auf existierende Optionen
-- Regeln verwenden bekannte Frage-IDs
-- Schemata akzeptieren gültige Prüfdaten
-
-Befehl:
+- Projektschema `1.1.0` akzeptiert gültige Prüfdaten
+- Stores `projects`, `snapshots`, `meta` und `migrationLog` vorhanden
+- Hauptstand, Snapshot, Metadaten und Protokoll werden gemeinsam geschrieben
+- Snapshots werden ausschließlich per `add` angelegt
+- Prüfsumme und Recovery-Auswahl sind vorhanden
 
 ```bash
 pytest -q tests/unit tests/integration
 ```
 
-## L2 – repräsentativer Smoke-Test
+## L2 – automatisierter Browser-Smoke
 
-- Seite öffnet ohne externen Netzwerkzugriff
-- sechs Fragen sind erreichbar
-- Fortschritt steigt nach Antworten
-- Empfehlung kann übernommen werden
-- Konflikt `offline + Cloud-Hauptspeicher` wird sichtbar
-- Desktop- und Mobilansicht überlaufen nicht horizontal
-- Tastaturfokus bleibt sichtbar
+Der Test läuft mit 1440×1000 und 390×844 und prüft praktisch:
+
+- sechs Fragen und vier Phasen
+- Phasennavigation
+- Empfehlungsschaltfläche
+- Fortschritt bis 100 Prozent
+- Themewechsel
+- Konfliktampel
+- horizontales Überlaufen
+- auf normalen Systemen: echte IndexedDB-Speicherung und automatische Wiederherstellung
+
+```bash
+python3 tests/smoke/run_browser_smoke.py
+```
+
+Kompletter Lauf:
+
+```bash
+python3 scripts/validate.py --browser
+```
+
+## Besonderheit isolierter Prüfumgebungen
+
+Die OpenAI-Prüfumgebung kann lokale HTTP- und `file://`-Navigation administrativ blockieren. Der Runner meldet das ausdrücklich und führt dann einen eingebetteten UI-Fallback aus. Dieser prüft Oberfläche, Workflow und die reine Recovery-Auswahl, ersetzt aber keine spätere echte IndexedDB-Abnahme auf einem normalen Linux-System.
 
 ## Noch offen
 
-Realer Browser-Smoke-Test, Screenreader-Test, IndexedDB-Fehlerfälle, Migrationen und Wiederherstellung.
+- reale Screenreader-Abnahme
+- Migrationsmatrix über mehrere Projektschemata
+- Speicherquota- und Abbruchtests
+- Snapshot-Aufbewahrung und manuelle Wiederherstellung
