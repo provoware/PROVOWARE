@@ -73,8 +73,8 @@
       "Speicherstatus aktualisiert.", "Datenkataloge geladen.", "Daten geprüft.",
       "Projektkennung gesetzt.", "Projektstatus aktualisiert.",
       "Gespeicherter Projektstand geladen.", "Neues Projekt geöffnet.", "Projektkopie geöffnet.",
-      "Letzter gültiger Snapshot wiederhergestellt.", "Snapshot manuell wiederhergestellt.",
-      "Projektstand schrittweise migriert."
+      "Importiertes Projekt geöffnet.", "Letzter gültiger Snapshot wiederhergestellt.",
+      "Snapshot manuell wiederhergestellt.", "Projektstand schrittweise migriert."
     ].includes(message)) return;
     clearTimeout(saveTimer);
     pendingAutosave = true;
@@ -286,6 +286,94 @@
     return namespace.projectRepository.listProjects();
   }
 
+  async function exportCurrentProject() {
+    if (!storageReady) throw new Error("Der lokale Speicher ist noch nicht bereit.");
+    await settlePendingSave("before-project-export");
+    const state = namespace.state.getState();
+    if (state.projectLifecycle !== "active") throw new Error("Nur ein aktives Projekt kann exportiert werden.");
+    return namespace.projectTransfer.createPackage(state, "0.8.0");
+  }
+
+  async function inspectImportPackage(packageData) {
+    if (!storageReady) throw new Error("Der lokale Speicher ist noch nicht bereit.");
+    const projectId = packageData?.project?.projectId;
+    const existing = typeof projectId === "string"
+      ? await namespace.projectRepository.getProjectRecord(projectId)
+      : null;
+    return namespace.projectTransfer.preparePreview(
+      packageData,
+      namespace.state.getState().catalog,
+      existing
+    );
+  }
+
+  function validateImportPayload(payload) {
+    const errors = storedProjectValidator(payload);
+    namespace.projectRepository.validateName(payload?.name);
+    if (errors.length) throw new Error(`Importierter Projektstand ist ungültig: ${errors.join(" ")}`);
+  }
+
+  async function applyImport(preview, mode) {
+    if (!storageReady) throw new Error("Der lokale Speicher ist noch nicht bereit.");
+    if (!preview?.valid || !preview.payload) throw new Error("Der Import besitzt keine gültige, geprüfte Vorschau.");
+    if (!preview.allowedModes.includes(mode)) throw new Error("Die gewählte Importart ist für diesen Stand nicht zulässig.");
+    autosaveSuspended += 1;
+    try {
+      await settlePendingSave("before-project-import");
+      let payload = structuredClone(preview.payload);
+      const now = new Date().toISOString();
+      let result;
+
+      if (mode === "preserve") {
+        const collision = await namespace.projectRepository.getProjectRecord(payload.projectId);
+        if (collision) throw new Error("Die Projekt-ID wurde zwischen Vorschau und Import bereits belegt.");
+        payload.updatedAt = now;
+        payload.lastValidatedAt = now;
+        validateImportPayload(payload);
+        result = await namespace.storage.saveProject(payload, "project-imported");
+      } else if (mode === "new") {
+        const projects = await namespace.projectRepository.listProjects();
+        const importedName = namespace.projectRepository.validateName(`${payload.name} – Import`);
+        payload.projectId = namespace.projectRepository.createProjectId(importedName, projects.map(item => item.id));
+        payload.name = importedName;
+        payload.createdAt = now;
+        payload.updatedAt = now;
+        payload.lastValidatedAt = now;
+        validateImportPayload(payload);
+        result = await namespace.storage.saveProject(payload, "project-imported-new-id");
+      } else if (mode === "replace") {
+        const existing = await namespace.projectRepository.getProjectRecord(payload.projectId);
+        if (!existing) throw new Error("Das zu ersetzende Projekt existiert nicht mehr.");
+        if (existing.summary.lifecycle.state !== "active") {
+          throw new Error("Archivierte Projekte oder Papierkorbprojekte dürfen nicht ersetzt werden.");
+        }
+        await namespace.storage.saveProject(existing.record.payload, "pre-import-backup");
+        payload.createdAt = existing.record.payload.createdAt || payload.createdAt;
+        payload.updatedAt = now;
+        payload.lastValidatedAt = now;
+        validateImportPayload(payload);
+        result = await namespace.storage.saveProject(payload, "project-import-replace");
+      } else {
+        throw new Error("Unbekannte Importart.");
+      }
+
+      namespace.state.restoreProject(payload, {
+        revision: result.revision,
+        source: "project-imported",
+        lifecycle: "active",
+        migratedFrom: preview.migrationRequired ? preview.sourceSchemaVersion : null,
+        migrationSteps: preview.migrationSteps
+      });
+      namespace.state.setStorageStatus("saved", result.revision, "current");
+      updateProjectUrl(payload.projectId);
+      const limit = await namespace.storage.getRetentionLimit(payload.projectId);
+      await namespace.storage.pruneSnapshots(payload.projectId, limit, storedProjectValidator, currentMigrationContext());
+      return { ...result, payload, mode };
+    } finally {
+      autosaveSuspended -= 1;
+    }
+  }
+
   async function startStorage() {
     await namespace.storage.open();
     const state = namespace.state.getState();
@@ -345,8 +433,10 @@
   }
 
   async function start() {
+    namespace.accessibility.initialize();
     namespace.ui.initialize();
     namespace.projectManager.initialize();
+    namespace.projectTransferManager.initialize();
     namespace.reportManager.initialize();
     namespace.storageManager.initialize();
     namespace.state.setProjectId(projectIdFromLocation());
@@ -379,7 +469,10 @@
     archiveProject,
     trashProject,
     restoreProjectLifecycle,
-    deleteProject
+    deleteProject,
+    exportCurrentProject,
+    inspectImportPackage,
+    applyImport
   };
   window.addEventListener("DOMContentLoaded", () => { namespace.ready = start(); }, { once: true });
 })();
