@@ -8,10 +8,14 @@ def test_index_contains_accessible_core_regions():
     for marker in (
         "<header", "<main", "<nav", "<section", "<aside", "<footer", "<dialog",
         'aria-live="polite"', 'id="storage-manager-button"', 'id="snapshot-confirm"',
-        'src="js/migration-engine.js"'
+        'id="report-manager-button"', 'id="report-dialog"', 'id="report-preview-content"',
+        'data-report-format="markdown"', 'data-report-format="html"',
+        'data-report-format="text"', 'data-report-format="json"',
+        'src="js/migration-engine.js"', 'src="js/report-manager.js"'
     ):
         assert marker in html
     assert html.index('src="js/migration-engine.js"') < html.index('src="js/storage-engine.js"')
+    assert html.index('src="js/report-generator.js"') < html.index('src="js/report-manager.js"') < html.index('src="js/app.js"')
 
 
 def test_runtime_has_no_remote_assets():
