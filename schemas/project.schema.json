@@ -7,47 +7,24 @@
     "schemaVersion",
     "projectId",
     "name",
-    "answers"
+    "answers",
+    "currentQuestionId",
+    "theme",
+    "createdAt",
+    "updatedAt"
   ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": {
-      "const": "1.0.0"
-    },
-    "projectId": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
-    },
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 120
-    },
+    "schemaVersion": { "const": "1.1.0" },
+    "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
     "answers": {
       "type": "object",
-      "additionalProperties": {
-        "type": [
-          "string",
-          "number",
-          "boolean",
-          "array",
-          "null"
-        ]
-      }
+      "additionalProperties": { "type": ["string", "number", "boolean", "array", "null"] }
     },
-    "currentQuestionId": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "createdAt": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "updatedAt": {
-      "type": "string",
-      "format": "date-time"
-    }
+    "currentQuestionId": { "type": ["string", "null"] },
+    "theme": { "enum": ["dark", "light"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
   }
 }
