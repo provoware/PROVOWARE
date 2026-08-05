@@ -1,32 +1,17 @@
 # Schwachstellen und technische Risiken
 
-## Zweck
-
-Dieses Dokument sammelt bekannte Risiken, technische Schulden und offene Sicherheitsfragen. Ein Punkt wird erst entfernt, wenn Ursache, Korrektur und Nachprüfung dokumentiert sind.
-
 ## Aktuelle Schwachstellen
 
 | ID | Bereich | Risiko | Auswirkung | Gegenmaßnahme | Status |
 |---|---|---|---|---|---|
-| S-001 | Architektur | Der Prototyp bildet erst einen kleinen Funktionskern ab | komplexe Projekte sind noch nicht vollständig planbar | Kern schrittweise erweitern, ohne Module zu vermischen | Reduziert |
-| S-002 | Datenhaltung | Projektschema ist vorhanden, aber noch keine IndexedDB-Persistenz | Antworten gehen nach Neuladen verloren | versionierte IndexedDB mit Snapshots ergänzen | Offen |
-| S-003 | Qualität | Lokale Prüfungen vorhanden, aber noch keine automatisierte CI | Fehler können auf `main` unbemerkt bleiben | kleinen GitHub-Actions-Workflow ergänzen | Teilweise |
-| S-004 | Barrierefreiheit | Tastaturgrundlage vorhanden, aber keine reale Screenreader-Abnahme | Bedienhindernisse können unentdeckt bleiben | NVDA, Orca oder VoiceOver nach festem Prüfplan testen | Offen |
-| S-005 | Release | Modularer Build vorbereitet, Ein-Datei-Build fehlt | Direktverteilung ist noch nicht optimal | deterministischen One-File-Build ergänzen | Teilweise |
-| S-006 | Umfang | Gefahr zu vieler gleichzeitiger Funktionen | Komplexität, Wiederholungen und Fehler nehmen zu | P0/P1/P2-Prioritäten und Minimal-Patches erzwingen | Beobachtung |
-| S-007 | Browser | Manche Browser blockieren `fetch()` bei `file://` | getrennte JSON-Kataloge werden beim Doppelklick nicht geladen | klar gekennzeichneter Fallback; empfohlenen lokalen Server dokumentieren | Kontrolliert |
-
-## Meldeformat
-
-Neue Schwachstellen erhalten:
-
-- eindeutige ID
-- betroffenen Bereich
-- konkrete Ursache
-- nachvollziehbare Auswirkung
-- reproduzierbaren Nachweis
-- geplante Gegenmaßnahme
-- Prüf- und Abschlusskriterium
+| S-001 | Architektur | Der Prototyp deckt erst sechs Beispiel-Fragen ab | Fachkatalog noch nicht produktionsvollständig | Katalog iterativ erweitern und jede Phase abnehmen | Beobachtung |
+| S-002 | Migration | Bisher existiert nur Projektschema `1.1.0` | Mehrstufige Migrationen sind noch nicht praktisch geprüft | Migrationsmatrix mit älteren Prüfdaten ergänzen | Offen |
+| S-003 | Qualität | Noch keine GitHub-Actions-CI | Prüfungen müssen lokal gestartet werden | Kleine CI für L0/L1 und Browser-Smoke vorbereiten | Offen |
+| S-004 | Barrierefreiheit | Noch keine reale Screenreader-Abnahme | Bedienhindernisse können unentdeckt bleiben | NVDA-/Orca- und Tastaturprüfplan durchführen | Offen |
+| S-005 | Browserdaten | Nutzer kann Browserdaten manuell löschen | Lokale Projektstände könnten verloren gehen | geprüften JSON-Export und Sicherungserinnerung ergänzen | Offen |
+| S-006 | Snapshots | Noch keine Aufbewahrungsgrenze oder manuelle Auswahl | Langzeitnutzung kann viele Revisionen erzeugen | konfigurierbare, sichere Aufbewahrung entwickeln | Offen |
+| S-007 | Prüfumgebung | Isolierte Umgebungen können lokale Browsernavigation blockieren | Echte IndexedDB-Abnahme ist dort nicht möglich | Runner nutzt klar gemeldeten UI-Fallback; reale Linux-Abnahme bleibt Pflicht | Teilweise |
+| S-008 | Release | Ein-Datei-Build fehlt noch | Direktverteilung ist noch nicht optimal | deterministischen One-File-Build ergänzen | Teilweise |
 
 ## Sicherheitsgrundsatz
 
