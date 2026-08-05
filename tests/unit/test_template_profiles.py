@@ -92,7 +92,8 @@ def test_all_template_javascript_modules_pass_node_syntax_check():
         ROOT / "js" / "template-catalog-adapter.js",
         ROOT / "js" / "template-ui.js",
         *sorted((ROOT / "data" / "template-profiles").glob("*.js")),
+        ROOT / "tests" / "smoke" / "template-profile-smoke.js",
     ]
-    assert len(paths) == 10
+    assert len(paths) == 11
     for path in paths:
         subprocess.run([NODE, "--check", str(path)], check=True, capture_output=True, text=True)
