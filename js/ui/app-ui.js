@@ -6,7 +6,7 @@
 
   function cacheElements() {
     const ids = [
-      "data-mode", "status-badge", "project-progress", "progress-text", "phase-list",
+      "data-mode", "storage-status", "status-badge", "project-progress", "progress-text", "phase-list",
       "question-panel", "question-counter", "question-title", "question-required", "question-short-help",
       "answer-options", "question-why", "question-example", "question-pro", "question-contra",
       "question-alternative", "question-recommendation", "question-details", "previous-button",
@@ -116,16 +116,37 @@
     elements["report-preview"].textContent = namespace.report.createMarkdown(state.catalog, state.answers, activeRules);
   }
 
+  function storagePresentation(status, revision, restoredFrom) {
+    if (status === "saved" || status === "ready") {
+      return { text: revision ? `Lokal gespeichert · R${revision}` : "Lokaler Speicher bereit", css: "badge-success" };
+    }
+    if (status === "recovered" || restoredFrom === "recovery") {
+      return { text: `Snapshot wiederhergestellt · R${revision}`, css: "badge-warning" };
+    }
+    if (status === "unavailable") return { text: "Speicher nicht verfügbar", css: "badge-warning" };
+    if (status === "error") return { text: "Speicherfehler", css: "badge-danger" };
+    return { text: "Speicher wird geprüft", css: "badge-neutral" };
+  }
+
   function render(state, message = "") {
     if (!state.catalog) return;
     const activeRules = namespace.rules.evaluate(state.rules, state.answers);
     const progress = namespace.validation.calculateProgress(state.catalog, state.answers);
     const hasCritical = activeRules.some(rule => rule.severity === "critical");
+
+    document.documentElement.dataset.theme = state.theme;
+    elements["theme-button"].textContent = state.theme === "dark" ? "Helles Theme" : "Dunkles Theme";
+    elements["theme-button"].setAttribute("aria-pressed", String(state.theme === "light"));
     elements["project-progress"].value = progress;
     elements["project-progress"].textContent = `${progress} %`;
     elements["progress-text"].textContent = `${progress} %`;
     elements["data-mode"].textContent = state.dataMode === "files" ? "JSON-Kataloge geladen" : "Direktdatei-Fallback";
     elements["data-mode"].className = `badge ${state.dataMode === "files" ? "badge-success" : "badge-info"}`;
+
+    const storage = storagePresentation(state.storageStatus, state.revision, state.restoredFrom);
+    elements["storage-status"].textContent = storage.text;
+    elements["storage-status"].className = `badge ${storage.css}`;
+
     elements["status-badge"].textContent = hasCritical ? "Konflikt" : progress === 100 ? "Vollständig" : "Unvollständig";
     elements["status-badge"].className = `badge ${hasCritical ? "badge-danger" : progress === 100 ? "badge-success" : "badge-warning"}`;
     elements["live-status"].textContent = message || "Projektübersicht aktualisiert.";
@@ -137,11 +158,7 @@
   function initialize() {
     cacheElements();
     elements["theme-button"].addEventListener("click", () => {
-      const html = document.documentElement;
-      const nextTheme = html.dataset.theme === "dark" ? "light" : "dark";
-      html.dataset.theme = nextTheme;
-      elements["theme-button"].textContent = nextTheme === "dark" ? "Helles Theme" : "Dunkles Theme";
-      elements["theme-button"].setAttribute("aria-pressed", String(nextTheme === "light"));
+      namespace.state.setTheme(namespace.state.getState().theme === "dark" ? "light" : "dark");
     });
     namespace.state.subscribe(render);
   }
