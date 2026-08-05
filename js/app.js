@@ -49,10 +49,7 @@
     const result = await namespace.storage.saveProject(payload, reason);
     const limit = await namespace.storage.getRetentionLimit(state.projectId);
     const retention = await namespace.storage.pruneSnapshots(
-      state.projectId,
-      limit,
-      storedProjectValidator,
-      currentMigrationContext()
+      state.projectId, limit, storedProjectValidator, currentMigrationContext()
     );
     namespace.state.setStorageStatus("saved", result.revision, result.source);
     return { ...result, retention };
@@ -86,25 +83,18 @@
     if (!storageReady) throw new Error("Der lokale Speicher ist noch nicht bereit.");
     const state = namespace.state.getState();
     return namespace.storage.getStorageOverview(
-      state.projectId,
-      storedProjectValidator,
-      currentMigrationContext()
+      state.projectId, storedProjectValidator, currentMigrationContext()
     );
   }
 
-  async function createSnapshot() {
-    return flush("manual-snapshot");
-  }
+  async function createSnapshot() { return flush("manual-snapshot"); }
 
   async function setRetention(requestedLimit) {
     if (!storageReady) throw new Error("Der lokale Speicher ist nicht verfügbar.");
     const state = namespace.state.getState();
     const limit = await namespace.storage.setRetentionLimit(state.projectId, requestedLimit);
     const result = await namespace.storage.pruneSnapshots(
-      state.projectId,
-      limit,
-      storedProjectValidator,
-      currentMigrationContext()
+      state.projectId, limit, storedProjectValidator, currentMigrationContext()
     );
     return { ...result, limit };
   }
@@ -117,10 +107,7 @@
       saveChain = saveChain.then(async () => {
         const state = namespace.state.getState();
         return namespace.storage.restoreSnapshot(
-          state.projectId,
-          snapshotId,
-          storedProjectValidator,
-          currentMigrationContext()
+          state.projectId, snapshotId, storedProjectValidator, currentMigrationContext()
         );
       });
       const result = await saveChain;
@@ -136,9 +123,7 @@
     const state = namespace.state.getState();
     await namespace.storage.open();
     const restored = await namespace.storage.loadLatestValid(
-      state.projectId,
-      storedProjectValidator,
-      currentMigrationContext()
+      state.projectId, storedProjectValidator, currentMigrationContext()
     );
     if (restored) namespace.state.restoreProject(restored.payload, restored);
     storageReady = true;
@@ -152,10 +137,7 @@
     else {
       const limit = await namespace.storage.getRetentionLimit(state.projectId);
       await namespace.storage.pruneSnapshots(
-        state.projectId,
-        limit,
-        storedProjectValidator,
-        currentMigrationContext()
+        state.projectId, limit, storedProjectValidator, currentMigrationContext()
       );
     }
   }
@@ -170,6 +152,7 @@
 
   async function start() {
     namespace.ui.initialize();
+    namespace.reportManager.initialize();
     namespace.storageManager.initialize();
     namespace.state.setProjectId(projectIdFromLocation());
     const catalogs = await loadCatalogs();
@@ -186,10 +169,6 @@
     loadSmokeHarness();
   }
 
-  namespace.persistence = {
-    flush, persistNow, getStorageOverview, createSnapshot, setRetention, restoreSnapshot
-  };
-  window.addEventListener("DOMContentLoaded", () => {
-    namespace.ready = start();
-  }, { once: true });
+  namespace.persistence = { flush, persistNow, getStorageOverview, createSnapshot, setRetention, restoreSnapshot };
+  window.addEventListener("DOMContentLoaded", () => { namespace.ready = start(); }, { once: true });
 })();
