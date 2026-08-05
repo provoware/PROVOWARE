@@ -57,7 +57,9 @@ PROVOWARE/
 │   │   ├── test_report_generator.py
 │   │   ├── test_project_management.py
 │   │   ├── test_project_transfer.py
-│   │   └── test_accessibility_contract.py
+│   │   ├── test_import_guard.py
+│   │   ├── test_accessibility_contract.py
+│   │   └── test_version_sync.py
 │   ├── integration/test_structure.py
 │   ├── smoke/
 │   │   ├── test_index.py
@@ -92,7 +94,7 @@ PROVOWARE/
 - `project-repository.js`: Projektübersicht, Projektanlage, Duplikate, Lebenszyklus und vollständige Löschung
 - `project-manager.js`: grafische Suche, Filter, Projektaktionen und sichere Bestätigungen
 - `project-transfer.js`: Paketbildung, Prüfsumme, Migration, fachliche Importprüfung und Vergleich
-- `project-transfer-manager.js`: Dateiauswahl, reine Vorschau, Moduswahl und Transferdialog
+- `project-transfer-manager.js`: Dateiauswahl, reine Vorschau, Moduswahl, Revisionsschutz und Transferdialog
 - `accessibility.js`: Dialogstapel, Fokusfalle, Escape-Hierarchie, Pfeiltasten und Grundprüfung
 - `storage-manager.js`: Snapshot-Liste und kontrollierte Wiederherstellung
 - `report-generator.js`: formatneutrales Berichtsmodell und Renderer
@@ -106,14 +108,16 @@ PROVOWARE/
 2. Die Storage-Engine bleibt allein für allgemeine IndexedDB-Speichervorgänge verantwortlich.
 3. Projektbezogene Datensätze werden konsequent über `projectId` getrennt.
 4. Importdateien werden vor der Vorschau ausschließlich gelesen und niemals unmittelbar gespeichert.
-5. Paketschema, Prüfsumme, Projektschema, Fragen und Antworten müssen vor jeder Übernahme gültig sein.
+5. Paketschema, Prüfsumme, Projektschema, Herkunftsmetadaten, Fragen und Antworten müssen vor jeder Übernahme gültig sein.
 6. Bei einer Projekt-ID-Kollision ist eine neue ID die sichere Standardoption.
 7. Ersetzen ist nur für aktive Projekte, nach exakter Namenseingabe, separater Bestätigung und Vorher-Sicherung zulässig.
-8. Archivierte Projekte und Papierkorbprojekte müssen vor der Bearbeitung wiederhergestellt werden.
-9. Ein Projektwechsel schließt ausstehende Speicherung des bisherigen Projekts zuerst ab.
-10. Duplikate und neue Importe erhalten eine eigene Projekt-ID und eigene künftige Snapshots.
-11. Endgültiges Löschen ist nur im Papierkorb und nach exakter Namensbestätigung zulässig.
-12. Der oberste Dialog hält den Tastaturfokus und verarbeitet Escape zuerst.
-13. Automatisierte Barrierefreiheitsprüfungen ergänzen, ersetzen aber keine reale Screenreader-Abnahme.
-14. Browser- und echte IndexedDB-Tests bleiben getrennte Release-Gates.
-15. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
+8. Hat sich die lokale Revision seit der Vorschau geändert, wird das Ersetzen blockiert und eine neue Vorschau verlangt.
+9. Archivierte Projekte und Papierkorbprojekte müssen vor der Bearbeitung wiederhergestellt werden.
+10. Ein Projektwechsel schließt ausstehende Speicherung des bisherigen Projekts zuerst ab.
+11. Duplikate und neue Importe erhalten eine eigene Projekt-ID und eigene künftige Snapshots.
+12. Endgültiges Löschen ist nur im Papierkorb und nach exakter Namensbestätigung zulässig.
+13. Der oberste Dialog hält den Tastaturfokus und verarbeitet Escape zuerst.
+14. Automatisierte Barrierefreiheitsprüfungen ergänzen, ersetzen aber keine reale Screenreader-Abnahme.
+15. Anwendungs-, Build-, Transfer- und Releaseversion müssen durch einen automatischen Vertragstest übereinstimmen.
+16. Browser- und echte IndexedDB-Tests bleiben getrennte Release-Gates.
+17. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
