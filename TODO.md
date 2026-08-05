@@ -16,7 +16,7 @@
 - [x] Versionierte IndexedDB mit transaktionalen Snapshots und automatischem Rückfall implementieren.
 - [x] Grafische Snapshot-Liste, Vorschau und manuelle Wiederherstellung ergänzen.
 - [x] Konfigurierbare Snapshot-Aufbewahrung mit Schutz des letzten gültigen Sicherheitsstands umsetzen.
-- [ ] Migrationsmatrix über mehrere Projektschemata entwickeln.
+- [x] Schrittweise Migrationsmatrix `1.0.0 → 1.1.0 → 1.2.0` mit Vorher-Sicherung entwickeln.
 - [ ] Berichtsgenerator für Markdown, HTML, TXT und JSON entwickeln.
 - [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
 - [ ] Importvorschau und Konfliktbehandlung entwickeln.
@@ -25,7 +25,8 @@
 ## P2 – Qualität und Release
 
 - [x] Unit-, Integrations- und Browser-Smoke-Grundtests ergänzen.
-- [ ] Quota-, Transaktionsabbruch- und beschädigte-Snapshot-Tests erweitern.
+- [x] Quota-, Transaktionsabbruch- und beschädigte-Snapshot-Tests ergänzen.
+- [ ] Reale IndexedDB-Fehlerabnahme unter Kubuntu dokumentieren.
 - [ ] Sicherheits- und Barrierefreiheitsprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
 - [x] SHA-256-Buildmanifest vorbereiten.
