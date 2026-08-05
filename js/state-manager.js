@@ -16,12 +16,13 @@
         validationErrors: [],
         projectId: "default-project",
         projectName: "PROVOWARE Entwicklungsplan",
-        schemaVersion: "1.1.0",
+        schemaVersion: "1.2.0",
         theme: "dark",
         storageStatus: "checking",
         revision: 0,
         restoredFrom: null,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        lastMigration: null
       };
     }
 
@@ -63,19 +64,25 @@
 
     restoreProject(payload, metadata = {}) {
       const source = metadata.source || null;
-      const message = source === "manual-recovery"
-        ? "Snapshot manuell wiederhergestellt."
-        : source === "recovery"
-          ? "Letzter gültiger Snapshot wiederhergestellt."
-          : "Gespeicherter Projektstand geladen.";
+      const message = source === "migration"
+        ? "Projektstand schrittweise migriert."
+        : source === "manual-recovery"
+          ? "Snapshot manuell wiederhergestellt."
+          : source === "recovery"
+            ? "Letzter gültiger Snapshot wiederhergestellt."
+            : "Gespeicherter Projektstand geladen.";
       this.update({
+        schemaVersion: payload.schemaVersion || this.state.schemaVersion,
         answers: payload.answers || {},
         currentQuestionId: payload.currentQuestionId || this.state.currentQuestionId,
         theme: payload.theme || "dark",
         projectName: payload.name || this.state.projectName,
         createdAt: payload.createdAt || this.state.createdAt,
         revision: metadata.revision || 0,
-        restoredFrom: source
+        restoredFrom: source,
+        lastMigration: metadata.migratedFrom
+          ? { from: metadata.migratedFrom, to: payload.schemaVersion, steps: metadata.migrationSteps || [] }
+          : null
       }, message);
     }
 
