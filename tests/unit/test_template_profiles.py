@@ -70,9 +70,13 @@ def test_template_runtime_contract_is_safe_and_local():
     loader = (ROOT / "js" / "template-manager.js").read_text(encoding="utf-8")
     core = (ROOT / "js" / "template-core.js").read_text(encoding="utf-8")
     ui = (ROOT / "js" / "template-ui.js").read_text(encoding="utf-8")
+    fixes = (ROOT / "js" / "template-ui-fixes.js").read_text(encoding="utf-8")
+    styles = (ROOT / "css" / "template-manager.css").read_text(encoding="utf-8")
     assert 'script.src = "js/template-manager.js"' in state
     assert "data/template-profiles" in loader
     assert "template-catalog-adapter.js" in loader
+    assert "template-ui-fixes.js" in loader
+    assert "template-manager.css" in loader
     assert 'PROFILE_TYPE = "template-profile"' in core
     assert 'type: "template-origin"' in core
     assert "Fehlende Frage-IDs" in core
@@ -81,8 +85,11 @@ def test_template_runtime_contract_is_safe_and_local():
     assert "lastPreviewFingerprint" in ui
     assert 'id="template-confirm"' in ui
     assert 'id="template-critical-confirm"' in ui
-    assert "https://" not in loader + core + ui
-    assert "http://" not in loader + core + ui
+    assert 'label[for="template-import-file"]' in fixes
+    assert '["Enter", " "]' in fixes
+    assert "--color-border" in styles and "--color-surface" in styles
+    assert "https://" not in loader + core + ui + fixes
+    assert "http://" not in loader + core + ui + fixes
 
 
 def test_all_template_javascript_modules_pass_node_syntax_check():
@@ -91,9 +98,10 @@ def test_all_template_javascript_modules_pass_node_syntax_check():
         ROOT / "js" / "template-core.js",
         ROOT / "js" / "template-catalog-adapter.js",
         ROOT / "js" / "template-ui.js",
+        ROOT / "js" / "template-ui-fixes.js",
         *sorted((ROOT / "data" / "template-profiles").glob("*.js")),
         ROOT / "tests" / "smoke" / "template-profile-smoke.js",
     ]
-    assert len(paths) == 11
+    assert len(paths) == 12
     for path in paths:
         subprocess.run([NODE, "--check", str(path)], check=True, capture_output=True, text=True)
