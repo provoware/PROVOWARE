@@ -1,17 +1,54 @@
 {
-  "catalogVersion": "1.0.0",
+  "catalogVersion": "2.0.0",
+  "profileSchemaVersion": "1.0.0",
   "templates": [
     {
       "id": "template.offline-html",
       "title": "Offline-HTML-Werkzeug",
-      "description": "Sicherer Ausgangspunkt für ein lokales, laienoptimiertes Browserwerkzeug.",
-      "answerDefaults": {
-        "project.scope": "minimal",
-        "users.experience": "mixed",
-        "platform.offline": "yes",
-        "platform.target": "browser-linux",
-        "data.storage": "local"
-      }
+      "description": "Vollständig lokales Browserwerkzeug ohne Cloud- oder CDN-Pflicht.",
+      "category": "Browser & Offline",
+      "modulePath": "data/template-profiles/offline-html.js",
+      "profileCount": 3
+    },
+    {
+      "id": "template.linux-desktop",
+      "title": "Linux-Desktop-Anwendung",
+      "description": "Eigenständige Linux-Oberfläche mit lokaler Persistenz und klarer Systemintegration.",
+      "category": "Desktop Linux",
+      "modulePath": "data/template-profiles/linux-desktop.js",
+      "profileCount": 3
+    },
+    {
+      "id": "template.media-processing",
+      "title": "Medienverarbeitung",
+      "description": "Lokale Bild-, Audio- oder Videoverarbeitung mit kontrollierten Jobs.",
+      "category": "Medien",
+      "modulePath": "data/template-profiles/media-processing.js",
+      "profileCount": 3
+    },
+    {
+      "id": "template.file-organization",
+      "title": "Dateiorganisation",
+      "description": "Sicheres Sortieren, Prüfen und Umbenennen ohne unkontrollierte Originaländerung.",
+      "category": "Dateien",
+      "modulePath": "data/template-profiles/file-organization.js",
+      "profileCount": 3
+    },
+    {
+      "id": "template.songwriting-audio",
+      "title": "Songwriting und Audio",
+      "description": "Lokaler kreativer Arbeitsraum für Texte, Stilprofile und Audioentwürfe.",
+      "category": "Kreativ & Audio",
+      "modulePath": "data/template-profiles/songwriting-audio.js",
+      "profileCount": 3
+    },
+    {
+      "id": "template.mobile-pwa",
+      "title": "Mobile PWA",
+      "description": "Installierbare mobile Webanwendung mit Offline-Kern und sicherer Gerätespeicherung.",
+      "category": "Mobil",
+      "modulePath": "data/template-profiles/mobile-pwa.js",
+      "profileCount": 3
     }
   ]
 }
