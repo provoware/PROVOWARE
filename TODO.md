@@ -8,11 +8,13 @@
 - [x] Minimalen Offline-HTML-Prototyp anlegen.
 - [x] Fragen-, Regel- und Projektschema definieren.
 - [x] Automatische Struktur- und Syntaxprüfung einrichten.
+- [x] Automatisierten Desktop-/Mobil-Browser-Smoke-Test ergänzen.
 
 ## P1 – Kernfunktionen
 
 - [x] Workflow-Navigation und mehrschichtige Beispiel-Fragenansicht entwickeln.
-- [ ] Lokale Speicherung mit IndexedDB und Snapshots implementieren.
+- [x] Versionierte IndexedDB mit transaktionalen Snapshots und automatischem Rückfall implementieren.
+- [ ] Autosave-Aufbewahrung, manuelle Snapshot-Auswahl und Speicherdiagnose ausbauen.
 - [ ] Berichtsgenerator für Markdown, HTML, TXT und JSON entwickeln.
 - [ ] Projekt-, Vorlagen- und Profilverwaltung ergänzen.
 - [ ] Importvorschau und Konfliktbehandlung entwickeln.
@@ -20,8 +22,8 @@
 
 ## P2 – Qualität und Release
 
-- [x] Erste Unit-, Integrations- und Smoke-Tests ergänzen.
-- [ ] Fehler-, Migrations- und Wiederherstellungstests durchführen.
+- [x] Unit-, Integrations- und Browser-Smoke-Grundtests ergänzen.
+- [ ] Migrationsmatrix und Wiederherstellung über mehrere Schemaversionen prüfen.
 - [ ] Sicherheits- und Barrierefreiheitsprüfung dokumentieren.
 - [x] Reproduzierbaren modularen Build vorbereiten.
 - [x] SHA-256-Buildmanifest vorbereiten.
