@@ -67,6 +67,30 @@
     };
   }
 
+  async function exerciseReportManager() {
+    click("#report-manager-button");
+    await waitFor(() => document.getElementById("report-dialog").open);
+    const model = namespace.reportManager.refresh("Browserprüfung des Berichtsmodells.");
+    record("Berichtsmodell erzeugt", model?.modelVersion === "1.0.0");
+    record("sechs Anforderungen abgeleitet", model?.requirements.length === 6, String(model?.requirements.length));
+    record("zwölf Testfälle abgeleitet", model?.testCases.length === 12, String(model?.testCases.length));
+    record("Konflikt als Risiko übernommen", model?.risks.some(risk => risk.severity === "critical"));
+    record("Rückverfolgbarkeit vollständig", model?.traceability.every(item => item.testCaseIds.length === 2 && item.acceptanceCriterionIds.length === 1));
+    record("Markdown-Vorschau", document.getElementById("report-preview-content").textContent.includes("## Abnahmekriterien"));
+
+    const format = document.getElementById("report-format");
+    format.value = "html";
+    format.dispatchEvent(new Event("change", { bubbles: true }));
+    record("Offline-HTML-Vorschau", document.getElementById("report-preview-content").textContent.startsWith("<!doctype html>"));
+
+    format.value = "json";
+    format.dispatchEvent(new Event("change", { bubbles: true }));
+    const jsonReport = JSON.parse(document.getElementById("report-preview-content").textContent);
+    record("JSON-Vorschau konsistent", jsonReport.requirements.length === model.requirements.length && jsonReport.testCases.length === model.testCases.length);
+    record("vier Exportformate", document.querySelectorAll("[data-report-format]").length === 4);
+    click("#report-close-button");
+  }
+
   async function exerciseStorageManager() {
     if (window.__PROVOWARE_SMOKE_EMBEDDED__) await prepareEmbeddedStorageManager();
     else {
@@ -139,6 +163,8 @@
       document.querySelector('input[value="cloud"]').click();
       await wait();
       record("Konfliktampel", document.getElementById("status-badge").textContent === "Konflikt");
+
+      await exerciseReportManager();
 
       if (window.__PROVOWARE_SMOKE_EMBEDDED__) {
         const validPayload = namespace.storage.createPayload(namespace.state.getState());
