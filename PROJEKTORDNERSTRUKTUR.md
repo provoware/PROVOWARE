@@ -4,9 +4,7 @@
 
 ```text
 PROVOWARE/
-├── .github/
-│   └── workflows/
-│       └── ci.yml
+├── .github/workflows/ci.yml
 ├── README.md
 ├── TODO.md
 ├── CHANGELOG.md
@@ -20,11 +18,14 @@ PROVOWARE/
 │   ├── variables.css
 │   ├── layout.css
 │   ├── components.css
-│   └── themes.css
+│   ├── themes.css
+│   └── project-manager.css
 ├── js/
 │   ├── app.js
 │   ├── migration-engine.js
 │   ├── storage-engine.js
+│   ├── project-repository.js
+│   ├── project-manager.js
 │   ├── storage-manager.js
 │   ├── state-manager.js
 │   ├── workflow-engine.js
@@ -48,12 +49,15 @@ PROVOWARE/
 │   │   ├── test_storage_contract.py
 │   │   ├── test_migration_matrix.py
 │   │   ├── test_storage_failures.py
-│   │   └── test_report_generator.py
+│   │   ├── test_report_generator.py
+│   │   └── test_project_management.py
 │   ├── integration/test_structure.py
 │   ├── smoke/
 │   │   ├── test_index.py
 │   │   ├── browser-smoke.js
 │   │   ├── run_browser_smoke.py
+│   │   ├── project-management-smoke.js
+│   │   ├── run_project_management_smoke.py
 │   │   ├── failure-harness.html
 │   │   ├── storage-failure-smoke.js
 │   │   └── run_storage_failure_smoke.py
@@ -75,25 +79,26 @@ PROVOWARE/
 
 ## Verantwortlichkeiten
 
-- `migration-engine.js`: reine Projektschema-Matrix ohne IndexedDB-Zugriffe
-- `storage-engine.js`: einzige Schicht für IndexedDB, Transaktionen, Migration und Wiederherstellung
-- `storage-manager.js`: grafische Snapshot-Liste und kontrollierte Benutzeraktionen
-- `report-generator.js`: formatneutrales Modell und Renderer für Markdown, HTML, TXT und JSON
-- `report-manager.js`: Vorprüfung, Vorschau, Formatwahl und lokaler Download
-- `state-manager.js`: laufender Anwendungszustand ohne direkte Datenbankzugriffe
-- `app.js`: koordiniert Modulstart, Autospeicherung und Übergaben
-- `ci.yml`: schnelle L0-/L1-Prüfung ohne Browserinstallation
+- `storage-engine.js`: IndexedDB, Revisionen, Snapshots, Migration und Wiederherstellung
+- `project-repository.js`: Projektübersicht, Projektanlage, Duplikate, Lebenszyklus und vollständige Löschung
+- `project-manager.js`: grafische Suche, Filter, Projektaktionen und sichere Bestätigungen
+- `storage-manager.js`: Snapshot-Liste und kontrollierte Wiederherstellung
+- `report-generator.js`: formatneutrales Berichtsmodell und Renderer
+- `report-manager.js`: Vorschau, Prüfung und lokaler Download
+- `state-manager.js`: ausschließlich der aktuell geöffnete Anwendungszustand
+- `app.js`: serialisierte Speicherung und sicherer Wechsel zwischen Projekten
 
 ## Regeln
 
 1. Keine Fachlogik direkt in `index.html`, sofern sie als Modul testbar ist.
-2. Jede Projektschema-Version benötigt einen expliziten Einzelschritt zur direkt folgenden Version.
-3. Die Storage-Engine ist allein für IndexedDB-Transaktionen verantwortlich.
-4. Legacy-Originale werden nicht überschrieben.
-5. Snapshots werden unveränderlich mit `add` angelegt.
-6. Alle Berichtsformate werden ausschließlich aus demselben validierten Modell erzeugt.
-7. Renderer dürfen Kennungen und Rückverfolgbarkeit nicht neu berechnen.
-8. Offline-HTML darf keine externen Ressourcen enthalten.
-9. Fehlerinjektion ist nur mit `window.__PROVOWARE_TESTING__ === true` zulässig.
-10. Browser- und echte IndexedDB-Tests bleiben getrennte Release-Gates.
-11. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
+2. Die Storage-Engine bleibt allein für allgemeine IndexedDB-Speichervorgänge verantwortlich.
+3. Die Projekt-Persistenz verwendet dieselben Stores und trennt Datensätze konsequent über `projectId`.
+4. Projektlebenszyklusdaten liegen getrennt vom Projektschema unter `lifecycle:<projectId>`.
+5. Archivierte Projekte und Papierkorbprojekte müssen vor der Bearbeitung wiederhergestellt werden.
+6. Ein Projektwechsel schließt ausstehende Speicherung des bisherigen Projekts zuerst ab.
+7. Duplikate erhalten eine neue Projekt-ID, Revision 1 und eigene künftige Snapshots.
+8. Endgültiges Löschen ist nur im Papierkorb und nach exakter Namensbestätigung zulässig.
+9. Projektstand, Snapshots, Metadaten und Protokolle werden beim endgültigen Löschen in einer gemeinsamen Transaktion entfernt.
+10. Alle Berichtsformate werden ausschließlich aus dem aktuell geöffneten Projekt erzeugt.
+11. Browser- und echte IndexedDB-Tests bleiben getrennte Release-Gates.
+12. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
