@@ -17,7 +17,7 @@ RUNTIME_ITEMS = ["index.html", "css", "js", "data", "schemas", "README.md", "doc
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+        for chunk in iter(lambda: handle.read(1024 * 1024, b"")):
             digest.update(chunk)
     return digest.hexdigest()
 
@@ -37,7 +37,7 @@ def main():
             shutil.copy2(source, destination)
 
     manifest = {
-        "buildVersion": "0.5.0",
+        "buildVersion": "0.6.0",
         "files": [
             {"path": str(path.relative_to(TARGET)), "sha256": sha256(path), "size": path.stat().st_size}
             for path in sorted(TARGET.rglob("*")) if path.is_file()
