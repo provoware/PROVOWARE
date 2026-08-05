@@ -5,9 +5,28 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 ## [Unreleased]
 
 ### Geplant
-- manuelle Snapshot-Verwaltung
+- Migrationsmatrix über mehrere Projektschemata
 - vollständiger Berichtsgenerator
 - Projekt- und Vorlagenverwaltung
+
+## [0.4.0] – 2026-08-05
+
+### Hinzugefügt
+- `js/storage-manager.js` als getrennte grafische Speicherverwaltung
+- Snapshot-Liste mit Revision, Zeitpunkt, Speichergrund und Prüfergebnis
+- vollständige JSON-Vorschau des ausgewählten Projektstands
+- ausdrückliche Bestätigung vor manueller Wiederherstellung
+- Wiederherstellung als neue, nachvollziehbare Revision
+- manueller Sicherheitsstand auf Knopfdruck
+- Aufbewahrungsgrenze von 5 bis 200 Snapshots
+- reine Planungslogik zum Schutz des letzten gültigen Sicherheitsstands
+- erweiterte Unit-, Integrations- und Browser-Smoke-Prüfungen
+
+### Geändert
+- Buildversion auf `0.4.0` angehoben
+- Autospeicherung führt nach erfolgreichem Speichern die sichere Aufbewahrungsprüfung aus
+- Browser-Smoke prüft Speicherverwaltung auf Desktop und Mobil
+- Dokumentation und Schwachstellenregister aktualisiert
 
 ## [0.3.0] – 2026-08-05
 
@@ -18,27 +37,15 @@ Alle wesentlichen Änderungen dieses Projekts werden hier dokumentiert.
 - Prüfsummenprüfung und automatischer Rückfall
 - sichtbarer Speicherstatus und Revisionsanzeige
 - automatisierter Desktop-/Mobil-Browser-Smoke-Test
-- Speichervertrags-Unit-Tests
-
-### Geändert
-- Projektschema auf `1.1.0` erweitert
-- Buildversion auf `0.3.0` angehoben
-- Dokumentation, TODO und Schwachstellenregister aktualisiert
 
 ## [0.2.0] – 2026-08-05
 
 ### Hinzugefügt
-- minimale Zielstruktur mit getrennten Laufzeit-, Daten-, Schema-, Test- und Dokumentationsbereichen
-- startbarer Offline-HTML-Prototyp mit responsiver Dreispaltenansicht
+- minimale Zielstruktur und startbarer Offline-HTML-Prototyp
 - sechs repräsentative Entwicklungsfragen in vier Phasen
-- erste Regel- und Konflikterkennung
-- Projekt-, Fragen- und Vorlagenschema
-- lokale Validierungs-, Build- und Release-Skripte
-- Unit-, Integrations- und Smoke-Prüfungen
+- erste Regel-, Schema-, Build- und Testgrundlage
 
 ## [0.1.0] – 2026-08-05
 
 ### Geändert
 - Repository vollständig neu aufgesetzt.
-- Sämtliche alten Dateien aus dem aktiven `main`-Baum entfernt.
-- Neue verbindliche Projektgrundlage angelegt.
