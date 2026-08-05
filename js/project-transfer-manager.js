@@ -32,6 +32,10 @@
         if (candidatePreview.existingProject?.lifecycle?.state !== "active") {
           throw new Error("Nur ein aktives Projekt darf ersetzt werden.");
         }
+        const current = await namespace.projectRepository.getProjectRecord(candidatePreview.payload.projectId);
+        if (!current || current.summary.revision !== candidatePreview.existingProject.revision) {
+          throw new Error("Das lokale Projekt wurde seit der Vorschau verändert. Erzeuge vor dem Ersetzen eine neue Importvorschau.");
+        }
         if (elements["transfer-replace-checkbox"]?.checked !== true) {
           throw new Error("Die separate Bestätigung für das Ersetzen fehlt.");
         }
