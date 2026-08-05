@@ -41,7 +41,7 @@ jobs:
       - name: Struktur, JSON-Schemata und Offline-Vertrag prüfen
         run: python scripts/validate.py
 
-      - name: Migrationsmatrix, Speicher- und Berichtsverträge prüfen
+      - name: Migration, Speicher, Projekte, Transfer, A11y und Berichte prüfen
         run: python -m pytest -q tests/unit tests/integration tests/smoke/test_index.py
 
       - name: JavaScript-Syntax separat bestätigen
@@ -56,8 +56,10 @@ jobs:
             echo '## Schnelle Qualitätsprüfung'
             echo
             echo '- Struktur und JSON-Schemata'
-            echo '- Migrationsmatrix und Unit-Tests'
+            echo '- Migration, Speicher und Mehrprojektverwaltung'
+            echo '- Projekttransfer und Barrierefreiheits-Grundverträge'
+            echo '- Berichtsgenerator und Rückverfolgbarkeit'
             echo '- JavaScript-Syntax'
             echo
-            echo 'Browser-, Quota- und echte IndexedDB-Tests sind bewusst separate Release-Gates.'
+            echo 'Browser-, Quota-, echte IndexedDB- und Screenreader-Tests sind bewusst separate Release-Gates.'
           } >> "$GITHUB_STEP_SUMMARY"
