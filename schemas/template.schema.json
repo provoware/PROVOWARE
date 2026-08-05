@@ -1,12 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://provoware.local/schemas/template.schema.json",
-  "title": "PROVOWARE Projektvorlage",
+  "title": "PROVOWARE Projektvorlagen-Modul",
   "type": "object",
   "required": [
     "id",
     "title",
-    "answerDefaults"
+    "description",
+    "category",
+    "modulePath",
+    "profileCount"
   ],
   "additionalProperties": false,
   "properties": {
@@ -16,22 +19,27 @@
     },
     "title": {
       "type": "string",
-      "minLength": 1
+      "minLength": 3,
+      "maxLength": 80
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 400
     },
-    "answerDefaults": {
-      "type": "object",
-      "additionalProperties": {
-        "type": [
-          "string",
-          "number",
-          "boolean",
-          "array",
-          "null"
-        ]
-      }
+    "category": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "modulePath": {
+      "type": "string",
+      "pattern": "^data/template-profiles/[a-z0-9._-]+\\.js$"
+    },
+    "profileCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50
     }
   }
 }
