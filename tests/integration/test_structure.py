@@ -19,12 +19,12 @@ EXPECTED = [
     "tests/fixtures/project-v1.0.0.json", "tests/fixtures/project-v1.1.0.json",
     "tests/fixtures/project-valid.json", "tests/unit/test_report_generator.py",
     "tests/unit/test_project_management.py", "tests/unit/test_project_transfer.py",
-    "tests/unit/test_accessibility_contract.py", "tests/smoke/browser-smoke.js",
-    "tests/smoke/run_browser_smoke.py", "tests/smoke/project-management-smoke.js",
-    "tests/smoke/run_project_management_smoke.py", "tests/smoke/transfer-accessibility-smoke.js",
-    "tests/smoke/run_transfer_accessibility_smoke.py", "tests/smoke/storage-failure-smoke.js",
-    "tests/smoke/run_storage_failure_smoke.py", "tests/smoke/failure-harness.html",
-    "scripts/validate.py", "scripts/build.py", "scripts/release.py"
+    "tests/unit/test_accessibility_contract.py", "tests/unit/test_version_sync.py",
+    "tests/smoke/browser-smoke.js", "tests/smoke/run_browser_smoke.py",
+    "tests/smoke/project-management-smoke.js", "tests/smoke/run_project_management_smoke.py",
+    "tests/smoke/transfer-accessibility-smoke.js", "tests/smoke/run_transfer_accessibility_smoke.py",
+    "tests/smoke/storage-failure-smoke.js", "tests/smoke/run_storage_failure_smoke.py",
+    "tests/smoke/failure-harness.html", "scripts/validate.py", "scripts/build.py", "scripts/release.py"
 ]
 
 
