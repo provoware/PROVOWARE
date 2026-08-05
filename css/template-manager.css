@@ -1,0 +1,52 @@
+.template-sidebar,
+.template-preview-panel,
+.template-custom-panel {
+  border-color: var(--color-border);
+  background: var(--color-surface-strong);
+}
+
+.template-stat,
+.template-card {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.template-create-panel,
+.template-profile-actions,
+.template-diff th,
+.template-diff td {
+  border-color: var(--color-border);
+}
+
+.template-diff tr[data-status="changed"],
+.template-diff tr[data-status="new"] {
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+}
+
+.template-errors li[data-kind="error"],
+.template-status[data-kind="error"] {
+  color: var(--color-danger);
+}
+
+.template-status[data-kind="success"] {
+  color: var(--color-success);
+}
+
+.template-status[data-kind="info"] {
+  color: var(--color-muted);
+}
+
+.template-dialog input,
+.template-dialog select {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.template-dialog input:focus,
+.template-dialog select:focus,
+.template-dialog button:focus-visible,
+.template-dialog label.button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
