@@ -15,8 +15,9 @@ EXPECTED_FILES = [
     "README.md", "TODO.md", "CHANGELOG.md", "SCHWACHSTELLEN.md", "AGENTS.md",
     "UPGRADEPOOL.md", "PROJEKTORDNERSTRUKTUR.md", "requirements.txt", "index.html",
     "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css",
-    "js/app.js", "js/storage-engine.js", "js/state-manager.js", "js/workflow-engine.js",
-    "js/rule-engine.js", "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js",
+    "js/app.js", "js/storage-engine.js", "js/storage-manager.js", "js/state-manager.js",
+    "js/workflow-engine.js", "js/rule-engine.js", "js/validation-engine.js",
+    "js/report-generator.js", "js/ui/app-ui.js",
     "data/questions.json", "data/rules.json", "data/templates.json", "data/prompts.json",
     "schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json",
     "tests/unit/test_catalogs.py", "tests/unit/test_storage_contract.py",
@@ -95,7 +96,17 @@ def validate_html_references():
     local_references = [ref for ref in references if not ref.startswith(("#", "data:"))]
     missing = [ref for ref in local_references if not (ROOT / ref).is_file()]
     assert not missing, f"Fehlende HTML-Verweise: {missing}"
-    assert html.index('src="js/storage-engine.js"') < html.index('src="js/state-manager.js"'), "Storage-Engine muss vor dem State-Manager geladen werden."
+    order = [
+        'src="js/storage-engine.js"', 'src="js/state-manager.js"', 'src="js/ui/app-ui.js"',
+        'src="js/storage-manager.js"', 'src="js/app.js"'
+    ]
+    positions = [html.index(marker) for marker in order]
+    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Speicherverwaltung ist ungültig."
+    for element_id in (
+        "storage-manager-button", "storage-dialog", "retention-limit", "snapshot-list",
+        "snapshot-preview", "snapshot-confirm", "snapshot-restore-button"
+    ):
+        assert f'id="{element_id}"' in html, f"UI-Element fehlt: {element_id}"
 
 
 def validate_javascript_syntax():
@@ -110,11 +121,16 @@ def validate_javascript_syntax():
 
 def validate_storage_contract():
     source = (ROOT / "js" / "storage-engine.js").read_text(encoding="utf-8")
+    manager = (ROOT / "js" / "storage-manager.js").read_text(encoding="utf-8")
     for store in ("projects", "snapshots", "meta", "migrationLog"):
         assert f'"{store}"' in source, f"IndexedDB-Store fehlt: {store}"
     assert 'transaction(Object.values(STORES), "readwrite")' in source, "Gemeinsame Schreibtransaktion fehlt."
     assert "snapshots.add(snapshotRecord)" in source, "Snapshots müssen unveränderlich per add geschrieben werden."
     assert "loadLatestValid" in source and "automatic-recovery" in source, "Automatische Wiederherstellung fehlt."
+    for function_name in ("listSnapshots", "restoreSnapshot", "planRetention", "pruneSnapshots", "getStorageOverview"):
+        assert function_name in source, f"Speicherfunktion fehlt: {function_name}"
+    assert "safetySnapshotId" in source, "Schutz des letzten gültigen Sicherheitsstands fehlt."
+    assert "snapshot-confirm" in manager and "selectedSnapshot?.valid" in manager, "Bestätigte Wiederherstellung fehlt."
 
 
 def validate_no_remote_runtime_assets():
