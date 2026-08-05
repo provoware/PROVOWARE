@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "projectId": "demo-projekt",
   "name": "Demo-Projekt",
   "answers": {
@@ -8,6 +8,8 @@
   },
   "currentQuestionId": "data.storage",
   "theme": "dark",
+  "questionCatalogVersion": "1.0.0",
   "createdAt": "2026-08-05T00:00:00Z",
-  "updatedAt": "2026-08-05T00:00:00Z"
+  "updatedAt": "2026-08-05T00:00:00Z",
+  "lastValidatedAt": "2026-08-05T00:00:00Z"
 }
