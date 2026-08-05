@@ -14,7 +14,91 @@ Das fachliche Projektschema bleibt bei `1.2.0` und enthält:
 - Erstellungs- und Änderungszeitpunkt
 - `lastValidatedAt`
 
-Mehrprojektfunktionen verändern dieses Schema nicht. Archiv und Papierkorb liegen bewusst in getrennten IndexedDB-Metadaten.
+Mehrprojekt- und Transferfunktionen verändern dieses Schema nicht. Archiv, Papierkorb und Aufbewahrung liegen in getrennten IndexedDB-Metadaten.
+
+## Projektpaket 1.0.0
+
+Ein exportiertes Projekt wird in einem äußeren Paket gespeichert:
+
+```text
+package
+├── packageSchemaVersion = 1.0.0
+├── applicationVersion
+├── exportedAt
+├── source
+│   ├── projectId
+│   ├── projectName
+│   ├── revision
+│   ├── lifecycle
+│   ├── projectSchemaVersion
+│   └── questionCatalogVersion
+├── project
+│   └── vollständiger Projekt-Payload
+└── checksum
+```
+
+Die Prüfsumme wird aus allen Paketfeldern außer `checksum` in stabil sortierter Form gebildet. Sie erkennt typische Beschädigungen und unbeabsichtigte Änderungen. Sie ist keine kryptografische Signatur.
+
+Das JSON-Schema liegt unter `schemas/project-package.schema.json`.
+
+## Importvorschau
+
+Die Importvorschau ist ein temporäres Arbeitsspeichermodell und wird vor der Übernahme nicht in IndexedDB geschrieben.
+
+```text
+preview
+├── packageSchemaVersion
+├── checksumExpected
+├── checksumCalculated
+├── checksumValid
+├── sourceSchemaVersion
+├── targetSchemaVersion
+├── migrationRequired
+├── migrationSteps[]
+├── payload
+├── existingProject
+├── answerInspection
+│   ├── unknownQuestionIds[]
+│   ├── invalidAnswerValues[]
+│   └── validAnswers[]
+├── comparison
+│   ├── identical
+│   ├── fields[]
+│   ├── answers.same[]
+│   ├── answers.changed[]
+│   ├── answers.added[]
+│   ├── answers.missing[]
+│   └── conflictCount
+├── errors[]
+├── allowedModes[]
+└── recommendation
+```
+
+Nur eine Vorschau mit gültiger Prüfsumme, unterstütztem Schema, gültigem Namen, bekannten Fragen und zulässigen Antwortwerten darf übernommen werden.
+
+## Importmodi
+
+### `preserve`
+
+- nur bei freier Projekt-ID
+- ursprüngliche ID bleibt erhalten
+- erster lokaler Stand erhält Revision 1
+
+### `new`
+
+- neue eindeutige Projekt-ID
+- Projektname erhält eine sichtbare Importkennzeichnung
+- neue Erstellungs- und Validierungszeit
+- vorhandenes Projekt bleibt unverändert
+
+### `replace`
+
+- nur für ein aktives vorhandenes Projekt
+- exakter lokaler Projektname und separates Bestätigungsfeld erforderlich
+- vorhandener Projektstand wird zunächst mit `pre-import-backup` als neue Revision gesichert
+- importierter Stand wird danach als `project-import-replace` gespeichert
+
+Archiv- und Papierkorbprojekte bieten den Ersetzungsmodus nicht an.
 
 ## Mehrprojektmodell
 
@@ -25,10 +109,6 @@ projects
 └── id = projectId
     ├── revision
     ├── payload
-    │   ├── projectId
-    │   ├── name
-    │   ├── answers
-    │   └── weitere Projektschemafelder
     ├── checksum
     ├── savedAt
     └── reason
@@ -49,13 +129,7 @@ meta
     └── updatedAt
 ```
 
-Zulässige Zustände:
-
-- `active`
-- `archive`
-- `trash`
-
-Fehlt der Datensatz, wird das Projekt als `active` interpretiert. Dadurch bleiben ältere Projektstände ohne zusätzliche Migration nutzbar.
+Zulässige Zustände sind `active`, `archive` und `trash`. Fehlt der Datensatz, wird das Projekt als aktiv interpretiert.
 
 ### Projektbezogene Aufbewahrung
 
@@ -66,8 +140,6 @@ meta
     ├── limit
     └── updatedAt
 ```
-
-Jedes Projekt besitzt eine eigene Aufbewahrungsgrenze.
 
 ### Snapshots
 
@@ -83,69 +155,27 @@ snapshots
     └── sourceSnapshotId (optional)
 ```
 
-Der Index `projectId` ermöglicht eine streng projektbezogene Liste und Löschung. Revisionen verschiedener Projekte dürfen dieselbe Nummer besitzen, da die Eindeutigkeit aus Projekt-ID und Revision entsteht.
+Mögliche transferbezogene Speichergründe:
 
-### Ereignisprotokoll
+- `before-project-export`
+- `project-imported`
+- `project-imported-new-id`
+- `pre-import-backup`
+- `project-import-replace`
 
-`migrationLog` enthält zusätzlich zum bisherigen Speicher- und Migrationsprotokoll:
+## Barrierefreiheits-Prüfergebnis
+
+Die automatisierte Grundprüfung erzeugt ausschließlich einen flüchtigen Prüfbericht:
 
 ```text
-type: project-lifecycle
-projectId
-fromState
-toState
-createdAt
+a11yAudit
+├── errors[]
+├── warnings[]
+├── passed
+└── checkedAt
 ```
 
-## Projektanlage
-
-Ein neues Projekt erhält:
-
-- geprüften Namen
-- eindeutige, lesbare Projekt-ID mit zufälligem Suffix
-- Revision 1
-- leeres Antwortobjekt
-- erste Workflowfrage
-- aktuelles Theme
-- aktuelle Fragenkatalogversion
-- eigene Snapshot-Folge
-
-## Umbenennen
-
-Der Name liegt im Projekt-Payload. Umbenennen erzeugt daher eine neue Projekt-Revision und einen neuen Snapshot. Frühere Snapshots behalten den damaligen Namen und bleiben historisch nachvollziehbar.
-
-## Duplizieren
-
-Ein Duplikat übernimmt die fachlichen Antworten und Einstellungen, setzt aber neu:
-
-- `projectId`
-- Name
-- `createdAt`
-- `updatedAt`
-- `lastValidatedAt`
-- Revision auf 1
-
-Snapshots, Metadaten und Protokolle des Ausgangsprojekts werden nicht kopiert.
-
-## Archiv und Papierkorb
-
-Archivieren oder Verschieben in den Papierkorb verändert nur den Lebenszyklusdatensatz. Projektstand und Snapshots bleiben unverändert erhalten.
-
-Wiederherstellen setzt den Zustand auf `active` und protokolliert `restoredAt`.
-
-## Endgültige Löschung
-
-Nach exakter Namensbestätigung werden in einer gemeinsamen Transaktion entfernt:
-
-- `projects[projectId]`
-- alle Snapshots mit passendem `projectId`
-- `project:<projectId>`
-- `retention:<projectId>`
-- `lifecycle:<projectId>`
-- weitere Metadaten mit passendem `projectId`
-- alle Ereignis- und Migrationsprotokolle mit passendem `projectId`
-
-Andere Projekte bleiben unberührt.
+Dieser Bericht wird nicht als Ersatz für eine reale Screenreader-Abnahme gewertet.
 
 ## Berichtsmodell
 
