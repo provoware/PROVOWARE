@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <script defer src="js/storage-engine.js"></script>
   <script defer src="js/state-manager.js"></script>
   <script defer src="js/workflow-engine.js"></script>
   <script defer src="js/rule-engine.js"></script>
@@ -22,12 +23,13 @@
 
   <header class="app-header">
     <div>
-      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.2.0</p>
+      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.3.0</p>
       <h1>Entwicklungsplan-Assistent</h1>
       <p class="subtitle">Schritt für Schritt von der Idee zum prüfbaren Plan.</p>
     </div>
     <div class="header-status" aria-label="Projektstatus">
       <span id="data-mode" class="badge badge-info">Daten werden geladen</span>
+      <span id="storage-status" class="badge badge-neutral">Speicher wird geprüft</span>
       <span id="status-badge" class="badge badge-warning">Unvollständig</span>
       <label class="progress-label" for="project-progress">Fortschritt <span id="progress-text">0 %</span></label>
       <progress id="project-progress" max="100" value="0">0 %</progress>
@@ -53,34 +55,15 @@
       </div>
 
       <p id="question-short-help" class="lead"></p>
-
       <div id="answer-options" class="answer-options" role="radiogroup" aria-labelledby="question-title"></div>
 
       <div class="help-grid">
-        <article class="help-card">
-          <h3>Warum wichtig?</h3>
-          <p id="question-why"></p>
-        </article>
-        <article class="help-card">
-          <h3>Optimales Beispiel</h3>
-          <p id="question-example"></p>
-        </article>
-        <article class="help-card help-positive">
-          <h3>Pro</h3>
-          <p id="question-pro"></p>
-        </article>
-        <article class="help-card help-negative">
-          <h3>Contra</h3>
-          <p id="question-contra"></p>
-        </article>
-        <article class="help-card">
-          <h3>Alternative</h3>
-          <p id="question-alternative"></p>
-        </article>
-        <article class="help-card help-recommendation">
-          <h3>Empfehlung</h3>
-          <p id="question-recommendation"></p>
-        </article>
+        <article class="help-card"><h3>Warum wichtig?</h3><p id="question-why"></p></article>
+        <article class="help-card"><h3>Optimales Beispiel</h3><p id="question-example"></p></article>
+        <article class="help-card help-positive"><h3>Pro</h3><p id="question-pro"></p></article>
+        <article class="help-card help-negative"><h3>Contra</h3><p id="question-contra"></p></article>
+        <article class="help-card"><h3>Alternative</h3><p id="question-alternative"></p></article>
+        <article class="help-card help-recommendation"><h3>Empfehlung</h3><p id="question-recommendation"></p></article>
       </div>
 
       <details class="expert-details">
@@ -96,32 +79,20 @@
     </section>
 
     <aside class="summary-panel panel" aria-labelledby="summary-title">
-      <div class="panel-heading">
-        <p class="eyebrow">Live-Auswertung</p>
-        <h2 id="summary-title">Projektübersicht</h2>
-      </div>
+      <div class="panel-heading"><p class="eyebrow">Live-Auswertung</p><h2 id="summary-title">Projektübersicht</h2></div>
       <dl class="summary-stats">
         <div><dt>Beantwortet</dt><dd id="answered-count">0</dd></div>
         <div><dt>Offen</dt><dd id="open-count">6</dd></div>
         <div><dt>Hinweise</dt><dd id="rule-count">0</dd></div>
       </dl>
-      <section aria-labelledby="decision-title">
-        <h3 id="decision-title">Entscheidungen</h3>
-        <ul id="decision-list" class="summary-list"></ul>
-      </section>
-      <section aria-labelledby="rule-title">
-        <h3 id="rule-title">Hinweise und Konflikte</h3>
-        <ul id="rule-list" class="summary-list"></ul>
-      </section>
-      <details>
-        <summary>Markdown-Planvorschau</summary>
-        <pre id="report-preview" class="report-preview"></pre>
-      </details>
+      <section aria-labelledby="decision-title"><h3 id="decision-title">Entscheidungen</h3><ul id="decision-list" class="summary-list"></ul></section>
+      <section aria-labelledby="rule-title"><h3 id="rule-title">Hinweise und Konflikte</h3><ul id="rule-list" class="summary-list"></ul></section>
+      <details><summary>Markdown-Planvorschau</summary><pre id="report-preview" class="report-preview"></pre></details>
     </aside>
   </main>
 
   <footer class="app-footer">
-    <p id="live-status" role="status" aria-live="polite">Prototyp bereit.</p>
+    <p id="live-status" role="status" aria-live="polite">Prototyp wird gestartet.</p>
     <button id="theme-button" type="button" class="button button-secondary" aria-pressed="false">Helles Theme</button>
   </footer>
 </body>
