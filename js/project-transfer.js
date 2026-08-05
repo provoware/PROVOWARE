@@ -110,7 +110,11 @@
       return {
         identical: false,
         fields: [],
-        answers: { same: [], changed: [], added: Object.keys(imported.answers || {}), missing: [] },
+        answers: {
+          same: [], changed: [],
+          added: Object.entries(imported.answers || {}).map(([questionId, importedValue]) => ({ questionId, importedValue })),
+          missing: []
+        },
         conflictCount: 0
       };
     }
@@ -177,6 +181,10 @@
     }
     const answerInspection = inspectAnswers(prepared.payload || packageData.project, catalog);
     errors.push(...prepared.validationErrors);
+    if (prepared.payload) {
+      try { namespace.projectRepository.validateName(prepared.payload.name); }
+      catch (error) { errors.push(error.message); }
+    }
     if (answerInspection.unknownQuestionIds.length) {
       errors.push(`Unbekannte Frage-IDs: ${answerInspection.unknownQuestionIds.join(", ")}.`);
     }
@@ -205,9 +213,10 @@
     };
     preview.valid = preview.errors.length === 0 && Boolean(preview.payload);
     preview.recommendation = recommendation(preview);
+    const existingIsActive = preview.existingProject?.lifecycle?.state === "active";
     preview.allowedModes = preview.valid
       ? preview.existingProject
-        ? preview.comparison.identical ? [] : ["new", "replace"]
+        ? preview.comparison.identical ? [] : existingIsActive ? ["new", "replace"] : ["new"]
         : ["preserve", "new"]
       : [];
     return preview;
