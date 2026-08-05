@@ -1,0 +1,5 @@
+# Der Anwendungskern soll ohne Python-Laufzeit und ohne externe Pakete funktionieren.
+# Python wird ausschließlich für optionale Entwicklungs-, Prüf- und Build-Skripte verwendet.
+
+jsonschema>=4.23,<5
+pytest>=8.3,<9
