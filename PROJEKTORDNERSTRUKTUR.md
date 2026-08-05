@@ -4,6 +4,9 @@
 
 ```text
 PROVOWARE/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── README.md
 ├── TODO.md
 ├── CHANGELOG.md
@@ -28,6 +31,7 @@ PROVOWARE/
 │   ├── rule-engine.js
 │   ├── validation-engine.js
 │   ├── report-generator.js
+│   ├── report-manager.js
 │   └── ui/app-ui.js
 ├── data/
 │   ├── questions.json
@@ -43,7 +47,8 @@ PROVOWARE/
 │   │   ├── test_catalogs.py
 │   │   ├── test_storage_contract.py
 │   │   ├── test_migration_matrix.py
-│   │   └── test_storage_failures.py
+│   │   ├── test_storage_failures.py
+│   │   └── test_report_generator.py
 │   ├── integration/test_structure.py
 │   ├── smoke/
 │   │   ├── test_index.py
@@ -70,22 +75,25 @@ PROVOWARE/
 
 ## Verantwortlichkeiten
 
-- `migration-engine.js`: reine, schrittweise und testbare Projektschema-Matrix ohne IndexedDB-Zugriffe
-- `storage-engine.js`: einzige Schicht für IndexedDB, Transaktionen, Revisionen, Prüfsummen, Migration, Aufbewahrung und Wiederherstellung
-- `storage-manager.js`: grafische Liste, Vorschau, Bestätigung und Benutzeraktionen ohne direkte Datenbanktransaktionen
+- `migration-engine.js`: reine Projektschema-Matrix ohne IndexedDB-Zugriffe
+- `storage-engine.js`: einzige Schicht für IndexedDB, Transaktionen, Migration und Wiederherstellung
+- `storage-manager.js`: grafische Snapshot-Liste und kontrollierte Benutzeraktionen
+- `report-generator.js`: formatneutrales Modell und Renderer für Markdown, HTML, TXT und JSON
+- `report-manager.js`: Vorprüfung, Vorschau, Formatwahl und lokaler Download
 - `state-manager.js`: laufender Anwendungszustand ohne direkte Datenbankzugriffe
-- `app.js`: koordiniert Autospeicherung, Migration, Aufbewahrung und Übergabe zwischen Zustand und Speicher
-- `storage-failure-smoke.js`: reproduzierbare Quota-, Abbruch-, Korruptions- und Legacy-Szenarien
+- `app.js`: koordiniert Modulstart, Autospeicherung und Übergaben
+- `ci.yml`: schnelle L0-/L1-Prüfung ohne Browserinstallation
 
 ## Regeln
 
 1. Keine Fachlogik direkt in `index.html`, sofern sie als Modul testbar ist.
 2. Jede Projektschema-Version benötigt einen expliziten Einzelschritt zur direkt folgenden Version.
-3. Migrationen dürfen keinen unkontrollierten Direktsprung verwenden.
-4. Die Storage-Engine ist allein für IndexedDB-Transaktionen verantwortlich.
-5. Legacy-Originale werden nicht überschrieben; migrierte Stände entstehen als neue Revisionen.
-6. Hauptstand, Sicherung, migrierte Snapshots, Metadaten und Protokolle müssen atomar geschrieben werden.
-7. Snapshots werden unveränderlich mit `add` angelegt.
-8. Eine Wiederherstellung erzeugt immer eine neue Revision.
+3. Die Storage-Engine ist allein für IndexedDB-Transaktionen verantwortlich.
+4. Legacy-Originale werden nicht überschrieben.
+5. Snapshots werden unveränderlich mit `add` angelegt.
+6. Alle Berichtsformate werden ausschließlich aus demselben validierten Modell erzeugt.
+7. Renderer dürfen Kennungen und Rückverfolgbarkeit nicht neu berechnen.
+8. Offline-HTML darf keine externen Ressourcen enthalten.
 9. Fehlerinjektion ist nur mit `window.__PROVOWARE_TESTING__ === true` zulässig.
-10. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
+10. Browser- und echte IndexedDB-Tests bleiben getrennte Release-Gates.
+11. Temporäre Browserprofile, Caches und Nutzerdaten gehören nicht ins Repository.
