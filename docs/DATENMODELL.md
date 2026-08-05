@@ -1,11 +1,12 @@
 # Datenmodell
 
-## Projektstand
+## Projektschema
 
-Projektschema `1.2.0` enthält:
+Das fachliche Projektschema bleibt bei `1.2.0` und enthält:
 
 - `schemaVersion`
-- Projekt-ID und Name
+- `projectId`
+- Projektname
 - Antworten
 - aktuelle Frage
 - Theme
@@ -13,31 +14,62 @@ Projektschema `1.2.0` enthält:
 - Erstellungs- und Änderungszeitpunkt
 - `lastValidatedAt`
 
-`questionCatalogVersion` dokumentiert, gegen welchen Fragenkatalog der Projektstand zuletzt geprüft wurde. `lastValidatedAt` hält den Zeitpunkt dieser Prüfung fest.
+Mehrprojektfunktionen verändern dieses Schema nicht. Archiv und Papierkorb liegen bewusst in getrennten IndexedDB-Metadaten.
 
-## Unterstützte Legacy-Schemata
+## Mehrprojektmodell
 
-| Version | Fehlende Angaben | Migrationsziel |
-|---|---|---|
-| `1.0.0` | Theme und gegebenenfalls aktuelle Frage | `1.1.0` |
-| `1.1.0` | Fragenkatalogversion und Validierungszeitpunkt | `1.2.0` |
-| `1.2.0` | keine | keine Migration |
-
-## Persistenz
-
-### Aktueller Projekt-Datensatz
+### Aktueller Projektstand
 
 ```text
 projects
-└── id
+└── id = projectId
     ├── revision
     ├── payload
+    │   ├── projectId
+    │   ├── name
+    │   ├── answers
+    │   └── weitere Projektschemafelder
     ├── checksum
     ├── savedAt
     └── reason
 ```
 
-### Snapshot
+Jede Projekt-ID besitzt maximal einen aktuellen Datensatz.
+
+### Projektlebenszyklus
+
+```text
+meta
+└── key = lifecycle:<projectId>
+    ├── projectId
+    ├── state
+    ├── archivedAt
+    ├── trashedAt
+    ├── restoredAt
+    └── updatedAt
+```
+
+Zulässige Zustände:
+
+- `active`
+- `archive`
+- `trash`
+
+Fehlt der Datensatz, wird das Projekt als `active` interpretiert. Dadurch bleiben ältere Projektstände ohne zusätzliche Migration nutzbar.
+
+### Projektbezogene Aufbewahrung
+
+```text
+meta
+└── key = retention:<projectId>
+    ├── projectId
+    ├── limit
+    └── updatedAt
+```
+
+Jedes Projekt besitzt eine eigene Aufbewahrungsgrenze.
+
+### Snapshots
 
 ```text
 snapshots
@@ -51,78 +83,70 @@ snapshots
     └── sourceSnapshotId (optional)
 ```
 
-Snapshots werden ausschließlich mit `add` erzeugt. Eine vorhandene Snapshot-ID kann dadurch nicht still überschrieben werden.
+Der Index `projectId` ermöglicht eine streng projektbezogene Liste und Löschung. Revisionen verschiedener Projekte dürfen dieselbe Nummer besitzen, da die Eindeutigkeit aus Projekt-ID und Revision entsteht.
 
-### Migrationsstände
+### Ereignisprotokoll
 
-- `pre-migration-backup`: unveränderter Hauptstand vor der Migration
-- `snapshot-migration`: migrierte Kopie eines Legacy-Snapshots
-- `schema-migration`: neuer aktueller Projektstand im Zielschema
-
-Legacy-Originale bleiben erhalten. Eine migrierte Kopie verweist über `sourceSnapshotId` auf ihre Quelle.
-
-## Berichtsmodell 1.0.0
-
-Das Berichtsmodell wird nicht separat gepflegt. Es wird bei Vorschau oder Export aus dem aktuellen Projektzustand, dem Fragenkatalog und den aktiven Regeln neu erzeugt.
+`migrationLog` enthält zusätzlich zum bisherigen Speicher- und Migrationsprotokoll:
 
 ```text
-report
-├── modelVersion
-├── generatedAt
-├── project
-│   ├── id
-│   ├── name
-│   ├── schemaVersion
-│   ├── questionCatalogVersion
-│   ├── revision
-│   ├── progress
-│   └── status
-├── summary
-├── decisions[]
-├── requirements[]
-├── architecture
-│   ├── principles[]
-│   ├── components[]
-│   ├── decisions[]
-│   └── dataFlow[]
-├── risks[]
-├── testCases[]
-├── acceptanceCriteria[]
-├── milestones[]
-├── openDecisions[]
-└── traceability[]
+type: project-lifecycle
+projectId
+fromState
+toState
+createdAt
 ```
 
-### Kennungen
+## Projektanlage
 
-- `DEC-###`: bestätigte Entscheidung
-- `REQ-###`: abgeleitete Anforderung
-- `ADR-###`: Architekturentscheidung
-- `RISK-###`: Risiko oder offener Konflikt
-- `TEST-###`: Normal- oder Fehlerfalltest
-- `AC-###`: Abnahmekriterium
-- `MS-##`: Meilenstein
-- `OPEN-###`: offene Entscheidung
+Ein neues Projekt erhält:
 
-### Rückverfolgbarkeit
+- geprüften Namen
+- eindeutige, lesbare Projekt-ID mit zufälligem Suffix
+- Revision 1
+- leeres Antwortobjekt
+- erste Workflowfrage
+- aktuelles Theme
+- aktuelle Fragenkatalogversion
+- eigene Snapshot-Folge
 
-Jeder Eintrag verbindet:
+## Umbenennen
 
-```text
-Frage-ID → Anforderungs-ID → Testfall-IDs → Abnahmekriterium-ID
-```
+Der Name liegt im Projekt-Payload. Umbenennen erzeugt daher eine neue Projekt-Revision und einen neuen Snapshot. Frühere Snapshots behalten den damaligen Namen und bleiben historisch nachvollziehbar.
 
-Renderer dürfen diese Beziehungen nicht neu berechnen oder verändern. Markdown, HTML, TXT und JSON verwenden dieselben Modellobjekte.
+## Duplizieren
 
-## Metadaten und Ereignisse
+Ein Duplikat übernimmt die fachlichen Antworten und Einstellungen, setzt aber neu:
 
-Der Store `meta` enthält:
+- `projectId`
+- Name
+- `createdAt`
+- `updatedAt`
+- `lastValidatedAt`
+- Revision auf 1
 
-- `project:<projectId>` für letzte Revision, Schema und Speichergrund
-- `retention:<projectId>` für Aufbewahrungsgrenze und Änderungszeitpunkt
+Snapshots, Metadaten und Protokolle des Ausgangsprojekts werden nicht kopiert.
 
-`migrationLog` dokumentiert Datenbank-Upgrades, Speicherungen, Wiederherstellungen, Migrationsschritte, Aufbewahrungsänderungen und Bereinigungen.
+## Archiv und Papierkorb
 
-## Wiederherstellung
+Archivieren oder Verschieben in den Papierkorb verändert nur den Lebenszyklusdatensatz. Projektstand und Snapshots bleiben unverändert erhalten.
 
-Ein historischer Snapshot wird nie verändert. Ein Legacy-Snapshot wird zuerst rein im Speicher schrittweise auf `1.2.0` migriert, anschließend validiert und danach als neue Revision mit dem Grund `manual-recovery` gespeichert.
+Wiederherstellen setzt den Zustand auf `active` und protokolliert `restoredAt`.
+
+## Endgültige Löschung
+
+Nach exakter Namensbestätigung werden in einer gemeinsamen Transaktion entfernt:
+
+- `projects[projectId]`
+- alle Snapshots mit passendem `projectId`
+- `project:<projectId>`
+- `retention:<projectId>`
+- `lifecycle:<projectId>`
+- weitere Metadaten mit passendem `projectId`
+- alle Ereignis- und Migrationsprotokolle mit passendem `projectId`
+
+Andere Projekte bleiben unberührt.
+
+## Berichtsmodell
+
+Das Berichtsmodell wird bei Vorschau oder Export ausschließlich aus dem aktuell geöffneten Projekt erzeugt. Sein Kopf enthält Projekt-ID, Name, Projektschema und Revision. Damit ist jede Ausgabedatei eindeutig einem Projektstand zugeordnet.
