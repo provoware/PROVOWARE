@@ -1,0 +1,41 @@
+{
+  "catalogVersion": "1.0.0",
+  "rules": [
+    {
+      "id": "rule.offline-cloud-conflict",
+      "severity": "critical",
+      "when": {
+        "all": [
+          {
+            "questionId": "platform.offline",
+            "equals": "yes"
+          },
+          {
+            "questionId": "data.storage",
+            "equals": "cloud"
+          }
+        ]
+      },
+      "message": "Vollständige Offline-Nutzung widerspricht einer Cloud als Hauptspeicher.",
+      "recommendation": "Lokale Speicherung oder einen nur optionalen Austausch wählen."
+    },
+    {
+      "id": "rule.beginner-guidance",
+      "severity": "recommendation",
+      "when": {
+        "any": [
+          {
+            "questionId": "users.experience",
+            "equals": "beginner"
+          },
+          {
+            "questionId": "users.experience",
+            "equals": "mixed"
+          }
+        ]
+      },
+      "message": "Für diese Zielgruppe sind Auswahldialoge, sichere Standardwerte und mehrstufige Hilfen sinnvoll.",
+      "recommendation": "Manuelle Pfadeingaben und unkommentierte Fachbegriffe vermeiden."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "catalogVersion": "1.0.0",
+  "templates": [
+    {
+      "id": "template.offline-html",
+      "title": "Offline-HTML-Werkzeug",
+      "description": "Sicherer Ausgangspunkt für ein lokales, laienoptimiertes Browserwerkzeug.",
+      "answerDefaults": {
+        "project.scope": "minimal",
+        "users.experience": "mixed",
+        "platform.offline": "yes",
+        "platform.target": "browser-linux",
+        "data.storage": "local"
+      }
+    }
+  ]
+}

@@ -2,28 +2,98 @@
 
 ## Projektstatus
 
-Dieses Repository wurde am 5. August 2026 vollständig neu aufgesetzt. Frühere Dateien gehören nicht mehr zum aktiven Projektbaum und bleiben nur über die Git-Historie rekonstruierbar.
+Das Repository enthält jetzt einen kleinen, startbaren und vollständig lokalen HTML-Prototypen. Die Oberfläche, JavaScript-Logik, Datenkataloge und JSON-Schemata sind getrennt aufgebaut.
 
-**Phase:** Planung und Architektur  
-**Ziel:** vollständig offline nutzbares, laienoptimiertes HTML-Werkzeug  
+**Version:** 0.2.0 – Architekturprototyp  
+**Ziel:** laienoptimierter Assistent für belastbare Entwicklungspläne  
 **Grundsatz:** kleine, prüfbare und reversible Entwicklungsschritte
 
 ## Zweck
 
-Das Projekt soll Nutzer schrittweise durch die Planung technischer Anwendungen führen. Antworten werden in Anforderungen, Risiken, Testfälle, Ordnerstrukturen, Architekturvorschläge und Entwicklungsberichte überführt.
+Das Tool führt Nutzer durch wichtige Projektentscheidungen. Jede Antwort kann später in Anforderungen, Risiken, Testfälle, Ordnerstrukturen und Entwicklungsberichte überführt werden.
 
-## Verbindliche Grunddateien
+## Schnellstart
 
-| Datei | Zweck |
+### Empfohlen: lokaler Browserstart
+
+```bash
+python3 -m http.server 8080
+```
+
+Danach im Browser öffnen:
+
+```text
+http://localhost:8080
+```
+
+Damit werden die getrennten JSON-Datenkataloge direkt geladen.
+
+### Direkter Offline-Start
+
+`index.html` kann auch per Doppelklick geöffnet werden. Falls der Browser lokale JSON-Zugriffe blockiert, verwendet der Prototyp automatisch einen eingebauten, klar gekennzeichneten Beispieldatensatz. Es werden keine Daten ins Internet übertragen.
+
+## Aktuell enthalten
+
+- semantischer Header mit Fortschritt und Statusampel
+- Workflow-Navigation mit vier Beispielphasen
+- mehrschichtige Fragenkarte
+- einfache Erklärungen, Beispiel, Pro, Contra, Alternative und Empfehlung
+- Live-Zusammenfassung und offene Entscheidungen
+- regelbasierte Hinweise und Konflikterkennung
+- getrennte CSS-, JavaScript-, Daten- und Schemadateien
+- Tastaturbedienung und sichtbarer Fokus
+- lokale Validierungs-, Test-, Build- und Release-Skripte
+- keine Cloud-, CDN- oder externen Laufzeitabhängigkeiten
+
+## Projektstruktur
+
+Die verbindliche Struktur steht in `PROJEKTORDNERSTRUKTUR.md`.
+
+Wichtige Bereiche:
+
+| Bereich | Zweck |
 |---|---|
-| `README.md` | Einstieg, Ziel, Status und Arbeitsweise |
-| `TODO.md` | priorisierte offene Aufgaben und Abnahmepunkte |
-| `CHANGELOG.md` | nachvollziehbarer Änderungsverlauf |
-| `SCHWACHSTELLEN.md` | bekannte Risiken, technische Schulden und Gegenmaßnahmen |
-| `AGENTS.md` | verbindliche Regeln für Entwickler und KI-Agenten |
-| `UPGRADEPOOL.md` | geprüfte spätere Erweiterungen ohne Vermischung mit dem Kernumfang |
-| `PROJEKTORDNERSTRUKTUR.md` | geplante Zielstruktur und Verantwortlichkeiten |
-| `requirements.txt` | optionale Python-Werkzeuge für Prüfung und Entwicklung |
+| `index.html` | semantische Grundoberfläche |
+| `css/` | Design-Tokens, Layout, Komponenten und Themes |
+| `js/` | Zustand, Workflow, Regeln, Validierung und UI |
+| `data/` | versionierte Fragen, Regeln, Vorlagen und Prompts |
+| `schemas/` | maschinenlesbare Datenverträge |
+| `tests/` | Unit-, Integrations- und Smoke-Prüfungen |
+| `scripts/` | Validierung, Build und Release |
+| `docs/` | Architektur, Datenmodell, Testplan und Bedienhilfe |
+| `dist/` | ausschließlich generierte Release-Ausgaben |
+
+## Prüfung
+
+Optionale Python-Werkzeuge installieren:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+Struktur, JSON, Schemata und Verweise prüfen:
+
+```bash
+python3 scripts/validate.py
+```
+
+Tests ausführen:
+
+```bash
+pytest -q
+```
+
+Modulares Ausgabepaket erzeugen:
+
+```bash
+python3 scripts/build.py
+```
+
+ZIP-Release erzeugen:
+
+```bash
+python3 scripts/release.py
+```
 
 ## Entwicklungsprinzipien
 
@@ -31,20 +101,11 @@ Das Projekt soll Nutzer schrittweise durch die Planung technischer Anwendungen f
 - datengetriebene Fragen-, Regel- und Berichtssysteme
 - verständliche Hilfetexte mit Beispiel, Pro, Contra, Alternative und Empfehlung
 - Vorvalidierung, Vorschau, sichere Ausführung und Nachprüfung
-- Autospeicherung, Snapshots, Migration und Wiederherstellung
 - Tastaturbedienung, sichtbarer Fokus und Screenreader-Beschriftungen
 - keine zerstörerischen Änderungen ohne Sicherung oder nachvollziehbaren Commit
 
-## Aktueller Umfang
-
-Der aktive Repository-Stand enthält zunächst nur die Projektgrundlage. Programmcode, Tests, Datenkataloge und Release-Artefakte werden erst nach bestätigter Struktur in kleinen Iterationen ergänzt.
-
-## Start
-
-Noch keine ausführbare Anwendung vorhanden. Der erste technische Meilenstein ist in `TODO.md` beschrieben.
-
 ## Statusanzeige
 
-- **Erledigt:** Repository bereinigt und Grunddokumentation angelegt
-- **Offen:** Architekturgrundgerüst, Datenmodelle, Prototyp, Tests und Releaseprozess
-- **Nächster Schritt:** Zielstruktur anlegen und minimalen Offline-Prototyp erstellen
+- **Erledigt:** Grundstruktur, Minimalprototyp, erste Datenkataloge, Schemata und lokale Prüfungen
+- **Offen:** IndexedDB, vollständiger Berichtsgenerator, Projektverwaltung, Import und umfassende Barrierefreiheitsabnahme
+- **Nächster Schritt:** lokale Projektpersistenz mit versioniertem IndexedDB-Schema entwickeln

@@ -26,6 +26,7 @@ PROVOWARE/
 │   ├── validation-engine.js
 │   ├── report-generator.js
 │   └── ui/
+│       └── app-ui.js
 ├── data/
 │   ├── questions.json
 │   ├── rules.json
@@ -37,9 +38,13 @@ PROVOWARE/
 │   └── questions.schema.json
 ├── tests/
 │   ├── unit/
+│   │   └── test_catalogs.py
 │   ├── integration/
+│   │   └── test_structure.py
 │   ├── smoke/
+│   │   └── test_index.py
 │   └── fixtures/
+│       └── project-valid.json
 ├── scripts/
 │   ├── build.py
 │   ├── validate.py
@@ -50,6 +55,7 @@ PROVOWARE/
 │   ├── TESTPLAN.md
 │   └── BEDIENHILFE.md
 └── dist/
+    └── .gitkeep
 ```
 
 ## Verantwortlichkeiten

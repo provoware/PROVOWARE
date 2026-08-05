@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "demo-projekt",
+  "name": "Demo-Projekt",
+  "answers": {
+    "platform.offline": "yes",
+    "data.storage": "local"
+  },
+  "currentQuestionId": "data.storage",
+  "createdAt": "2026-08-05T00:00:00Z",
+  "updatedAt": "2026-08-05T00:00:00Z"
+}
