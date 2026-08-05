@@ -16,6 +16,7 @@
         validationErrors: [],
         projectId: "default-project",
         projectName: "PROVOWARE Entwicklungsplan",
+        projectLifecycle: "active",
         schemaVersion: "1.2.0",
         theme: "dark",
         storageStatus: "checking",
@@ -48,7 +49,7 @@
         templates: templates.templates,
         prompts: prompts.prompts,
         dataMode,
-        currentQuestionId: firstQuestion?.id || null
+        currentQuestionId: this.state.currentQuestionId || firstQuestion?.id || null
       }, "Datenkataloge geladen.");
     }
 
@@ -62,6 +63,10 @@
       this.update({ theme: theme === "light" ? "light" : "dark" }, "Theme gewechselt.");
     }
 
+    setProjectLifecycle(projectLifecycle) {
+      this.update({ projectLifecycle }, "Projektstatus aktualisiert.");
+    }
+
     restoreProject(payload, metadata = {}) {
       const source = metadata.source || null;
       const message = source === "migration"
@@ -70,13 +75,19 @@
           ? "Snapshot manuell wiederhergestellt."
           : source === "recovery"
             ? "Letzter gültiger Snapshot wiederhergestellt."
-            : "Gespeicherter Projektstand geladen.";
+            : source === "project-created"
+              ? "Neues Projekt geöffnet."
+              : source === "project-duplicated"
+                ? "Projektkopie geöffnet."
+                : "Gespeicherter Projektstand geladen.";
       this.update({
+        projectId: payload.projectId || this.state.projectId,
+        projectName: payload.name || this.state.projectName,
+        projectLifecycle: metadata.lifecycle || "active",
         schemaVersion: payload.schemaVersion || this.state.schemaVersion,
         answers: payload.answers || {},
-        currentQuestionId: payload.currentQuestionId || this.state.currentQuestionId,
+        currentQuestionId: payload.currentQuestionId || this.state.catalog?.questions?.[0]?.id || this.state.currentQuestionId,
         theme: payload.theme || "dark",
-        projectName: payload.name || this.state.projectName,
         createdAt: payload.createdAt || this.state.createdAt,
         revision: metadata.revision || 0,
         restoredFrom: source,
