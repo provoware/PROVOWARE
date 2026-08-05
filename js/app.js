@@ -4,6 +4,7 @@
   let storageReady = false;
   let saveTimer = null;
   let saveChain = Promise.resolve();
+  let autosaveSuspended = 0;
 
   async function loadJson(path) {
     const response = await fetch(path, { cache: "no-store" });
@@ -14,10 +15,8 @@
   async function loadCatalogs() {
     try {
       const [questions, rules, templates, prompts] = await Promise.all([
-        loadJson("data/questions.json"),
-        loadJson("data/rules.json"),
-        loadJson("data/templates.json"),
-        loadJson("data/prompts.json")
+        loadJson("data/questions.json"), loadJson("data/rules.json"),
+        loadJson("data/templates.json"), loadJson("data/prompts.json")
       ]);
       return { questions, rules, templates, prompts, dataMode: "files" };
     } catch (error) {
@@ -31,23 +30,33 @@
     return /^[a-z0-9][a-z0-9._-]{2,63}$/.test(value) ? value : "default-project";
   }
 
+  function storedProjectValidator(payload) {
+    const state = namespace.state.getState();
+    return namespace.validation.validateStoredProject(payload, state.catalog);
+  }
+
   async function persistNow(reason = "autosave") {
     if (!storageReady) return null;
     const state = namespace.state.getState();
     const payload = namespace.storage.createPayload(state);
-    const errors = namespace.validation.validateStoredProject(payload, state.catalog);
+    const errors = storedProjectValidator(payload);
     if (errors.length) throw new Error(`Projektstand kann nicht gespeichert werden: ${errors.join(" ")}`);
     const result = await namespace.storage.saveProject(payload, reason);
+    const limit = await namespace.storage.getRetentionLimit(state.projectId);
+    const retention = await namespace.storage.pruneSnapshots(
+      state.projectId,
+      limit,
+      candidate => storedProjectValidator(candidate).length === 0
+    );
     namespace.state.setStorageStatus("saved", result.revision, result.source);
-    return result;
+    return { ...result, retention };
   }
 
   function scheduleAutosave(_state, message) {
-    if (!storageReady || [
-      "Speicherstatus aktualisiert.",
-      "Datenkataloge geladen.",
-      "Daten geprüft.",
-      "Projektkennung gesetzt."
+    if (!storageReady || autosaveSuspended > 0 || [
+      "Speicherstatus aktualisiert.", "Datenkataloge geladen.", "Daten geprüft.",
+      "Projektkennung gesetzt.", "Gespeicherter Projektstand geladen.",
+      "Letzter gültiger Snapshot wiederhergestellt.", "Snapshot manuell wiederhergestellt."
     ].includes(message)) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
@@ -66,12 +75,57 @@
     return saveChain;
   }
 
+  async function getStorageOverview() {
+    if (!storageReady) throw new Error("Der lokale Speicher ist noch nicht bereit.");
+    const state = namespace.state.getState();
+    return namespace.storage.getStorageOverview(
+      state.projectId,
+      payload => storedProjectValidator(payload).length === 0
+    );
+  }
+
+  async function createSnapshot() {
+    return flush("manual-snapshot");
+  }
+
+  async function setRetention(requestedLimit) {
+    if (!storageReady) throw new Error("Der lokale Speicher ist nicht verfügbar.");
+    const state = namespace.state.getState();
+    const limit = await namespace.storage.setRetentionLimit(state.projectId, requestedLimit);
+    const result = await namespace.storage.pruneSnapshots(
+      state.projectId,
+      limit,
+      payload => storedProjectValidator(payload).length === 0
+    );
+    return { ...result, limit };
+  }
+
+  async function restoreSnapshot(snapshotId) {
+    if (!storageReady) throw new Error("Der lokale Speicher ist nicht verfügbar.");
+    clearTimeout(saveTimer);
+    await saveChain;
+    const state = namespace.state.getState();
+    const result = await namespace.storage.restoreSnapshot(
+      state.projectId,
+      snapshotId,
+      payload => storedProjectValidator(payload).length === 0
+    );
+    autosaveSuspended += 1;
+    try {
+      namespace.state.restoreProject(result.payload, { revision: result.revision, source: "manual-recovery" });
+      namespace.state.setStorageStatus("recovered", result.revision, "manual-recovery");
+    } finally {
+      autosaveSuspended -= 1;
+    }
+    return result;
+  }
+
   async function startStorage() {
     const state = namespace.state.getState();
     await namespace.storage.open();
     const restored = await namespace.storage.loadLatestValid(
       state.projectId,
-      payload => namespace.validation.validateStoredProject(payload, state.catalog).length === 0
+      payload => storedProjectValidator(payload).length === 0
     );
     if (restored) namespace.state.restoreProject(restored.payload, restored);
     storageReady = true;
@@ -82,6 +136,14 @@
     );
     namespace.state.subscribe(scheduleAutosave);
     if (!restored) await flush("initial-state");
+    else {
+      const limit = await namespace.storage.getRetentionLimit(state.projectId);
+      await namespace.storage.pruneSnapshots(
+        state.projectId,
+        limit,
+        payload => storedProjectValidator(payload).length === 0
+      );
+    }
   }
 
   function loadSmokeHarness() {
@@ -94,6 +156,7 @@
 
   async function start() {
     namespace.ui.initialize();
+    namespace.storageManager.initialize();
     namespace.state.setProjectId(projectIdFromLocation());
     const catalogs = await loadCatalogs();
     const errors = namespace.validation.validateQuestionCatalog(catalogs.questions);
@@ -109,7 +172,9 @@
     loadSmokeHarness();
   }
 
-  namespace.persistence = { flush, persistNow };
+  namespace.persistence = {
+    flush, persistNow, getStorageOverview, createSnapshot, setRetention, restoreSnapshot
+  };
   window.addEventListener("DOMContentLoaded", () => {
     namespace.ready = start();
   }, { once: true });
