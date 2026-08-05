@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import shutil
@@ -14,11 +15,13 @@ EXPECTED_FILES = [
     "README.md", "TODO.md", "CHANGELOG.md", "SCHWACHSTELLEN.md", "AGENTS.md",
     "UPGRADEPOOL.md", "PROJEKTORDNERSTRUKTUR.md", "requirements.txt", "index.html",
     "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css",
-    "js/app.js", "js/state-manager.js", "js/workflow-engine.js", "js/rule-engine.js",
-    "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js",
+    "js/app.js", "js/storage-engine.js", "js/state-manager.js", "js/workflow-engine.js",
+    "js/rule-engine.js", "js/validation-engine.js", "js/report-generator.js", "js/ui/app-ui.js",
     "data/questions.json", "data/rules.json", "data/templates.json", "data/prompts.json",
     "schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json",
-    "tests/unit/test_catalogs.py", "tests/integration/test_structure.py", "tests/smoke/test_index.py",
+    "tests/unit/test_catalogs.py", "tests/unit/test_storage_contract.py",
+    "tests/integration/test_structure.py", "tests/smoke/test_index.py",
+    "tests/smoke/browser-smoke.js", "tests/smoke/run_browser_smoke.py",
     "tests/fixtures/project-valid.json", "scripts/build.py", "scripts/validate.py", "scripts/release.py",
     "docs/ARCHITEKTUR.md", "docs/DATENMODELL.md", "docs/TESTPLAN.md", "docs/BEDIENHILFE.md", "dist/.gitkeep"
 ]
@@ -71,8 +74,7 @@ def validate_schemas():
     except ImportError:
         print("[HINWEIS] jsonschema nicht installiert; strukturelle Ersatzprüfung wird verwendet.")
         for path in ("schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json"):
-            schema = load_json(path)
-            assert schema.get("type") == "object"
+            assert load_json(path).get("type") == "object"
         return
 
     project_schema = load_json("schemas/project.schema.json")
@@ -93,6 +95,7 @@ def validate_html_references():
     local_references = [ref for ref in references if not ref.startswith(("#", "data:"))]
     missing = [ref for ref in local_references if not (ROOT / ref).is_file()]
     assert not missing, f"Fehlende HTML-Verweise: {missing}"
+    assert html.index('src="js/storage-engine.js"') < html.index('src="js/state-manager.js"'), "Storage-Engine muss vor dem State-Manager geladen werden."
 
 
 def validate_javascript_syntax():
@@ -100,8 +103,18 @@ def validate_javascript_syntax():
     if not node:
         print("[HINWEIS] Node.js nicht vorhanden; JavaScript-Syntaxprüfung übersprungen.")
         return
-    for path in sorted((ROOT / "js").rglob("*.js")):
+    paths = [*sorted((ROOT / "js").rglob("*.js")), ROOT / "tests" / "smoke" / "browser-smoke.js"]
+    for path in paths:
         subprocess.run([node, "--check", str(path)], check=True, capture_output=True, text=True)
+
+
+def validate_storage_contract():
+    source = (ROOT / "js" / "storage-engine.js").read_text(encoding="utf-8")
+    for store in ("projects", "snapshots", "meta", "migrationLog"):
+        assert f'"{store}"' in source, f"IndexedDB-Store fehlt: {store}"
+    assert 'transaction(Object.values(STORES), "readwrite")' in source, "Gemeinsame Schreibtransaktion fehlt."
+    assert "snapshots.add(snapshotRecord)" in source, "Snapshots müssen unveränderlich per add geschrieben werden."
+    assert "loadLatestValid" in source and "automatic-recovery" in source, "Automatische Wiederherstellung fehlt."
 
 
 def validate_no_remote_runtime_assets():
@@ -111,18 +124,30 @@ def validate_no_remote_runtime_assets():
         assert "https://" not in text and "http://" not in text, f"Externe Laufzeitadresse in {path.relative_to(ROOT)}"
 
 
+def run_browser_smoke():
+    subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_browser_smoke.py")], check=True)
+
+
 def main():
+    parser = argparse.ArgumentParser(description="PROVOWARE-Struktur und Datenverträge prüfen.")
+    parser.add_argument("--browser", action="store_true", help="zusätzlich den Desktop-/Mobil-Browser-Smoke-Test ausführen")
+    args = parser.parse_args()
+
     checks = [
         ("Struktur", validate_structure),
         ("Datenkataloge", validate_catalogs),
         ("Schemata", validate_schemas),
         ("HTML-Verweise", validate_html_references),
         ("JavaScript-Syntax", validate_javascript_syntax),
+        ("Speichervertrag", validate_storage_contract),
         ("Offline-Laufzeit", validate_no_remote_runtime_assets),
     ]
     for label, check in checks:
         check()
         print(f"[OK] {label}")
+    if args.browser:
+        run_browser_smoke()
+        print("[OK] Browser-Smoke")
     print("[OK] Alle Validierungen bestanden.")
     return 0
 
@@ -130,6 +155,6 @@ def main():
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (AssertionError, subprocess.CalledProcessError) as exc:
+    except (AssertionError, subprocess.CalledProcessError, ModuleNotFoundError) as exc:
         print(f"[FEHLER] {exc}", file=sys.stderr)
         raise SystemExit(1)
