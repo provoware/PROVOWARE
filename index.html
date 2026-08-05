@@ -17,6 +17,7 @@
   <script defer src="js/validation-engine.js"></script>
   <script defer src="js/report-generator.js"></script>
   <script defer src="js/ui/app-ui.js"></script>
+  <script defer src="js/report-manager.js"></script>
   <script defer src="js/storage-manager.js"></script>
   <script defer src="js/app.js"></script>
 </head>
@@ -25,7 +26,7 @@
 
   <header class="app-header">
     <div>
-      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.5.0</p>
+      <p class="eyebrow">PROVOWARE · Offline-Prototyp 0.6.0</p>
       <h1>Entwicklungsplan-Assistent</h1>
       <p class="subtitle">Schritt für Schritt von der Idee zum prüfbaren Plan.</p>
     </div>
@@ -40,25 +41,17 @@
 
   <main class="workspace">
     <nav class="phase-panel panel" aria-label="Planungsphasen">
-      <div class="panel-heading">
-        <p class="eyebrow">Workflow</p>
-        <h2>Planungsphasen</h2>
-      </div>
+      <div class="panel-heading"><p class="eyebrow">Workflow</p><h2>Planungsphasen</h2></div>
       <ol id="phase-list" class="phase-list"></ol>
     </nav>
 
     <section id="question-panel" class="question-panel panel" tabindex="-1" aria-labelledby="question-title">
       <div class="panel-heading question-heading">
-        <div>
-          <p id="question-counter" class="eyebrow">Frage 1 von 6</p>
-          <h2 id="question-title">Frage wird geladen</h2>
-        </div>
+        <div><p id="question-counter" class="eyebrow">Frage 1 von 6</p><h2 id="question-title">Frage wird geladen</h2></div>
         <span id="question-required" class="badge badge-neutral">Pflichtfrage</span>
       </div>
-
       <p id="question-short-help" class="lead"></p>
       <div id="answer-options" class="answer-options" role="radiogroup" aria-labelledby="question-title"></div>
-
       <div class="help-grid">
         <article class="help-card"><h3>Warum wichtig?</h3><p id="question-why"></p></article>
         <article class="help-card"><h3>Optimales Beispiel</h3><p id="question-example"></p></article>
@@ -67,12 +60,7 @@
         <article class="help-card"><h3>Alternative</h3><p id="question-alternative"></p></article>
         <article class="help-card help-recommendation"><h3>Empfehlung</h3><p id="question-recommendation"></p></article>
       </div>
-
-      <details class="expert-details">
-        <summary>Ausführlichere Fachinformation anzeigen</summary>
-        <p id="question-details"></p>
-      </details>
-
+      <details class="expert-details"><summary>Ausführlichere Fachinformation anzeigen</summary><p id="question-details"></p></details>
       <div class="question-actions" aria-label="Fragenavigation">
         <button id="previous-button" type="button" class="button button-secondary">Zurück</button>
         <button id="recommended-button" type="button" class="button button-quiet">Empfehlung übernehmen</button>
@@ -87,6 +75,7 @@
         <div><dt>Offen</dt><dd id="open-count">6</dd></div>
         <div><dt>Hinweise</dt><dd id="rule-count">0</dd></div>
       </dl>
+      <button id="report-manager-button" type="button" class="button button-primary button-wide">Bericht prüfen und exportieren</button>
       <button id="storage-manager-button" type="button" class="button button-secondary button-wide">Speicherstände verwalten</button>
       <section aria-labelledby="decision-title"><h3 id="decision-title">Entscheidungen</h3><ul id="decision-list" class="summary-list"></ul></section>
       <section aria-labelledby="rule-title"><h3 id="rule-title">Hinweise und Konflikte</h3><ul id="rule-list" class="summary-list"></ul></section>
@@ -99,6 +88,54 @@
     <button id="theme-button" type="button" class="button button-secondary" aria-pressed="false">Helles Theme</button>
   </footer>
 
+  <dialog id="report-dialog" class="storage-dialog" aria-labelledby="report-dialog-title">
+    <div class="dialog-shell">
+      <header class="dialog-header">
+        <div>
+          <p class="eyebrow">Vorprüfung und Ausgabe</p>
+          <h2 id="report-dialog-title">Entwicklungsbericht</h2>
+          <p class="subtitle">Alle Formate entstehen aus demselben geprüften Berichtsmodell. Offene Entscheidungen und Konflikte bleiben sichtbar.</p>
+        </div>
+        <button id="report-close-button" type="button" class="button button-secondary" aria-label="Berichtsverwaltung schließen">Schließen</button>
+      </header>
+
+      <section class="storage-toolbar" aria-label="Berichtsaktionen">
+        <button id="report-refresh-button" type="button" class="button button-secondary">Bericht neu prüfen</button>
+        <label class="retention-control" for="report-format">
+          <span>Vorschauformat</span>
+          <select id="report-format">
+            <option value="markdown">Markdown</option>
+            <option value="html">Offline-HTML</option>
+            <option value="text">Text</option>
+            <option value="json">JSON</option>
+          </select>
+        </label>
+      </section>
+
+      <dl class="storage-stats">
+        <div><dt>Status</dt><dd><span id="report-project-status" class="badge badge-warning">incomplete</span></dd></div>
+        <div><dt>Anforderungen</dt><dd id="report-requirement-count">0</dd></div>
+        <div><dt>Risiken</dt><dd id="report-risk-count">0</dd></div>
+        <div><dt>Testfälle</dt><dd id="report-test-count">0</dd></div>
+        <div><dt>Offene Entscheidungen</dt><dd id="report-open-count">0</dd></div>
+      </dl>
+
+      <section class="snapshot-preview-panel" aria-labelledby="report-preview-title">
+        <h3 id="report-preview-title">Geprüfte Vorschau</h3>
+        <pre id="report-preview-content" class="report-preview snapshot-json"></pre>
+      </section>
+
+      <section id="report-export-buttons" class="storage-toolbar" aria-label="Bericht herunterladen">
+        <button type="button" class="button button-primary" data-report-format="markdown">Markdown herunterladen</button>
+        <button type="button" class="button button-secondary" data-report-format="html">Offline-HTML herunterladen</button>
+        <button type="button" class="button button-secondary" data-report-format="text">TXT herunterladen</button>
+        <button type="button" class="button button-secondary" data-report-format="json">JSON herunterladen</button>
+      </section>
+
+      <p id="report-status" class="dialog-status" role="status" aria-live="polite">Berichtsverwaltung bereit.</p>
+    </div>
+  </dialog>
+
   <dialog id="storage-dialog" class="storage-dialog" aria-labelledby="storage-dialog-title">
     <div class="dialog-shell">
       <header class="dialog-header">
@@ -109,52 +146,31 @@
         </div>
         <button id="storage-close-button" type="button" class="button button-secondary" aria-label="Speicherverwaltung schließen">Schließen</button>
       </header>
-
       <section class="storage-toolbar" aria-label="Speicheraktionen">
         <button id="storage-refresh-button" type="button" class="button button-secondary">Liste aktualisieren</button>
         <button id="storage-create-button" type="button" class="button button-primary">Jetzt Sicherheitsstand anlegen</button>
-        <label class="retention-control" for="retention-limit">
-          <span>Maximale Snapshots</span>
-          <input id="retention-limit" type="number" min="5" max="200" step="1" value="30" inputmode="numeric">
-        </label>
+        <label class="retention-control" for="retention-limit"><span>Maximale Snapshots</span><input id="retention-limit" type="number" min="5" max="200" step="1" value="30" inputmode="numeric"></label>
         <button id="retention-save-button" type="button" class="button button-secondary">Grenze anwenden</button>
       </section>
-
       <p class="storage-help">Die Grenze entfernt nur ältere Überschüsse. Der jüngste gültige Sicherheitsstand bleibt immer erhalten, auch wenn neuere Snapshots beschädigt sein sollten.</p>
-
       <dl class="storage-stats">
         <div><dt>Aktuelle Revision</dt><dd id="storage-revision">0</dd></div>
         <div><dt>Snapshots</dt><dd id="snapshot-count">0</dd></div>
         <div><dt>Wiederherstellungen</dt><dd id="storage-recovery-count">0</dd></div>
       </dl>
-
       <div class="storage-grid">
-        <section aria-labelledby="snapshot-list-title">
-          <h3 id="snapshot-list-title">Gespeicherte Revisionen</h3>
-          <ul id="snapshot-list" class="snapshot-list"></ul>
-        </section>
-
+        <section aria-labelledby="snapshot-list-title"><h3 id="snapshot-list-title">Gespeicherte Revisionen</h3><ul id="snapshot-list" class="snapshot-list"></ul></section>
         <section class="snapshot-preview-panel" aria-labelledby="snapshot-preview-title">
           <div id="snapshot-preview-empty" class="empty-state">Wähle links einen Snapshot aus. Erst danach werden Details und Wiederherstellung freigeschaltet.</div>
           <div id="snapshot-preview" hidden>
-            <div class="snapshot-preview-heading">
-              <h3 id="snapshot-preview-title">Snapshot-Vorschau</h3>
-              <span id="snapshot-preview-status" class="badge badge-neutral">Nicht geprüft</span>
-            </div>
+            <div class="snapshot-preview-heading"><h3 id="snapshot-preview-title">Snapshot-Vorschau</h3><span id="snapshot-preview-status" class="badge badge-neutral">Nicht geprüft</span></div>
             <div id="snapshot-preview-meta" class="snapshot-preview-meta"></div>
-            <details open>
-              <summary>Gespeicherten Projektstand anzeigen</summary>
-              <pre id="snapshot-preview-json" class="report-preview snapshot-json"></pre>
-            </details>
-            <label class="restore-confirmation">
-              <input id="snapshot-confirm" type="checkbox">
-              <span>Ich habe Revision, Zeitpunkt und Inhalt geprüft. Die Wiederherstellung darf als neue Revision gespeichert werden.</span>
-            </label>
+            <details open><summary>Gespeicherten Projektstand anzeigen</summary><pre id="snapshot-preview-json" class="report-preview snapshot-json"></pre></details>
+            <label class="restore-confirmation"><input id="snapshot-confirm" type="checkbox"><span>Ich habe Revision, Zeitpunkt und Inhalt geprüft. Die Wiederherstellung darf als neue Revision gespeichert werden.</span></label>
             <button id="snapshot-restore-button" type="button" class="button button-primary" disabled>Ausgewählten Snapshot wiederherstellen</button>
           </div>
         </section>
       </div>
-
       <p id="storage-manager-status" class="dialog-status" role="status" aria-live="polite">Speicherverwaltung bereit.</p>
     </div>
   </dialog>
