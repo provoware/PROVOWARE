@@ -15,19 +15,24 @@ EXPECTED_FILES = [
     ".github/workflows/ci.yml",
     "README.md", "TODO.md", "CHANGELOG.md", "SCHWACHSTELLEN.md", "AGENTS.md",
     "UPGRADEPOOL.md", "PROJEKTORDNERSTRUKTUR.md", "requirements.txt", "index.html",
-    "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css", "css/project-manager.css",
+    "css/variables.css", "css/layout.css", "css/components.css", "css/themes.css",
+    "css/project-manager.css", "css/project-transfer.css",
     "js/app.js", "js/migration-engine.js", "js/storage-engine.js", "js/project-repository.js",
-    "js/project-manager.js", "js/storage-manager.js", "js/state-manager.js", "js/workflow-engine.js",
+    "js/project-manager.js", "js/project-transfer.js", "js/project-transfer-manager.js",
+    "js/accessibility.js", "js/storage-manager.js", "js/state-manager.js", "js/workflow-engine.js",
     "js/rule-engine.js", "js/validation-engine.js", "js/report-generator.js", "js/report-manager.js",
     "js/ui/app-ui.js",
     "data/questions.json", "data/rules.json", "data/templates.json", "data/prompts.json",
-    "schemas/project.schema.json", "schemas/template.schema.json", "schemas/questions.schema.json",
+    "schemas/project.schema.json", "schemas/project-package.schema.json",
+    "schemas/template.schema.json", "schemas/questions.schema.json",
     "tests/unit/test_catalogs.py", "tests/unit/test_storage_contract.py",
     "tests/unit/test_migration_matrix.py", "tests/unit/test_storage_failures.py",
     "tests/unit/test_report_generator.py", "tests/unit/test_project_management.py",
+    "tests/unit/test_project_transfer.py", "tests/unit/test_accessibility_contract.py",
     "tests/integration/test_structure.py", "tests/smoke/test_index.py",
     "tests/smoke/browser-smoke.js", "tests/smoke/run_browser_smoke.py",
     "tests/smoke/project-management-smoke.js", "tests/smoke/run_project_management_smoke.py",
+    "tests/smoke/transfer-accessibility-smoke.js", "tests/smoke/run_transfer_accessibility_smoke.py",
     "tests/smoke/storage-failure-smoke.js", "tests/smoke/run_storage_failure_smoke.py",
     "tests/smoke/failure-harness.html",
     "tests/fixtures/project-v1.0.0.json", "tests/fixtures/project-v1.1.0.json",
@@ -75,19 +80,21 @@ def validate_catalogs():
 
 def validate_schemas():
     project_schema = load_json("schemas/project.schema.json")
+    package_schema = load_json("schemas/project-package.schema.json")
     template_schema = load_json("schemas/template.schema.json")
     questions_schema = load_json("schemas/questions.schema.json")
     assert project_schema["properties"]["schemaVersion"]["const"] == "1.2.0"
+    assert package_schema["properties"]["packageSchemaVersion"]["const"] == "1.0.0"
+    assert package_schema["properties"]["checksum"]["pattern"] == "^[a-f0-9]{8}$"
     try:
         import jsonschema
     except ImportError:
         print("[HINWEIS] jsonschema nicht installiert; strukturelle Ersatzprüfung wird verwendet.")
-        for schema in (project_schema, template_schema, questions_schema):
+        for schema in (project_schema, package_schema, template_schema, questions_schema):
             assert schema.get("type") == "object"
         return
-    jsonschema.Draft202012Validator.check_schema(project_schema)
-    jsonschema.Draft202012Validator.check_schema(template_schema)
-    jsonschema.Draft202012Validator.check_schema(questions_schema)
+    for schema in (project_schema, package_schema, template_schema, questions_schema):
+        jsonschema.Draft202012Validator.check_schema(schema)
     jsonschema.validate(load_json("tests/fixtures/project-valid.json"), project_schema)
     jsonschema.validate(load_json("data/questions.json"), questions_schema)
     for template in load_json("data/templates.json")["templates"]:
@@ -111,18 +118,22 @@ def validate_html_references():
     assert not missing, f"Fehlende HTML-Verweise: {missing}"
     order = [
         'src="js/migration-engine.js"', 'src="js/storage-engine.js"',
-        'src="js/project-repository.js"', 'src="js/state-manager.js"',
-        'src="js/report-generator.js"', 'src="js/ui/app-ui.js"',
-        'src="js/project-manager.js"', 'src="js/report-manager.js"',
-        'src="js/storage-manager.js"', 'src="js/app.js"'
+        'src="js/project-repository.js"', 'src="js/project-transfer.js"',
+        'src="js/state-manager.js"', 'src="js/report-generator.js"',
+        'src="js/ui/app-ui.js"', 'src="js/accessibility.js"',
+        'src="js/project-manager.js"', 'src="js/project-transfer-manager.js"',
+        'src="js/report-manager.js"', 'src="js/storage-manager.js"', 'src="js/app.js"'
     ]
     positions = [html.index(marker) for marker in order]
-    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Projekt-, Berichts- und Speicherverwaltung ist ungültig."
+    assert positions == sorted(positions), "JavaScript-Ladereihenfolge für Projekt-, Transfer-, Berichts- und Speicherverwaltung ist ungültig."
     for marker in (
         'id="project-manager-button"', 'id="project-dialog"', 'id="project-new-form"',
-        'id="project-filter"', 'id="project-action-checkbox"', 'id="current-project-name"'
+        'id="project-filter"', 'id="project-action-checkbox"', 'id="current-project-name"',
+        'id="project-transfer-button"', 'id="transfer-dialog"', 'id="transfer-file"',
+        'id="transfer-checksum-status"', 'id="transfer-mode"', 'id="transfer-apply-button"',
+        'id="transfer-audit-result"'
     ):
-        assert marker in html, f"Mehrprojekt-Oberfläche fehlt: {marker}"
+        assert marker in html, f"Projekt- oder Transferoberfläche fehlt: {marker}"
 
 
 def validate_javascript_syntax():
@@ -134,6 +145,7 @@ def validate_javascript_syntax():
         *sorted((ROOT / "js").rglob("*.js")),
         ROOT / "tests" / "smoke" / "browser-smoke.js",
         ROOT / "tests" / "smoke" / "project-management-smoke.js",
+        ROOT / "tests" / "smoke" / "transfer-accessibility-smoke.js",
         ROOT / "tests" / "smoke" / "storage-failure-smoke.js",
     ]
     for path in paths:
@@ -172,6 +184,33 @@ def validate_project_contract():
     assert 'project-action-checkbox' in manager
 
 
+def validate_transfer_contract():
+    transfer = (ROOT / "js" / "project-transfer.js").read_text(encoding="utf-8")
+    manager = (ROOT / "js" / "project-transfer-manager.js").read_text(encoding="utf-8")
+    app = (ROOT / "js" / "app.js").read_text(encoding="utf-8")
+    for marker in (
+        'PACKAGE_SCHEMA_VERSION = "1.0.0"', "MAX_IMPORT_BYTES", "checksum(coreFromPackage",
+        "preparePreview", "unknownQuestionIds", "invalidAnswerValues", "compareProjects",
+        'existingIsActive ? ["new", "replace"] : ["new"]'
+    ):
+        assert marker in transfer, f"Projekttransfervertrag fehlt: {marker}"
+    assert "await file.text()" in manager
+    assert 'mode === "replace"' in manager
+    assert 'transfer-replace-checkbox' in manager and 'transfer-replace-name' in manager
+    assert '"pre-import-backup"' in app
+    assert "inspectImportPackage" in app and "applyImport" in app and "exportCurrentProject" in app
+
+
+def validate_accessibility_contract():
+    source = (ROOT / "js" / "accessibility.js").read_text(encoding="utf-8")
+    for marker in (
+        "dialogStack", "openerByDialog", "focusableElements", "trapTab", "handleEscape",
+        "data-arrow-navigation", '"ArrowUp"', '"ArrowDown"', '"ArrowLeft"', '"ArrowRight"',
+        "Doppelte ID", "Formularfeld ohne Beschriftung", "Dialog ohne gültige Überschrift"
+    ):
+        assert marker in source, f"Barrierefreiheitsvertrag fehlt: {marker}"
+
+
 def validate_no_remote_runtime_assets():
     runtime_paths = [ROOT / "index.html", *sorted((ROOT / "css").glob("*.css")), *sorted((ROOT / "js").rglob("*.js"))]
     for path in runtime_paths:
@@ -182,6 +221,7 @@ def validate_no_remote_runtime_assets():
 def run_browser_smoke():
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_browser_smoke.py")], check=True)
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_project_management_smoke.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_transfer_accessibility_smoke.py")], check=True)
     subprocess.run([sys.executable, str(ROOT / "tests" / "smoke" / "run_storage_failure_smoke.py")], check=True)
 
 
@@ -198,6 +238,8 @@ def main():
         ("JavaScript-Syntax", validate_javascript_syntax),
         ("Speichervertrag", validate_storage_contract),
         ("Mehrprojektvertrag", validate_project_contract),
+        ("Projekttransfervertrag", validate_transfer_contract),
+        ("Barrierefreiheitsvertrag", validate_accessibility_contract),
         ("Offline-Laufzeit", validate_no_remote_runtime_assets),
     ]
     for label, check in checks:
