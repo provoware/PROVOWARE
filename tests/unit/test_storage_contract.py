@@ -3,6 +3,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = (ROOT / "js" / "storage-engine.js").read_text(encoding="utf-8")
 MANAGER = (ROOT / "js" / "storage-manager.js").read_text(encoding="utf-8")
+APP = (ROOT / "js" / "app.js").read_text(encoding="utf-8")
 
 
 def test_storage_uses_required_object_stores():
@@ -39,3 +40,9 @@ def test_graphical_manager_requires_preview_and_confirmation():
     assert "snapshot-confirm" in MANAGER
     assert "snapshot-restore-button" in MANAGER
     assert "selectedSnapshot?.valid" in MANAGER
+
+
+def test_manual_recovery_is_serialized_with_autosave():
+    assert "autosaveSuspended += 1" in APP
+    assert "saveChain = saveChain.then(async () =>" in APP
+    assert "namespace.storage.restoreSnapshot" in APP
