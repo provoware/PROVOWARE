@@ -7,7 +7,9 @@
     {"id": "ARCH-005", "regel": "Command/Query-Trennung", "status": "AKTIV"},
     {"id": "ARCH-006", "regel": "Audit, Debug und Evidence getrennt", "status": "AKTIV"},
     {"id": "ARCH-007", "regel": "A/B-Update statt In-Place-Update", "status": "AKTIV"},
-    {"id": "ARCH-008", "regel": "Kernverträge sind GUI-, Datenbank-, Datei- und Modul-unabhängig; öffentliche IDs, Status, Fehler und Ergebnisse werden ausschließlich typisiert exponiert.", "status": "AKTIV"}
+    {"id": "ARCH-008", "regel": "Kernverträge sind GUI-, Datenbank-, Datei- und Modul-unabhängig; öffentliche IDs, Status, Fehler und Ergebnisse werden ausschließlich typisiert exponiert.", "status": "AKTIV"},
+    {"id": "ARCH-009", "regel": "Schema-Version und Produktversion sind getrennte Typen und Namensräume; Schemas akzeptieren nur explizite Pflichtfelder und weisen unbekannte Felder standardmäßig ab.", "status": "AKTIV"},
+    {"id": "ARCH-010", "regel": "Die in I007 qualifizierten ID-Präfixe, Statuswerte und OperationErgebnis-Invarianten gelten ab I008 als öffentliche API und dürfen nur über einen expliziten migrationsfähigen Vertragswechsel geändert werden.", "status": "AKTIV"}
   ],
   "schema": "1.0.0"
 }
