@@ -68,13 +68,9 @@ def pruefe_iterationsfolge(
     naechste = status.get("naechste_iteration")
 
     if letzte != baseline.get("letzte_iteration"):
-        fehler.append(
-            "Letzte Iteration zwischen PROJEKTSTATUS und CURRENT_BASELINE inkonsistent."
-        )
+        fehler.append("Letzte Iteration zwischen PROJEKTSTATUS und CURRENT_BASELINE inkonsistent.")
     if naechste != baseline.get("naechste_iteration"):
-        fehler.append(
-            "Nächste Iteration zwischen PROJEKTSTATUS und CURRENT_BASELINE inkonsistent."
-        )
+        fehler.append("Nächste Iteration zwischen PROJEKTSTATUS und CURRENT_BASELINE inkonsistent.")
 
     if not isinstance(letzte, str) or not isinstance(naechste, str):
         fehler.append("Letzte/nächste Iteration fehlen oder sind keine Strings.")
@@ -89,9 +85,7 @@ def pruefe_iterationsfolge(
         fehler.append("Iterationsfolge ist nicht fortlaufend.")
 
 
-def pruefe_identitaet(
-    status: dict[str, Any], baseline: dict[str, Any], fehler: list[str]
-) -> None:
+def pruefe_identitaet(status: dict[str, Any], baseline: dict[str, Any], fehler: list[str]) -> None:
     if status.get("kanonischer_projektname") != "PROVOWARE":
         fehler.append("Projektname inkonsistent.")
     if status.get("repository") != "https://github.com/provoware/PROVOWARE":
@@ -102,9 +96,7 @@ def pruefe_identitaet(
         fehler.append("Projektversion zwischen PROJEKTSTATUS und CURRENT_BASELINE inkonsistent.")
 
 
-def pruefe_masterplan(
-    status: dict[str, Any], baseline: dict[str, Any], fehler: list[str]
-) -> None:
+def pruefe_masterplan(status: dict[str, Any], baseline: dict[str, Any], fehler: list[str]) -> None:
     masterplan = status.get("masterplan")
     if not isinstance(masterplan, dict):
         fehler.append("Masterplan-Metadaten fehlen in PROJEKTSTATUS.")
@@ -118,9 +110,7 @@ def pruefe() -> list[str]:
     if fehler:
         return fehler
 
-    status = als_objekt(
-        lade_json(ROOT / "PROJEKTSTATUS.json"), "PROJEKTSTATUS.json", fehler
-    )
+    status = als_objekt(lade_json(ROOT / "PROJEKTSTATUS.json"), "PROJEKTSTATUS.json", fehler)
     baseline = als_objekt(
         lade_json(ROOT / "CURRENT_BASELINE.json"), "CURRENT_BASELINE.json", fehler
     )
