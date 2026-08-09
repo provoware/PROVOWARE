@@ -1,0 +1,202 @@
+name: I007 Kernverträge Qualifikation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - iteration/i007-kernvertraege
+    paths:
+      - ".github/workflows/i007-kernvertraege.yml"
+      - ".github/workflows/i005-wheelhouse.yml"
+      - ".github/workflows/transfer-v1.yml"
+      - "src/provoware/vertraege/**"
+      - "tests/contract/**"
+      - "tests/test_structure.py"
+      - "ARCHITEKTURREGISTER.json"
+      - "KOMPONENTENREGISTER.json"
+      - "FEHLERKLASSEN.json"
+      - "TRACEABILITY.json"
+      - "PLAN_DELTA.json"
+      - "EVIDENCE/I007/**"
+      - "pyproject.toml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/i007-kernvertraege.yml"
+      - ".github/workflows/i005-wheelhouse.yml"
+      - ".github/workflows/transfer-v1.yml"
+      - "src/provoware/vertraege/**"
+      - "tests/contract/**"
+      - "tests/test_structure.py"
+      - "ARCHITEKTURREGISTER.json"
+      - "KOMPONENTENREGISTER.json"
+      - "FEHLERKLASSEN.json"
+      - "TRACEABILITY.json"
+      - "PLAN_DELTA.json"
+      - "EVIDENCE/I007/**"
+      - "pyproject.toml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: i007-kernvertraege-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualifikation:
+    name: Python 3.13.15 / mypy strict / Contracttests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: Verifiziertes I005-Wheelhouse laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .artefakte/i005-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: I005-Artefakt prüfen und Toolchain offline installieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ZIP="$(find .artefakte/i005-download -type f -name '*.zip' -print -quit)"
+          test -n "$ZIP"
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "$ZIP" | sha256sum -c -
+          mkdir -p .artefakte/i005
+          unzip -q "$ZIP" -d .artefakte/i005
+          python3 -m venv .venv-i007
+          PIP_NO_INDEX=1 .venv-i007/bin/python -m pip install \
+            --no-index \
+            --find-links "$PWD/.artefakte/i005/wheelhouse" \
+            pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
+          PIP_NO_INDEX=1 .venv-i007/bin/python -m pip check
+
+      - name: Baseline vor I007 prüfen
+        shell: bash
+        run: python3 WERKZEUGE/baseline_pruefen.py
+
+      - name: Ruff prüfen
+        shell: bash
+        run: |
+          .venv-i007/bin/ruff check src tests WERKZEUGE
+          .venv-i007/bin/ruff format --check src tests WERKZEUGE
+
+      - name: mypy strict für Vertragsschicht
+        shell: bash
+        run: .venv-i007/bin/mypy src/provoware/vertraege tests/contract/test_datentypen.py tests/contract/test_id_varianten.py
+
+      - name: Contracttests
+        shell: bash
+        run: .venv-i007/bin/pytest -q -m contract tests/contract
+
+      - name: Gesamte schnelle Regression
+        shell: bash
+        run: .venv-i007/bin/pytest -q
+
+      - name: I007-Qualifikationsreceipt erzeugen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .artefakte/I007
+          .venv-i007/bin/python - <<'PY'
+          from __future__ import annotations
+          import json, os, platform
+          from datetime import UTC, datetime
+          from pathlib import Path
+
+          receipt = {
+              "schema": "1.0.0",
+              "iteration": "I007",
+              "status": "GRUEN",
+              "zeit_utc": datetime.now(UTC).isoformat(),
+              "github": {
+                  "repository": os.environ.get("GITHUB_REPOSITORY"),
+                  "sha": os.environ.get("GITHUB_SHA"),
+                  "run_id": int(os.environ["GITHUB_RUN_ID"]),
+                  "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              },
+              "plattform": {
+                  "python": platform.python_version(),
+                  "system": platform.system(),
+                  "maschine": platform.machine(),
+              },
+              "toolchain": {
+                  "quelle": "verifiziertes I005-Wheelhouse",
+                  "pytest": "9.1.1",
+                  "ruff": "0.16.1",
+                  "mypy": "2.3.0",
+                  "pip_no_index": True,
+              },
+              "gates": {
+                  "baseline": "GRUEN",
+                  "ruff_check": "GRUEN",
+                  "ruff_format": "GRUEN",
+                  "mypy_strict": "GRUEN",
+                  "contracttests": "GRUEN",
+                  "gesamte_regression": "GRUEN",
+                  "qt_sqlite_importgrenze": "GRUEN"
+              }
+          }
+          Path('.artefakte/I007/I007_QUALIFIKATION.json').write_text(
+              json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8'
+          )
+          PY
+          sha256sum .artefakte/I007/I007_QUALIFIKATION.json
+
+      - name: I007-Evidence hochladen
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: PROVOWARE-I007-kernvertraege-${{ github.sha }}
+          path: .artefakte/I007/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 90
+
+      - name: Ergebnis zusammenfassen
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        run: |
+          {
+            echo "## I007 — Kernverträge GRÜN"
+            echo
+            echo "- Python 3.13.15"
+            echo "- Toolchain ausschließlich aus verifiziertem I005-Wheelhouse"
+            echo "- Ruff Check/Format GRÜN"
+            echo "- mypy strict GRÜN"
+            echo "- Contracttests GRÜN"
+            echo "- Gesamtregression GRÜN"
+            echo "- Artifact-ID: ${ARTIFACT_ID}"
+            echo "- Artifact-Digest: ${ARTIFACT_DIGEST}"
+          } >> "$GITHUB_STEP_SUMMARY"

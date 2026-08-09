@@ -1,11 +1,11 @@
 {
-  "schema":"1.0.0",
-  "status":"INITIAL",
-  "regeln":"MUSS -> Architektur -> Komponente -> Implementierung -> Test -> Evidence -> Gate",
-  "eintraege":[
+  "schema": "1.0.0",
+  "status": "AKTIV",
+  "regeln": "MUSS -> Architektur -> Komponente -> Implementierung -> Test -> Evidence -> Gate",
+  "eintraege": [
     {"anforderung_id":"REQ-V1-001","zielphase":"P07","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-002","zielphase":"P07","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
-    {"anforderung_id":"REQ-V1-003","zielphase":"P02-P05","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-003","zielphase":"P02-P05","architektur":["ARCH-001","ARCH-008"],"komponenten":["KMP-VERTRAEGE"],"implementierung":["src/provoware/vertraege/datentypen.py","src/provoware/vertraege/__init__.py"],"tests":["tests/contract/test_datentypen.py","tests/contract/test_id_varianten.py","tests/test_structure.py"],"evidence":["EVIDENCE/I007/TESTERGEBNIS.json","EVIDENCE/I007/ABSCHLUSSBERICHT.md"],"gates":["G1","G2"],"status":"VALIDIERT"},
     {"anforderung_id":"REQ-V1-004","zielphase":"P04","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-005","zielphase":"P08","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-006","zielphase":"P08-P10","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
@@ -18,7 +18,7 @@
     {"anforderung_id":"REQ-V1-013","zielphase":"P21-P24","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-014","zielphase":"P26","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-015","zielphase":"P27-P30","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
-    {"anforderung_id":"REQ-V1-016","zielphase":"P00-P32","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-016","zielphase":"P00-P32","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":["EVIDENCE/I007/TESTERGEBNIS.json","EVIDENCE/I007/ABSCHLUSSBERICHT.md"],"gates":[],"status":"IN_ARBEIT"},
     {"anforderung_id":"REQ-V1-017","zielphase":"global","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-018","zielphase":"P16,P23","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
     {"anforderung_id":"REQ-V1-019","zielphase":"P25","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},

@@ -9,9 +9,11 @@ on:
       - ".github/workflows/i006-clean-bootstrap.yml"
       - "WERKZEUGE/bootstrap_pruefen.py"
       - "WERKZEUGE/clean-bootstrap.sh"
+      - "WERKZEUGE/baseline_pruefen.py"
       - "WERKZEUGE/WHEELHOUSE_STATUS.json"
       - "WERKZEUGE/wheelhouse-anforderungen.txt"
-      - "tests/**"
+      - "tests/test_baseline.py"
+      - "tests/test_i006_bootstrap_contract.py"
       - "pyproject.toml"
   pull_request:
     branches:
@@ -20,9 +22,11 @@ on:
       - ".github/workflows/i006-clean-bootstrap.yml"
       - "WERKZEUGE/bootstrap_pruefen.py"
       - "WERKZEUGE/clean-bootstrap.sh"
+      - "WERKZEUGE/baseline_pruefen.py"
       - "WERKZEUGE/WHEELHOUSE_STATUS.json"
       - "WERKZEUGE/wheelhouse-anforderungen.txt"
-      - "tests/**"
+      - "tests/test_baseline.py"
+      - "tests/test_i006_bootstrap_contract.py"
       - "pyproject.toml"
 
 permissions:

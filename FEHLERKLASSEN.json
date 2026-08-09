@@ -1,1 +1,14 @@
-{"schema":"1.0.0","fehlerklassen":[],"regel":"Dauerhaft nur nach reproduzierter Root Cause und bestätigtem Fix."}
+{
+  "fehlerklassen": [
+    {"bedeutung": "Eingabe oder Vertragswert verletzt definierte Regeln.", "name": "VALIDIERUNG"},
+    {"bedeutung": "Adressiertes Objekt oder Ressource existiert nicht.", "name": "NICHT_GEFUNDEN"},
+    {"bedeutung": "Zustand, Revision oder konkurrierende Operation kollidiert.", "name": "KONFLIKT"},
+    {"bedeutung": "Operation ist aufgrund fehlender Berechtigung nicht zulässig.", "name": "BERECHTIGUNG"},
+    {"bedeutung": "Ein-/Ausgabeoperation konnte nicht korrekt ausgeführt werden.", "name": "IO"},
+    {"bedeutung": "Hash-, Schema-, Daten- oder Zustandsintegrität ist verletzt.", "name": "INTEGRITAET"},
+    {"bedeutung": "Nicht näher klassifizierter interner Programmfehler.", "name": "INTERN"}
+  ],
+  "regel": "Dauerhafte Fehlercodes werden erst nach reproduzierter Root Cause und bestätigtem Fix in das Fehlerwissen übernommen; Fehlerklassen sind stabile Vertragstypen.",
+  "schema": "1.0.0",
+  "status": "I007_VALIDIERT"
+}

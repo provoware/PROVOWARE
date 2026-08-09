@@ -8,18 +8,12 @@ on:
     paths:
       - "TRANSFER/**"
       - ".github/workflows/transfer-v1.yml"
-      - "PROJEKTSTATUS.json"
-      - "CURRENT_BASELINE.json"
-      - "README.md"
   push:
     branches:
       - main
     paths:
       - "TRANSFER/**"
       - ".github/workflows/transfer-v1.yml"
-      - "PROJEKTSTATUS.json"
-      - "CURRENT_BASELINE.json"
-      - "README.md"
 
 permissions:
   contents: read

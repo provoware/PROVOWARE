@@ -1,1 +1,13 @@
-{"schema":"1.0.0","architektur":[{"id":"ARCH-001","regel":"Headless-Core; Desktop ist Adapter","status":"AKTIV"},{"id":"ARCH-002","regel":"Keine Fachlogik in Qt-Widgets","status":"AKTIV"},{"id":"ARCH-003","regel":"Nutzerdaten später nur über zentralen Transaktionsdienst schreiben","status":"AKTIV"},{"id":"ARCH-004","regel":"SQLite ohne ORM; explizite Repository-/Migrationsschicht","status":"AKTIV"},{"id":"ARCH-005","regel":"Command/Query-Trennung","status":"AKTIV"},{"id":"ARCH-006","regel":"Audit, Debug und Evidence getrennt","status":"AKTIV"},{"id":"ARCH-007","regel":"A/B-Update statt In-Place-Update","status":"AKTIV"}]}
+{
+  "architektur": [
+    {"id": "ARCH-001", "regel": "Headless-Core; Desktop ist Adapter", "status": "AKTIV"},
+    {"id": "ARCH-002", "regel": "Keine Fachlogik in Qt-Widgets", "status": "AKTIV"},
+    {"id": "ARCH-003", "regel": "Nutzerdaten später nur über zentralen Transaktionsdienst schreiben", "status": "AKTIV"},
+    {"id": "ARCH-004", "regel": "SQLite ohne ORM; explizite Repository-/Migrationsschicht", "status": "AKTIV"},
+    {"id": "ARCH-005", "regel": "Command/Query-Trennung", "status": "AKTIV"},
+    {"id": "ARCH-006", "regel": "Audit, Debug und Evidence getrennt", "status": "AKTIV"},
+    {"id": "ARCH-007", "regel": "A/B-Update statt In-Place-Update", "status": "AKTIV"},
+    {"id": "ARCH-008", "regel": "Kernverträge sind GUI-, Datenbank-, Datei- und Modul-unabhängig; öffentliche IDs, Status, Fehler und Ergebnisse werden ausschließlich typisiert exponiert.", "status": "AKTIV"}
+  ],
+  "schema": "1.0.0"
+}
