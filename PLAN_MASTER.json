@@ -6,7 +6,7 @@
   "phasen": [
     {"id": "P00", "name": "Plan- und Baseline-Freeze", "von": "I000", "bis": "I002", "status": "VALIDIERT"},
     {"id": "P01", "name": "Repository- und Entwicklungsfundament", "von": "I003", "bis": "I006", "status": "VALIDIERT"},
-    {"id": "P02", "name": "Verträge, Typen und Schemata", "von": "I007", "bis": "I010", "status": "BEREIT"},
+    {"id": "P02", "name": "Verträge, Typen und Schemata", "von": "I007", "bis": "I010", "status": "IN_ARBEIT"},
     {"id": "P03", "name": "Plattform- und Dateisystemschicht", "von": "I011", "bis": "I014", "status": "GEPLANT"},
     {"id": "P04", "name": "Identität, Version und Audit", "von": "I015", "bis": "I018", "status": "GEPLANT"},
     {"id": "P05", "name": "Zustandsmaschinen und Controller", "von": "I019", "bis": "I022", "status": "GEPLANT"},
