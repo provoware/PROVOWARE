@@ -177,7 +177,9 @@ class ManifestSchema:
         }
 
     def als_json(self) -> str:
-        return json.dumps(self.als_dict(), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return json.dumps(
+            self.als_dict(), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -199,7 +201,9 @@ class ProjektSchema:
         if self.schema != PROJEKT_SCHEMA_VERSION:
             raise ValueError(f"ProjektSchema benötigt Schema-Version {PROJEKT_SCHEMA_VERSION}.")
         if self.name != self.name.strip() or _PROJEKTNAME_RE.fullmatch(self.name) is None:
-            raise ValueError("Projektname muss 1-120 sichtbare Zeichen ohne Rand-Leerraum besitzen.")
+            raise ValueError(
+                "Projektname muss 1-120 sichtbare Zeichen ohne Rand-Leerraum besitzen."
+            )
 
     @classmethod
     def aus_mapping(cls, daten: Mapping[str, object]) -> Self:
@@ -242,4 +246,6 @@ class ProjektSchema:
         }
 
     def als_json(self) -> str:
-        return json.dumps(self.als_dict(), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return json.dumps(
+            self.als_dict(), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        )
