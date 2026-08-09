@@ -8,6 +8,10 @@ def test_p01_ordnerstruktur() -> None:
         assert (ROOT / rel).is_dir(), rel
 
 
-def test_keine_breite_fachimplementierung_vor_i005() -> None:
-    files = [p for p in (ROOT / "src").rglob("*.py")]
-    assert [p.relative_to(ROOT).as_posix() for p in files] == ["src/provoware/__init__.py"]
+def test_i007_implementiert_nur_vertragsschicht() -> None:
+    files = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / "src").rglob("*.py"))
+    assert files == [
+        "src/provoware/__init__.py",
+        "src/provoware/vertraege/__init__.py",
+        "src/provoware/vertraege/datentypen.py",
+    ]
