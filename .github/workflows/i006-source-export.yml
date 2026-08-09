@@ -1,0 +1,54 @@
+name: I006 Main-Quellstand Export
+
+on:
+  push:
+    branches:
+      - package/i006-source-export
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Exportzweig auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Parent als qualifizierten I006-main verifizieren
+        shell: bash
+        env:
+          EXPECTED_MAIN: cbde85eb80ab76153247887e29ffa69809a9651b
+        run: |
+          set -Eeuo pipefail
+          ACTUAL="$(git rev-parse HEAD^)"
+          test "$ACTUAL" = "$EXPECTED_MAIN"
+          echo "MAIN_COMMIT=$ACTUAL" >> "$GITHUB_ENV"
+
+      - name: Exakten main-Tree archivieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .uebergabe
+          git archive \
+            --format=zip \
+            --prefix=PROVOWARE/ \
+            --output=.uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.zip \
+            "$MAIN_COMMIT"
+          sha256sum .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.zip \
+            > .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.sha256
+          cat .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.sha256
+
+      - name: Übergabeartefakt hochladen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: PROVOWARE-I006-main-source-${{ env.MAIN_COMMIT }}
+          path: .uebergabe/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
