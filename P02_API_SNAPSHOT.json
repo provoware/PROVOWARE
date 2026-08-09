@@ -1,0 +1,161 @@
+{
+  "fingerprint_sha256": "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16",
+  "freeze_iteration": "I010",
+  "migrationsregel": "Änderungen an diesem Snapshot benötigen einen expliziten, dokumentierten Vertrags-/Migrationswechsel mit neuem Snapshot-Fingerprint.",
+  "phase": "P02",
+  "schema": "1.0.0",
+  "snapshot": {
+    "dataclass_felder": {
+      "ChangeId": ["wert"],
+      "FehlerInfo": ["klasse", "code", "nachricht"],
+      "ManifestSchema": ["schema", "projekt_id", "produktversion"],
+      "ObjektId": ["wert"],
+      "OperationArt": ["wert"],
+      "OperationErgebnis": ["erfolgreich", "wert", "fehler"],
+      "OperationId": ["wert"],
+      "OperationPayload": ["kanonisch_json"],
+      "OperationRequest": ["schema", "operation_id", "operation_art", "payload"],
+      "OperationResult": ["schema", "operation_id", "ergebnis"],
+      "ProduktVersion": ["wert"],
+      "ProjektId": ["wert"],
+      "ProjektSchema": ["schema", "projekt_id", "name", "produktversion", "status"],
+      "RevisionId": ["wert"],
+      "SchemaVersion": ["wert"]
+    },
+    "enumwerte": {
+      "Fehlerklasse": [
+        "VALIDIERUNG",
+        "NICHT_GEFUNDEN",
+        "KONFLIKT",
+        "BERECHTIGUNG",
+        "IO",
+        "INTEGRITAET",
+        "INTERN"
+      ],
+      "Status": ["BEREIT", "IN_ARBEIT", "VALIDIERT", "BLOCKIERT"]
+    },
+    "fehlercodes": {
+      "fehlerinfo_codeformat": "^[A-Z][A-Z0-9_]{2,63}$",
+      "fehlerklassen": [
+        "VALIDIERUNG",
+        "NICHT_GEFUNDEN",
+        "KONFLIKT",
+        "BERECHTIGUNG",
+        "IO",
+        "INTEGRITAET",
+        "INTERN"
+      ],
+      "operation_vertrag": [
+        "OPERATION_ART_UNGUELTIG",
+        "OPERATION_FELDTYP_UNGUELTIG",
+        "OPERATION_ID_UNGUELTIG",
+        "OPERATION_PAYLOAD_FLOAT_VERBOTEN",
+        "OPERATION_PAYLOAD_JSON_UNGUELTIG",
+        "OPERATION_PAYLOAD_NICHT_KANONISCH",
+        "OPERATION_PAYLOAD_SCHLUESSEL_UNGUELTIG",
+        "OPERATION_PAYLOAD_TYP_UNGUELTIG",
+        "OPERATION_PAYLOAD_WURZEL_UNGUELTIG",
+        "OPERATION_PAYLOAD_ZU_GROSS",
+        "OPERATION_PAYLOAD_ZU_TIEF",
+        "OPERATION_PFLICHTFELD_FEHLT",
+        "OPERATION_RESULT_FEHLER_UNGUELTIG",
+        "OPERATION_RESULT_WERT_UNGUELTIG",
+        "OPERATION_RESULT_WIDERSPRUCH",
+        "OPERATION_SCHEMA_INKOMPATIBEL",
+        "OPERATION_SCHEMA_UNGUELTIG",
+        "OPERATION_TYP_UNGUELTIG",
+        "OPERATION_UNBEKANNTES_FELD"
+      ],
+      "schema_validierung": [
+        "PRODUKTVERSION_UNGUELTIG",
+        "PROJEKTNAME_UNGUELTIG",
+        "PROJEKT_ID_UNGUELTIG",
+        "SCHEMA_ART_UNGUELTIG",
+        "SCHEMA_FELDTYP_UNGUELTIG",
+        "SCHEMA_PFLICHTFELD_FEHLT",
+        "SCHEMA_UNBEKANNTES_FELD",
+        "SCHEMA_VERSION_INKOMPATIBEL",
+        "SCHEMA_VERSION_UNGUELTIG",
+        "STATUS_UNGUELTIG"
+      ]
+    },
+    "id_praefixe": {
+      "ChangeId": "chg",
+      "ObjektId": "obj",
+      "OperationId": "op",
+      "ProjektId": "prj",
+      "RevisionId": "rev"
+    },
+    "oeffentliche_exporte": [
+      "MANIFEST_SCHEMA_VERSION",
+      "OPERATION_SCHEMA_VERSION",
+      "PROJEKT_SCHEMA_VERSION",
+      "ChangeId",
+      "FehlerInfo",
+      "Fehlerklasse",
+      "ManifestSchema",
+      "ObjektId",
+      "OperationArt",
+      "OperationErgebnis",
+      "OperationId",
+      "OperationPayload",
+      "OperationRequest",
+      "OperationResult",
+      "OperationVertragsfehler",
+      "ProduktVersion",
+      "ProjektId",
+      "ProjektSchema",
+      "RevisionId",
+      "SchemaValidierungsfehler",
+      "SchemaVersion",
+      "Status"
+    ],
+    "pflichtfelder": {
+      "ManifestSchema": ["art", "produktversion", "projekt_id", "schema"],
+      "OperationRequest": ["operation_art", "operation_id", "payload", "schema", "typ"],
+      "OperationResult": ["erfolgreich", "fehler", "operation_id", "schema", "typ", "wert"],
+      "ProjektSchema": ["art", "name", "produktversion", "projekt_id", "schema", "status"]
+    },
+    "quell_sha256": {
+      "datentypen.py": "6699a04e5e8f99b701e29d9e78ebeaf1fd83365098a5b976639ead4a474b488e",
+      "operationen.py": "e818dac9353f43e50d46c1bfe8087581600cb9d3c609b23ffd68198656dfc0b0",
+      "schemata.py": "2ef40891deea5c83d9f8c669d653fcf751ba1ef4c64d6310b6931a101cadb23d"
+    },
+    "schema_versionen": {
+      "manifest": "1.0.0",
+      "operation": "1.0.0",
+      "projekt": "1.0.0"
+    },
+    "symboltypen": {
+      "ChangeId": "Dataclass",
+      "FehlerInfo": "Dataclass",
+      "Fehlerklasse": "StrEnum",
+      "MANIFEST_SCHEMA_VERSION": "SchemaVersion",
+      "ManifestSchema": "Dataclass",
+      "OPERATION_SCHEMA_VERSION": "SchemaVersion",
+      "ObjektId": "Dataclass",
+      "OperationArt": "Dataclass",
+      "OperationErgebnis": "Dataclass",
+      "OperationId": "Dataclass",
+      "OperationPayload": "Dataclass",
+      "OperationRequest": "Dataclass",
+      "OperationResult": "Dataclass",
+      "OperationVertragsfehler": "ValueError",
+      "PROJEKT_SCHEMA_VERSION": "SchemaVersion",
+      "ProduktVersion": "Dataclass",
+      "ProjektId": "Dataclass",
+      "ProjektSchema": "Dataclass",
+      "RevisionId": "Dataclass",
+      "SchemaValidierungsfehler": "ValueError",
+      "SchemaVersion": "Dataclass",
+      "Status": "StrEnum"
+    },
+    "vertragsmarker": {
+      "ManifestSchema.ART": "MANIFEST",
+      "OperationRequest.TYP": "OPERATION_REQUEST",
+      "OperationResult.TYP": "OPERATION_RESULT",
+      "ProjektSchema.ART": "PROJEKT"
+    }
+  },
+  "source_iterations": ["I007", "I008", "I009"]
+}
