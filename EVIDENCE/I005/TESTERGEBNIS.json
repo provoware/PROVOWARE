@@ -1,0 +1,35 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I005",
+  "status": "GRUEN",
+  "workflow_run_id": 31330952896,
+  "job_id": 93288985009,
+  "plattform": {
+    "os": "Ubuntu 22.04.5 LTS",
+    "architektur": "x86_64",
+    "python": "3.13.15",
+    "pip": "25.2"
+  },
+  "ergebnisse": {
+    "wheel_download": "50 Wheels / 294428822 Bytes",
+    "source_distributions": 0,
+    "offline_installation": "GRUEN",
+    "pip_check": "No broken requirements found",
+    "import_smoke": "GRUEN",
+    "cli_smoke": "GRUEN",
+    "baseline_pruefer": "GRUEN / 17 Register",
+    "pytest": "11 bestanden in 0.11 s",
+    "ruff_check": "GRUEN",
+    "ruff_format_check": "2 Dateien bereits formatiert"
+  },
+  "artefakt": {
+    "id": 9042907351,
+    "bytes": 294502210,
+    "sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+  },
+  "nachpruefung": {
+    "download_sha256_stimmt": true,
+    "wheel_hashliste_stimmt": true,
+    "wheelanzahl_stimmt": true
+  }
+}
