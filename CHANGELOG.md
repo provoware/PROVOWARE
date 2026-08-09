@@ -2,70 +2,62 @@
 
 ## 0.1.0-dev - 2026-08-09
 
+### I009 — kanonische Operationsverträge qualifiziert
+- Obsoleten parallelen I008-PR #7 geschlossen und als durch PR #8 ersetzt dokumentiert.
+- I008-Regressionsworkflow promotionsfest gemacht: aktuelle validierte Baseline und historische I008-Evidence werden getrennt geprüft.
+- `OperationArt` als streng validierten Code-Werttyp ohne vorgezogene Fach- oder Handler-Enum eingeführt.
+- `OperationPayload` als unveränderliche kanonische JSON-Objekthülle eingeführt.
+- Tiefe Payload-Validierung mit Limits für Verschachtelung, Containergröße, Schlüssel und 65.536 Byte kanonische Größe eingeführt.
+- Fließkommazahlen für eindeutige kanonische Semantik explizit ausgeschlossen.
+- `OperationRequest` mit Schema, `OperationId`, Operationsart und Payload eingeführt.
+- `OperationResult` ausschließlich auf `OperationErgebnis[OperationPayload]` und `FehlerInfo` aufgebaut; keine zweite Ergebnissemantik.
+- Request und Result ausschließlich über `OperationId` korreliert.
+- Deterministische JSON-Serialisierung und SHA-256-Fingerprints für Payload, Request und Result qualifiziert.
+- Unbekannte Request-/Result-Felder fail-closed abgewiesen.
+- Gültige und ungültige Golden-Fixtures für Request, Erfolg, Fehler, Float, Widerspruch und unbekannte Felder ergänzt.
+- AST-basierte Architekturgrenze auf Handler, GUI, SQLite, Persistenz und Dateizugriffe erweitert.
+- Payload-Normalisierung nach erstem Ruff-Befund in kleinere wartbare Hilfsfunktionen zerlegt und exakt auf Ruff 0.16.1 formatiert.
+- Finale Qualifikation: Ruff grün, mypy strict grün, **49 Contracttests** und **68 Gesamtregressionstests** bestanden.
+- I007- und I008-Regressionsworkflows auf finalem I009-Head ebenfalls vollständig grün.
+- Finaler I009-Workflow `31337914639`, Artifact-ID `9044902480`, Größe **0,000663 MB**, SHA-256 `962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9`.
+- Vorheriger validierter I008-main-Stand auf `backup/vor-i009-promotion-2026-08-09` gesichert.
+- I009 per PR #9 auf Main-Merge-Commit `5f94bfc43c038530738d1a320ba6c9a050b39a17` promoviert.
+
 ### I008 — Manifest- und Projektschemata qualifiziert
-- `SchemaVersion` als eigener numerischer `MAJOR.MINOR.PATCH`-Typ eingeführt.
-- `ProduktVersion` technisch und semantisch von Schema-Versionen getrennt; Vorab-Suffixe wie `0.1.0-dev` bleiben ausschließlich Produktversionen vorbehalten.
-- `ManifestSchema` als minimale strikt versionierte Identitätshülle eingeführt.
-- `ProjektSchema` als minimale Projektidentität mit dem bereits qualifizierten `Status` eingeführt.
-- `SchemaValidierungsfehler` mit stabilem Code, Feldbezug und Nachricht eingeführt.
-- Unbekannte Felder, fehlende Pflichtfelder, falsche Schema-Arten und inkompatible Schema-Versionen werden strikt abgewiesen.
-- Deterministische JSON-Serialisierung als Vertragsbestandteil festgelegt.
-- Kanonische gültige und ungültige Golden-Fixtures für Manifest- und Projektbeispiele ergänzt.
-- I007-ID-Präfixe, Statuswerte, Fehlerklassen und `OperationErgebnis`-Invarianten per Contracttest als öffentliche API eingefroren.
-- Architekturwächter von anfälliger Textsuche auf AST-basierte Prüfung echter Imports und `open()`-Dateizugriffe gehärtet.
-- `VERSIONSREGISTER.json`, Architekturregister, Komponentenregister, Traceability und ADR-0003 nachgezogen.
-- Finale Qualifikation auf Ubuntu 22.04.5 / Python 3.13.15: Ruff grün, mypy strict grün, **30 Contracttests** und **48 Regressionstests** bestanden.
-- Finaler I008-Workflow `31336626886`, Artifact-ID `9044527742`, Größe **0,000618 MB**, SHA-256 `f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61`.
-- I007-Regressionsworkflow auf dem finalen I008-Head erneut vollständig grün.
-- Vorheriger validierter I007-main-Stand auf `backup/vor-i008-promotion-2026-08-09` gesichert.
+- `SchemaVersion` und `ProduktVersion` technisch getrennt.
+- `ManifestSchema`, `ProjektSchema` und strukturierte Schemafehler eingeführt.
+- Unbekannte Felder, fehlende Pflichtfelder, falsche Schema-Arten und inkompatible Versionen strikt abgewiesen.
+- Deterministische JSON-Serialisierung und kanonische Golden-Fixtures qualifiziert.
+- I007-ID-Präfixe, Statuswerte, Fehlerklassen und `OperationErgebnis`-Invarianten als öffentliche API eingefroren.
+- AST-basierte Architekturprüfung eingeführt.
+- 30 Contracttests und 48 Regressionstests bestanden; Ruff und mypy strict grün.
+- Workflow `31336626886`, Artifact `9044527742`, **0,000618 MB**, SHA-256 `f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61`.
 
 ### I007 — strikt typisierte Kernverträge qualifiziert
-- `ProjektId`, `ObjektId`, `RevisionId`, `ChangeId` und `OperationId` als unveränderliche, domänentrennte Wertobjekte eingeführt.
-- Kanonisches ID-Format `<praefix>_<32 lowercase-hex>` festgelegt und validiert.
-- `Status` und `Fehlerklasse` als stabile `StrEnum`-Verträge eingeführt.
-- `FehlerInfo` trennt Fehlerklasse, maschinenlesbaren Diagnosecode und Nachricht.
-- `OperationErgebnis[T]` erzwingt widerspruchsfreie Erfolgs-/Fehlerzustände.
+- `ProjektId`, `ObjektId`, `RevisionId`, `ChangeId`, `OperationId`, `Status`, `Fehlerklasse`, `FehlerInfo` und `OperationErgebnis[T]` qualifiziert.
+- ID-Präfixe und Ergebnisinvarianten stabilisiert.
 - Vertragsschicht technisch von Qt, SQLite, Datei-I/O und Modulen getrennt.
-- ADR-0002, Architekturregister, Komponentenregister, Fehlerklassenregister und Traceability nachgezogen.
-- DELTA-0003 geschlossen: I005-Workflow reagiert nicht mehr auf beliebige `tests/**`.
-- DELTA-0005 geschlossen: Transfer V1 wird nicht mehr durch allgemeine Produktstatusänderungen als veraltete I006-Baseline automatisch gestartet.
-- DELTA-0006 geschlossen: auch I006 reagiert nicht mehr auf beliebige `tests/**`.
-- Finale Qualifikation auf Ubuntu 22.04.5 / Python 3.13.15: Ruff grün, mypy strict grün, 16 Contracttests und 33 Regressionstests bestanden.
-- Finaler I007-Workflow `31335066204`, Artifact-ID `9044073684`, Größe **0,000575 MB**, SHA-256 `007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909`.
-- I005, I006 und Transfer V1 nach den CI-Änderungen erneut vollständig grün revalidiert.
-- I006-Rückfallbasis auf `backup/vor-i007-promotion-2026-08-09` gesichert.
+- 16 Contracttests und 33 Regressionstests bestanden; Ruff und mypy strict grün.
+- Workflow `31335066204`, Artifact `9044073684`, **0,000575 MB**.
 
 ### I006 — reproduzierbarer Offline-Clean-Bootstrap qualifiziert
-- I005-Actions-Artefakt über feste Run-/Artifact-Identität geladen und vor dem Entpacken per SHA-256 verifiziert.
-- Nach dem Entpacken Manifest, Evidence und alle 50 Wheel-Hashes erneut geprüft.
-- Zwei voneinander getrennte Clean-Bootstraps auf Ubuntu 22.04.5 LTS / CPython 3.13.15 durchgeführt.
-- Paketinstallation mit `PIP_NO_INDEX=1`, `--no-index`, lokalem `PIP_FIND_LINKS` und zusätzlicher Proxy-Falle erzwungen.
-- Beide Paket-Freezes byteidentisch mit I005 und miteinander; SHA-256 `5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed`.
-- In beiden Umgebungen `pip check`, Projektinstallation, Baseline-Prüfer, 17 Tests, Ruff Check/Format und Import-Smoke erfolgreich.
-- I006-Evidence-Artefakt `9043135144` mit SHA-256 `2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636` erzeugt.
-- P00 und P01 im Masterplanstatus auf `VALIDIERT` gesetzt.
+- Zwei voneinander getrennte Offline-Clean-Bootstraps auf Ubuntu 22.04.5 / CPython 3.13.15 durchgeführt.
+- Paketinstallation ausschließlich aus I005-Wheelhouse erzwungen.
+- Byteidentische Paket-Freezes und vollständige Baseline-/Ruff-/Testprüfung.
 
 ### I005 — Offline-Wheelhouse qualifiziert
-- Reproduzierbarer GitHub-Actions-Builder auf Ubuntu 22.04 amd64 eingeführt.
-- CPython 3.13.15 und pip 25.2 als Ausführungsbasis erzwungen.
-- Direkte Toolchain-Pins festgelegt; transitive Abhängigkeiten vollständig aufgelöst und inventarisiert.
-- 50 Wheels mit zusammen 294428822 Bytes erzeugt; keine Source-Distribution zugelassen.
-- SHA-256 je Wheel, finales Wheelhouse-Manifest, Lizenz- und `Requires-Dist`-Inventar sowie vollständiger Offline-Freeze erzeugt.
-- Zweite frische Umgebung ausschließlich aus lokalem Wheelhouse mit `PIP_NO_INDEX=1` und `--no-index` installiert.
-- `pip check`, Import-/CLI-Smoke, Baselineprüfung, Projekttests und Ruff Check/Format erfolgreich.
-- GitHub-Actions-Artefakt `9042907351` mit SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040` erzeugt.
+- 50 Wheels mit zusammen 294428822 Byte erzeugt und inventarisiert.
+- Zweite frische Umgebung ausschließlich offline aus dem Wheelhouse installiert und geprüft.
+- Artifact `9042907351`, SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040`.
 
 ### Neuaufbau I000-I004
 - Repository-Neuaufbau auf Basis des Masterplans v2.0.0.
 - Maschinenlesbare Projekt-, Technologie-, Architektur-, Versions- und Gate-Registries.
-- Struktur- und Baseline-Validator.
-- Zentrale `pyproject.toml`-Qualitätskonfiguration.
-- Backup-Hinweis auf den vorherigen Repositoryzustand.
-- Initiale Evidence für I000-I004.
+- Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- OperationRequest/OperationResult aus I009.
-- abschließendes P02-Architekturgate aus I010.
+- I010 P02-Architekturgate und Gesamtqualifikation.
+- P03-Plattformschicht.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
