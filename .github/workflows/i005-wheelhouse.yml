@@ -13,12 +13,23 @@ on:
       - "WERKZEUGE/baseline_pruefen.py"
       - "tests/**"
       - "pyproject.toml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/i005-wheelhouse.yml"
+      - "WERKZEUGE/wheelhouse-anforderungen.txt"
+      - "WERKZEUGE/wheelhouse_inventar.py"
+      - "WERKZEUGE/qualifiziere_i005.sh"
+      - "WERKZEUGE/baseline_pruefen.py"
+      - "tests/**"
+      - "pyproject.toml"
 
 permissions:
   contents: read
 
 concurrency:
-  group: i005-wheelhouse-${{ github.ref }}
+  group: i005-wheelhouse-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
