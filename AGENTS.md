@@ -15,10 +15,11 @@
 11. Jede Installations-, Build-, Recovery- oder Bedienanleitung enthält alle benötigten Befehle vollständig, kopierbar und in korrekter Reihenfolge.
 12. Größen von Downloads, Artefakten und Transferteilen werden nutzerseitig zusätzlich in MB angegeben.
 13. Große Übergabebinärdaten werden bevorzugt als reproduzierbare GitHub-Actions-Artefakte erzeugt, statt die Git-Historie dauerhaft aufzublähen; Hashes und Buildlogik bleiben im Repository.
+14. Jede abgeschlossene Iteration wird nach grüner Validierung vollständig im GitHub-Repository nachgezogen: Code, Registries, Evidence, README/Changelog und Iterationsübergabe. `main` wird erst nach grünen Pflichtgates promoviert; der unmittelbar vorherige validierte Stand bleibt als Rückfallbasis erhalten.
 
 ## Iterationsablauf
 
-`BASELINE -> VORANALYSE -> PATCHPLAN -> PRECHECK -> STAGING -> PATCH -> TEST -> POSTCHECK -> EVIDENCE -> PLAN_DELTA -> UEBERGABE`
+`BASELINE -> VORANALYSE -> PATCHPLAN -> PRECHECK -> STAGING -> PATCH -> TEST -> POSTCHECK -> EVIDENCE -> PLAN_DELTA -> GITHUB_PROMOTION -> UEBERGABE`
 
 ## Abbruch
 
