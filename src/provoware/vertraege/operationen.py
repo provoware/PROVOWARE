@@ -82,9 +82,7 @@ def _schema_version(text: str) -> SchemaVersion:
     try:
         version = SchemaVersion.parse(text)
     except ValueError as exc:
-        raise OperationVertragsfehler(
-            "OPERATION_SCHEMA_UNGUELTIG", str(exc), "schema"
-        ) from exc
+        raise OperationVertragsfehler("OPERATION_SCHEMA_UNGUELTIG", str(exc), "schema") from exc
     if version != OPERATION_SCHEMA_VERSION:
         nachricht = (
             f"Operationsschema {version} ist inkompatibel; "
@@ -102,9 +100,7 @@ def _operation_id(text: str) -> OperationId:
     try:
         return OperationId.parse(text)
     except ValueError as exc:
-        raise OperationVertragsfehler(
-            "OPERATION_ID_UNGUELTIG", str(exc), "operation_id"
-        ) from exc
+        raise OperationVertragsfehler("OPERATION_ID_UNGUELTIG", str(exc), "operation_id") from exc
 
 
 def _operation_art(text: str) -> OperationArt:
@@ -113,9 +109,7 @@ def _operation_art(text: str) -> OperationArt:
     except OperationVertragsfehler:
         raise
     except ValueError as exc:
-        raise OperationVertragsfehler(
-            "OPERATION_ART_UNGUELTIG", str(exc), "operation_art"
-        ) from exc
+        raise OperationVertragsfehler("OPERATION_ART_UNGUELTIG", str(exc), "operation_art") from exc
 
 
 def _schluessel_gueltig(schluessel: str) -> bool:
@@ -183,9 +177,7 @@ def _normalisiere_json_wert(wert: object, *, pfad: str, tiefe: int = 0) -> JsonW
     if isinstance(wert, list):
         return _normalisiere_liste(cast(list[object], wert), pfad=pfad, tiefe=tiefe)
     if isinstance(wert, dict):
-        return _normalisiere_objekt(
-            cast(dict[object, object], wert), pfad=pfad, tiefe=tiefe
-        )
+        return _normalisiere_objekt(cast(dict[object, object], wert), pfad=pfad, tiefe=tiefe)
     raise OperationVertragsfehler(
         "OPERATION_PAYLOAD_TYP_UNGUELTIG",
         f"Nicht unterstützter Payload-Typ an {pfad}: {type(wert).__name__}.",
