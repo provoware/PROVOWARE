@@ -1,0 +1,22 @@
+{
+  "schema": "1.0.0",
+  "patch_id": "PATCH-I006-001",
+  "iteration_id": "I006",
+  "baseline_id": "BASELINE-2026-08-09-I005",
+  "anforderungs_ids": ["REQ-V1-003", "REQ-V1-016", "REQ-V1-017"],
+  "zielkomponenten": ["WERKZEUGE/bootstrap", "GitHub Actions", "EVIDENCE/I006"],
+  "ziel_dateien": [
+    "WERKZEUGE/bootstrap_pruefen.py",
+    "WERKZEUGE/clean-bootstrap.sh",
+    ".github/workflows/i006-clean-bootstrap.yml",
+    "tests/test_i006_bootstrap_contract.py"
+  ],
+  "ziel_symbole": ["pruefe_i005", "parse_hashliste", "clean-bootstrap"],
+  "beabsichtigte_aenderung": "Zwei reproduzierbare, vom I005-Artefakt abgeleitete Offline-Clean-Bootstraps mit äußerer und innerer Hashprüfung automatisieren.",
+  "nicht_zu_aendern": ["Datenmodell", "Core-Fachlogik", "Qt-Oberfläche", "Module", "I005-Wheel-Binaries"],
+  "risikoklasse": "MITTEL",
+  "rollback_plan": "Branch iteration/i006-clean-bootstrap verwerfen; main bleibt auf validierter I005-Baseline.",
+  "minimaltests": ["I006 Contracttests", "Ruff Check/Format der neuen Python-Dateien"],
+  "eskalationstests": ["GitHub Actions Ubuntu 22.04", "I005 Artifact SHA-256", "interne Wheel-Hashliste", "zwei Clean-Bootstraps", "Freeze-A/B-Vergleich", "vollständige Projektprüfungen"],
+  "scope_freeze": true
+}

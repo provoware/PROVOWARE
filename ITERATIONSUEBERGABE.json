@@ -1,60 +1,70 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I006",
-  "next_goal": "Reproduzierbare Entwicklungsumgebung vollständig offline aus dem verifizierten I005-Wheelhouse aufbauen.",
-  "why_next": "I005 hat Paketbestand, Hashes, Metadaten und Offline-Installation qualifiziert. P01 ist erst abgeschlossen, wenn ein Clean-Bootstrap aus einer leeren Umgebung denselben Entwicklungsstand ohne Paketindex reproduziert.",
+  "next_iteration": "I007",
+  "next_goal": "ID-, Status-, Fehler- und Ergebnis-Typen als strikt typisierte, GUI- und datenbankunabhängige Kernverträge definieren.",
+  "why_next": "P01 ist durch I005 und I006 praktisch qualifiziert. Der Masterplan führt danach zwingend in P02; I007 bildet die Typgrenze für alle späteren Commands, Zustände, Fehler und Ergebnisse.",
   "priority": "P0",
-  "probable_component": "WERKZEUGE/bootstrap",
+  "probable_component": "src/provoware/vertraege/datentypen",
   "probable_files": [
-    "WERKZEUGE/clean-bootstrap.sh",
-    "WERKZEUGE/bootstrap_pruefen.py",
-    ".github/workflows/i006-clean-bootstrap.yml",
-    "tests/test_i006_bootstrap_contract.py",
-    "EVIDENCE/I006/"
+    "src/provoware/vertraege/__init__.py",
+    "src/provoware/vertraege/datentypen.py",
+    "tests/contract/test_datentypen.py",
+    "ARCHITEKTURREGISTER.json",
+    "TRACEABILITY.json",
+    "EVIDENCE/I007/"
   ],
-  "probable_symbols": ["clean_bootstrap", "pruefe_offline_bootstrap"],
+  "probable_symbols": [
+    "ProjektId",
+    "ObjektId",
+    "RevisionId",
+    "ChangeId",
+    "OperationId",
+    "Status",
+    "Fehlerklasse",
+    "OperationErgebnis"
+  ],
   "context_fingerprints": {
-    "i005_artifact_id": 9042907351,
-    "i005_artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
-    "i005_manifest_sha256": "975aaf8694b3dffd2f7b5f730b9099360ec0836284bd270efd4c26af96bedb3c"
+    "i006_workflow_run_id": 31331742667,
+    "i006_artifact_id": 9043135144,
+    "i006_artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
+    "bootstrap_freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed"
   },
   "known_dependencies": [
-    "I005 muss weiterhin VALIDiert sein",
-    "CPython 3.13.15",
-    "Ubuntu 22.04 amd64",
-    "verifiziertes Wheelhouse mit 50 Wheels"
+    "BASELINE-2026-08-09-I006",
+    "P01 Offline-Entwicklungsumgebung qualifiziert",
+    "Python 3.13.15",
+    "mypy 2.3.0",
+    "pytest 9.1.1"
   ],
   "preconditions": [
-    "I005-Artefakt lokal bereitstellen und SHA-256 vor Entpacken prüfen",
-    "frisches Bootstrap-Zielverzeichnis ohne bestehendes venv verwenden",
-    "PIP_NO_INDEX=1 und lokale Paketquelle erzwingen",
-    "keine Schreibänderung an der I005-Baseline vor Bootstrap-Erfolg"
+    "I006-Evidence gegen aktuelle Baseline revalidieren",
+    "DELTA-0003 im Precheck behandeln: I005-Workflowtrigger auf I005-relevante Eingaben verengen",
+    "öffentliche Typnamen und Semantik vor Implementierung als Contract festlegen",
+    "keine Qt-, SQLite- oder Modulabhängigkeit in die Vertragsschicht einführen"
   ],
   "expected_tests": [
-    "Artefakt-SHA-256 und interne Wheel-Hashliste prüfen",
-    "Clean-venv ausschließlich offline erstellen",
-    "Projekt im Entwicklungsmodus ausschließlich aus lokalem Wheelhouse installieren",
-    "pip check",
-    "Baseline-Prüfer",
-    "pytest",
-    "Ruff check/format",
-    "zweiter Clean-Bootstrap zum Reproduzierbarkeitsvergleich"
+    "mypy --strict für die neue Vertragsschicht",
+    "pytest Contracttests für gültige und ungültige IDs",
+    "Enum-/Status-Stabilität",
+    "Fehler-/Ergebnis-Serialisierbarkeit soweit in I007 definiert",
+    "Architekturprüfung auf verbotene GUI-/DB-Imports",
+    "vollständige bestehende schnelle Regression"
   ],
   "done_criteria": [
-    "kein Paketindex oder externer Paketdownload im Installationspfad",
-    "leere Umgebung vollständig aufsetzbar",
-    "zwei aufeinanderfolgende Clean-Bootstraps ergeben dieselbe installierte Paketliste",
-    "Projektprüfungen sind grün",
-    "Bootstrap-Evidence und Hashvergleich vorhanden",
-    "P01 kann als abgeschlossen qualifiziert werden"
+    "alle in I007 vorgesehenen IDs sind eindeutig typisiert und validierbar",
+    "Status-, Fehler- und Ergebnistypen besitzen keine Magic-String-Schnittstelle",
+    "mypy strict ist grün",
+    "Contracttests sind grün",
+    "keine GUI-/DB-Abhängigkeit",
+    "Traceability und Evidence aktualisiert"
   ],
   "known_risks": [
-    "I005-GitHub-Artefakt besitzt 90-Tage-Retention und muss für langfristige Offline-Nutzung in eine persistente Projekt-/Release-Ablage überführt werden",
-    "Systembibliotheken von Qt sind nicht Python-Wheels und benötigen gesonderte Laufzeitqualifikation",
-    "ein versehentlicher Indexzugriff würde den Offline-Beweis entwerten"
+    "zu frühe Überabstraktion der Typen kann spätere Verträge unnötig verkomplizieren",
+    "unterschiedliche Stringformate für IDs könnten später Persistenz- und Importgrenzen destabilisieren",
+    "I005-Workflow ist derzeit noch zu breit getriggert und erzeugt unnötigen I/O bei Teständerungen"
   ],
   "open_subpoints": [
-    "Nach I006 P01-Gesamtcheckpoint durchführen",
-    "Danach I007 Verträge, Typen und Schemata beginnen"
+    "DELTA-0003 als kleiner CI-Sparsamkeitspatch vor oder im I007-Precheck schließen",
+    "I008 Manifest- und Projekt-Schemata erst nach grünem I007 beginnen"
   ]
 }

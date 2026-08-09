@@ -2,6 +2,18 @@
 
 ## 0.1.0-dev - 2026-08-09
 
+### I006 — reproduzierbarer Offline-Clean-Bootstrap qualifiziert
+- I005-Actions-Artefakt über feste Run-/Artifact-Identität geladen und vor dem Entpacken per SHA-256 verifiziert.
+- Nach dem Entpacken Manifest, Evidence und alle 50 Wheel-Hashes erneut geprüft.
+- Zwei voneinander getrennte Clean-Bootstraps auf Ubuntu 22.04.5 LTS / CPython 3.13.15 durchgeführt.
+- Paketinstallation mit `PIP_NO_INDEX=1`, `--no-index`, lokalem `PIP_FIND_LINKS` und zusätzlicher Proxy-Falle erzwungen.
+- Beide Paket-Freezes byteidentisch mit I005 und miteinander; SHA-256 `5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed`.
+- In beiden Umgebungen `pip check`, Projektinstallation, Baseline-Prüfer, 17 Tests, Ruff Check/Format und Import-Smoke erfolgreich.
+- Hartcodierte I004-Annahme aus dem Baseline-Prüfer entfernt; Prüfung arbeitet jetzt gegen autoritative Baseline-/Iterationsregistries.
+- Prüflogik nach Ruff-Komplexitätsgate modularisiert und bestehende Strukturtests formatiert.
+- I006-Evidence-Artefakt `9043135144` mit SHA-256 `2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636` erzeugt und lokal nachverifiziert.
+- P00 und P01 im Masterplanstatus auf `VALIDIERT` gesetzt; P02 ist `BEREIT`.
+
 ### I005 — Offline-Wheelhouse qualifiziert
 - Reproduzierbarer GitHub-Actions-Builder auf Ubuntu 22.04 amd64 eingeführt.
 - CPython 3.13.15 und pip 25.2 als Ausführungsbasis erzwungen.
@@ -27,4 +39,4 @@
 - PySide6-Oberfläche.
 - Module.
 - Release-Builder.
-- I006 Clean-Bootstrap-Nachweis.
+- I007 Vertrags- und Datentypen.
