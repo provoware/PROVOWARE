@@ -1,74 +1,75 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I009",
-  "next_goal": "OperationRequest- und OperationResult-Verträge als strikt typisierte, serialisierbare und handlerunabhängige Operationshülle definieren.",
-  "why_next": "I007 hat primitive Identitäts-, Status-, Fehler- und Ergebnistypen qualifiziert; I008 hat die versionierte Schema- und Validierungsgrenze geschlossen. Innerhalb P02 folgt nun die einheitliche Operationshülle, bevor I010 die Architekturgrenzen als Gesamtgate schließt.",
+  "next_iteration": "I010",
+  "next_goal": "P02 durch ein kombiniertes Architektur- und Vertragsgate über I007-I009 schließen und erst danach P03 freigeben.",
+  "why_next": "I007 qualifiziert Identitäten, Status, Fehler und Ergebnisinvarianten; I008 qualifiziert versionierte Manifest-/Projektschemata; I009 qualifiziert die kanonische Request-/Result-Grenze. I010 muss diese drei Schichten nun als gemeinsame unverletzbare P02-Architekturbasis prüfen, bevor Plattform-, Persistenz- oder GUI-Code beginnen darf.",
   "priority": "P0",
-  "probable_component": "src/provoware/vertraege/operationen",
+  "probable_component": "WERKZEUGE/p02_architekturgate.py",
   "probable_files": [
-    "src/provoware/vertraege/operationen.py",
-    "src/provoware/vertraege/__init__.py",
-    "tests/contract/test_operationen.py",
-    "tests/fixtures/i009/",
-    "TRACEABILITY.json",
+    "WERKZEUGE/p02_architekturgate.py",
+    "tests/architecture/test_p02_architekturgate.py",
+    "tests/fixtures/i010/",
     "ARCHITEKTURREGISTER.json",
     "KOMPONENTENREGISTER.json",
-    "EVIDENCE/I009/"
-  ],
-  "probable_symbols": [
-    "OperationRequest",
-    "OperationResult",
-    "OperationArt",
-    "OperationPayload",
-    "OperationVertragsfehler"
+    "TRACEABILITY.json",
+    "PLAN_MASTER.json",
+    "EVIDENCE/I010/",
+    ".github/workflows/i010-p02-gate.yml"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-09-I008",
-    "i008_workflow_run_id": 31336626886,
-    "i008_artifact_id": 9044527742,
-    "i008_artifact_sha256": "f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61",
-    "i008_receipt_sha256": "60d5db55ab1b95e77ad92cd7ae99781bd5b665c071ca95648f30cada5138f7ea"
+    "baseline": "BASELINE-2026-08-09-I009",
+    "i009_workflow_run_id": 31337914639,
+    "i009_artifact_id": 9044902480,
+    "i009_artifact_sha256": "962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9",
+    "i009_receipt_sha256": "46b8bb9f9f6fa215f70c7fb89fe7afaf884ece0918e02055daa11eb5e4a05e23",
+    "i009_main_merge_commit": "5f94bfc43c038530738d1a320ba6c9a050b39a17"
   },
   "known_dependencies": [
-    "BASELINE-2026-08-09-I008",
+    "BASELINE-2026-08-09-I009",
     "KMP-VERTRAEGE validiert",
     "KMP-SCHEMATA validiert",
-    "ARCH-008 bis ARCH-010 aktiv",
+    "KMP-OPERATIONEN validiert",
+    "ARCH-008 bis ARCH-012 aktiv",
     "I007 öffentliche API eingefroren",
-    "SchemaVersion und ProduktVersion technisch getrennt"
+    "Manifest-, Projekt- und Operationsschema unabhängig versioniert",
+    "I007-, I008- und I009-Regressionsworkflows auf finalem I009-Head grün"
   ],
   "preconditions": [
-    "I008-Evidence gegen CURRENT_BASELINE revalidieren",
-    "OperationRequest und OperationResult semantisch von Handlern, Persistenz und GUI trennen",
-    "OperationId und vorhandene Fehler-/Ergebnisverträge wiederverwenden statt parallele Identitäten einzuführen",
-    "Payload-Grenze und Serialisierungsregeln vor Implementierung als Contract festlegen",
-    "keine Ausführungslogik, SQLite-, Qt- oder Dateischreiblogik vorziehen"
+    "I009-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
+    "öffentliche Exporte von I007-I009 als API-Snapshot erfassen",
+    "ID-Präfixe, Statuswerte, Fehlerklassen und OperationErgebnis-Invarianten unverändert prüfen",
+    "Manifest-, Projekt- und Operationsschema sowie deren Versionsnamensräume getrennt prüfen",
+    "AST-basierte Abhängigkeitsgrenzen für sämtliche P02-Produktdateien gemeinsam prüfen",
+    "keine neue Produktfunktion oder P03-Implementierung während I010 einführen"
   ],
   "expected_tests": [
-    "mypy --strict für Operationsverträge",
-    "kanonische gültige und ungültige Request-/Result-Fixtures",
-    "OperationId-Roundtrip und Zuordnung Request zu Result",
-    "Erfolgs-/Fehlerinvarianten auf Basis der I007-Verträge",
-    "deterministische Serialisierung",
-    "Ablehnung unbekannter oder widersprüchlicher Felder",
-    "Architekturprüfung auf verbotene Handler-/GUI-/DB-Abhängigkeiten",
-    "vollständige schnelle Regression einschließlich I007/I008-Verträge"
+    "vollständiger öffentlicher API-Snapshot I007-I009",
+    "exaktes Produktquellinventar für den P02-Stand",
+    "AST-Abhängigkeitsmatrix ohne Qt, SQLite, Datei-I/O, Handler, Module oder Persistenz",
+    "Schema-/Produkt-/Operationsversions-Trennung",
+    "deterministische Manifest-, Projekt-, Request-, Result- und Payload-Serialisierung",
+    "Golden-Fixtures I008 und I009 unverändert grün",
+    "mypy --strict für die gesamte Vertragsschicht",
+    "Ruff Check und Format",
+    "vollständige Contract- und Gesamtregression",
+    "Traceability-Nachweis Architektur -> Komponente -> Code -> Test -> Evidence",
+    "reproduzierbare I010-Qualifikation aus dem verifizierten I005-Wheelhouse"
   ],
   "done_criteria": [
-    "OperationRequest und OperationResult besitzen eine eindeutige typisierte öffentliche Form",
-    "Request-/Result-Korrelation erfolgt über OperationId",
-    "Fehler und Ergebnisse verwenden die I007-Invarianten ohne parallele Magic-String-Schnittstelle",
-    "keine Ausführungs-, GUI-, DB- oder Dateischreibabhängigkeit",
-    "mypy strict, Contracttests und Gesamtregression sind grün",
-    "Traceability und Evidence sind aktualisiert"
+    "P02 besitzt ein einziges reproduzierbares grünes Gesamtgate",
+    "I007-I009 öffentliche API und Architekturgrenzen sind maschinenlesbar eingefroren",
+    "keine verbotene Abhängigkeit oder unregistrierte Produktdatei existiert",
+    "Traceability und Evidence sind für P02 geschlossen",
+    "PLAN_MASTER markiert P02 erst nach erfolgreicher Gesamtqualifikation als VALIDIERT",
+    "I011/P03 wird erst nach Promotion von I010 freigegeben"
   ],
   "known_risks": [
-    "zu frühe Handler- oder Command-Semantik würde P02 und spätere Controllerphasen vermischen",
-    "beliebige untypisierte Payloads würden die gerade geschlossene Schemagrenze wieder aufweichen",
-    "eine zweite Ergebnissemantik neben OperationErgebnis würde I007 widersprechen"
+    "ein Gate, das nur einzelne Dateien statt die komplette P02-Schicht prüft, könnte Architekturdrift über neue Dateien übersehen",
+    "ein API-Snapshot ohne strukturierte Migrationsregel könnte spätere legitime Vertragsänderungen unnötig blockieren",
+    "P03-Code vor Abschluss von I010 würde die Schichtgrenze verwischen"
   ],
   "open_subpoints": [
-    "I010 Architekturgate erst nach grünem I009 schließen",
-    "keine Plattform-, Persistenz- oder GUI-Funktion vor I010 vorziehen"
+    "I010 ausschließlich als Gate-/Evidence-Iteration halten",
+    "nach grünem I010 P02 atomar auf VALIDIERT setzen und I011 als ersten P03-Schritt übergeben"
   ]
 }
