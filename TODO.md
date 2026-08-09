@@ -1,22 +1,29 @@
 # Offene Punkte
 
-## P0 — nächster Pflichtschritt
-- I008: Manifest- und Projektschemata als versionierte, strikt validierbare Verträge definieren.
-- I008: Pflichtfelder, unbekannte Felder und Schema-Versionierungsregeln vor Implementierung als Contract festlegen.
-- I008: Schemafehler strukturiert abbilden und Qt-, SQLite-, Datei-I/O- sowie Modulabhängigkeiten technisch ausschließen.
-- I008: `mypy --strict`, Contracttests, Ruff und vollständige schnelle Regression als Pflichtgates ausführen.
+## P0 — nächster Pflichtschritt I009
+- `OperationRequest` und `OperationResult` als strikt typisierte, serialisierbare und handlerunabhängige Operationsverträge definieren.
+- Request/Result über die bestehende `OperationId` korrelieren; keine parallele Identität einführen.
+- Fehler- und Erfolgssemantik auf den I007-Verträgen `FehlerInfo` und `OperationErgebnis` aufbauen statt eine zweite Ergebnislogik zu erzeugen.
+- Payload-Grenze, Pflichtfelder, unbekannte Felder und deterministische Serialisierung vor Implementierung als Contract festlegen.
+- Kanonische gültige und ungültige Golden-Fixtures für Request und Result ergänzen.
+- Qt-, SQLite-, Handler-, Ausführungs- und Dateischreibabhängigkeiten technisch ausschließen.
+- `mypy --strict`, Contracttests, Ruff und vollständige schnelle Regression als Pflichtgates ausführen.
 
 ## P02 danach
-- I009: OperationRequest/OperationResult-Verträge.
-- I010: P02-Architekturgate und Gesamtqualifikation.
-- Erst danach P03 gemäß `PLAN_MASTER.json`.
+- I010: P02-Architekturgate und Gesamtqualifikation der I007-I009-Verträge.
+- Erst nach grünem I010 P03 gemäß `PLAN_MASTER.json` beginnen.
 
-## Erledigt in I007
-- ID-, Status-, Fehler- und Ergebnistypen qualifiziert.
-- DELTA-0003 geschlossen: I005-Workflowfilter verengt.
-- DELTA-0005 geschlossen: Transfer-V1-Autotrigger auf Transferänderungen begrenzt.
-- DELTA-0006 geschlossen: I006-Workflowfilter verengt.
-- 16 Contracttests und 33 Regressionstests grün; mypy strict und Ruff grün.
+## Erledigt in I008
+- Schema- und Produktversion technisch getrennt.
+- `ManifestSchema`, `ProjektSchema` und strukturierte Schemafehler qualifiziert.
+- unbekannte Felder und fehlende Pflichtfelder strikt abgesichert.
+- deterministische JSON-Serialisierung qualifiziert.
+- gültige und ungültige Golden-Fixtures eingeführt.
+- I007-ID-Präfixe, Statuswerte, Fehlerklassen und `OperationErgebnis`-Invarianten als öffentliche API eingefroren.
+- Architekturwächter auf AST-basierte Import-/Dateizugriffsprüfung gehärtet.
+- **30 Contracttests** und **48 Regressionstests** grün; mypy strict und Ruff grün.
+- I007-Regressionsworkflow auf finalem I008-Head erneut grün.
+- I007-Rückfallbasis auf `backup/vor-i008-promotion-2026-08-09` gesichert.
 
 ## Release-Blocker
 - Keine Stable-Freigabe vor vollständigem PoA, Fault-/Recovery-Nachweis, Real-Target-Abnahme und Release-Gates G0-G15.
