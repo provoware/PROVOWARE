@@ -1,5 +1,13 @@
 {
   "baseline": "BASELINE-2026-08-09-I006",
+  "github_qualifikation": {
+    "artifact_bytes": 589370103,
+    "artifact_id": 9043695271,
+    "artifact_mb": 589.370103,
+    "artifact_sha256": "2476edbc28565e65f0dfde95a720ad8f927a694955644700c0085caa3e9cdbf7",
+    "end_to_end_installation": "GRUEN",
+    "workflow_run_id": 31333763347
+  },
   "installation": {
     "automatisch_nach_start": true,
     "backup": true,
@@ -27,6 +35,6 @@
     "grosse_binaerdaten": "GitHub Actions Artefakt",
     "grund": "Git-Historie nicht dauerhaft um rund 295 MB pro Iteration aufblasen."
   },
-  "status": "REPO_INTEGRATION_VORBEREITET",
+  "status": "VALIDIERT_GITHUB",
   "transfer_version": "1.0.0"
 }
