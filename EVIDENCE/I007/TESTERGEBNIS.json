@@ -3,15 +3,16 @@
   "iteration": "I007",
   "status": "GRUEN",
   "qualifikationslauf": {
-    "workflow_run_id": 31334879927,
-    "job_id": 93298988745,
-    "branch_head": "88ea0f276b5072b9f4777952a546b5c7f3bc17fb",
-    "pr_merge_ref": "5d2fa157dd88ea771421670915dd5a8ec8f599d4",
-    "artifact_id": 9044019124,
+    "workflow_run_id": 31335066204,
+    "job_id": 93299485576,
+    "branch_head": "fa2a4751c6a5c3baf0b3b2e78485fb3142de04ef",
+    "pr_merge_ref": "b40666adcabba585ecd9fd150150469b9857f447",
+    "main_merge_commit": "9b8c18a99f2433e3f7ded5f09dd1f5a5804041ae",
+    "artifact_id": 9044073684,
     "artifact_bytes": 575,
     "artifact_mb": 0.000575,
-    "artifact_sha256": "4f828ff1e15c26c0c755715c23a6fcd62a51aae63e73012fb4a7aa19ea4dcd82",
-    "receipt_sha256": "c1b5c4afde2f65773a88f59808e6e36a0a323b5fe2fb14d077cd96b27a595e24"
+    "artifact_sha256": "007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909",
+    "receipt_sha256": "11cb28d66188298496c65059918d707b17a1cb4e95087c8368e6c9aa49221d33"
   },
   "plattform": {
     "ubuntu": "22.04.5 LTS",
@@ -34,12 +35,12 @@
     "gesamtregression": "33 bestanden",
     "qt_sqlite_importgrenze": "GRUEN"
   },
-  "precheck_revalidierungen": {
-    "i005_workflow_run_id": 31334879946,
+  "postcheck_revalidierungen": {
+    "i005_workflow_run_id": 31335066186,
     "i005_status": "GRUEN",
-    "i006_workflow_run_id": 31334879936,
+    "i006_workflow_run_id": 31335066190,
     "i006_status": "GRUEN",
-    "transfer_workflow_run_id": 31334879918,
+    "transfer_workflow_run_id": 31335066203,
     "transfer_status": "GRUEN"
   },
   "vorherige_fehlversuche": [
