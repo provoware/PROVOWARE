@@ -1,1 +1,32 @@
-{"schema":"1.0.0","neu":[{"id":"DELTA-0001","prioritaet":"P0","quelle":"I004 Validierung","zielphase":"P01","ziel_iteration":"I005","thema":"Wheelhouse-Binaries und vollständiges Hash-/Lizenzinventar fehlen noch.","grund":"Die aktuelle Ausführungsumgebung besitzt nicht die gepinnte vollständige Toolchain und ist nicht die qualifizierte Ubuntu-22.04-Buildbasis.","blockiert_aktuelle_iteration":false}],"geaendert":[],"verschoben":[],"erledigt":[],"blockiert":[]}
+{
+  "schema": "1.0.0",
+  "neu": [
+    {
+      "id": "DELTA-0002",
+      "prioritaet": "P0",
+      "quelle": "I005 Qualifikation",
+      "zielphase": "P01",
+      "ziel_iteration": "I006",
+      "thema": "Clean-Bootstrap muss das unveraenderliche I005-Artefakt als einzige Paketquelle verwenden.",
+      "grund": "I005 beweist die Offline-Installierbarkeit des Wheelhouse; I006 muss nun den gesamten Entwicklungs-Bootstrap in einer leeren Umgebung reproduzierbar und ohne Indexzugriff nachweisen.",
+      "blockiert_aktuelle_iteration": false
+    }
+  ],
+  "geaendert": [],
+  "verschoben": [],
+  "erledigt": [
+    {
+      "id": "DELTA-0001",
+      "erledigt_in": "I005",
+      "nachweis": {
+        "workflow_run_id": 31330952896,
+        "artifact_id": 9042907351,
+        "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
+        "pakete": 50,
+        "wheel_bytes": 294428822
+      },
+      "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert."
+    }
+  ],
+  "blockiert": []
+}
