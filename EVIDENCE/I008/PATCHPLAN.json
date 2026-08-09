@@ -1,0 +1,31 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I008",
+  "ziel": "Versionierte Manifest- und Projektschemata als strikt validierbare Kernverträge",
+  "scope": [
+    "SchemaVersion und ProduktVersion technisch trennen",
+    "ManifestSchema und ProjektSchema minimal und strikt definieren",
+    "SchemaValidierungsfehler strukturieren",
+    "kanonische Golden-Fixtures ergänzen",
+    "I007-API-Freeze per Contracttest absichern",
+    "VERSIONSREGISTER, Architektur, Komponenten und Traceability aktualisieren",
+    "I008 CI-Qualifikation aus verifiziertem I005-Wheelhouse"
+  ],
+  "nicht_scope": [
+    "OperationRequest/OperationResult",
+    "SQLite oder Persistenz",
+    "GUI oder Qt",
+    "Modulmanifeste",
+    "Fachfelder außerhalb der minimalen Schemahülle"
+  ],
+  "gates": [
+    "Baseline GRUEN",
+    "Ruff Check/Format GRUEN",
+    "mypy strict GRUEN",
+    "Contracttests GRUEN",
+    "Golden-Fixtures GRUEN",
+    "Architekturimportgrenze GRUEN",
+    "Gesamtregression GRUEN"
+  ],
+  "rueckweg": "main bleibt bis zur grünen PR-Qualifikation unverändert; vor Promotion wird der I007-main-Stand als Backupzweig erhalten."
+}
