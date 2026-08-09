@@ -1,1 +1,12 @@
-{"schema":"1.0.0","projektversion":"0.1.0-dev","manifest_schema":"1.0.0","projektstatus_schema":"1.0.0","traceability_schema":"1.0.0","plan_schema":"1.0.0"}
+{
+  "schema": "1.0.0",
+  "projektversion": "0.1.0-dev",
+  "produktversion_format": "MAJOR.MINOR.PATCH[-SUFFIX]",
+  "schema_version_format": "MAJOR.MINOR.PATCH",
+  "manifest_schema": "1.0.0",
+  "projekt_schema": "1.0.0",
+  "projektstatus_schema": "1.0.0",
+  "traceability_schema": "1.0.0",
+  "plan_schema": "1.0.0",
+  "regel": "Produktversion und Schema-Versionen sind getrennte Namensräume und dürfen nicht gegeneinander substituiert werden."
+}
