@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - package/i006-source-export
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -13,22 +16,24 @@ jobs:
   export:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    env:
+      EXPECTED_MAIN: cbde85eb80ab76153247887e29ffa69809a9651b
     steps:
       - name: Exportzweig auschecken
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Parent als qualifizierten I006-main verifizieren
+      - name: Qualifizierten I006-main verifizieren
         shell: bash
-        env:
-          EXPECTED_MAIN: cbde85eb80ab76153247887e29ffa69809a9651b
         run: |
           set -Eeuo pipefail
-          ACTUAL="$(git rev-parse HEAD^)"
-          test "$ACTUAL" = "$EXPECTED_MAIN"
-          echo "MAIN_COMMIT=$ACTUAL" >> "$GITHUB_ENV"
+          git cat-file -e "${EXPECTED_MAIN}^{commit}"
+          ACTUAL_TREE="$(git rev-parse "${EXPECTED_MAIN}^{tree}")"
+          test -n "$ACTUAL_TREE"
+          echo "MAIN_COMMIT=$EXPECTED_MAIN" >> "$GITHUB_ENV"
+          echo "MAIN_TREE=$ACTUAL_TREE" >> "$GITHUB_ENV"
 
       - name: Exakten main-Tree archivieren
         shell: bash
@@ -42,6 +47,8 @@ jobs:
             "$MAIN_COMMIT"
           sha256sum .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.zip \
             > .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.sha256
+          printf '%s  %s\n' "$MAIN_COMMIT" "$MAIN_TREE" \
+            > .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.commit-tree.txt
           cat .uebergabe/PROVOWARE_v0.1.0-dev_I006_SOURCE.sha256
 
       - name: Übergabeartefakt hochladen
