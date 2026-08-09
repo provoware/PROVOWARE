@@ -1,44 +1,57 @@
 {
-  "schema": "1.0.0",
-  "neu": [
-    {
-      "id": "DELTA-0003",
-      "prioritaet": "P1",
-      "quelle": "I006 Workflowbeobachtung",
-      "zielphase": "P02 Vorvalidierung",
-      "ziel_iteration": "I007",
-      "thema": "I005-Workflowpfade sind zu breit und lösen bei beliebigen Tests unnötig einen rund 294-MB-Wheelhouse-Neubau aus.",
-      "grund": "Der aktuelle Pfadfilter `tests/**` widerspricht bei unveränderter I005-Eingabe dem Sparsamkeitsprinzip. Vor I007 soll der Trigger auf tatsächlich I005-relevante Test- und Tooldateien verengt werden.",
-      "blockiert_aktuelle_iteration": false
-    }
-  ],
-  "geaendert": [],
-  "verschoben": [],
+  "blockiert": [],
   "erledigt": [
     {
-      "id": "DELTA-0001",
       "erledigt_in": "I005",
+      "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert.",
+      "id": "DELTA-0001",
       "nachweis": {
-        "workflow_run_id": 31330952896,
         "artifact_id": 9042907351,
         "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
         "pakete": 50,
-        "wheel_bytes": 294428822
-      },
-      "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert."
+        "wheel_bytes": 294428822,
+        "workflow_run_id": 31330952896
+      }
     },
     {
-      "id": "DELTA-0002",
       "erledigt_in": "I006",
+      "ergebnis": "Zwei saubere Offline-Bootstraps aus dem validierten I005-Artefakt erzeugten byteidentische Paket-Freezes und vollständig grüne Projektprüfungen.",
+      "id": "DELTA-0002",
       "nachweis": {
-        "workflow_run_id": 31331742667,
         "artifact_id": 9043135144,
         "artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
         "bootstrap_durchlaeufe": 2,
-        "freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed"
+        "freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed",
+        "workflow_run_id": 31331742667
+      }
+    },
+    {
+      "erledigt_in": "I006-TRANSFER-V1",
+      "ergebnis": "Transfer V1 mit 24-MiB-Teilstücken, vollautomatischem Installer, Hash-/ZIP-/Baseline-Prüfung, Backup/Rollback, vollständiger Befehlsanleitung, MB-Größenangaben und repo-integriertem Actions-Builder eingeführt.",
+      "id": "DELTA-0004",
+      "nachweis": {
+        "referenz_gesamt_bytes": 295210603,
+        "referenz_gesamt_mb": 295.210603,
+        "referenz_sha256": "9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17",
+        "teil_mib": 24,
+        "teile": 12
       },
-      "ergebnis": "Zwei saubere Offline-Bootstraps aus dem validierten I005-Artefakt erzeugten byteidentische Paket-Freezes und vollständig grüne Projektprüfungen."
+      "quelle": "Nutzeranforderung 2026-08-09"
     }
   ],
-  "blockiert": []
+  "geaendert": [],
+  "neu": [
+    {
+      "blockiert_aktuelle_iteration": false,
+      "grund": "Der aktuelle Pfadfilter `tests/**` widerspricht bei unveränderter I005-Eingabe dem Sparsamkeitsprinzip. Vor I007 soll der Trigger auf tatsächlich I005-relevante Test- und Tooldateien verengt werden.",
+      "id": "DELTA-0003",
+      "prioritaet": "P1",
+      "quelle": "I006 Workflowbeobachtung",
+      "thema": "I005-Workflowpfade sind zu breit und lösen bei beliebigen Tests unnötig einen rund 294-MB-Wheelhouse-Neubau aus.",
+      "ziel_iteration": "I007",
+      "zielphase": "P02 Vorvalidierung"
+    }
+  ],
+  "schema": "1.0.0",
+  "verschoben": []
 }
