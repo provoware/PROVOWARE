@@ -11,7 +11,7 @@ on:
       - "WERKZEUGE/wheelhouse_inventar.py"
       - "WERKZEUGE/qualifiziere_i005.sh"
       - "WERKZEUGE/baseline_pruefen.py"
-      - "tests/**"
+      - "tests/test_i005_contract.py"
       - "pyproject.toml"
   pull_request:
     branches:
@@ -22,7 +22,7 @@ on:
       - "WERKZEUGE/wheelhouse_inventar.py"
       - "WERKZEUGE/qualifiziere_i005.sh"
       - "WERKZEUGE/baseline_pruefen.py"
-      - "tests/**"
+      - "tests/test_i005_contract.py"
       - "pyproject.toml"
 
 permissions:
