@@ -50,9 +50,7 @@ def parse_hashliste(path: Path) -> dict[str, str]:
 def pruefe_status(status_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     status = lade_json(status_path)
     if status.get("iteration") != "I005" or status.get("status") != "VALIDIERT":
-        raise BootstrapPrueffehler(
-            "WHEELHOUSE_STATUS ist nicht die validierte I005-Baseline."
-        )
+        raise BootstrapPrueffehler("WHEELHOUSE_STATUS ist nicht die validierte I005-Baseline.")
     evidence_hashes = status.get("evidence_hashes")
     if not isinstance(evidence_hashes, dict):
         raise BootstrapPrueffehler("evidence_hashes fehlen in WHEELHOUSE_STATUS.")
@@ -86,21 +84,15 @@ def pruefe_manifest(i005_root: Path, expected_count: int) -> None:
     if qualification.get("status") != "GRUEN":
         raise BootstrapPrueffehler("I005-Qualifikation ist nicht GRUEN.")
     if manifest.get("paketanzahl") != expected_count:
-        raise BootstrapPrueffehler(
-            "Paketanzahl zwischen Status und Manifest weicht ab."
-        )
+        raise BootstrapPrueffehler("Paketanzahl zwischen Status und Manifest weicht ab.")
 
 
 def pruefe_wheels(i005_root: Path, expected_count: int) -> list[Path]:
     hash_entries = parse_hashliste(i005_root / "WHEELHOUSE_SHA256.txt")
     wheel_entries = {
-        rel: digest
-        for rel, digest in hash_entries.items()
-        if rel.startswith("wheelhouse/")
+        rel: digest for rel, digest in hash_entries.items() if rel.startswith("wheelhouse/")
     }
-    wheels = sorted(
-        (i005_root / "wheelhouse").glob("*.whl"), key=lambda item: item.name.lower()
-    )
+    wheels = sorted((i005_root / "wheelhouse").glob("*.whl"), key=lambda item: item.name.lower())
     if len(wheels) != expected_count or len(wheel_entries) != expected_count:
         raise BootstrapPrueffehler(
             "Wheelanzahl abweichend: "
@@ -112,9 +104,7 @@ def pruefe_wheels(i005_root: Path, expected_count: int) -> list[Path]:
     if actual_names != set(wheel_entries):
         missing = sorted(set(wheel_entries) - actual_names)
         extra = sorted(actual_names - set(wheel_entries))
-        raise BootstrapPrueffehler(
-            f"Wheelbestand weicht ab; fehlt={missing}, extra={extra}"
-        )
+        raise BootstrapPrueffehler(f"Wheelbestand weicht ab; fehlt={missing}, extra={extra}")
 
     for wheel in wheels:
         rel = f"wheelhouse/{wheel.name}"
@@ -123,9 +113,7 @@ def pruefe_wheels(i005_root: Path, expected_count: int) -> list[Path]:
 
     manifest_hash = sha256(i005_root / "WHEELHOUSE_MANIFEST.json")
     if hash_entries.get("WHEELHOUSE_MANIFEST.json") != manifest_hash:
-        raise BootstrapPrueffehler(
-            "Manifesthash in WHEELHOUSE_SHA256.txt stimmt nicht."
-        )
+        raise BootstrapPrueffehler("Manifesthash in WHEELHOUSE_SHA256.txt stimmt nicht.")
     return wheels
 
 
@@ -162,10 +150,7 @@ def main() -> int:
             json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-    print(
-        f"I005-BASIS: GRÜN — {result['paketanzahl']} Wheels / "
-        f"{result['wheel_bytes']} Bytes"
-    )
+    print(f"I005-BASIS: GRÜN — {result['paketanzahl']} Wheels / {result['wheel_bytes']} Bytes")
     return 0
 
 
