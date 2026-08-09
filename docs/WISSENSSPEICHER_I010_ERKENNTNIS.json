@@ -3,25 +3,40 @@
   "id": "ERK-I010-001",
   "typ": "Regelentwurf",
   "titel": "Öffentliche Vertrags-API muss als maschinenlesbare Baseline gegen Drift gesichert sein",
-  "beschreibung": "Ein gemeinsames Architektur- und Vertragsgate soll öffentliche Symbole, ID-Präfixe, Statuswerte, Fehlerklassen, Schemaversionen und das exakte Produktquellinventar gemeinsam prüfen. Dadurch werden unbeabsichtigte Vertragsänderungen und Architekturgrenzumgehungen vor späteren Phasen sichtbar.",
+  "beschreibung": "Ein gemeinsames Architektur- und Vertragsgate prüft öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Statuswerte, Fehlerklassen, Schemaversionen, Pflichtfelder, Fehlercodes und das exakte hashgebundene Produktquellinventar gemeinsam. Negative Fixtures beweisen zusätzlich, dass Architekturverletzungen tatsächlich blockiert werden.",
   "hauptkategorie": "Daten & Integrität",
   "nebenkategorien": ["Architektur", "Tests", "Evidence & Audit", "Fehlervermeidung"],
-  "reifegrad": "E1",
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE P02",
   "projektbezug": ["PROVOWARE"],
   "quelle_herkunft": [
-    "PROJEKTSTATUS.json BASELINE-2026-08-09-I009",
-    "TODO.md I010",
-    "I007-I009 öffentliche Verträge"
+    "PROJEKTSTATUS.json BASELINE-2026-08-10-I010",
+    "P02_API_SNAPSHOT.json",
+    "P02_QUELLINVENTAR.json",
+    "EVIDENCE/I010/TESTERGEBNIS.json",
+    "GitHub Actions Run 31339417368"
   ],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
+  "nachweis": {
+    "workflow_run_id": 31339417368,
+    "artifact_id": 9045351696,
+    "api_snapshot_sha256": "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16",
+    "architecture_tests": 12,
+    "contracttests": 49,
+    "gesamtregression": 80,
+    "status": "GRUEN"
+  },
   "historie": [
     {
       "iteration": "I010",
       "aktion": "Als E1-Regelentwurf aufgenommen; Hochstufung erst nach reproduzierter I010-Qualifikation."
+    },
+    {
+      "iteration": "I010",
+      "aktion": "Nach reproduzierter GitHub-Gesamtqualifikation auf E2/BESTAETIGT angehoben; noch keine projektübergreifende Goldene Regel."
     }
   ]
 }
