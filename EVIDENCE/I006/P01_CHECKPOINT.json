@@ -1,0 +1,38 @@
+{
+  "schema": "1.0.0",
+  "checkpoint": "P01_ABSCHLUSS",
+  "status": "GRUEN",
+  "phasenbereich": "I003-I006",
+  "baseline": "BASELINE-2026-08-09-I006",
+  "nachweise": {
+    "i003_repositorystruktur": "VALIDIERT",
+    "i004_pyproject_qualitaetskonfiguration": "VALIDIERT",
+    "i005_offline_wheelhouse": {
+      "status": "VALIDIERT",
+      "workflow_run_id": 31330952896,
+      "artifact_id": 9042907351,
+      "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+    },
+    "i006_clean_bootstrap": {
+      "status": "VALIDIERT",
+      "workflow_run_id": 31331742667,
+      "artifact_id": 9043135144,
+      "artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
+      "durchlaeufe": 2,
+      "freeze_identisch": true
+    }
+  },
+  "pflichtkern": {
+    "baseline_pinning": true,
+    "vorvalidierung": true,
+    "minimalpatch": true,
+    "nachvalidierung": true,
+    "evidence": true,
+    "iterationsuebergabe": true,
+    "offline_entwicklungsbasis": true,
+    "reproduzierbarer_clean_bootstrap": true
+  },
+  "offene_blocker": [],
+  "nicht_blockierende_plan_deltas": ["DELTA-0003"],
+  "freigabe": "P02/I007 darf beginnen."
+}
