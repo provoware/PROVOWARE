@@ -2,9 +2,9 @@
 
 **Status:** Neuaufbau · `0.1.0-dev` · P00/P01 qualifiziert · P02 in Arbeit  
 **Repository:** `provoware/PROVOWARE`  
-**Aktuelle Baseline:** `BASELINE-2026-08-09-I007`  
-**Letzte abgeschlossene Iteration:** `I007`  
-**Nächste Iteration:** `I008`  
+**Aktuelle Baseline:** `BASELINE-2026-08-09-I008`  
+**Letzte abgeschlossene Iteration:** `I008`  
+**Nächste Iteration:** `I009`  
 **Ziel:** portables, offline-first Linux-Desktopwerkzeug auf professioneller Engineering-Basis.
 
 ## Aktueller Implementierungsstand
@@ -19,51 +19,75 @@ Abgeschlossen und qualifiziert:
 - I005: Offline-Wheelhouse auf Ubuntu 22.04 amd64 / CPython 3.13.15 erzeugt und offline verifiziert.
 - I006: zwei vollständige Offline-Clean-Bootstraps reproduzierbar qualifiziert.
 - I007: strikt typisierte ID-, Status-, Fehler- und Ergebnisverträge qualifiziert.
+- I008: versionierte Manifest-/Projektschemata, Golden-Fixtures und Schema-/Produktversions-Trennung qualifiziert.
 - Transfer V1: automatischer 24-MiB-Teiltransfer mit Hashprüfung, Backup, Rollback und End-to-End-Installer repo-integriert.
 
-**P00 und P01 sind vollständig qualifiziert. P02 steht nach I007 bei 25 %.** Nächster Pflichtschritt ist **I008 — Manifest- und Projektschemata**.
+**P00 und P01 sind vollständig qualifiziert. P02 steht nach I008 bei 50 %.** Nächster Pflichtschritt ist **I009 — OperationRequest-/OperationResult-Verträge**.
 
-## I007 — Kernverträge
+## I007 — öffentliche Kern-API
 
-Die Vertragsschicht `src/provoware/vertraege/` ist bewusst unabhängig von Qt, SQLite, Datei-I/O und Modulen. Sie enthält:
+Die in I007 qualifizierten Präfixe und Invarianten werden seit I008 durch Contracttests als öffentliche API geschützt:
 
-- `ProjektId`, `ObjektId`, `RevisionId`, `ChangeId`, `OperationId`
-- kanonische präfixierte UUID-Formate
-- `Status`
-- `Fehlerklasse` und `FehlerInfo`
-- `OperationErgebnis[T]`
+- `ProjektId` → `prj_...`
+- `ObjektId` → `obj_...`
+- `RevisionId` → `rev_...`
+- `ChangeId` → `chg_...`
+- `OperationId` → `op_...`
+- stabile Werte für `Status` und `Fehlerklasse`
+- stabile Erfolgs-/Fehlerinvarianten von `OperationErgebnis[T]`
+
+## I008 — Manifest- und Projektschemata
+
+Die Schemaschicht `src/provoware/vertraege/schemata.py` ist bewusst unabhängig von Qt, SQLite, Datei-I/O, Handlern und Modulen.
+
+Qualifiziert sind:
+
+- `SchemaVersion`: ausschließlich numerisches `MAJOR.MINOR.PATCH`
+- `ProduktVersion`: eigener Typ, optional mit Vorab-Suffix wie `0.1.0-dev`
+- `ManifestSchema`: minimale Identitätshülle
+- `ProjektSchema`: minimale Projektidentität mit qualifiziertem `Status`
+- `SchemaValidierungsfehler`: stabiler Code, Feldbezug und Nachricht
+- deterministische JSON-Serialisierung
+- strikte Pflichtfelder und Ablehnung unbekannter Felder
+- Golden-Fixtures für gültige und ungültige Beispiele
+- AST-basierte Architekturgrenze gegen verbotene Imports und Dateizugriffe
 
 Finale GitHub-Qualifikation:
 
-- Workflow-Run: `31335066204`
-- Artifact-ID: `9044073684`
-- Artifact-Größe: **0,000575 MB** (`575 Byte`)
-- Artifact-SHA-256: `007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909`
-- Receipt-SHA-256: `11cb28d66188298496c65059918d707b17a1cb4e95087c8368e6c9aa49221d33`
-- `mypy --strict`: GRÜN
-- Contracttests: **16 bestanden**
-- Gesamtregression: **33 bestanden**
-- Ruff Check/Format: GRÜN
-
-Zusätzlich waren die abschließenden Revalidierungen von I005, I006 und Transfer V1 grün.
+- Workflow-Run: `31336626886`
+- Job: `93303450280`
+- Artifact-ID: `9044527742`
+- Artifact-Größe: **0,000618 MB** (`618 Byte`)
+- Artifact-SHA-256: `f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61`
+- Receipt-SHA-256: `60d5db55ab1b95e77ad92cd7ae99781bd5b665c071ca95648f30cada5138f7ea`
+- `mypy --strict`: GRÜN / 7 Quelldateien
+- Contracttests: **30 bestanden**
+- Gesamtregression: **48 bestanden**
+- Ruff Check/Format: GRÜN / 15 Dateien
+- I007-Regressionsworkflow auf finalem I008-Head: GRÜN
 
 ## Projekt lokal prüfen — alle Befehle
 
 ```bash
 cd "$HOME/PROVOWARE"
 python3 WERKZEUGE/baseline_pruefen.py
+ruff check src tests WERKZEUGE
+ruff format --check src tests WERKZEUGE
+mypy \
+  src/provoware/vertraege \
+  tests/contract/test_datentypen.py \
+  tests/contract/test_id_varianten.py \
+  tests/contract/test_i007_api_freeze.py \
+  tests/contract/test_schemata.py
+pytest -q -m contract tests/contract
 pytest -q
 ```
 
-Mit dem qualifizierten Entwicklungs-Wheelhouse zusätzlich:
+Die Qualitätswerkzeuge werden produktiv aus dem verifizierten I005-Wheelhouse verwendet. Ohne lokal installierte Werkzeuge reicht für die reine Baselineprüfung:
 
 ```bash
 cd "$HOME/PROVOWARE"
-mypy src/provoware/vertraege tests/contract/test_datentypen.py tests/contract/test_id_varianten.py
-ruff check src tests WERKZEUGE
-ruff format --check src tests WERKZEUGE
-pytest -q -m contract tests/contract
-pytest -q
+python3 WERKZEUGE/baseline_pruefen.py
 ```
 
 ## Repository frisch klonen — alle Befehle
@@ -84,23 +108,26 @@ git pull --ff-only
 python3 WERKZEUGE/baseline_pruefen.py
 ```
 
-## I007-GitHub-Lauf ansehen und Evidence laden
+## I008-GitHub-Evidence ansehen und herunterladen
 
 ```bash
 gh auth status
-gh run view 31335066204 -R provoware/PROVOWARE
-gh run download 31335066204 -R provoware/PROVOWARE
+gh run view 31336626886 -R provoware/PROVOWARE
+gh run download 31336626886 -R provoware/PROVOWARE
 ```
 
-## Transfer V1 — Referenzgröße und Installation
+## Rückfall auf den vorherigen validierten I007-Stand ansehen
 
-Der repo-integrierte Transfer-V1-Referenzstand für die I006-Übergabe besitzt **295,21 MB** (`281,53 MiB`). Der Transfermechanismus selbst bleibt als reproduzierbarer Builder Bestandteil des Repositorys; für jede neue Übergabe wird ein neues, zur Baseline passendes Teilset erzeugt.
+```bash
+git fetch origin backup/vor-i008-promotion-2026-08-09
+git log --oneline --decorate -5 origin/backup/vor-i008-promotion-2026-08-09
+```
 
-- Teil 001–011: je **25,17 MB** (`24,00 MiB`)
-- Teil 012: **18,39 MB** (`17,53 MiB`)
-- Installer: ca. **0,009 MB**
-- Starter-ZIP: ca. **0,006 MB**
-- I006-Referenz-SHA-256: `9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17`
+## Transfer V1 — Mechanismus und Installation
+
+Der repo-integrierte Transfermechanismus arbeitet mit maximal **24 MiB / 25,17 MB** großen Teilstücken, prüft Einzel- und Gesamthashes, validiert das ZIP und die Baseline, sichert den vorhandenen Zielstand und rollt bei Fehler automatisch zurück.
+
+Der historische I006-Referenztransfer besitzt **295,21 MB** (`281,53 MiB`). Für jede neue Übergabe wird ein neues, zur aktuellen Baseline passendes Teilset erzeugt.
 
 ### Teilpaket installieren — alle Befehle
 
@@ -135,26 +162,16 @@ gh run view RUN_ID -R provoware/PROVOWARE
 gh run download RUN_ID -R provoware/PROVOWARE
 ```
 
-## I005-Qualifikation
+## Qualifizierte Offline-Basis
 
-Workflow `31330952896` erzeugte **50 Wheels mit 294,43 MB** (`280,79 MiB`, `294428822` Byte). Artifact-ID `9042907351`; SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040`.
-
-## I006-Qualifikation
-
-Workflow `31331742667` führte zwei getrennte Offline-Clean-Bootstraps aus. Beide Paket-Freezes waren byteidentisch; Freeze-SHA-256 `5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed`. Evidence-Artefakt `9043135144` besitzt ca. **0,003 MB** und SHA-256 `2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636`.
+- I005: 50 Wheels, **294,43 MB**, Artifact `9042907351`, SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040`.
+- I006: zwei reproduzierbare Offline-Bootstraps, Artifact `9043135144`, ca. **0,003 MB**, SHA-256 `2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636`.
+- I007: Kernverträge, Artifact `9044073684`, **0,000575 MB**.
+- I008: Schemas, Artifact `9044527742`, **0,000618 MB**.
 
 ## Harte Entwicklungsregel
 
-Noch keine breite Modul-, Daten- oder UI-Implementierung. P02 schließt zuerst I007–I010 als stabile Vertrags- und Architekturbasis ab. Erst danach folgt P03.
-
-## Rückfall
-
-Der vorherige I006-main-Stand bleibt auf folgendem Backupzweig erhalten:
-
-```bash
-git fetch origin backup/vor-i007-promotion-2026-08-09
-git log --oneline --decorate -5 origin/backup/vor-i007-promotion-2026-08-09
-```
+Keine breite Modul-, Daten- oder UI-Implementierung vorziehen. P02 schließt zuerst I007–I010 als stabile Vertrags- und Architekturbasis ab. Auf I008 folgt I009; danach schließt I010 das P02-Architekturgate.
 
 ## Masterplan-Identität
 
