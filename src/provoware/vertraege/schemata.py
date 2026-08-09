@@ -109,9 +109,7 @@ def _schema_version(text: str, erwartet: SchemaVersion) -> SchemaVersion:
     try:
         version = SchemaVersion.parse(text)
     except ValueError as exc:
-        raise SchemaValidierungsfehler(
-            "SCHEMA_VERSION_UNGUELTIG", str(exc), "schema"
-        ) from exc
+        raise SchemaValidierungsfehler("SCHEMA_VERSION_UNGUELTIG", str(exc), "schema") from exc
     if version != erwartet:
         raise SchemaValidierungsfehler(
             "SCHEMA_VERSION_INKOMPATIBEL",
