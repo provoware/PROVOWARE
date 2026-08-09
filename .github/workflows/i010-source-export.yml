@@ -1,0 +1,75 @@
+name: I010 Source Export
+
+on:
+  pull_request:
+    branches: [main]
+    paths: [".github/workflows/i010-source-export.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Finalen I010-Main auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: 9d4a6a6ec05fd7e61554748d217802e775c572d8
+          path: current
+          persist-credentials: false
+      - name: I009-Rückfallbasis auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: backup/vor-i010-promotion-2026-08-10
+          path: backup
+          persist-credentials: false
+      - name: Cache-freien Source-Export bauen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$(git -C current rev-parse HEAD)" = "9d4a6a6ec05fd7e61554748d217802e775c572d8"
+          test "$(git -C backup rev-parse HEAD)" = "2fe130ce24141f6cafcea8454376dfab6096aa7a"
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+
+          excludes = {'.git', '.mypy_cache', '.pytest_cache', '.ruff_cache', '__pycache__'}
+          out = Path('export')
+          out.mkdir()
+          archive = out / 'PROVOWARE_I010_SOURCE_EXPORT.zip'
+
+          def files(root: Path):
+              for path in sorted(p for p in root.rglob('*') if p.is_file()):
+                  if any(part in excludes for part in path.parts) or path.suffix == '.pyc':
+                      continue
+                  yield path
+
+          with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+              for label, root in [('CURRENT_I010', Path('current')), ('BACKUP_I009', Path('backup'))]:
+                  for path in files(root):
+                      z.write(path, (Path(label) / path.relative_to(root)).as_posix())
+          with zipfile.ZipFile(archive) as z:
+              assert z.testzip() is None
+          digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+          manifest = {
+              'schema': '1.0.0',
+              'current_main_sha': '9d4a6a6ec05fd7e61554748d217802e775c572d8',
+              'backup_i009_sha': '2fe130ce24141f6cafcea8454376dfab6096aa7a',
+              'backup_branch': 'backup/vor-i010-promotion-2026-08-10',
+              'cache_frei': True,
+              'zip_bytes': archive.stat().st_size,
+              'zip_sha256': digest,
+          }
+          (out / 'SOURCE_EXPORT_MANIFEST.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(manifest, indent=2))
+          PY
+      - name: Source-Export hochladen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I010-SOURCE-EXPORT-9d4a6a6ec05fd7e61554748d217802e775c572d8
+          path: export/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 90
