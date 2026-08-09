@@ -7,6 +7,7 @@
   "vorgaenger_commit": "61530dfc5e0063dc0ed7003f0f59cae2947199f0",
   "staging_branch": "neuaufbau/i000-i004",
   "inhaltscommit": "bec9da36316f47792835411ac111e4cde3c0d79c",
+  "promotion_evidence_commit": "3b40e83725db96ca814cad79c14021252efa39b4",
   "validierungen": [
     "README auf Staging erfolgreich gelesen",
     "PROJEKTSTATUS.json auf Staging erfolgreich gelesen",

@@ -1,0 +1,24 @@
+{
+  "github": {
+    "backup_branch": "backup/vor-neuaufbau-2026-08-09",
+    "evidence_commit": "3b40e83725db96ca814cad79c14021252efa39b4",
+    "inhaltscommit": "bec9da36316f47792835411ac111e4cde3c0d79c"
+  },
+  "iterationsblock": "I000-I004",
+  "schema": "1.0.0",
+  "textdateien": 45,
+  "zeichen_gesamt": 40433,
+  "zeichen_nach_zweck": {
+    "dokumentation": 7574,
+    "evidence": 4058,
+    "registries": 23163,
+    "werkzeuge_tests_code": 5638
+  },
+  "zeilen_gesamt": 1521,
+  "zielgruppe": {
+    "dokumentation": "Entwickler und Nutzer",
+    "evidence": "Review, Audit und Wiederanlauf",
+    "registries": "Entwicklungsautomat, Validatoren und spätere Release-Agenten",
+    "werkzeuge_tests_code": "Entwickler, CI und lokale Qualifikation"
+  }
+}

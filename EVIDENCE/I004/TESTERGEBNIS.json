@@ -1,0 +1,9 @@
+{
+  "schema": "1.0.0",
+  "status": "GRUEN",
+  "laeufe": [
+    {"cmd": "python3 WERKZEUGE/baseline_pruefen.py", "returncode": 0, "stdout": "BASELINE: GRÜN; Register geprüft: 17"},
+    {"cmd": "python3 -m compileall -q src WERKZEUGE tests", "returncode": 0, "stdout": ""},
+    {"cmd": "pytest -q", "returncode": 0, "stdout": "6 passed"}
+  ]
+}
