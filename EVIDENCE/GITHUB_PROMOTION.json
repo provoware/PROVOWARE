@@ -1,0 +1,17 @@
+{
+  "schema": "1.0.0",
+  "vorgang": "Neuaufbau-Promotion",
+  "zeit_utc": "2026-08-09T18:38:05Z",
+  "repository": "provoware/PROVOWARE",
+  "backup_branch": "backup/vor-neuaufbau-2026-08-09",
+  "vorgaenger_commit": "61530dfc5e0063dc0ed7003f0f59cae2947199f0",
+  "staging_branch": "neuaufbau/i000-i004",
+  "inhaltscommit": "bec9da36316f47792835411ac111e4cde3c0d79c",
+  "validierungen": [
+    "README auf Staging erfolgreich gelesen",
+    "PROJEKTSTATUS.json auf Staging erfolgreich gelesen",
+    "alter index.html-Pfad auf Staging nicht vorhanden",
+    "main ohne Force als Fast-Forward auf Neuaufbau promoviert"
+  ],
+  "status": "GRUEN"
+}
