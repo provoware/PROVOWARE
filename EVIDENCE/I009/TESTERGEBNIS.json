@@ -1,0 +1,66 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I009",
+  "status": "GRUEN",
+  "qualifikationslauf": {
+    "workflow_run_id": 31337914639,
+    "job_id": 93306696652,
+    "branch_head": "b4ae4a4ef54dff3fabfa6b428f7e62af91100a3f",
+    "pr_merge_ref": "2b197fed99c2f3be7794f9bc1caa2afe0391a998",
+    "main_merge_commit": "5f94bfc43c038530738d1a320ba6c9a050b39a17",
+    "artifact_id": 9044902480,
+    "artifact_bytes": 663,
+    "artifact_mb": 0.000663,
+    "artifact_sha256": "962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9",
+    "receipt_sha256": "46b8bb9f9f6fa215f70c7fb89fe7afaf884ece0918e02055daa11eb5e4a05e23"
+  },
+  "plattform": {
+    "ubuntu": "22.04.5 LTS",
+    "architektur": "x86_64",
+    "python": "3.13.15"
+  },
+  "toolchain": {
+    "quelle": "verifiziertes I005-Wheelhouse",
+    "pytest": "9.1.1",
+    "ruff": "0.16.1",
+    "mypy": "2.3.0",
+    "offline_installation": true
+  },
+  "ergebnisse": {
+    "aktuelle_baseline": "GRUEN / 17 Register",
+    "i008_evidence": "GRUEN / Artifact-ID und SHA-256 gebunden",
+    "i007_regressionsworkflow": "GRUEN / Run 31337914654",
+    "i008_regressionsworkflow": "GRUEN / Run 31337914673",
+    "operation_request_result": "GRUEN",
+    "request_result_korrelation": "GRUEN / OperationId",
+    "payload_kanonisierung": "GRUEN",
+    "payload_grenzen": "GRUEN / Tiefe, Container, Schlüssel, 65536 Byte",
+    "float_ablehnung": "GRUEN",
+    "fingerprints": "GRUEN / SHA-256",
+    "golden_fixtures": "GRUEN",
+    "architektur_importgrenze": "GRUEN / AST-basiert",
+    "ruff_check": "GRUEN",
+    "ruff_format": "GRUEN / 17 Dateien",
+    "mypy_strict": "GRUEN / 9 Quelldateien",
+    "contracttests": "49 bestanden",
+    "gesamtregression": "68 bestanden"
+  },
+  "korrigierte_schwachstellen": [
+    {
+      "ursache": "PR #7 blieb nach erfolgreicher I008-Promotion als obsoleter paralleler Entwicklungsweg offen.",
+      "korrektur": "PR #7 wurde geschlossen und explizit als durch PR #8 ersetzt dokumentiert."
+    },
+    {
+      "ursache": "Der I008-Regressionsworkflow erwartete nach eigener Promotion weiterhin fest die I007-Baseline.",
+      "korrektur": "Der Workflow prüft nun die jeweils aktuelle validierte Baseline und bindet die historische I008-Evidence separat an Artifact-ID und SHA-256."
+    },
+    {
+      "ursache": "Der erste I009-Entwurf überschritt Ruff-Zeilenlänge und Komplexitätsgrenze.",
+      "korrektur": "Payload-Normalisierung wurde in kleine Hilfsfunktionen zerlegt und der gesamte neue Code exakt auf Ruff 0.16.1 formatiert."
+    },
+    {
+      "ursache": "Ein beliebiger veränderlicher Payload oder eine zweite Ergebnissemantik hätte I007/I008 wieder aufgeweicht.",
+      "korrektur": "OperationPayload ist tief validiert, kanonisch und begrenzt; OperationResult verwendet ausschließlich OperationErgebnis und FehlerInfo."
+    }
+  ]
+}
