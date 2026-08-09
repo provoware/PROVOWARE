@@ -98,7 +98,7 @@ jobs:
             pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
           PIP_NO_INDEX=1 .venv-i008/bin/python -m pip check
 
-      - name: I007-Baseline und Evidence revalidieren
+      - name: Aktuelle Baseline und I008-Evidence revalidieren
         shell: bash
         run: |
           python3 WERKZEUGE/baseline_pruefen.py
@@ -107,12 +107,13 @@ jobs:
           from pathlib import Path
 
           baseline = json.loads(Path('CURRENT_BASELINE.json').read_text(encoding='utf-8'))
-          evidence = json.loads(Path('EVIDENCE/I007/TESTERGEBNIS.json').read_text(encoding='utf-8'))
-          assert baseline['baseline_id'] == 'BASELINE-2026-08-09-I007'
+          evidence = json.loads(Path('EVIDENCE/I008/TESTERGEBNIS.json').read_text(encoding='utf-8'))
           assert baseline['status'] == 'VALIDIERT_GITHUB'
+          assert baseline['letzte_iteration'] >= 'I008'
+          assert evidence['iteration'] == 'I008'
           assert evidence['status'] == 'GRUEN'
-          assert evidence['qualifikationslauf']['artifact_id'] == 9044073684
-          assert evidence['qualifikationslauf']['artifact_sha256'] == '007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909'
+          assert evidence['qualifikationslauf']['artifact_id'] == 9044527742
+          assert evidence['qualifikationslauf']['artifact_sha256'] == 'f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61'
           PY
 
       - name: Ruff prüfen
@@ -174,7 +175,8 @@ jobs:
                   'pip_no_index': True,
               },
               'gates': {
-                  'i007_baseline': 'GRUEN',
+                  'aktuelle_baseline': 'GRUEN',
+                  'i008_evidence': 'GRUEN',
                   'i007_api_freeze': 'GRUEN',
                   'schema_produktversion_trennung': 'GRUEN',
                   'golden_fixtures': 'GRUEN',
@@ -212,6 +214,8 @@ jobs:
           {
             echo "## I008 — Schemas GRÜN"
             echo
+            echo "- aktuelle validierte Baseline revalidiert"
+            echo "- I008-Evidence unverändert verifiziert"
             echo "- I007 öffentliche API eingefroren"
             echo "- SchemaVersion und ProduktVersion getrennt"
             echo "- Manifest-/Projekt-Golden-Fixtures GRÜN"
