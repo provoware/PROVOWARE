@@ -1,0 +1,27 @@
+{
+  "schema":"1.0.0",
+  "status":"INITIAL",
+  "regeln":"MUSS -> Architektur -> Komponente -> Implementierung -> Test -> Evidence -> Gate",
+  "eintraege":[
+    {"anforderung_id":"REQ-V1-001","zielphase":"P07","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-002","zielphase":"P07","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-003","zielphase":"P02-P05","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-004","zielphase":"P04","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-005","zielphase":"P08","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-006","zielphase":"P08-P10","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-007","zielphase":"P10","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-008","zielphase":"P11-P13","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-009","zielphase":"P14","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-010","zielphase":"P15-P16","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-011","zielphase":"P17","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-012","zielphase":"P19-P20","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-013","zielphase":"P21-P24","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-014","zielphase":"P26","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-015","zielphase":"P27-P30","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-016","zielphase":"P00-P32","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-017","zielphase":"global","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-018","zielphase":"P16,P23","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-019","zielphase":"P25","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"},
+    {"anforderung_id":"REQ-V1-020","zielphase":"P32","architektur":[],"komponenten":[],"implementierung":[],"tests":[],"evidence":[],"gates":[],"status":"GEPLANT"}
+  ]
+}

@@ -1,50 +1,22 @@
 # AGENTS.md
 
-## Geltungsbereich
+## Verbindlicher Arbeitsmodus
 
-Diese Regeln gelten für alle Entwickler, Automationen und KI-Agenten, die an diesem Repository arbeiten.
+1. Nie auf unbekannter Baseline patchen.
+2. Pro Iteration genau ein Hauptziel oder ein explizit dokumentierter enger Iterationsblock.
+3. Neue Arbeit wird als `PLAN_DELTA` registriert und nicht still mitimplementiert.
+4. Kritische Änderungen benötigen vorab einen Rückweg.
+5. Pflichtprüfungen dürfen nicht durch spätere Funktionen überdeckt werden.
+6. Nutzerseitige Begriffe und Berichte bleiben deutsch.
+7. Stable- und Evidence-Artefakte werden nicht still überschrieben.
+8. Alle maschinenlesbaren Projektwahrheiten besitzen eine eindeutige autoritative Datei.
+9. Netzwerkzugriff ist kein Bestandteil der Laufzeit-Kernfunktion.
+10. Erst nach grünem kritischen PoA-Pfad beginnt breiter V1-Ausbau.
 
-## Arbeitsprinzip
+## Iterationsablauf
 
-1. Vor jeder Änderung Ziel, betroffene Dateien, Abhängigkeiten und Risiken bestimmen.
-2. Nur den kleinsten sinnvollen Patch umsetzen.
-3. Keine fremden oder nicht zugehörigen Änderungen mitnehmen.
-4. Vorhandene Datenformate, IDs und Migrationspfade erhalten.
-5. Nach jeder Änderung die kleinste passende Prüfung ausführen.
-6. Fehler nicht verdecken, sondern Ursache, Auswirkung und Restunsicherheit dokumentieren.
+`BASELINE -> VORANALYSE -> PATCHPLAN -> PRECHECK -> STAGING -> PATCH -> TEST -> POSTCHECK -> EVIDENCE -> PLAN_DELTA -> UEBERGABE`
 
-## Pflichtanforderungen
+## Abbruch
 
-- vollständig offline nutzbarer Kern
-- keine CDN- oder Cloud-Pflicht
-- klare Modulgrenzen und kleine Funktionen
-- verständliche deutsche Hilfetexte ohne unnötigen Fachjargon
-- Beispiele, Pro, Contra, Alternative und Empfehlung bei wichtigen Entscheidungen
-- Tastaturbedienung und sichtbarer Fokus
-- Vorvalidierung, Vorschau, Ausführung und Nachprüfung bei riskanten Aktionen
-- versionierte Datenmodelle, Snapshots und Wiederherstellung
-- keine destruktive Aktion ohne Sicherung oder Git-Historie
-
-## Prüfklassen
-
-- **L0:** Syntax, JSON, Format und Dateipfade
-- **L1:** betroffene Unit- und Regeltests
-- **L2:** repräsentativer Workflow- oder Browser-Smoke-Test
-- **L3:** vollständige Release-, Migrations- und Barrierefreiheitsabnahme
-
-Nicht jede Änderung benötigt L3. Umfangreiche Prüfungen nur an Meilensteinen oder bei querschnittlichen Änderungen ausführen.
-
-## Commit-Regeln
-
-- ein fachlich zusammenhängender Zweck pro Commit
-- kurze, eindeutige Commit-Nachricht
-- generierte Dateien nur zusammen mit Quelle und Buildnachweis aktualisieren
-- keine geheimen Daten, Nutzerdaten, temporären Artefakte oder lokalen Caches committen
-
-## Abschlussformat jeder Iteration
-
-- erledigte Änderungen
-- ausgeführte Prüfungen
-- offene Risiken
-- direkt folgender technischer Schritt
-- alternative Verbesserung mit hohem Nutzen und geringem Risiko
+Bei Baseline-Mismatch, unklarer Datenintegrität, fehlendem Rückweg für einen riskanten Schritt oder rotem Pflichtgate wird nicht automatisch weiterentwickelt.

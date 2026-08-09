@@ -1,0 +1,19 @@
+{
+  "aktuelle_baseline": "BASELINE-2026-08-09-I004",
+  "aliasnamen": ["PROVOWARE Desktop", "PROVOWARE Neuaufbau 2026"],
+  "forward_qualifikation": ["Ubuntu 26.04 LTS amd64 X11"],
+  "hauptdatei": null,
+  "kanonischer_projektname": "PROVOWARE",
+  "letzte_abgeschlossene_iteration": "I004",
+  "letztes_validiertes_release": null,
+  "masterplan": {"bytes": 269583, "datum": "2026-08-09", "seiten": 81, "sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c", "version": "2.0.0"},
+  "naechste_iteration": "I005",
+  "offline_first": true,
+  "phase": "P01 Repository- und Entwicklungsfundament",
+  "portabel": true,
+  "repository": "https://github.com/provoware/PROVOWARE",
+  "schema": "1.0.0",
+  "status": "IN_ARBEIT",
+  "version": "0.1.0-dev",
+  "zielplattform": ["Ubuntu 22.04 LTS amd64 X11", "Ubuntu 24.04 LTS amd64 X11"]
+}

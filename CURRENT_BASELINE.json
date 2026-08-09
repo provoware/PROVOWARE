@@ -1,0 +1,12 @@
+{
+  "baseline_id": "BASELINE-2026-08-09-I004",
+  "github_backup_branch": "backup/vor-neuaufbau-2026-08-09",
+  "github_vorgaenger_commit": "61530dfc5e0063dc0ed7003f0f59cae2947199f0",
+  "letzte_iteration": "I004",
+  "masterplan_sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c",
+  "naechste_iteration": "I005",
+  "schema": "1.0.0",
+  "source": "Neuaufbau nach Masterplan v2.0.0",
+  "status": "VALIDIERT_LOKAL",
+  "version": "0.1.0-dev"
+}

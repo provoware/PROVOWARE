@@ -1,0 +1,12 @@
+{
+  "entwicklung": {"bandit": "1.9.4", "mypy": "2.3.0", "pip_audit": "2.10.1", "pyinstaller_builder": "6.21.0", "pytest": "9.1.1", "ruff": "0.16.1"},
+  "hinweis": "Versionen werden erst durch separate Dependency-Qualification geändert.",
+  "packaging": {"buildbasis": "Ubuntu 22.04 amd64", "format": "PyInstaller One-Dir"},
+  "runtime": {
+    "pyside6": {"qualifikationsziel": "6.11.1", "ui": "Qt Widgets"},
+    "python": {"buildvariante": "normal_GIL", "qualifikationsziel": "3.13.15"},
+    "sqlite": {"journal_default": "rollback", "qualifikationsziel": "3.53.4", "wal_default": false}
+  },
+  "schema": "1.0.0",
+  "status": "GEPLANT_UND_GEPINNT"
+}

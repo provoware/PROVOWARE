@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "provoware"
+version = "0.1.0.dev0"
+description = "Offline-first, portables Linux-Desktopwerkzeug"
+requires-python = ">=3.13,<3.14"
+dependencies = []
+
+[project.optional-dependencies]
+entwicklung = [
+  "pytest==9.1.1",
+  "ruff==0.16.1",
+  "mypy==2.3.0",
+  "bandit==1.9.4",
+  "pip-audit==2.10.1",
+  "PyInstaller==6.21.0",
+]
+desktop = [
+  "PySide6==6.11.1",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "contract: Vertrags- und Schnittstellentests",
+  "struktur: Repository- und Baselinestruktur",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src", "tests", "WERKZEUGE"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I", "SIM", "C90", "RUF"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+mypy_path = "src"
+warn_unused_configs = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "EVIDENCE"]

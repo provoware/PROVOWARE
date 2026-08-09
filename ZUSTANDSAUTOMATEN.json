@@ -1,0 +1,1 @@
+{"schema":"1.0.0","status":"VORBEREITET","automaten":[{"id":"SM-ENTWICKLUNG","zustaende":["BEREIT","IN_ARBEIT","VALIDIERT","BLOCKIERT"],"implementierung":"P02/P05"},{"id":"SM-RELEASE","zustaende":["IN_ARBEIT","KANDIDAT","BLOCKIERT","STABLE"],"implementierung":"P27-P30"}]}

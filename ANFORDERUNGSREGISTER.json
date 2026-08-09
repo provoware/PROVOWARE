@@ -1,0 +1,27 @@
+{
+  "schema": "1.0.0",
+  "quelle": {"masterplan_version": "2.0.0", "sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c"},
+  "vollstaendigkeit": "V1-Kernbaseline; Detailanforderungen werden iterativ verfeinert, ohne Kernanforderungen zu entfernen.",
+  "anforderungen": [
+    {"id":"REQ-V1-001","titel":"Portabler Offline-Start","prioritaet":"MUSS","zielphase":"P07","status":"GEPLANT"},
+    {"id":"REQ-V1-002","titel":"Grafischer Start-Wizard und Self-Check","prioritaet":"MUSS","zielphase":"P07","status":"GEPLANT"},
+    {"id":"REQ-V1-003","titel":"Headless-fähiger Core mit Desktop-Adapter","prioritaet":"MUSS","zielphase":"P02-P05","status":"GEPLANT"},
+    {"id":"REQ-V1-004","titel":"Feste IDs, Versionen und Manifeste","prioritaet":"MUSS","zielphase":"P04","status":"GEPLANT"},
+    {"id":"REQ-V1-005","titel":"Projektverwaltung","prioritaet":"MUSS","zielphase":"P08","status":"GEPLANT"},
+    {"id":"REQ-V1-006","titel":"Revisionsbasierte Datenhaltung","prioritaet":"MUSS","zielphase":"P08-P10","status":"GEPLANT"},
+    {"id":"REQ-V1-007","titel":"Einziger regulärer Nutzerdaten-Schreibweg über Transaktionsdienst","prioritaet":"MUSS","zielphase":"P10","status":"GEPLANT"},
+    {"id":"REQ-V1-008","titel":"Undo, Recovery, Backup und Restore","prioritaet":"MUSS","zielphase":"P11-P13","status":"GEPLANT"},
+    {"id":"REQ-V1-009","titel":"Modulvertrag, Minimalmodus und Sandbox","prioritaet":"MUSS","zielphase":"P14","status":"GEPLANT"},
+    {"id":"REQ-V1-010","titel":"Qt-Widgets Raster-Desktop-GUI","prioritaet":"MUSS","zielphase":"P15-P16","status":"GEPLANT"},
+    {"id":"REQ-V1-011","titel":"Datenbank-Referenzmodul","prioritaet":"MUSS","zielphase":"P17","status":"GEPLANT"},
+    {"id":"REQ-V1-012","titel":"Diagnose- und Reparaturpipeline","prioritaet":"MUSS","zielphase":"P19-P20","status":"GEPLANT"},
+    {"id":"REQ-V1-013","titel":"Automatisierte Test-, Fault-, GUI-, Visual- und A11y-Prüfung","prioritaet":"MUSS","zielphase":"P21-P24","status":"GEPLANT"},
+    {"id":"REQ-V1-014","titel":"A/B-Update mit atomarer CURRENT-Promotion und Rollback","prioritaet":"MUSS","zielphase":"P26","status":"GEPLANT"},
+    {"id":"REQ-V1-015","titel":"Release-, Evidence-, Signatur- und Stable-Prozess","prioritaet":"MUSS","zielphase":"P27-P30","status":"GEPLANT"},
+    {"id":"REQ-V1-016","titel":"Vollständige Traceability und Entwicklerdokumentation","prioritaet":"MUSS","zielphase":"P00-P32","status":"GEPLANT"},
+    {"id":"REQ-V1-017","titel":"Keine versteckte Telemetrie; Kernfunktion ohne Internet","prioritaet":"MUSS","zielphase":"global","status":"GEPLANT"},
+    {"id":"REQ-V1-018","titel":"Barrierefreiheit als Release-Gate","prioritaet":"MUSS","zielphase":"P16,P23","status":"GEPLANT"},
+    {"id":"REQ-V1-019","titel":"Buildbasis Ubuntu 22.04; Zielmatrix 22.04/24.04/26.04 X11","prioritaet":"MUSS","zielphase":"P25","status":"GEPLANT"},
+    {"id":"REQ-V1-020","titel":"Scope-Bremse: Zukunftsfunktionen nur Contract-only bis Stable","prioritaet":"MUSS","zielphase":"P32","status":"GEPLANT"}
+  ]
+}
