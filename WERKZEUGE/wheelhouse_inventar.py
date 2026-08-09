@@ -6,12 +6,12 @@ import json
 import os
 import platform
 import re
-import sys
 import zipfile
 from datetime import UTC, datetime
 from email.parser import BytesParser
 from email.policy import default
 from pathlib import Path
+from typing import Any
 
 _NORMALIZE_RE = re.compile(r"[-_.]+")
 
@@ -50,15 +50,28 @@ def direkte_anforderungen(path: Path) -> list[dict[str, str]]:
         if "==" not in line:
             raise ValueError(f"Nicht exakt gepinnte Anforderung: {line}")
         name, version = line.split("==", 1)
-        result.append({"name": name, "normalisiert": normalisiere_name(name), "version": version})
+        result.append(
+            {
+                "name": name,
+                "normalisiert": normalisiere_name(name),
+                "version": version,
+            }
+        )
     return result
 
 
-def metadata_aus_wheel(path: Path) -> dict[str, object]:
+def metadata_aus_wheel(path: Path) -> dict[str, Any]:
     with zipfile.ZipFile(path) as archive:
-        metadata_names = sorted(name for name in archive.namelist() if name.endswith(".dist-info/METADATA"))
+        metadata_names = sorted(
+            name
+            for name in archive.namelist()
+            if name.endswith(".dist-info/METADATA") and name.count("/") == 1
+        )
         if len(metadata_names) != 1:
-            raise ValueError(f"Wheel {path.name}: erwartete genau eine METADATA-Datei, gefunden {len(metadata_names)}")
+            raise ValueError(
+                f"Wheel {path.name}: erwartete genau eine Root-METADATA-Datei, "
+                f"gefunden {len(metadata_names)}"
+            )
         message = BytesParser(policy=default).parsebytes(archive.read(metadata_names[0]))
 
     name = str(message.get("Name", "")).strip()
@@ -66,9 +79,21 @@ def metadata_aus_wheel(path: Path) -> dict[str, object]:
     if not name or not version:
         raise ValueError(f"Wheel {path.name}: Name/Version fehlen in METADATA")
 
-    licenses = [str(value).strip() for value in message.get_all("License", []) if str(value).strip()]
-    expressions = [str(value).strip() for value in message.get_all("License-Expression", []) if str(value).strip()]
-    requires = [str(value).strip() for value in message.get_all("Requires-Dist", []) if str(value).strip()]
+    licenses = [
+        str(value).strip()
+        for value in message.get_all("License", [])
+        if str(value).strip()
+    ]
+    expressions = [
+        str(value).strip()
+        for value in message.get_all("License-Expression", [])
+        if str(value).strip()
+    ]
+    requires = [
+        str(value).strip()
+        for value in message.get_all("Requires-Dist", [])
+        if str(value).strip()
+    ]
 
     return {
         "datei": path.name,
@@ -83,7 +108,7 @@ def metadata_aus_wheel(path: Path) -> dict[str, object]:
     }
 
 
-def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, object]:
+def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, Any]:
     wheels = sorted(wheelhouse.glob("*.whl"), key=lambda item: item.name.lower())
     if not wheels:
         raise ValueError("Wheelhouse enthält keine Wheels.")
@@ -91,7 +116,11 @@ def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, object]:
     pakete = [metadata_aus_wheel(path) for path in wheels]
     direkte = direkte_anforderungen(requirements)
     index = {(str(p["name_normalisiert"]), str(p["version"])) for p in pakete}
-    fehlend = [entry for entry in direkte if (entry["normalisiert"], entry["version"]) not in index]
+    fehlend = [
+        entry
+        for entry in direkte
+        if (entry["normalisiert"], entry["version"]) not in index
+    ]
     if fehlend:
         raise ValueError(f"Direkte Pins fehlen im Wheelhouse: {fehlend}")
 
@@ -101,7 +130,10 @@ def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, object]:
         if sum(1 for p in pakete if p["name_normalisiert"] == name) > 1
     )
     if doppelte:
-        raise ValueError(f"Mehrere Wheels desselben normalisierten Pakets vorhanden: {doppelte}")
+        raise ValueError(
+            "Mehrere Wheels desselben normalisierten Pakets vorhanden: "
+            f"{doppelte}"
+        )
 
     os_release = lese_os_release()
     return {
@@ -132,7 +164,7 @@ def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, object]:
     }
 
 
-def schreibe_artefakte(manifest: dict[str, object], out: Path) -> None:
+def schreibe_artefakte(manifest: dict[str, Any], out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
     manifest_path = out / "WHEELHOUSE_MANIFEST.json"
     manifest_path.write_text(
@@ -140,9 +172,15 @@ def schreibe_artefakte(manifest: dict[str, object], out: Path) -> None:
         encoding="utf-8",
     )
 
-    lines = [f"{paket['sha256']}  wheelhouse/{paket['datei']}" for paket in manifest["pakete"]]  # type: ignore[index]
+    lines = [
+        f"{paket['sha256']}  wheelhouse/{paket['datei']}"
+        for paket in manifest["pakete"]
+    ]
     lines.append(f"{sha256(manifest_path)}  WHEELHOUSE_MANIFEST.json")
-    (out / "WHEELHOUSE_SHA256.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / "WHEELHOUSE_SHA256.txt").write_text(
+        "\n".join(lines) + "\n",
+        encoding="utf-8",
+    )
 
     inventory = {
         "schema": "1.0.0",
@@ -155,7 +193,7 @@ def schreibe_artefakte(manifest: dict[str, object], out: Path) -> None:
                 "license_expression": paket["license_expression"],
                 "requires_dist": paket["requires_dist"],
             }
-            for paket in manifest["pakete"]  # type: ignore[index]
+            for paket in manifest["pakete"]
         ],
     }
     (out / "ABHAENGIGKEITSINVENTAR.json").write_text(
@@ -165,7 +203,9 @@ def schreibe_artefakte(manifest: dict[str, object], out: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Erzeugt das I005 Wheelhouse-Inventar.")
+    parser = argparse.ArgumentParser(
+        description="Erzeugt das I005 Wheelhouse-Inventar."
+    )
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--requirements", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
@@ -173,7 +213,10 @@ def main() -> int:
 
     manifest = baue_manifest(args.wheelhouse, args.requirements)
     schreibe_artefakte(manifest, args.out)
-    print(f"I005-Inventar: {manifest['paketanzahl']} Wheels, {manifest['gesamtbytes']} Bytes")
+    print(
+        f"I005-Inventar: {manifest['paketanzahl']} Wheels, "
+        f"{manifest['gesamtbytes']} Bytes"
+    )
     return 0
 
 
