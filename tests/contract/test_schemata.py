@@ -34,9 +34,9 @@ def test_schema_und_produktversion_sind_getrennte_typen() -> None:
 
     assert str(schema) == "1.0.0"
     assert str(produkt) == "0.1.0-dev"
-    assert schema != produkt
     with pytest.raises(ValueError):
-        SchemaVersion.parse("0.1.0-dev")
+        SchemaVersion.parse(str(produkt))
+    assert ProduktVersion.parse(str(produkt)) == produkt
 
 
 @pytest.mark.contract
