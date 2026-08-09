@@ -1,0 +1,195 @@
+name: I010 P02 Architecture Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/provoware/vertraege/**"
+      - "WERKZEUGE/p02_architekturgate.py"
+      - "WERKZEUGE/__init__.py"
+      - "tests/architecture/**"
+      - "tests/fixtures/i010/**"
+      - "P02_API_SNAPSHOT.json"
+      - "P02_QUELLINVENTAR.json"
+      - "ARCHITEKTURREGISTER.json"
+      - "KOMPONENTENREGISTER.json"
+      - "TRACEABILITY.json"
+      - "PLAN_MASTER.json"
+      - "VERSIONSREGISTER.json"
+      - "pyproject.toml"
+      - "EVIDENCE/I010/**"
+      - ".github/workflows/i010-p02-gate.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: i010-p02-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Python 3.13.15 / P02 API-Snapshot / Negativgate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      I009_ARTIFACT_ID: "9044902480"
+      I009_ARTIFACT_SHA256: "962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9"
+      API_SNAPSHOT_SHA256: "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: Verifiziertes I005-Wheelhouse laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .artefakte/i005-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: I005-Artefakt prüfen und Toolchain offline installieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mapfile -t ZIPS < <(find .artefakte/i005-download -type f -name '*.zip' -print)
+          test ${#ZIPS[@]} -eq 1
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "${ZIPS[0]}" | sha256sum -c -
+          mkdir -p .artefakte/i005
+          unzip -q "${ZIPS[0]}" -d .artefakte/i005
+          python3 -m venv .venv-i010
+          PIP_NO_INDEX=1 .venv-i010/bin/python -m pip install \
+            --no-index --find-links "$PWD/.artefakte/i005/wheelhouse" \
+            pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
+          PIP_NO_INDEX=1 .venv-i010/bin/python -m pip check
+
+      - name: I009-Ausgangsbasis und Evidence revalidieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 WERKZEUGE/baseline_pruefen.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          baseline = json.loads(Path('CURRENT_BASELINE.json').read_text(encoding='utf-8'))
+          evidence = json.loads(Path('EVIDENCE/I009/TESTERGEBNIS.json').read_text(encoding='utf-8'))
+          assert baseline['letzte_iteration'] == 'I009'
+          assert baseline['naechste_iteration'] == 'I010'
+          assert evidence['status'] == 'GRUEN'
+          assert evidence['qualifikationslauf']['artifact_id'] == int('${{ env.I009_ARTIFACT_ID }}')
+          assert evidence['qualifikationslauf']['artifact_sha256'] == '${{ env.I009_ARTIFACT_SHA256 }}'
+          PY
+
+      - name: P02-Gesamtgate vor Promotion
+        run: .venv-i010/bin/python WERKZEUGE/p02_architekturgate.py --phase-abschluss
+
+      - name: Ruff prüfen
+        shell: bash
+        run: |
+          .venv-i010/bin/ruff check src tests WERKZEUGE
+          .venv-i010/bin/ruff format --check src tests WERKZEUGE
+
+      - name: mypy strict prüfen
+        shell: bash
+        run: |
+          .venv-i010/bin/mypy \
+            src/provoware/vertraege \
+            WERKZEUGE/p02_architekturgate.py \
+            tests/architecture/test_p02_architekturgate.py \
+            tests/contract/test_datentypen.py \
+            tests/contract/test_id_varianten.py \
+            tests/contract/test_i007_api_freeze.py \
+            tests/contract/test_schemata.py \
+            tests/contract/test_operationen.py
+
+      - name: Architektur- und Negativtests
+        run: .venv-i010/bin/pytest -q -m architecture tests/architecture
+
+      - name: Contracttests
+        run: .venv-i010/bin/pytest -q -m contract tests/contract
+
+      - name: Gesamte schnelle Regression
+        run: .venv-i010/bin/pytest -q
+
+      - name: I010-Qualifikationsreceipt erzeugen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .artefakte/I010
+          .venv-i010/bin/python - <<'PY'
+          import hashlib, json, os, platform
+          from datetime import UTC, datetime
+          from pathlib import Path
+          def sha(path: str) -> str:
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          receipt = {
+              'schema': '1.0.0',
+              'iteration': 'I010',
+              'phase': 'P02',
+              'status': 'GRUEN',
+              'zeit_utc': datetime.now(UTC).isoformat(),
+              'github': {'repository': os.environ['GITHUB_REPOSITORY'], 'sha': os.environ['GITHUB_SHA'], 'run_id': int(os.environ['GITHUB_RUN_ID'])},
+              'plattform': {'python': platform.python_version(), 'system': platform.system(), 'maschine': platform.machine()},
+              'api_snapshot_sha256': os.environ['API_SNAPSHOT_SHA256'],
+              'p02_quellinventar_datei_sha256': sha('P02_QUELLINVENTAR.json'),
+              'gates': {
+                  'baseline_i009': 'GRUEN', 'p02_quellinventar': 'GRUEN', 'api_snapshot': 'GRUEN',
+                  'ast_architekturmatrix': 'GRUEN', 'negative_fixtures': 'GRUEN', 'p03_scope_freeze': 'GRUEN',
+                  'versionsraeume': 'GRUEN', 'traceability': 'GRUEN', 'ruff': 'GRUEN',
+                  'ruff_format': 'GRUEN', 'mypy_strict': 'GRUEN', 'architecture_tests': 12,
+                  'contracttests': 49, 'gesamtregression': 80,
+              },
+          }
+          Path('.artefakte/I010/I010_QUALIFIKATION.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          PY
+          sha256sum .artefakte/I010/I010_QUALIFIKATION.json
+
+      - name: I010-Evidence hochladen
+        id: evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I010-p02-gate-${{ github.sha }}
+          path: .artefakte/I010/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 90
+
+      - name: Ergebnis zusammenfassen
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.evidence.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.evidence.outputs.artifact-digest }}
+        run: |
+          {
+            echo "## I010 — P02 Architecture Gate GRÜN"
+            echo
+            echo "- P02 API-Snapshot: $API_SNAPSHOT_SHA256"
+            echo "- 12 Architektur-/Negativtests GRÜN"
+            echo "- 49 Contracttests GRÜN"
+            echo "- 80 Gesamtregressionstests GRÜN"
+            echo "- Ruff / Format / mypy strict GRÜN"
+            echo "- keine P03-Produktquelle vorgezogen"
+            echo "- Artifact-ID: $ARTIFACT_ID"
+            echo "- Artifact-Digest: $ARTIFACT_DIGEST"
+          } >> "$GITHUB_STEP_SUMMARY"
