@@ -51,7 +51,7 @@ python3 "$ROOT/WERKZEUGE/wheelhouse_inventar.py" \
   --requirements "$REQ" \
   --out "$OUT"
 
-# Offline-Verifikationsphase: pip darf keinerlei Index verwenden.
+# Offline-Verifikationsphase: pip verwendet ausschließlich lokale Wheels.
 python3 -m venv "$VENV"
 export PIP_NO_INDEX=1
 export PIP_FIND_LINKS="$WHEELHOUSE"
@@ -78,6 +78,9 @@ PY
 "$VENV/bin/pip-audit" --version
 "$VENV/bin/pyinstaller" --version
 
+# Das temporäre venv gehört nicht zum unveränderlichen Artefakt.
+rm -rf "$VENV"
+
 python3 - <<'PY'
 from __future__ import annotations
 
@@ -89,12 +92,14 @@ from pathlib import Path
 
 root = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ.get("GITHUB_WORKSPACE") else Path.cwd()
 out = root / ".artefakte" / "I005"
-manifest = json.loads((out / "WHEELHOUSE_MANIFEST.json").read_text(encoding="utf-8"))
+manifest_path = out / "WHEELHOUSE_MANIFEST.json"
+manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 manifest["status"] = "OFFLINE_INSTALLATION_VERIFIZIERT"
-(out / "WHEELHOUSE_MANIFEST.json").write_text(
+manifest_path.write_text(
     json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
     encoding="utf-8",
 )
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -102,6 +107,13 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+# Finale Hashliste: zuerst alle Wheels, danach das final markierte Manifest.
+lines = []
+for wheel in sorted((out / "wheelhouse").glob("*.whl"), key=lambda item: item.name.lower()):
+    lines.append(f"{sha256(wheel)}  wheelhouse/{wheel.name}")
+lines.append(f"{sha256(manifest_path)}  WHEELHOUSE_MANIFEST.json")
+(out / "WHEELHOUSE_SHA256.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 qualification = {
     "schema": "1.0.0",
@@ -121,12 +133,14 @@ qualification = {
         "python": "3.13.15",
         "pip_resolver": "25.2",
         "download": "nur Wheels; --only-binary=:all:",
-        "offline_install": "--no-index + lokales --find-links",
+        "offline_install": "PIP_NO_INDEX=1 + --no-index + lokales --find-links",
         "pip_check": "GRUEN",
         "import_smoke": "GRUEN",
     },
-    "manifest_sha256": sha256(out / "WHEELHOUSE_MANIFEST.json"),
+    "manifest_sha256": sha256(manifest_path),
+    "hashliste_sha256": sha256(out / "WHEELHOUSE_SHA256.txt"),
     "freeze_sha256": sha256(out / "OFFLINE_FREEZE.txt"),
+    "abhaengigkeitsinventar_sha256": sha256(out / "ABHAENGIGKEITSINVENTAR.json"),
 }
 (out / "I005_QUALIFIKATION.json").write_text(
     json.dumps(qualification, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -134,26 +148,4 @@ qualification = {
 )
 PY
 
-# Das temporäre venv gehört nicht zum unveränderlichen Artefakt.
-rm -rf "$VENV"
-
-# Hashliste nach finalem Manifeststatus neu erzeugen.
-python3 "$ROOT/WERKZEUGE/wheelhouse_inventar.py" \
-  --wheelhouse "$WHEELHOUSE" \
-  --requirements "$REQ" \
-  --out "$OUT"
-python3 - <<'PY'
-from pathlib import Path
-import json
-import os
-
-root = Path(os.environ["GITHUB_WORKSPACE"]) if os.environ.get("GITHUB_WORKSPACE") else Path.cwd()
-out = root / ".artefakte" / "I005"
-manifest_path = out / "WHEELHOUSE_MANIFEST.json"
-data = json.loads(manifest_path.read_text(encoding="utf-8"))
-data["status"] = "OFFLINE_INSTALLATION_VERIFIZIERT"
-manifest_path.write_text(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-PY
-
-# Qualifikationsdatei und Freeze bleiben erhalten; SHA-Liste für alle Wheels ist bereits deterministisch.
 echo "I005: GRÜN — Wheelhouse erzeugt und offline verifiziert."
