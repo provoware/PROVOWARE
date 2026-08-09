@@ -1,0 +1,40 @@
+{
+  "baseline": "BASELINE-2026-08-09-I006",
+  "github_qualifikation": {
+    "artifact_bytes": 589370103,
+    "artifact_id": 9043695271,
+    "artifact_mb": 589.370103,
+    "artifact_sha256": "2476edbc28565e65f0dfde95a720ad8f927a694955644700c0085caa3e9cdbf7",
+    "end_to_end_installation": "GRUEN",
+    "workflow_run_id": 31333763347
+  },
+  "installation": {
+    "automatisch_nach_start": true,
+    "backup": true,
+    "baseline_pruefung": true,
+    "einzelhashes": true,
+    "gesamthash": true,
+    "offline": true,
+    "rollback": true,
+    "standardziel": "~/PROVOWARE",
+    "zip_integritaet": true
+  },
+  "projektversion": "0.1.0-dev",
+  "referenzpaket": {
+    "bytes": 295210603,
+    "mb": 295.210603,
+    "mib": 281.53477,
+    "sha256": "9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17",
+    "teil_001_bis_011_mb": 25.165824,
+    "teil_012_mb": 18.386539,
+    "teile": 12
+  },
+  "schema": "1.0.0",
+  "speicherstrategie": {
+    "git_textdateien": true,
+    "grosse_binaerdaten": "GitHub Actions Artefakt",
+    "grund": "Git-Historie nicht dauerhaft um rund 295 MB pro Iteration aufblasen."
+  },
+  "status": "VALIDIERT_GITHUB",
+  "transfer_version": "1.0.0"
+}

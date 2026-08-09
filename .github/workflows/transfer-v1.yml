@@ -1,0 +1,274 @@
+name: PROVOWARE Transfer V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "TRANSFER/**"
+      - ".github/workflows/transfer-v1.yml"
+      - "PROJEKTSTATUS.json"
+      - "CURRENT_BASELINE.json"
+      - "README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - "TRANSFER/**"
+      - ".github/workflows/transfer-v1.yml"
+      - "PROJEKTSTATUS.json"
+      - "CURRENT_BASELINE.json"
+      - "README.md"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: transfer-v1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bauen-und-pruefen:
+    name: Transfer V1 bauen und End-to-End prüfen
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      I006_RUN_ID: "31331742667"
+      I006_ARTIFACT_ID: "9043135144"
+      I006_ARTIFACT_SHA256: "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636"
+      BASELINE: "BASELINE-2026-08-09-I006"
+      TEIL_MIB: "24"
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: I005-Wheelhouse-Artefakt herunterladen
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .transfer_build/i005
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: true
+          digest-mismatch: error
+
+      - name: I006-Evidence-Artefakt herunterladen
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I006_ARTIFACT_ID }}
+          path: .transfer_build/i006
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I006_RUN_ID }}
+          skip-decompress: true
+          digest-mismatch: error
+
+      - name: Externe Artefakte bytegenau prüfen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          I005_ZIP="$(find .transfer_build/i005 -type f -name '*.zip' -print -quit)"
+          I006_ZIP="$(find .transfer_build/i006 -type f -name '*.zip' -print -quit)"
+          test -n "$I005_ZIP"
+          test -n "$I006_ZIP"
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "$I005_ZIP" | sha256sum -c -
+          printf '%s  %s\n' "$I006_ARTIFACT_SHA256" "$I006_ZIP" | sha256sum -c -
+          echo "I005_ZIP=$I005_ZIP" >> "$GITHUB_ENV"
+          echo "I006_ZIP=$I006_ZIP" >> "$GITHUB_ENV"
+
+      - name: Repo-Baseline prüfen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 WERKZEUGE/baseline_pruefen.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("PROJEKTSTATUS.json").read_text(encoding="utf-8"))
+          assert data["aktuelle_baseline"] == "BASELINE-2026-08-09-I006"
+          PY
+
+      - name: Vollständiges Übergabe-ZIP bauen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, shutil, zipfile
+
+          root = Path.cwd()
+          work = root / ".transfer_build"
+          stage = work / "stage" / "PROVOWARE"
+          if stage.parent.exists():
+              shutil.rmtree(stage.parent)
+          stage.mkdir(parents=True)
+
+          for path in root.rglob("*"):
+              rel = path.relative_to(root)
+              if rel.parts and rel.parts[0] in {".git", ".transfer_build"}:
+                  continue
+              target = stage / rel
+              if path.is_dir():
+                  target.mkdir(parents=True, exist_ok=True)
+              elif path.is_file():
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(path, target)
+
+          artifacts = stage / "UEBERGABE" / "ARTEFAKTE"
+          artifacts.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(Path(os.environ["I005_ZIP"]), artifacts / "PROVOWARE-I005-wheelhouse.zip")
+          shutil.copy2(Path(os.environ["I006_ZIP"]), artifacts / "PROVOWARE-I006-clean-bootstrap.zip")
+
+          out = work / "ausgabe"
+          out.mkdir(parents=True, exist_ok=True)
+          full = out / "PROVOWARE_v0.1.0-dev_I006_TRANSFER_V1_VOLLSTAENDIG.zip"
+          with zipfile.ZipFile(full, "w", compression=zipfile.ZIP_STORED, allowZip64=True) as archive:
+              for item in sorted(stage.rglob("*")):
+                  if item.is_file():
+                      archive.write(item, arcname=(Path("PROVOWARE") / item.relative_to(stage)).as_posix())
+
+          with zipfile.ZipFile(full, "r") as archive:
+              bad = archive.testzip()
+              if bad is not None:
+                  raise SystemExit(f"ZIP-Integritätsfehler: {bad}")
+          PY
+
+      - name: Transferteile und Manifest erzeugen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          OUT=".transfer_build/ausgabe"
+          FULL="$OUT/PROVOWARE_v0.1.0-dev_I006_TRANSFER_V1_VOLLSTAENDIG.zip"
+          python3 TRANSFER/transferpaket_bauen.py \
+            "$FULL" \
+            "$OUT/TEILE_TMP" \
+            --teil-mib "$TEIL_MIB" \
+            --baseline "$BASELINE"
+          mv "$OUT"/TEILE_TMP/PROVOWARE_TRANSFER.teil*.pvpart "$OUT"/
+          mv "$OUT/TEILE_TMP/PROVOWARE_TRANSFER_MANIFEST.json" "$OUT"/
+          rmdir "$OUT/TEILE_TMP"
+
+      - name: Installer an neues Manifest binden
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          out = Path(".transfer_build/ausgabe")
+          manifest = (out / "PROVOWARE_TRANSFER_MANIFEST.json").read_text(encoding="utf-8").rstrip()
+          template = Path("TRANSFER/PROVOWARE_INSTALLIEREN_TEMPLATE.sh").read_text(encoding="utf-8")
+          marker = "__PROVOWARE_TRANSFER_MANIFEST_JSON__"
+          if template.count(marker) != 1:
+              raise SystemExit("Installer-Template-Marker fehlt oder ist mehrfach vorhanden.")
+          target = out / "PROVOWARE_INSTALLIEREN.sh"
+          target.write_text(template.replace(marker, manifest), encoding="utf-8")
+          target.chmod(0o755)
+          PY
+          cp TRANSFER/LAIENANLEITUNG_PROVOWARE_TRANSFER.txt .transfer_build/ausgabe/
+
+      - name: Repo-generierten Transfer End-to-End installieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          OUT="$PWD/.transfer_build/ausgabe"
+          TESTHOME="$PWD/.transfer_build/testhome"
+          mkdir -p "$TESTHOME"
+          HOME="$TESTHOME" bash "$OUT/PROVOWARE_INSTALLIEREN.sh"
+          test -f "$TESTHOME/PROVOWARE/TRANSFER/INSTALLATIONSNACHWEIS.json"
+          HOME="$TESTHOME" python3 "$TESTHOME/PROVOWARE/WERKZEUGE/baseline_pruefen.py"
+
+      - name: Größen, Prüfsummen und Testnachweis erzeugen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile
+
+          out = Path(".transfer_build/ausgabe")
+
+          def sha256(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open("rb") as f:
+                  for block in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(block)
+              return h.hexdigest()
+
+          files = sorted(p for p in out.iterdir() if p.is_file())
+          (out / "SHA256SUMMEN.txt").write_text(
+              "\n".join(f"{sha256(p)}  {p.name}" for p in files) + "\n",
+              encoding="utf-8",
+          )
+
+          sizes = []
+          for p in files:
+              size = p.stat().st_size
+              sizes.append({
+                  "datei": p.name,
+                  "bytes": size,
+                  "mb": round(size / 1_000_000, 6),
+                  "mib": round(size / 1024 / 1024, 6),
+                  "sha256": sha256(p),
+              })
+
+          report = {
+              "schema": "1.0.0",
+              "status": "GRUEN",
+              "baseline": "BASELINE-2026-08-09-I006",
+              "github_sha": "${{ github.sha }}",
+              "runner": "ubuntu-22.04",
+              "python": "3.13.15",
+              "teil_mib": 24,
+              "dateien": sizes,
+              "end_to_end_installation": "GRUEN",
+              "netzwerk_im_installationspfad": False,
+          }
+          (out / "TRANSFER_TESTERGEBNIS.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          starter = out / "PROVOWARE_TRANSFER_STARTER.zip"
+          with zipfile.ZipFile(starter, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+              for name in [
+                  "PROVOWARE_INSTALLIEREN.sh",
+                  "PROVOWARE_TRANSFER_MANIFEST.json",
+                  "LAIENANLEITUNG_PROVOWARE_TRANSFER.txt",
+                  "SHA256SUMMEN.txt",
+                  "TRANSFER_TESTERGEBNIS.json",
+              ]:
+                  zf.write(out / name, arcname=name)
+          PY
+
+      - name: Artefaktinhalt anzeigen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ls -lh .transfer_build/ausgabe
+          echo
+          cat .transfer_build/ausgabe/TRANSFER_TESTERGEBNIS.json
+
+      - name: Vollständiges Transfer-Artefakt hochladen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I006-TRANSFER-V1-${{ github.sha }}
+          path: .transfer_build/ausgabe/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

@@ -12,6 +12,9 @@
 8. Alle maschinenlesbaren Projektwahrheiten besitzen eine eindeutige autoritative Datei.
 9. Netzwerkzugriff ist kein Bestandteil der Laufzeit-Kernfunktion.
 10. Erst nach grünem kritischen PoA-Pfad beginnt breiter V1-Ausbau.
+11. Jede Installations-, Build-, Recovery- oder Bedienanleitung enthält alle benötigten Befehle vollständig, kopierbar und in korrekter Reihenfolge.
+12. Größen von Downloads, Artefakten und Transferteilen werden nutzerseitig zusätzlich in MB angegeben.
+13. Große Übergabebinärdaten werden bevorzugt als reproduzierbare GitHub-Actions-Artefakte erzeugt, statt die Git-Historie dauerhaft aufzublähen; Hashes und Buildlogik bleiben im Repository.
 
 ## Iterationsablauf
 

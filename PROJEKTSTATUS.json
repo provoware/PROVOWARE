@@ -20,6 +20,19 @@
   "repository": "https://github.com/provoware/PROVOWARE",
   "schema": "1.0.0",
   "status": "IN_ARBEIT",
+  "transfer_v1_qualifikation": {
+    "artifact_bytes": 589370103,
+    "artifact_id": 9043695271,
+    "artifact_mb": 589.370103,
+    "artifact_sha256": "2476edbc28565e65f0dfde95a720ad8f927a694955644700c0085caa3e9cdbf7",
+    "end_to_end_installation": "GRUEN",
+    "referenz_gesamtarchiv_mb": 295.210603,
+    "referenz_gesamtarchiv_sha256": "9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17",
+    "status": "VALIDIERT_GITHUB",
+    "teile": 12,
+    "teilgroesse_mib": 24,
+    "workflow_run_id": 31333763347
+  },
   "version": "0.1.0-dev",
   "wheelhouse_qualifikation": {
     "status": "VALIDIERT",

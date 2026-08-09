@@ -1,1 +1,13 @@
-{"schema":"1.0.0","regeln":[{"id":"REG-001","text":"Nie auf unbekannter Baseline patchen.","klasse":"PFLICHT"},{"id":"REG-002","text":"Keine neue Arbeit still in laufenden Patch mischen.","klasse":"PFLICHT"},{"id":"REG-003","text":"Stable/Evidence nie still verändern.","klasse":"PFLICHT"},{"id":"REG-004","text":"Unbekannter Pflichtzustand ist nicht GRÜN.","klasse":"PFLICHT"},{"id":"REG-005","text":"Kernfunktion bleibt offline.","klasse":"PFLICHT"}]}
+{
+  "regeln": [
+    {"id":"REG-001","klasse":"PFLICHT","text":"Nie auf unbekannter Baseline patchen."},
+    {"id":"REG-002","klasse":"PFLICHT","text":"Keine neue Arbeit still in laufenden Patch mischen."},
+    {"id":"REG-003","klasse":"PFLICHT","text":"Stable/Evidence nie still verändern."},
+    {"id":"REG-004","klasse":"PFLICHT","text":"Unbekannter Pflichtzustand ist nicht GRÜN."},
+    {"id":"REG-005","klasse":"PFLICHT","text":"Kernfunktion bleibt offline."},
+    {"id":"REG-006","klasse":"PFLICHT","text":"Jede Installations-, Build-, Recovery- oder Bedienanleitung enthält alle benötigten Befehle vollständig, kopierbar und in richtiger Reihenfolge."},
+    {"id":"REG-007","klasse":"PFLICHT","text":"Download-, Artefakt- und Transfergrößen werden in nutzerseitigen Übersichten zusätzlich in MB angegeben."},
+    {"id":"REG-008","klasse":"PFLICHT","text":"Große reproduzierbare Binärartefakte werden bevorzugt über GitHub Actions erzeugt und gehasht, statt die normale Git-Historie dauerhaft aufzublähen."}
+  ],
+  "schema": "1.0.0"
+}
