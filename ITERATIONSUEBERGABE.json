@@ -1,75 +1,75 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I010",
-  "next_goal": "P02 durch ein kombiniertes Architektur- und Vertragsgate über I007-I009 schließen und erst danach P03 freigeben.",
-  "why_next": "I007 qualifiziert Identitäten, Status, Fehler und Ergebnisinvarianten; I008 qualifiziert versionierte Manifest-/Projektschemata; I009 qualifiziert die kanonische Request-/Result-Grenze. I010 muss diese drei Schichten nun als gemeinsame unverletzbare P02-Architekturbasis prüfen, bevor Plattform-, Persistenz- oder GUI-Code beginnen darf.",
+  "next_iteration": "I011",
+  "next_goal": "Linux-Systemprofil und X11-Erkennung als erste P03-Plattformgrenze implementieren; Ubuntu 22.04 und 24.04 müssen über deterministische Profile qualifiziert werden.",
+  "why_next": "P02 ist durch I010 vollständig qualifiziert und als VALIDIERT geschlossen. Der Masterplan gibt danach P03 frei und nennt für I011 ausdrücklich Linux-Systemprofil und X11-Erkennung im Bereich PLATTFORM/linux mit 22.04-/24.04-Profilen als Abnahmekern.",
   "priority": "P0",
-  "probable_component": "WERKZEUGE/p02_architekturgate.py",
+  "probable_component": "src/provoware/plattform/linux.py",
   "probable_files": [
-    "WERKZEUGE/p02_architekturgate.py",
-    "tests/architecture/test_p02_architekturgate.py",
-    "tests/fixtures/i010/",
+    "src/provoware/plattform/__init__.py",
+    "src/provoware/plattform/linux.py",
+    "tests/platform/test_linux_systemprofil.py",
+    "tests/fixtures/i011/ubuntu-22.04-x11.json",
+    "tests/fixtures/i011/ubuntu-24.04-x11.json",
     "ARCHITEKTURREGISTER.json",
     "KOMPONENTENREGISTER.json",
     "TRACEABILITY.json",
     "PLAN_MASTER.json",
-    "EVIDENCE/I010/",
-    ".github/workflows/i010-p02-gate.yml"
+    "EVIDENCE/I011/",
+    ".github/workflows/i011-linux-profil.yml"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-09-I009",
-    "i009_workflow_run_id": 31337914639,
-    "i009_artifact_id": 9044902480,
-    "i009_artifact_sha256": "962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9",
-    "i009_receipt_sha256": "46b8bb9f9f6fa215f70c7fb89fe7afaf884ece0918e02055daa11eb5e4a05e23",
-    "i009_main_merge_commit": "5f94bfc43c038530738d1a320ba6c9a050b39a17"
+    "baseline": "BASELINE-2026-08-10-I010",
+    "i010_workflow_run_id": 31339417368,
+    "i010_artifact_id": 9045351696,
+    "i010_artifact_sha256": "6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9",
+    "i010_receipt_sha256": "cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee",
+    "p02_api_snapshot_sha256": "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16",
+    "i010_main_merge_commit": "7dfe6d2cf039d9b974bad464ed0efa0aa6eec998"
   },
   "known_dependencies": [
-    "BASELINE-2026-08-09-I009",
-    "KMP-VERTRAEGE validiert",
-    "KMP-SCHEMATA validiert",
-    "KMP-OPERATIONEN validiert",
-    "ARCH-008 bis ARCH-012 aktiv",
-    "I007 öffentliche API eingefroren",
-    "Manifest-, Projekt- und Operationsschema unabhängig versioniert",
-    "I007-, I008- und I009-Regressionsworkflows auf finalem I009-Head grün"
+    "P00-P02 vollständig VALIDIERT",
+    "P02_API_SNAPSHOT.json eingefroren",
+    "P02_QUELLINVENTAR.json hashgebunden",
+    "I010-Negativgate blockiert Architekturdrift",
+    "Zielplattform Ubuntu 22.04/24.04 amd64 X11",
+    "X11-first bleibt Zielstrategie"
   ],
   "preconditions": [
-    "I009-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
-    "öffentliche Exporte von I007-I009 als API-Snapshot erfassen",
-    "ID-Präfixe, Statuswerte, Fehlerklassen und OperationErgebnis-Invarianten unverändert prüfen",
-    "Manifest-, Projekt- und Operationsschema sowie deren Versionsnamensräume getrennt prüfen",
-    "AST-basierte Abhängigkeitsgrenzen für sämtliche P02-Produktdateien gemeinsam prüfen",
-    "keine neue Produktfunktion oder P03-Implementierung während I010 einführen"
+    "I010-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
+    "P02-Gate im Nach-Promotion-Modus erneut grün bestätigen",
+    "Systemerkennung von GUI, Persistenz und Dateischreiblogik trennen",
+    "Erkennungsquellen explizit und injizierbar modellieren statt Tests an den CI-Host zu koppeln",
+    "Ubuntu-/Architektur-/Sessionwerte fail-closed beziehungsweise strukturiert als unterstützt, eingeschränkt oder unbekannt klassifizieren",
+    "keine Pfadnormalisierung, atomare Dateischreibprimitive oder Lock-Logik aus I012-I014 vorziehen"
   ],
   "expected_tests": [
-    "vollständiger öffentlicher API-Snapshot I007-I009",
-    "exaktes Produktquellinventar für den P02-Stand",
-    "AST-Abhängigkeitsmatrix ohne Qt, SQLite, Datei-I/O, Handler, Module oder Persistenz",
-    "Schema-/Produkt-/Operationsversions-Trennung",
-    "deterministische Manifest-, Projekt-, Request-, Result- und Payload-Serialisierung",
-    "Golden-Fixtures I008 und I009 unverändert grün",
-    "mypy --strict für die gesamte Vertragsschicht",
-    "Ruff Check und Format",
-    "vollständige Contract- und Gesamtregression",
-    "Traceability-Nachweis Architektur -> Komponente -> Code -> Test -> Evidence",
-    "reproduzierbare I010-Qualifikation aus dem verifizierten I005-Wheelhouse"
+    "Ubuntu 22.04 amd64 X11 Profil",
+    "Ubuntu 24.04 amd64 X11 Profil",
+    "Wayland wird erkannt, aber nicht fälschlich als X11 qualifiziert",
+    "fehlendes oder widersprüchliches Session-Signal wird strukturiert als unbekannt gemeldet",
+    "nicht-amd64 Architektur wird nicht als V1-Zielplattform qualifiziert",
+    "os-release Parsing mit fehlenden und unbekannten Feldern",
+    "deterministischer Profil-Fingerprint bei gleichen Eingaben",
+    "keine Qt-, SQLite-, Persistenz- oder Fachmodulabhängigkeit",
+    "P02_API_SNAPSHOT bleibt byte- und fingerprintstabil",
+    "Ruff, mypy strict und vollständige Regression"
   ],
   "done_criteria": [
-    "P02 besitzt ein einziges reproduzierbares grünes Gesamtgate",
-    "I007-I009 öffentliche API und Architekturgrenzen sind maschinenlesbar eingefroren",
-    "keine verbotene Abhängigkeit oder unregistrierte Produktdatei existiert",
-    "Traceability und Evidence sind für P02 geschlossen",
-    "PLAN_MASTER markiert P02 erst nach erfolgreicher Gesamtqualifikation als VALIDIERT",
-    "I011/P03 wird erst nach Promotion von I010 freigegeben"
+    "Linux-Systemprofil besitzt eine eindeutige typisierte öffentliche Form",
+    "X11-Erkennung ist von Umgebungs-/OS-Probes getrennt und reproduzierbar testbar",
+    "Ubuntu 22.04 und 24.04 amd64 X11 sind über Golden-Profile grün qualifiziert",
+    "nicht unterstützte oder unbekannte Plattformzustände werden nicht als unterstützt ausgegeben",
+    "P02-Verträge und Snapshot bleiben unverändert",
+    "I012 wird erst nach grüner I011-Promotion freigegeben"
   ],
   "known_risks": [
-    "ein Gate, das nur einzelne Dateien statt die komplette P02-Schicht prüft, könnte Architekturdrift über neue Dateien übersehen",
-    "ein API-Snapshot ohne strukturierte Migrationsregel könnte spätere legitime Vertragsänderungen unnötig blockieren",
-    "P03-Code vor Abschluss von I010 würde die Schichtgrenze verwischen"
+    "nur DISPLAY zu prüfen würde XWayland und echte X11-Sitzungen vermischen",
+    "CI-Hostdaten ohne injizierbare Probes würden Tests nicht reproduzierbar machen",
+    "zu frühe Dateisystemlogik würde I011 mit I012-I014 vermischen"
   ],
   "open_subpoints": [
-    "I010 ausschließlich als Gate-/Evidence-Iteration halten",
-    "nach grünem I010 P02 atomar auf VALIDIERT setzen und I011 als ersten P03-Schritt übergeben"
+    "I011 strikt auf read-only Plattformprofil und X11-Erkennung begrenzen",
+    "I012 Pfadnormalisierung und Projektwurzel-Schutz erst nach I011 beginnen"
   ]
 }
