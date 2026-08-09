@@ -1,1 +1,32 @@
-{"schema":"1.0.0","iteration":"I005","status":"VORBEREITET_NICHT_QUALIFIZIERT","zielplattform":"Ubuntu 22.04 amd64","python":"3.13.15","erwartete_pakete":["PySide6==6.11.1","pytest==9.1.1","ruff==0.16.1","mypy==2.3.0","bandit==1.9.4","pip-audit==2.10.1","PyInstaller==6.21.0"],"blocker":"Wheel-Binaries und Transitivabhängigkeiten müssen auf qualifizierter Buildbasis beschafft und gehasht werden."}
+{
+  "schema": "1.0.0",
+  "iteration": "I005",
+  "status": "BUILDER_BEREIT_AUSFUEHRUNG_AUSSTEHEND",
+  "zielplattform": "Ubuntu 22.04 amd64",
+  "python": "3.13.15",
+  "pip_resolver": "25.2",
+  "erwartete_pakete": [
+    "pip==25.2",
+    "setuptools==80.9.0",
+    "wheel==0.45.1",
+    "PySide6==6.11.1",
+    "pytest==9.1.1",
+    "ruff==0.16.1",
+    "mypy==2.3.0",
+    "bandit==1.9.4",
+    "pip-audit==2.10.1",
+    "PyInstaller==6.21.0"
+  ],
+  "qualifikationskriterien": [
+    "Runner ist Ubuntu 22.04 amd64",
+    "CPython ist exakt 3.13.15",
+    "alle Artefakte sind Wheels; keine Source-Distribution",
+    "SHA-256 je Wheel vorhanden",
+    "Lizenz- und Requires-Dist-Metadaten inventarisiert",
+    "frisches venv installiert ausschliesslich mit --no-index aus lokalem Wheelhouse",
+    "pip check ist gruen",
+    "PySide6/pytest/mypy/PyInstaller Import-Smoke ist gruen",
+    "Ruff/Bandit/pip-audit/PyInstaller CLI-Smoke ist gruen"
+  ],
+  "blocker": "I005 gilt erst nach gruenem GitHub-Actions-Lauf und verifiziertem Artefakt als abgeschlossen."
+}
