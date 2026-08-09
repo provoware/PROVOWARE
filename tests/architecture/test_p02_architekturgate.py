@@ -70,9 +70,7 @@ def test_negativfixtures_schalten_architekturgate_nachweisbar_rot(fixture: str, 
 def test_unregistrierte_p02_produktdatei_wird_abgewiesen(tmp_path: Path) -> None:
     root = _minimaler_quellbaum(tmp_path)
     ziel = root / "src/provoware/vertraege/unerlaubt.py"
-    ziel.write_text(
-        _fixture("unregistrierte_vertragsdatei.py.fixture").read_text(encoding="utf-8")
-    )
+    ziel.write_text(_fixture("unregistrierte_vertragsdatei.py.fixture").read_text(encoding="utf-8"))
     with pytest.raises(P02GateFehler) as exc_info:
         pruefe_quellinventar(root)
     assert exc_info.value.code == "P02_UNREGISTRIERTE_PRODUKTDATEI"
