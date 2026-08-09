@@ -1,0 +1,20 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I010",
+  "status": "IN_QUALIFIKATION",
+  "ziel": "P02 als einheitliches Architektur- und Vertragsgate schließen, ohne P03-Code vorzuziehen.",
+  "schritte": [
+    "kanonischen P02-API-Snapshot mit SHA-256-Fingerprint erzeugen",
+    "hashgebundenes P02-Quellinventar erzeugen",
+    "kombiniertes AST-/API-/Versions-/Traceability-Gate implementieren",
+    "negative Architektur-Fixtures für SQLite, Qt, Handler, Datei-I/O und unregistrierte Quellen ergänzen",
+    "Ruff, Ruff Format, mypy strict, Architekturtests, 49 Contracttests und Gesamtregression aus I005-Wheelhouse ausführen",
+    "GitHub-Evidence erzeugen und erst danach P02 auf VALIDIERT promovieren"
+  ],
+  "scope_freeze": [
+    "keine P03-Produktdatei",
+    "keine Qt-Funktion",
+    "keine SQLite-Funktion",
+    "keine Persistenz-, Handler- oder Dateisystemfunktion"
+  ]
+}
