@@ -11,15 +11,20 @@ from provoware.vertraege.datentypen import (
     RevisionId,
     Status,
 )
+from provoware.vertraege.schemata import ManifestSchema, ProjektSchema, SCHEMA_VERSION, SchemaFehler
 
 __all__ = [
     "ChangeId",
     "FehlerInfo",
     "Fehlerklasse",
+    "ManifestSchema",
     "ObjektId",
     "OperationErgebnis",
     "OperationId",
     "ProjektId",
+    "ProjektSchema",
     "RevisionId",
+    "SCHEMA_VERSION",
+    "SchemaFehler",
     "Status",
 ]
