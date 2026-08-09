@@ -1,0 +1,54 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I008",
+  "status": "GRUEN",
+  "qualifikationslauf": {
+    "workflow_run_id": 31336525158,
+    "job_id": 93303182647,
+    "branch_head": "385ed6c1a069c13ec2814de232d79bacc06f41da",
+    "pr_merge_ref": "9bf74319ff3588265a054664387549177a2a41f7",
+    "artifact_id": 9044499048,
+    "artifact_bytes": 618,
+    "artifact_mb": 0.000618,
+    "artifact_sha256": "8115fb9326ad2f2daed44b6d2c0f65c016d824d1290bb09203a57a827fae75db",
+    "receipt_sha256": "dfd73aaebd746f0f4bba511ed183afeef3a33349da0c880dcc2bf8ce810fbb8e"
+  },
+  "plattform": {
+    "ubuntu": "22.04.5 LTS",
+    "architektur": "x86_64",
+    "python": "3.13.15"
+  },
+  "toolchain": {
+    "quelle": "verifiziertes I005-Wheelhouse",
+    "pytest": "9.1.1",
+    "ruff": "0.16.1",
+    "mypy": "2.3.0",
+    "offline_installation": true
+  },
+  "ergebnisse": {
+    "i007_baseline": "GRUEN / 17 Register",
+    "i007_api_freeze": "GRUEN",
+    "schema_produktversion_trennung": "GRUEN",
+    "golden_fixtures": "GRUEN",
+    "ruff_check": "GRUEN",
+    "ruff_format": "GRUEN / 15 Dateien",
+    "mypy_strict": "GRUEN / 7 Quelldateien",
+    "contracttests": "30 bestanden",
+    "gesamtregression": "48 bestanden",
+    "architektur_importgrenze": "GRUEN / AST-basiert"
+  },
+  "korrigierte_fehlversuche": [
+    {
+      "ursache": "Ruff meldete Sortier-, Zeilenlängen- und Formatabweichungen im ersten Schemaentwurf.",
+      "korrektur": "Öffentliche Exporte, Tests und Schemacode wurden exakt auf Ruff 0.16.1 ausgerichtet."
+    },
+    {
+      "ursache": "mypy strict erkannte direkte Vergleiche der absichtlich getrennten SchemaVersion- und ProduktVersion-Typen als statisch unvereinbar.",
+      "korrektur": "Die Typtrennung wird über getrennte Parser- und Validierungsverträge geprüft, nicht über typwidrige Vergleichsausdrücke."
+    },
+    {
+      "ursache": "Der erste Architekturwächter suchte verbotene Modulnamen als Text und interpretierte dadurch eine erklärende Docstring-Erwähnung als Import.",
+      "korrektur": "Die Architekturgrenze wird semantisch über den Python-AST auf echte Imports und open()-Dateizugriffe geprüft."
+    }
+  ]
+}
