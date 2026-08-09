@@ -41,8 +41,8 @@ def test_schema_und_produktversion_sind_getrennte_typen() -> None:
 
 @pytest.mark.contract
 def test_autoritative_schema_versionen_sind_stabil() -> None:
-    assert MANIFEST_SCHEMA_VERSION == SchemaVersion("1.0.0")
-    assert PROJEKT_SCHEMA_VERSION == SchemaVersion("1.0.0")
+    assert SchemaVersion("1.0.0") == MANIFEST_SCHEMA_VERSION
+    assert SchemaVersion("1.0.0") == PROJEKT_SCHEMA_VERSION
 
 
 @pytest.mark.contract
