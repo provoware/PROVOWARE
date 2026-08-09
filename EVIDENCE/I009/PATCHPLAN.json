@@ -1,0 +1,39 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I009",
+  "ziel": "OperationRequest und OperationResult als strikt typisierte, deterministische und handlerunabhängige Operationsverträge qualifizieren",
+  "scope": [
+    "I008-Regressionsworkflow promotionsfest korrigieren",
+    "OperationArt als validierten Werttyp definieren",
+    "OperationPayload tief validieren, kanonisieren und begrenzen",
+    "OperationRequest mit OperationId, Schema, Art und Payload definieren",
+    "OperationResult ausschließlich auf OperationErgebnis und FehlerInfo aufbauen",
+    "Request/Result-Korrelation über OperationId erzwingen",
+    "deterministische JSON-Serialisierung und SHA-256-Fingerprints bereitstellen",
+    "kanonische gültige und ungültige Golden-Fixtures ergänzen",
+    "Architektur-, Komponenten-, Versions- und Traceability-Register aktualisieren",
+    "I009-CI ausschließlich aus verifiziertem I005-Wheelhouse qualifizieren"
+  ],
+  "nicht_scope": [
+    "Handler oder Dispatcher",
+    "Command-Ausführung",
+    "SQLite oder Persistenz",
+    "Dateischreiblogik",
+    "Qt oder GUI",
+    "Revision, Undo oder Transaktion",
+    "Moduloperationen"
+  ],
+  "gates": [
+    "aktuelle Baseline GRUEN",
+    "historische I008-Evidence hashgebunden GRUEN",
+    "I007-Regressionsworkflow GRUEN",
+    "I008-Regressionsworkflow GRUEN",
+    "Ruff Check und Format GRUEN",
+    "mypy strict GRUEN",
+    "I009 Golden-Fixtures GRUEN",
+    "Architekturimportgrenze GRUEN",
+    "Contracttests GRUEN",
+    "Gesamtregression GRUEN"
+  ],
+  "rueckweg": "main bleibt bis zur vollständig grünen PR-Qualifikation unverändert; unmittelbar vor Promotion wird der aktuelle I008-main-Stand als Backupzweig gesichert."
+}
