@@ -56,7 +56,6 @@ jobs:
       I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PIP_NO_INPUT: "1"
-      PIP_NO_INDEX: "1"
       PYTHONHASHSEED: "0"
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
@@ -94,11 +93,11 @@ jobs:
           mkdir -p .artefakte/i005
           unzip -q "$ZIP" -d .artefakte/i005
           python3 -m venv .venv-i007
-          .venv-i007/bin/python -m pip install \
+          PIP_NO_INDEX=1 .venv-i007/bin/python -m pip install \
             --no-index \
             --find-links "$PWD/.artefakte/i005/wheelhouse" \
             pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
-          .venv-i007/bin/python -m pip check
+          PIP_NO_INDEX=1 .venv-i007/bin/python -m pip check
 
       - name: Baseline vor I007 prüfen
         shell: bash
@@ -112,7 +111,7 @@ jobs:
 
       - name: mypy strict für Vertragsschicht
         shell: bash
-        run: .venv-i007/bin/mypy src/provoware/vertraege tests/contract/test_datentypen.py
+        run: .venv-i007/bin/mypy src/provoware/vertraege tests/contract/test_datentypen.py tests/contract/test_id_varianten.py
 
       - name: Contracttests
         shell: bash
