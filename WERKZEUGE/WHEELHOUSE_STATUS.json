@@ -1,1 +1,43 @@
-{"schema":"1.0.0","iteration":"I005","status":"VORBEREITET_NICHT_QUALIFIZIERT","zielplattform":"Ubuntu 22.04 amd64","python":"3.13.15","erwartete_pakete":["PySide6==6.11.1","pytest==9.1.1","ruff==0.16.1","mypy==2.3.0","bandit==1.9.4","pip-audit==2.10.1","PyInstaller==6.21.0"],"blocker":"Wheel-Binaries und Transitivabhängigkeiten müssen auf qualifizierter Buildbasis beschafft und gehasht werden."}
+{
+  "schema": "1.0.0",
+  "iteration": "I005",
+  "status": "VALIDIERT",
+  "zielplattform": "Ubuntu 22.04 amd64",
+  "tatsaechliche_plattform": "Ubuntu 22.04.5 LTS x86_64",
+  "python": "3.13.15",
+  "pip_resolver": "25.2",
+  "paketanzahl": 50,
+  "wheel_bytes": 294428822,
+  "direkte_pins": 10,
+  "offline_installation": "GRUEN",
+  "pip_check": "GRUEN",
+  "projekt_baseline_pruefung": "GRUEN",
+  "projekt_tests": "11 bestanden",
+  "ruff_check": "GRUEN",
+  "ruff_format_check": "GRUEN",
+  "github": {
+    "workflow_run_id": 31330952896,
+    "job_id": 93288985009,
+    "branch_head_sha": "58fb17a1c3878ffa62c7688f6902a58a59e80893",
+    "validierungs_merge_sha": "abfcd3e5cee3e8901bdd1ebc5a9c77888dc7c111",
+    "artifact_id": 9042907351,
+    "artifact_name": "PROVOWARE-I005-wheelhouse-abfcd3e5cee3e8901bdd1ebc5a9c77888dc7c111",
+    "artifact_bytes": 294502210,
+    "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
+    "retention_days": 90
+  },
+  "evidence_hashes": {
+    "wheelhouse_manifest_sha256": "975aaf8694b3dffd2f7b5f730b9099360ec0836284bd270efd4c26af96bedb3c",
+    "wheelhouse_hashliste_sha256": "0065bb0b389b7758c137d740a89f5a47feb6b422f99df80c7c81aec2c313e2ea",
+    "abhaengigkeitsinventar_sha256": "aeba608a21259b3dd57225aca103c15fce222e252fbdb8166699b0d3fb4f9206",
+    "offline_freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed",
+    "qualifikation_sha256": "4ed689c4ae706fdd4cd6676e13824db6a19a6e09c672c621bfe0ca43d6e38cc0"
+  },
+  "lokale_nachpruefung_des_artefakts": {
+    "artifact_sha256_stimmt": true,
+    "wheel_hashliste_stimmt": true,
+    "wheelanzahl": 50
+  },
+  "blocker": null,
+  "naechster_schritt": "I006 reproduzierbarer Clean-Bootstrap vollstaendig offline aus dem verifizierten I005-Artefakt"
+}

@@ -1,0 +1,114 @@
+name: I005 Offline-Wheelhouse Qualifikation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - iteration/i005-wheelhouse
+    paths:
+      - ".github/workflows/i005-wheelhouse.yml"
+      - "WERKZEUGE/wheelhouse-anforderungen.txt"
+      - "WERKZEUGE/wheelhouse_inventar.py"
+      - "WERKZEUGE/qualifiziere_i005.sh"
+      - "WERKZEUGE/baseline_pruefen.py"
+      - "tests/**"
+      - "pyproject.toml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/i005-wheelhouse.yml"
+      - "WERKZEUGE/wheelhouse-anforderungen.txt"
+      - "WERKZEUGE/wheelhouse_inventar.py"
+      - "WERKZEUGE/qualifiziere_i005.sh"
+      - "WERKZEUGE/baseline_pruefen.py"
+      - "tests/**"
+      - "pyproject.toml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: i005-wheelhouse-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualifiziere-wheelhouse:
+    name: Ubuntu 22.04 amd64 / Python 3.13.15
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: CPython 3.13.15 und pip 25.2 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13.15"
+          pip-version: "25.2"
+          check-latest: false
+
+      - name: I005 qualifizieren
+        shell: bash
+        run: bash WERKZEUGE/qualifiziere_i005.sh
+
+      - name: Artefaktinventar anzeigen
+        if: success()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('.artefakte/I005/WHEELHOUSE_MANIFEST.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          print('Status:', data['status'])
+          print('Paketanzahl:', data['paketanzahl'])
+          print('Gesamtbytes:', data['gesamtbytes'])
+          print('Python:', data['plattform']['python'])
+          print('Ubuntu:', data['plattform']['ubuntu_version_id'])
+          PY
+          sha256sum .artefakte/I005/WHEELHOUSE_MANIFEST.json
+          sha256sum .artefakte/I005/WHEELHOUSE_SHA256.txt
+          sha256sum .artefakte/I005/ABHAENGIGKEITSINVENTAR.json
+          sha256sum .artefakte/I005/I005_QUALIFIKATION.json
+
+      - name: Unveränderliches I005-Artefakt hochladen
+        id: upload
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: PROVOWARE-I005-wheelhouse-${{ github.sha }}
+          path: .artefakte/I005/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Evidence-Zusammenfassung
+        if: success()
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          {
+            echo "## I005 — Offline-Wheelhouse GRÜN"
+            echo
+            echo "- Runner: Ubuntu 22.04 amd64"
+            echo "- Python: 3.13.15"
+            echo "- pip Resolver: 25.2"
+            echo "- Offline-Prüfung: --no-index / lokales Wheelhouse"
+            echo "- Artifact-ID: ${ARTIFACT_ID}"
+            echo "- Artifact-Digest: ${ARTIFACT_DIGEST}"
+            echo "- Artifact-URL: ${ARTIFACT_URL}"
+            echo "- Commit: ${GITHUB_SHA}"
+          } >> "$GITHUB_STEP_SUMMARY"
