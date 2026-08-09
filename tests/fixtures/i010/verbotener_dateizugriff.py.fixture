@@ -1,0 +1,2 @@
+def schreiben() -> None:
+    open("daten.txt", "w", encoding="utf-8")
