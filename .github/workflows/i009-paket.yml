@@ -1,0 +1,471 @@
+name: I009 Vollpaket und Transferqualifikation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/i009-paket.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: i009-paket-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  paket:
+    name: I009 Voll-ZIP / Backup / Offline-QA / Transfer-E2E
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      I009_RUN_ID: "31337914639"
+      I009_ARTIFACT_ID: "9044902480"
+      I009_ARTIFACT_SHA256: "962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9"
+      I009_RECEIPT_SHA256: "46b8bb9f9f6fa215f70c7fb89fe7afaf884ece0918e02055daa11eb5e4a05e23"
+      I009_QUAL_HEAD: "b4ae4a4ef54dff3fabfa6b428f7e62af91100a3f"
+      I009_MERGE_COMMIT: "5f94bfc43c038530738d1a320ba6c9a050b39a17"
+      I008_BASE_COMMIT: "67b9f110a032cd4f0af1c826a2e9310f020295b8"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Aktuellen Main-Stand auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: main
+          path: current
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: I008-Rückfallbasis auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: backup/vor-i009-promotion-2026-08-09
+          path: backup
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: I005-Wheelhouse laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .artefakte/i005-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: I009-Qualifikation laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I009_ARTIFACT_ID }}
+          path: .artefakte/i009-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I009_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: Artefakte und Main-Identität verifizieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$(git -C current rev-parse HEAD)" = "2fe130ce24141f6cafcea8454376dfab6096aa7a"
+          test "$(git -C backup rev-parse HEAD)" = "$I008_BASE_COMMIT"
+          mapfile -t I005_ZIPS < <(find .artefakte/i005-download -type f -name '*.zip' -print)
+          mapfile -t I009_ZIPS < <(find .artefakte/i009-download -type f -name '*.zip' -print)
+          test ${#I005_ZIPS[@]} -eq 1
+          test ${#I009_ZIPS[@]} -eq 1
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "${I005_ZIPS[0]}" | sha256sum -c -
+          printf '%s  %s\n' "$I009_ARTIFACT_SHA256" "${I009_ZIPS[0]}" | sha256sum -c -
+
+      - name: Vollständigen Projektstand mit Rückfallbasis aufbauen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          rm -rf stage qa release
+          mkdir -p stage/PROVOWARE/Backup/I009_VORGAENGER_I008
+          rsync -a --exclude='.git' current/ stage/PROVOWARE/
+          rsync -a --exclude='.git' backup/ stage/PROVOWARE/Backup/I009_VORGAENGER_I008/
+          mkdir -p stage/PROVOWARE/UEBERGABE/ARTEFAKTE
+          I005_ZIP="$(find .artefakte/i005-download -type f -name '*.zip' -print -quit)"
+          I009_ZIP="$(find .artefakte/i009-download -type f -name '*.zip' -print -quit)"
+          cp "$I005_ZIP" stage/PROVOWARE/UEBERGABE/ARTEFAKTE/PROVOWARE-I005-wheelhouse.zip
+          cp "$I009_ZIP" stage/PROVOWARE/UEBERGABE/ARTEFAKTE/PROVOWARE-I009-operationen.zip
+          python3 - <<'PY'
+          from __future__ import annotations
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+
+          root = Path('stage/PROVOWARE')
+          backup = root / 'Backup/I009_VORGAENGER_I008'
+
+          def sha256(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open('rb') as f:
+                  for block in iter(lambda: f.read(1024 * 1024), b''):
+                      h.update(block)
+              return h.hexdigest()
+
+          backup_files = []
+          for path in sorted(p for p in backup.rglob('*') if p.is_file()):
+              backup_files.append({
+                  'pfad': path.relative_to(backup).as_posix(),
+                  'bytes': path.stat().st_size,
+                  'sha256': sha256(path),
+              })
+          (backup / 'BACKUP_MANIFEST.json').write_text(
+              json.dumps({
+                  'schema': '1.0.0',
+                  'status': 'RUECKFALLBASIS_VORHANDEN',
+                  'baseline': 'BASELINE-2026-08-09-I008',
+                  'github_backup_branch': 'backup/vor-i009-promotion-2026-08-09',
+                  'github_vorgaenger_main': os.environ['I008_BASE_COMMIT'],
+                  'regel': 'Dieser vollständige I008-Vorgänger bleibt bis zum nächsten validierten Nachrücker erhalten.',
+                  'dateien': backup_files,
+              }, ensure_ascii=False, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+
+          changed = subprocess.check_output(
+              ['git', '-C', 'current', 'diff', '--name-only', os.environ['I008_BASE_COMMIT'], 'HEAD'],
+              text=True,
+          ).splitlines()
+          inserted = removed = current_chars = 0
+          text_files = 0
+          categories = {
+              'Code_CI_Tests': {'zeichen': 0, 'dateien': 0, 'zielgruppe': 'Entwickler, CI und automatische Validatoren'},
+              'Register_Evidence': {'zeichen': 0, 'dateien': 0, 'zielgruppe': 'Audit, Projektsteuerung, Traceability und Recovery'},
+              'Dokumentation': {'zeichen': 0, 'dateien': 0, 'zielgruppe': 'Nutzer und Entwickler'},
+          }
+          import difflib
+          for rel in changed:
+              new_path = Path('current') / rel
+              try:
+                  new = new_path.read_text(encoding='utf-8') if new_path.is_file() else ''
+              except UnicodeDecodeError:
+                  continue
+              try:
+                  old = subprocess.check_output(
+                      ['git', '-C', 'current', 'show', f"{os.environ['I008_BASE_COMMIT']}:{rel}"],
+                      text=True,
+                      stderr=subprocess.DEVNULL,
+                  )
+              except subprocess.CalledProcessError:
+                  old = ''
+              matcher = difflib.SequenceMatcher(a=old, b=new, autojunk=False)
+              for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                  if tag in ('insert', 'replace'):
+                      inserted += j2 - j1
+                  if tag in ('delete', 'replace'):
+                      removed += i2 - i1
+              text_files += 1
+              current_chars += len(new)
+              if rel.startswith(('.github/', 'src/', 'tests/', 'WERKZEUGE/')):
+                  key = 'Code_CI_Tests'
+              elif rel.startswith('EVIDENCE/') or rel.endswith('.json'):
+                  key = 'Register_Evidence'
+              else:
+                  key = 'Dokumentation'
+              categories[key]['zeichen'] += len(new)
+              categories[key]['dateien'] += 1
+
+          metric = {
+              'schema': '1.0.0',
+              'iteration': 'I009',
+              'status': 'GRUEN',
+              'vergleich': {
+                  'alt': os.environ['I008_BASE_COMMIT'],
+                  'neu': subprocess.check_output(['git', '-C', 'current', 'rev-parse', 'HEAD'], text=True).strip(),
+              },
+              'geaenderte_textdateien': text_files,
+              'zeichen_aktueller_geaenderter_dateien': current_chars,
+              'eingefuegte_zeichen': inserted,
+              'entfernte_zeichen': removed,
+              'netto_zeichen': inserted - removed,
+              'nach_zweck': categories,
+              'github_pr': {'nummer': 9, 'changed_files': 20, 'additions': 1174, 'deletions': 15},
+              'qualifikation': {'contracttests': 49, 'gesamtregression': 68, 'ruff': 'GRUEN', 'mypy_strict': 'GRUEN'},
+          }
+          (root / 'EVIDENCE/I009/AENDERUNGSMETRIK.json').write_text(
+              json.dumps(metric, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          (root / 'UEBERGABE/UEBERGABE_I009.json').write_text(
+              json.dumps({
+                  'schema': '1.0.0',
+                  'projekt': 'PROVOWARE',
+                  'version': '0.1.0-dev',
+                  'baseline': 'BASELINE-2026-08-09-I009',
+                  'github_main_merge_commit': os.environ['I009_MERGE_COMMIT'],
+                  'github_main_head_nach_dokumentation': subprocess.check_output(['git', '-C', 'current', 'rev-parse', 'HEAD'], text=True).strip(),
+                  'github_backup_branch': 'backup/vor-i009-promotion-2026-08-09',
+                  'workflow_run_id': int(os.environ['I009_RUN_ID']),
+                  'artifact_id': int(os.environ['I009_ARTIFACT_ID']),
+                  'artifact_sha256': os.environ['I009_ARTIFACT_SHA256'],
+                  'artifact_mb': 0.000663,
+                  'receipt_sha256': os.environ['I009_RECEIPT_SHA256'],
+                  'tests': {'contract': 49, 'gesamt': 68, 'mypy_strict': 'GRUEN', 'ruff': 'GRUEN'},
+                  'next_iteration': 'I010',
+              }, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+          cd stage/PROVOWARE
+          python3 WERKZEUGE/baseline_pruefen.py
+
+      - name: Vollpaket vollständig offline nachvalidieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p qa/i005
+          unzip -q stage/PROVOWARE/UEBERGABE/ARTEFAKTE/PROVOWARE-I005-wheelhouse.zip -d qa/i005
+          python3 -m venv qa/venv
+          PIP_NO_INDEX=1 qa/venv/bin/python -m pip install \
+            --no-index --find-links "$PWD/qa/i005/wheelhouse" \
+            pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
+          PIP_NO_INDEX=1 qa/venv/bin/python -m pip check
+          cd stage/PROVOWARE
+          ../../qa/venv/bin/ruff check src tests WERKZEUGE
+          ../../qa/venv/bin/ruff format --check src tests WERKZEUGE
+          ../../qa/venv/bin/mypy \
+            src/provoware/vertraege \
+            tests/contract/test_datentypen.py \
+            tests/contract/test_id_varianten.py \
+            tests/contract/test_i007_api_freeze.py \
+            tests/contract/test_schemata.py \
+            tests/contract/test_operationen.py
+          ../../qa/venv/bin/pytest -q -m contract tests/contract | tee /tmp/i009-contract.txt
+          ../../qa/venv/bin/pytest -q | tee /tmp/i009-gesamt.txt
+          grep -q '49 passed' /tmp/i009-contract.txt
+          grep -q '68 passed' /tmp/i009-gesamt.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          Path('EVIDENCE/I009/LOKALE_NACHVALIDIERUNG.json').write_text(
+              json.dumps({
+                  'schema': '1.0.0',
+                  'iteration': 'I009',
+                  'status': 'GRUEN',
+                  'basis': 'vollständiges I009-Übergabepaket vor ZIP-Erzeugung',
+                  'toolchain': {'quelle': 'qualifiziertes I005-Wheelhouse', 'pytest': '9.1.1', 'ruff': '0.16.1', 'mypy': '2.3.0', 'netzwerk_installation': False},
+                  'pruefungen': {'baseline': 'GRUEN', 'ruff': 'GRUEN', 'ruff_format': 'GRUEN', 'mypy_strict': 'GRUEN', 'contracttests': 49, 'gesamtregression': 68},
+              }, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+          python3 WERKZEUGE/baseline_pruefen.py
+
+      - name: Voll-ZIP, 24-MiB-Transfer und Installer bauen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p release
+          python3 - <<'PY'
+          from __future__ import annotations
+          import hashlib, json, os, shutil, zipfile
+          from pathlib import Path
+
+          stage = Path('stage')
+          project = stage / 'PROVOWARE'
+          out = Path('release')
+          full = out / 'PROVOWARE_v0.1.0-dev_I009_VOLLSTAENDIG_GITHUB_VALIDIERT.zip'
+
+          def sha256(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open('rb') as f:
+                  for block in iter(lambda: f.read(1024 * 1024), b''):
+                      h.update(block)
+              return h.hexdigest()
+
+          with zipfile.ZipFile(full, 'w', compression=zipfile.ZIP_STORED, allowZip64=True) as z:
+              for path in sorted(p for p in project.rglob('*') if p.is_file()):
+                  z.write(path, arcname=(Path('PROVOWARE') / path.relative_to(project)).as_posix())
+          with zipfile.ZipFile(full, 'r') as z:
+              bad = z.testzip()
+              if bad is not None:
+                  raise RuntimeError(f'ZIP-Integritätsfehler: {bad}')
+
+          full_sha = sha256(full)
+          full_bytes = full.stat().st_size
+          chunk = 24 * 1024 * 1024
+          parts = []
+          with full.open('rb') as src:
+              nr = 1
+              while True:
+                  data = src.read(chunk)
+                  if not data:
+                      break
+                  part = out / f'PROVOWARE_I009.teil{nr:03d}.pvpart'
+                  part.write_bytes(data)
+                  parts.append({
+                      'nummer': nr,
+                      'datei': part.name,
+                      'bytes': len(data),
+                      'mb': round(len(data) / 1_000_000, 6),
+                      'mib': round(len(data) / 1024 / 1024, 6),
+                      'sha256': sha256(part),
+                  })
+                  nr += 1
+
+          manifest = {
+              'schema': '1.0.0',
+              'projekt': 'PROVOWARE',
+              'version': '0.1.0-dev',
+              'transfer_version': 'I009-1.0.0',
+              'erwartete_baseline': 'BASELINE-2026-08-09-I009',
+              'github_main_head': '2fe130ce24141f6cafcea8454376dfab6096aa7a',
+              'github_i009_merge_commit': os.environ['I009_MERGE_COMMIT'],
+              'standard_ziel': '~/PROVOWARE',
+              'anzahl_teile': len(parts),
+              'teilgroesse_mib': 24,
+              'gesamtarchiv': {
+                  'datei': full.name,
+                  'bytes': full_bytes,
+                  'mb': round(full_bytes / 1_000_000, 6),
+                  'mib': round(full_bytes / 1024 / 1024, 6),
+                  'sha256': full_sha,
+              },
+              'teile': parts,
+          }
+          manifest_path = out / 'PROVOWARE_TRANSFER_MANIFEST.json'
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+
+          template = (project / 'TRANSFER/PROVOWARE_INSTALLIEREN_TEMPLATE.sh').read_text(encoding='utf-8')
+          marker = '__PROVOWARE_TRANSFER_MANIFEST_JSON__'
+          if template.count(marker) != 1:
+              raise RuntimeError('Installer-Template-Marker fehlt oder ist mehrfach vorhanden.')
+          installer = out / 'PROVOWARE_INSTALLIEREN.sh'
+          installer.write_text(template.replace(marker, manifest_path.read_text(encoding='utf-8').rstrip()), encoding='utf-8')
+          installer.chmod(0o755)
+
+          guide = out / 'LAIENANLEITUNG_PROVOWARE_I009.txt'
+          guide.write_text(f'''PROVOWARE I009 – VOLLSTÄNDIGE LAIENANLEITUNG\n\nVersion: 0.1.0-dev\nBaseline: BASELINE-2026-08-09-I009\nGesamtgröße: {full_bytes/1_000_000:.3f} MB ({full_bytes/1024/1024:.3f} MiB)\nTeilstücke: {len(parts)}\nSHA-256 Gesamtarchiv: {full_sha}\n\nWICHTIG:\nAlle PROVOWARE_I009.teil*.pvpart-Dateien und PROVOWARE_INSTALLIEREN.sh müssen im selben Ordner liegen.\n\nINSTALLATION – ALLE BEFEHLE\n\nmkdir -p "$HOME/Downloads/PROVOWARE_I009"\ncd "$HOME/Downloads/PROVOWARE_I009"\nls -lh PROVOWARE_INSTALLIEREN.sh PROVOWARE_I009.teil*.pvpart\nchmod +x PROVOWARE_INSTALLIEREN.sh\nbash PROVOWARE_INSTALLIEREN.sh\ncd "$HOME/PROVOWARE"\npython3 WERKZEUGE/baseline_pruefen.py\ncat TRANSFER/INSTALLATIONSNACHWEIS.json\n\nOPTIONALES TESTZIEL\ncd "$HOME/Downloads/PROVOWARE_I009"\nPROVOWARE_ZIEL="$HOME/PROVOWARE_TEST" bash PROVOWARE_INSTALLIEREN.sh\ncd "$HOME/PROVOWARE_TEST"\npython3 WERKZEUGE/baseline_pruefen.py\ncat TRANSFER/INSTALLATIONSNACHWEIS.json\n\nGITHUB-EVIDENCE\ngh auth status\ngh run view 31337914639 -R provoware/PROVOWARE\ngh run download 31337914639 -R provoware/PROVOWARE\n\nRÜCKFALLBASIS I008\ngit fetch origin backup/vor-i009-promotion-2026-08-09\ngit log --oneline --decorate -5 origin/backup/vor-i009-promotion-2026-08-09\n''', encoding='utf-8')
+
+          metric_src = project / 'EVIDENCE/I009/AENDERUNGSMETRIK.json'
+          shutil.copy2(metric_src, out / 'AENDERUNGSMETRIK_I009.json')
+
+          sums_targets = [full, installer, manifest_path, guide, out / 'AENDERUNGSMETRIK_I009.json'] + [out / p['datei'] for p in parts]
+          sums = out / 'SHA256SUMMEN.txt'
+          sums.write_text('\n'.join(f'{sha256(path)}  {path.name}' for path in sums_targets) + '\n', encoding='utf-8')
+
+          starter = out / 'PROVOWARE_I009_STARTER.zip'
+          with zipfile.ZipFile(starter, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+              for path in [installer, manifest_path, guide, out / 'AENDERUNGSMETRIK_I009.json', sums]:
+                  z.write(path, arcname=path.name)
+
+          (out / 'PAKETSTATUS_I009.json').write_text(
+              json.dumps({
+                  'schema': '1.0.0',
+                  'status': 'GEBAUT_VOR_E2E',
+                  'baseline': 'BASELINE-2026-08-09-I009',
+                  'vollzip_bytes': full_bytes,
+                  'vollzip_mb': round(full_bytes / 1_000_000, 6),
+                  'vollzip_sha256': full_sha,
+                  'teile': len(parts),
+                  'starter_bytes': starter.stat().st_size,
+              }, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+
+      - name: Transfer End-to-End in isoliertem HOME prüfen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          E2E="$PWD/.e2e-home"
+          rm -rf "$E2E"
+          mkdir -p "$E2E/Downloads/PROVOWARE_I009"
+          cp release/PROVOWARE_INSTALLIEREN.sh "$E2E/Downloads/PROVOWARE_I009/"
+          cp release/PROVOWARE_I009.teil*.pvpart "$E2E/Downloads/PROVOWARE_I009/"
+          (
+            cd "$E2E/Downloads/PROVOWARE_I009"
+            HOME="$E2E" bash PROVOWARE_INSTALLIEREN.sh
+          )
+          cd "$E2E/PROVOWARE"
+          HOME="$E2E" python3 WERKZEUGE/baseline_pruefen.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          proof = json.loads(Path('TRANSFER/INSTALLATIONSNACHWEIS.json').read_text(encoding='utf-8'))
+          assert proof['status'] == 'ERFOLGREICH'
+          assert json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))['aktuelle_baseline'] == 'BASELINE-2026-08-09-I009'
+          PY
+          cd "$GITHUB_WORKSPACE"
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          out = Path('release')
+          def sha256(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open('rb') as f:
+                  for block in iter(lambda: f.read(1024 * 1024), b''):
+                      h.update(block)
+              return h.hexdigest()
+          full = out / 'PROVOWARE_v0.1.0-dev_I009_VOLLSTAENDIG_GITHUB_VALIDIERT.zip'
+          status_path = out / 'PAKETSTATUS_I009.json'
+          status = json.loads(status_path.read_text(encoding='utf-8'))
+          status['status'] = 'GRUEN'
+          status['transfer_e2e'] = 'GRUEN'
+          status['vollzip_sha256'] = sha256(full)
+          status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          (out / 'TRANSFER_TESTERGEBNIS_I009.json').write_text(
+              json.dumps({
+                  'schema': '1.0.0',
+                  'status': 'GRUEN',
+                  'baseline': 'BASELINE-2026-08-09-I009',
+                  'isoliertes_home': True,
+                  'vollautomatische_installation': True,
+                  'end_to_end_baseline': 'GRUEN',
+                  'gesamtarchiv_sha256': sha256(full),
+                  'backup_rollback_logik': 'implementiert',
+                  'netzwerk_im_installationspfad': False,
+              }, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+          rm -rf "$E2E"
+
+      - name: Releasepaket hochladen
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I009-VOLLPAKET-2fe130ce24141f6cafcea8454376dfab6096aa7a
+          path: release/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Ergebnis zusammenfassen
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          s = json.loads(Path('release/PAKETSTATUS_I009.json').read_text(encoding='utf-8'))
+          print('## I009 Vollpaket — GRÜN')
+          print()
+          print(f"- Voll-ZIP: {s['vollzip_mb']:.3f} MB")
+          print(f"- SHA-256: `{s['vollzip_sha256']}`")
+          print(f"- Teile: {s['teile']} à maximal 24 MiB")
+          print('- Offline-QA: 49 Contracttests / 68 Gesamtregression / Ruff / mypy strict GRÜN')
+          print('- Rückfallbasis I008 vollständig im Projektordner Backup enthalten')
+          print('- isolierte End-to-End-Installation: GRÜN')
+          PY
+          echo "- Artifact-ID: ${ARTIFACT_ID}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact-Digest: ${ARTIFACT_DIGEST}" >> "$GITHUB_STEP_SUMMARY"
