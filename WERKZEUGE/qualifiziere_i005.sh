@@ -78,6 +78,19 @@ PY
 "$VENV/bin/pip-audit" --version
 "$VENV/bin/pyinstaller" --version
 
+# Das soeben erzeugte Offline-Wheelhouse muss die Projektpruefungen selbst tragen.
+"$VENV/bin/python" "$ROOT/WERKZEUGE/baseline_pruefen.py"
+"$VENV/bin/python" -m pytest -q \
+  "$ROOT/tests/test_baseline.py" \
+  "$ROOT/tests/test_structure.py" \
+  "$ROOT/tests/test_i005_contract.py"
+"$VENV/bin/ruff" check \
+  "$ROOT/WERKZEUGE/wheelhouse_inventar.py" \
+  "$ROOT/tests/test_i005_contract.py"
+"$VENV/bin/ruff" format --check \
+  "$ROOT/WERKZEUGE/wheelhouse_inventar.py" \
+  "$ROOT/tests/test_i005_contract.py"
+
 # Das temporäre venv gehört nicht zum unveränderlichen Artefakt.
 rm -rf "$VENV"
 
@@ -136,6 +149,9 @@ qualification = {
         "offline_install": "PIP_NO_INDEX=1 + --no-index + lokales --find-links",
         "pip_check": "GRUEN",
         "import_smoke": "GRUEN",
+        "projekt_baseline_pruefung": "GRUEN",
+        "projekt_tests": "GRUEN",
+        "ruff_check_format": "GRUEN"
     },
     "manifest_sha256": sha256(manifest_path),
     "hashliste_sha256": sha256(out / "WHEELHOUSE_SHA256.txt"),
