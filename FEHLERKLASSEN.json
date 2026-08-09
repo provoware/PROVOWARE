@@ -10,5 +10,5 @@
   ],
   "regel": "Dauerhafte Fehlercodes werden erst nach reproduzierter Root Cause und bestätigtem Fix in das Fehlerwissen übernommen; Fehlerklassen sind stabile Vertragstypen.",
   "schema": "1.0.0",
-  "status": "I007_INITIALISIERT"
+  "status": "I007_VALIDIERT"
 }
