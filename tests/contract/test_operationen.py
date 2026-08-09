@@ -184,7 +184,8 @@ def test_result_unbekanntes_feld_wird_abgewiesen() -> None:
 def test_request_result_korrelation_verwendet_ausschliesslich_operation_id() -> None:
     request = OperationRequest.aus_mapping(_fixture("request_gueltig.json"))
     passend = OperationResult.aus_mapping(_fixture("result_erfolg_gueltig.json"))
-    fremd = OperationResult.erfolg(OperationRequest.neu(OperationArt("ANDERE_OPERATION")).operation_id)
+    fremde_id = OperationRequest.neu(OperationArt("ANDERE_OPERATION")).operation_id
+    fremd = OperationResult.erfolg(fremde_id)
 
     assert passend.korreliert_mit(request) is True
     assert fremd.korreliert_mit(request) is False
