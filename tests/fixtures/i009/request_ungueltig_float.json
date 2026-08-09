@@ -1,0 +1,9 @@
+{
+  "typ": "OPERATION_REQUEST",
+  "schema": "1.0.0",
+  "operation_id": "op_0123456789abcdef0123456789abcdef",
+  "operation_art": "PROJEKT_PRUEFEN",
+  "payload": {
+    "schwelle": 1.5
+  }
+}
