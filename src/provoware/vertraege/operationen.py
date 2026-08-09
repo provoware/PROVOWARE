@@ -86,9 +86,13 @@ def _schema_version(text: str) -> SchemaVersion:
             "OPERATION_SCHEMA_UNGUELTIG", str(exc), "schema"
         ) from exc
     if version != OPERATION_SCHEMA_VERSION:
+        nachricht = (
+            f"Operationsschema {version} ist inkompatibel; "
+            f"erwartet wird {OPERATION_SCHEMA_VERSION}."
+        )
         raise OperationVertragsfehler(
             "OPERATION_SCHEMA_INKOMPATIBEL",
-            f"Operationsschema {version} ist inkompatibel; erwartet wird {OPERATION_SCHEMA_VERSION}.",
+            nachricht,
             "schema",
         )
     return version
@@ -122,6 +126,43 @@ def _schluessel_gueltig(schluessel: str) -> bool:
     )
 
 
+def _pruefe_container_groesse(anzahl: int, *, pfad: str, art: str) -> None:
+    if anzahl > _MAX_CONTAINER_EINTRAEGE:
+        raise OperationVertragsfehler(
+            "OPERATION_PAYLOAD_ZU_GROSS",
+            f"{art} überschreitet {_MAX_CONTAINER_EINTRAEGE} Einträge.",
+            pfad,
+        )
+
+
+def _normalisiere_liste(wert: list[object], *, pfad: str, tiefe: int) -> list[JsonWert]:
+    _pruefe_container_groesse(len(wert), pfad=pfad, art="Liste")
+    return [
+        _normalisiere_json_wert(eintrag, pfad=f"{pfad}[{index}]", tiefe=tiefe + 1)
+        for index, eintrag in enumerate(wert)
+    ]
+
+
+def _normalisiere_objekt(
+    wert: dict[object, object], *, pfad: str, tiefe: int
+) -> dict[str, JsonWert]:
+    _pruefe_container_groesse(len(wert), pfad=pfad, art="Objekt")
+    ergebnis: dict[str, JsonWert] = {}
+    for schluessel, eintrag in wert.items():
+        if not isinstance(schluessel, str) or not _schluessel_gueltig(schluessel):
+            raise OperationVertragsfehler(
+                "OPERATION_PAYLOAD_SCHLUESSEL_UNGUELTIG",
+                "Payload-Schlüssel müssen 1-128 sichtbare Zeichen ohne Rand-Leerraum besitzen.",
+                pfad,
+            )
+        ergebnis[schluessel] = _normalisiere_json_wert(
+            eintrag,
+            pfad=f"{pfad}.{schluessel}",
+            tiefe=tiefe + 1,
+        )
+    return ergebnis
+
+
 def _normalisiere_json_wert(wert: object, *, pfad: str, tiefe: int = 0) -> JsonWert:
     if tiefe > _MAX_TIEFE:
         raise OperationVertragsfehler(
@@ -140,35 +181,11 @@ def _normalisiere_json_wert(wert: object, *, pfad: str, tiefe: int = 0) -> JsonW
             pfad,
         )
     if isinstance(wert, list):
-        if len(wert) > _MAX_CONTAINER_EINTRAEGE:
-            raise OperationVertragsfehler(
-                "OPERATION_PAYLOAD_ZU_GROSS",
-                f"Liste überschreitet {_MAX_CONTAINER_EINTRAEGE} Einträge.",
-                pfad,
-            )
-        return [
-            _normalisiere_json_wert(eintrag, pfad=f"{pfad}[{index}]", tiefe=tiefe + 1)
-            for index, eintrag in enumerate(wert)
-        ]
+        return _normalisiere_liste(cast(list[object], wert), pfad=pfad, tiefe=tiefe)
     if isinstance(wert, dict):
-        if len(wert) > _MAX_CONTAINER_EINTRAEGE:
-            raise OperationVertragsfehler(
-                "OPERATION_PAYLOAD_ZU_GROSS",
-                f"Objekt überschreitet {_MAX_CONTAINER_EINTRAEGE} Einträge.",
-                pfad,
-            )
-        ergebnis: dict[str, JsonWert] = {}
-        for schluessel, eintrag in wert.items():
-            if not isinstance(schluessel, str) or not _schluessel_gueltig(schluessel):
-                raise OperationVertragsfehler(
-                    "OPERATION_PAYLOAD_SCHLUESSEL_UNGUELTIG",
-                    "Payload-Schlüssel müssen 1-128 sichtbare Zeichen ohne Rand-Leerraum besitzen.",
-                    pfad,
-                )
-            ergebnis[schluessel] = _normalisiere_json_wert(
-                eintrag, pfad=f"{pfad}.{schluessel}", tiefe=tiefe + 1
-            )
-        return ergebnis
+        return _normalisiere_objekt(
+            cast(dict[object, object], wert), pfad=pfad, tiefe=tiefe
+        )
     raise OperationVertragsfehler(
         "OPERATION_PAYLOAD_TYP_UNGUELTIG",
         f"Nicht unterstützter Payload-Typ an {pfad}: {type(wert).__name__}.",
