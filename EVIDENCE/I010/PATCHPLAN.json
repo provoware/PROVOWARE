@@ -1,7 +1,7 @@
 {
   "schema": "1.0.0",
   "iteration": "I010",
-  "status": "IN_QUALIFIKATION",
+  "status": "GRUEN_ABGESCHLOSSEN",
   "ziel": "P02 als einheitliches Architektur- und Vertragsgate schließen, ohne P03-Code vorzuziehen.",
   "schritte": [
     "kanonischen P02-API-Snapshot mit SHA-256-Fingerprint erzeugen",
@@ -16,5 +16,11 @@
     "keine Qt-Funktion",
     "keine SQLite-Funktion",
     "keine Persistenz-, Handler- oder Dateisystemfunktion"
-  ]
+  ],
+  "abschluss": {
+    "workflow_run_id": 31339417368,
+    "artifact_id": 9045351696,
+    "p02_status": "VALIDIERT",
+    "next_iteration": "I011"
+  }
 }
