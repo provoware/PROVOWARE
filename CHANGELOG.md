@@ -2,6 +2,23 @@
 
 ## 0.1.0-dev - 2026-08-09
 
+### I008 — Manifest- und Projektschemata qualifiziert
+- `SchemaVersion` als eigener numerischer `MAJOR.MINOR.PATCH`-Typ eingeführt.
+- `ProduktVersion` technisch und semantisch von Schema-Versionen getrennt; Vorab-Suffixe wie `0.1.0-dev` bleiben ausschließlich Produktversionen vorbehalten.
+- `ManifestSchema` als minimale strikt versionierte Identitätshülle eingeführt.
+- `ProjektSchema` als minimale Projektidentität mit dem bereits qualifizierten `Status` eingeführt.
+- `SchemaValidierungsfehler` mit stabilem Code, Feldbezug und Nachricht eingeführt.
+- Unbekannte Felder, fehlende Pflichtfelder, falsche Schema-Arten und inkompatible Schema-Versionen werden strikt abgewiesen.
+- Deterministische JSON-Serialisierung als Vertragsbestandteil festgelegt.
+- Kanonische gültige und ungültige Golden-Fixtures für Manifest- und Projektbeispiele ergänzt.
+- I007-ID-Präfixe, Statuswerte, Fehlerklassen und `OperationErgebnis`-Invarianten per Contracttest als öffentliche API eingefroren.
+- Architekturwächter von anfälliger Textsuche auf AST-basierte Prüfung echter Imports und `open()`-Dateizugriffe gehärtet.
+- `VERSIONSREGISTER.json`, Architekturregister, Komponentenregister, Traceability und ADR-0003 nachgezogen.
+- Finale Qualifikation auf Ubuntu 22.04.5 / Python 3.13.15: Ruff grün, mypy strict grün, **30 Contracttests** und **48 Regressionstests** bestanden.
+- Finaler I008-Workflow `31336626886`, Artifact-ID `9044527742`, Größe **0,000618 MB**, SHA-256 `f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61`.
+- I007-Regressionsworkflow auf dem finalen I008-Head erneut vollständig grün.
+- Vorheriger validierter I007-main-Stand auf `backup/vor-i008-promotion-2026-08-09` gesichert.
+
 ### I007 — strikt typisierte Kernverträge qualifiziert
 - `ProjektId`, `ObjektId`, `RevisionId`, `ChangeId` und `OperationId` als unveränderliche, domänentrennte Wertobjekte eingeführt.
 - Kanonisches ID-Format `<praefix>_<32 lowercase-hex>` festgelegt und validiert.
@@ -47,7 +64,6 @@
 - Initiale Evidence für I000-I004.
 
 ### Bewusst noch nicht enthalten
-- Manifest- und Projektschemata aus I008.
 - OperationRequest/OperationResult aus I009.
 - abschließendes P02-Architekturgate aus I010.
 - SQLite-Datenkern.
