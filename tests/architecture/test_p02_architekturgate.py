@@ -34,7 +34,9 @@ def _minimaler_quellbaum(tmp_path: Path) -> Path:
 @pytest.mark.architecture
 def test_p02_api_snapshot_ist_kanonisch_und_fingerprint_stabil() -> None:
     dokument = baue_snapshot_dokument(ROOT)
-    assert dokument["fingerprint_sha256"] == "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16"
+    assert dokument["fingerprint_sha256"] == (
+        "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16"
+    )
     assert pruefe_api_snapshot(ROOT) == dokument["fingerprint_sha256"]
 
 
@@ -68,7 +70,9 @@ def test_negativfixtures_schalten_architekturgate_nachweisbar_rot(fixture: str, 
 def test_unregistrierte_p02_produktdatei_wird_abgewiesen(tmp_path: Path) -> None:
     root = _minimaler_quellbaum(tmp_path)
     ziel = root / "src/provoware/vertraege/unerlaubt.py"
-    ziel.write_text(_fixture("unregistrierte_vertragsdatei.py.fixture").read_text(encoding="utf-8"))
+    ziel.write_text(
+        _fixture("unregistrierte_vertragsdatei.py.fixture").read_text(encoding="utf-8")
+    )
     with pytest.raises(P02GateFehler) as exc_info:
         pruefe_quellinventar(root)
     assert exc_info.value.code == "P02_UNREGISTRIERTE_PRODUKTDATEI"
