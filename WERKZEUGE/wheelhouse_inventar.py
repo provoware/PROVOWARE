@@ -80,9 +80,7 @@ def metadata_aus_wheel(path: Path) -> dict[str, Any]:
         raise ValueError(f"Wheel {path.name}: Name/Version fehlen in METADATA")
 
     licenses = [
-        str(value).strip()
-        for value in message.get_all("License", [])
-        if str(value).strip()
+        str(value).strip() for value in message.get_all("License", []) if str(value).strip()
     ]
     expressions = [
         str(value).strip()
@@ -90,9 +88,7 @@ def metadata_aus_wheel(path: Path) -> dict[str, Any]:
         if str(value).strip()
     ]
     requires = [
-        str(value).strip()
-        for value in message.get_all("Requires-Dist", [])
-        if str(value).strip()
+        str(value).strip() for value in message.get_all("Requires-Dist", []) if str(value).strip()
     ]
 
     return {
@@ -116,11 +112,7 @@ def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, Any]:
     pakete = [metadata_aus_wheel(path) for path in wheels]
     direkte = direkte_anforderungen(requirements)
     index = {(str(p["name_normalisiert"]), str(p["version"])) for p in pakete}
-    fehlend = [
-        entry
-        for entry in direkte
-        if (entry["normalisiert"], entry["version"]) not in index
-    ]
+    fehlend = [entry for entry in direkte if (entry["normalisiert"], entry["version"]) not in index]
     if fehlend:
         raise ValueError(f"Direkte Pins fehlen im Wheelhouse: {fehlend}")
 
@@ -130,10 +122,7 @@ def baue_manifest(wheelhouse: Path, requirements: Path) -> dict[str, Any]:
         if sum(1 for p in pakete if p["name_normalisiert"] == name) > 1
     )
     if doppelte:
-        raise ValueError(
-            "Mehrere Wheels desselben normalisierten Pakets vorhanden: "
-            f"{doppelte}"
-        )
+        raise ValueError(f"Mehrere Wheels desselben normalisierten Pakets vorhanden: {doppelte}")
 
     os_release = lese_os_release()
     return {
@@ -172,10 +161,7 @@ def schreibe_artefakte(manifest: dict[str, Any], out: Path) -> None:
         encoding="utf-8",
     )
 
-    lines = [
-        f"{paket['sha256']}  wheelhouse/{paket['datei']}"
-        for paket in manifest["pakete"]
-    ]
+    lines = [f"{paket['sha256']}  wheelhouse/{paket['datei']}" for paket in manifest["pakete"]]
     lines.append(f"{sha256(manifest_path)}  WHEELHOUSE_MANIFEST.json")
     (out / "WHEELHOUSE_SHA256.txt").write_text(
         "\n".join(lines) + "\n",
@@ -203,9 +189,7 @@ def schreibe_artefakte(manifest: dict[str, Any], out: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Erzeugt das I005 Wheelhouse-Inventar."
-    )
+    parser = argparse.ArgumentParser(description="Erzeugt das I005 Wheelhouse-Inventar.")
     parser.add_argument("--wheelhouse", type=Path, required=True)
     parser.add_argument("--requirements", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
@@ -213,10 +197,7 @@ def main() -> int:
 
     manifest = baue_manifest(args.wheelhouse, args.requirements)
     schreibe_artefakte(manifest, args.out)
-    print(
-        f"I005-Inventar: {manifest['paketanzahl']} Wheels, "
-        f"{manifest['gesamtbytes']} Bytes"
-    )
+    print(f"I005-Inventar: {manifest['paketanzahl']} Wheels, {manifest['gesamtbytes']} Bytes")
     return 0
 
 
