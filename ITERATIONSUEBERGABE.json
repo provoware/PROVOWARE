@@ -1,1 +1,60 @@
-{"schema":"1.0.0","next_iteration":"I005","next_goal":"Offline-Wheelhouse und Toolinventar qualifiziert aufbauen.","why_next":"P01 muss vollständig grün sein, bevor P02 und PoA-Code beginnen.","priority":"P0","probable_component":"WERKZEUGE/wheelhouse","probable_files":["WERKZEUGE/WHEELHOUSE_STATUS.json","WERKZEUGE/WHEELHOUSE_MANIFEST.json","WERKZEUGE/clean-bootstrap.sh"],"probable_symbols":[],"preconditions":["Ubuntu 22.04 amd64 Buildumgebung","CPython 3.13.15 verfügbar","Netzzugang nur im Beschaffungs-/Buildermodus"],"expected_tests":["Hashinventar vollständig","Offline-Installation in leerer Umgebung","Lizenz-/Versionsinventar vollständig"],"done_criteria":["Alle benötigten Wheels vorhanden","SHA-256 für jedes Artefakt","Offline-Installationsprobe grün","keine ungeklärte Dependency"],"known_risks":["Plattformabhängige PySide6/PyInstaller-Wheels","Toolversionsdrift"],"open_subpoints":["I006 Clean-Bootstrap nach erfolgreichem I005"]}
+{
+  "schema": "1.0.0",
+  "next_iteration": "I006",
+  "next_goal": "Reproduzierbare Entwicklungsumgebung vollständig offline aus dem verifizierten I005-Wheelhouse aufbauen.",
+  "why_next": "I005 hat Paketbestand, Hashes, Metadaten und Offline-Installation qualifiziert. P01 ist erst abgeschlossen, wenn ein Clean-Bootstrap aus einer leeren Umgebung denselben Entwicklungsstand ohne Paketindex reproduziert.",
+  "priority": "P0",
+  "probable_component": "WERKZEUGE/bootstrap",
+  "probable_files": [
+    "WERKZEUGE/clean-bootstrap.sh",
+    "WERKZEUGE/bootstrap_pruefen.py",
+    ".github/workflows/i006-clean-bootstrap.yml",
+    "tests/test_i006_bootstrap_contract.py",
+    "EVIDENCE/I006/"
+  ],
+  "probable_symbols": ["clean_bootstrap", "pruefe_offline_bootstrap"],
+  "context_fingerprints": {
+    "i005_artifact_id": 9042907351,
+    "i005_artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
+    "i005_manifest_sha256": "975aaf8694b3dffd2f7b5f730b9099360ec0836284bd270efd4c26af96bedb3c"
+  },
+  "known_dependencies": [
+    "I005 muss weiterhin VALIDiert sein",
+    "CPython 3.13.15",
+    "Ubuntu 22.04 amd64",
+    "verifiziertes Wheelhouse mit 50 Wheels"
+  ],
+  "preconditions": [
+    "I005-Artefakt lokal bereitstellen und SHA-256 vor Entpacken prüfen",
+    "frisches Bootstrap-Zielverzeichnis ohne bestehendes venv verwenden",
+    "PIP_NO_INDEX=1 und lokale Paketquelle erzwingen",
+    "keine Schreibänderung an der I005-Baseline vor Bootstrap-Erfolg"
+  ],
+  "expected_tests": [
+    "Artefakt-SHA-256 und interne Wheel-Hashliste prüfen",
+    "Clean-venv ausschließlich offline erstellen",
+    "Projekt im Entwicklungsmodus ausschließlich aus lokalem Wheelhouse installieren",
+    "pip check",
+    "Baseline-Prüfer",
+    "pytest",
+    "Ruff check/format",
+    "zweiter Clean-Bootstrap zum Reproduzierbarkeitsvergleich"
+  ],
+  "done_criteria": [
+    "kein Paketindex oder externer Paketdownload im Installationspfad",
+    "leere Umgebung vollständig aufsetzbar",
+    "zwei aufeinanderfolgende Clean-Bootstraps ergeben dieselbe installierte Paketliste",
+    "Projektprüfungen sind grün",
+    "Bootstrap-Evidence und Hashvergleich vorhanden",
+    "P01 kann als abgeschlossen qualifiziert werden"
+  ],
+  "known_risks": [
+    "I005-GitHub-Artefakt besitzt 90-Tage-Retention und muss für langfristige Offline-Nutzung in eine persistente Projekt-/Release-Ablage überführt werden",
+    "Systembibliotheken von Qt sind nicht Python-Wheels und benötigen gesonderte Laufzeitqualifikation",
+    "ein versehentlicher Indexzugriff würde den Offline-Beweis entwerten"
+  ],
+  "open_subpoints": [
+    "Nach I006 P01-Gesamtcheckpoint durchführen",
+    "Danach I007 Verträge, Typen und Schemata beginnen"
+  ]
+}
