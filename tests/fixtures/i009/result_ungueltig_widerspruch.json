@@ -1,0 +1,12 @@
+{
+  "typ": "OPERATION_RESULT",
+  "schema": "1.0.0",
+  "operation_id": "op_0123456789abcdef0123456789abcdef",
+  "erfolgreich": true,
+  "wert": {},
+  "fehler": {
+    "klasse": "INTERN",
+    "code": "UNERWARTETER_FEHLER",
+    "nachricht": "Darf bei Erfolg nicht vorhanden sein."
+  }
+}

@@ -1,57 +1,61 @@
-name: I008 Schema-Qualifikation
+name: I009 Operationsverträge Qualifikation
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - iteration/i008-schemata
+      - iteration/i009-operationen
     paths:
+      - ".github/workflows/i009-operationen.yml"
       - ".github/workflows/i008-schemata.yml"
-      - "src/provoware/vertraege/schemata.py"
+      - "src/provoware/vertraege/operationen.py"
       - "src/provoware/vertraege/__init__.py"
-      - "tests/contract/test_schemata.py"
-      - "tests/contract/test_i007_api_freeze.py"
-      - "tests/fixtures/i008/**"
+      - "tests/contract/test_operationen.py"
+      - "tests/fixtures/i009/**"
       - "tests/test_structure.py"
       - "VERSIONSREGISTER.json"
       - "ARCHITEKTURREGISTER.json"
       - "KOMPONENTENREGISTER.json"
       - "TRACEABILITY.json"
-      - "EVIDENCE/I008/**"
+      - "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md"
+      - "EVIDENCE/I009/**"
   pull_request:
     branches:
       - main
     paths:
+      - ".github/workflows/i009-operationen.yml"
       - ".github/workflows/i008-schemata.yml"
-      - "src/provoware/vertraege/schemata.py"
+      - "src/provoware/vertraege/operationen.py"
       - "src/provoware/vertraege/__init__.py"
-      - "tests/contract/test_schemata.py"
-      - "tests/contract/test_i007_api_freeze.py"
-      - "tests/fixtures/i008/**"
+      - "tests/contract/test_operationen.py"
+      - "tests/fixtures/i009/**"
       - "tests/test_structure.py"
       - "VERSIONSREGISTER.json"
       - "ARCHITEKTURREGISTER.json"
       - "KOMPONENTENREGISTER.json"
       - "TRACEABILITY.json"
-      - "EVIDENCE/I008/**"
+      - "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md"
+      - "EVIDENCE/I009/**"
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: i008-schemata-${{ github.event.pull_request.number || github.ref }}
+  group: i009-operationen-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   qualifikation:
-    name: Python 3.13.15 / Schemas / Golden-Fixtures
+    name: Python 3.13.15 / Operationsverträge / Golden-Fixtures
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     env:
       I005_RUN_ID: "31330952896"
       I005_ARTIFACT_ID: "9042907351"
       I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      I008_ARTIFACT_ID: "9044527742"
+      I008_ARTIFACT_SHA256: "f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PIP_NO_INPUT: "1"
       PYTHONHASHSEED: "0"
@@ -91,12 +95,12 @@ jobs:
           printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "$ZIP" | sha256sum -c -
           mkdir -p .artefakte/i005
           unzip -q "$ZIP" -d .artefakte/i005
-          python3 -m venv .venv-i008
-          PIP_NO_INDEX=1 .venv-i008/bin/python -m pip install \
+          python3 -m venv .venv-i009
+          PIP_NO_INDEX=1 .venv-i009/bin/python -m pip install \
             --no-index \
             --find-links "$PWD/.artefakte/i005/wheelhouse" \
             pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
-          PIP_NO_INDEX=1 .venv-i008/bin/python -m pip check
+          PIP_NO_INDEX=1 .venv-i009/bin/python -m pip check
 
       - name: Aktuelle Baseline und I008-Evidence revalidieren
         shell: bash
@@ -112,40 +116,41 @@ jobs:
           assert baseline['letzte_iteration'] >= 'I008'
           assert evidence['iteration'] == 'I008'
           assert evidence['status'] == 'GRUEN'
-          assert evidence['qualifikationslauf']['artifact_id'] == 9044527742
+          assert evidence['qualifikationslauf']['artifact_id'] == int('9044527742')
           assert evidence['qualifikationslauf']['artifact_sha256'] == 'f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61'
           PY
 
       - name: Ruff prüfen
         shell: bash
         run: |
-          .venv-i008/bin/ruff check src tests WERKZEUGE
-          .venv-i008/bin/ruff format --check src tests WERKZEUGE
+          .venv-i009/bin/ruff check src tests WERKZEUGE
+          .venv-i009/bin/ruff format --check src tests WERKZEUGE
 
       - name: mypy strict prüfen
         shell: bash
         run: |
-          .venv-i008/bin/mypy \
+          .venv-i009/bin/mypy \
             src/provoware/vertraege \
             tests/contract/test_datentypen.py \
             tests/contract/test_id_varianten.py \
             tests/contract/test_i007_api_freeze.py \
-            tests/contract/test_schemata.py
+            tests/contract/test_schemata.py \
+            tests/contract/test_operationen.py
 
-      - name: Contracttests und Golden-Fixtures
+      - name: I009 Contracttests und Golden-Fixtures
         shell: bash
-        run: .venv-i008/bin/pytest -q -m contract tests/contract
+        run: .venv-i009/bin/pytest -q -m contract tests/contract
 
       - name: Gesamte schnelle Regression
         shell: bash
-        run: .venv-i008/bin/pytest -q
+        run: .venv-i009/bin/pytest -q
 
-      - name: I008-Qualifikationsreceipt erzeugen
+      - name: I009-Qualifikationsreceipt erzeugen
         shell: bash
         run: |
           set -Eeuo pipefail
-          mkdir -p .artefakte/I008
-          .venv-i008/bin/python - <<'PY'
+          mkdir -p .artefakte/I009
+          .venv-i009/bin/python - <<'PY'
           from __future__ import annotations
           import json, os, platform
           from datetime import UTC, datetime
@@ -153,7 +158,7 @@ jobs:
 
           receipt = {
               'schema': '1.0.0',
-              'iteration': 'I008',
+              'iteration': 'I009',
               'status': 'GRUEN',
               'zeit_utc': datetime.now(UTC).isoformat(),
               'github': {
@@ -178,29 +183,32 @@ jobs:
                   'aktuelle_baseline': 'GRUEN',
                   'i008_evidence': 'GRUEN',
                   'i007_api_freeze': 'GRUEN',
-                  'schema_produktversion_trennung': 'GRUEN',
+                  'i008_schema_vertraege': 'GRUEN',
+                  'request_result_korrelation': 'GRUEN',
+                  'payload_kanonisierung': 'GRUEN',
+                  'fingerprints': 'GRUEN',
                   'golden_fixtures': 'GRUEN',
+                  'architektur_importgrenze': 'GRUEN',
                   'ruff_check': 'GRUEN',
                   'ruff_format': 'GRUEN',
                   'mypy_strict': 'GRUEN',
                   'contracttests': 'GRUEN',
                   'gesamtregression': 'GRUEN',
-                  'architektur_importgrenze': 'GRUEN',
               },
           }
-          Path('.artefakte/I008/I008_QUALIFIKATION.json').write_text(
+          Path('.artefakte/I009/I009_QUALIFIKATION.json').write_text(
               json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + '\n',
               encoding='utf-8',
           )
           PY
-          sha256sum .artefakte/I008/I008_QUALIFIKATION.json
+          sha256sum .artefakte/I009/I009_QUALIFIKATION.json
 
-      - name: I008-Evidence hochladen
+      - name: I009-Evidence hochladen
         id: upload
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: PROVOWARE-I008-schemata-${{ github.sha }}
-          path: .artefakte/I008/
+          name: PROVOWARE-I009-operationen-${{ github.sha }}
+          path: .artefakte/I009/
           if-no-files-found: error
           compression-level: 9
           retention-days: 90
@@ -212,13 +220,14 @@ jobs:
           ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
         run: |
           {
-            echo "## I008 — Schemas GRÜN"
+            echo "## I009 — Operationsverträge GRÜN"
             echo
             echo "- aktuelle validierte Baseline revalidiert"
-            echo "- I008-Evidence unverändert verifiziert"
-            echo "- I007 öffentliche API eingefroren"
-            echo "- SchemaVersion und ProduktVersion getrennt"
-            echo "- Manifest-/Projekt-Golden-Fixtures GRÜN"
+            echo "- I008-Evidence hashgebunden verifiziert"
+            echo "- OperationRequest / OperationResult typisiert"
+            echo "- Payload tief kanonisiert und begrenzt"
+            echo "- Request-/Result-Korrelation über OperationId"
+            echo "- deterministische SHA-256-Fingerprints"
             echo "- Ruff + mypy strict GRÜN"
             echo "- Contracttests + Gesamtregression GRÜN"
             echo "- Artifact-ID: ${ARTIFACT_ID}"

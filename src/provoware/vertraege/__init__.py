@@ -11,6 +11,14 @@ from provoware.vertraege.datentypen import (
     RevisionId,
     Status,
 )
+from provoware.vertraege.operationen import (
+    OPERATION_SCHEMA_VERSION,
+    OperationArt,
+    OperationPayload,
+    OperationRequest,
+    OperationResult,
+    OperationVertragsfehler,
+)
 from provoware.vertraege.schemata import (
     MANIFEST_SCHEMA_VERSION,
     PROJEKT_SCHEMA_VERSION,
@@ -23,14 +31,20 @@ from provoware.vertraege.schemata import (
 
 __all__ = [
     "MANIFEST_SCHEMA_VERSION",
+    "OPERATION_SCHEMA_VERSION",
     "PROJEKT_SCHEMA_VERSION",
     "ChangeId",
     "FehlerInfo",
     "Fehlerklasse",
     "ManifestSchema",
     "ObjektId",
+    "OperationArt",
     "OperationErgebnis",
     "OperationId",
+    "OperationPayload",
+    "OperationRequest",
+    "OperationResult",
+    "OperationVertragsfehler",
     "ProduktVersion",
     "ProjektId",
     "ProjektSchema",

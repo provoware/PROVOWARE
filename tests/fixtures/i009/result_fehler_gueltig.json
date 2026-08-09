@@ -1,0 +1,12 @@
+{
+  "typ": "OPERATION_RESULT",
+  "schema": "1.0.0",
+  "operation_id": "op_0123456789abcdef0123456789abcdef",
+  "erfolgreich": false,
+  "wert": null,
+  "fehler": {
+    "klasse": "VALIDIERUNG",
+    "code": "PROJEKT_UNGUELTIG",
+    "nachricht": "Projekt ist ungültig."
+  }
+}
