@@ -43,12 +43,8 @@ def test_operation_art_ist_typisiert_aber_zieht_keine_fachenum_vor() -> None:
 
 @pytest.mark.contract
 def test_payload_wird_tief_kanonisiert_und_ist_reihenfolgeunabhaengig() -> None:
-    links = OperationPayload.aus_mapping(
-        {"z": [True, 2, None], "a": {"beta": "B", "alpha": "A"}}
-    )
-    rechts = OperationPayload.aus_mapping(
-        {"a": {"alpha": "A", "beta": "B"}, "z": [True, 2, None]}
-    )
+    links = OperationPayload.aus_mapping({"z": [True, 2, None], "a": {"beta": "B", "alpha": "A"}})
+    rechts = OperationPayload.aus_mapping({"a": {"alpha": "A", "beta": "B"}, "z": [True, 2, None]})
 
     assert links == rechts
     assert links.kanonisch_json == '{"a":{"alpha":"A","beta":"B"},"z":[true,2,null]}'
