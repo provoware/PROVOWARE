@@ -1,70 +1,68 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I007",
-  "next_goal": "ID-, Status-, Fehler- und Ergebnis-Typen als strikt typisierte, GUI- und datenbankunabhängige Kernverträge definieren.",
-  "why_next": "P01 ist durch I005 und I006 praktisch qualifiziert. Der Masterplan führt danach zwingend in P02; I007 bildet die Typgrenze für alle späteren Commands, Zustände, Fehler und Ergebnisse.",
+  "next_iteration": "I008",
+  "next_goal": "Manifest- und Projektschemata als versionierte, strikt validierbare und von GUI/Persistenz unabhängige Verträge definieren.",
+  "why_next": "I007 hat die primitive Typgrenze für Identitäten, Zustände, Fehler und Ergebnisse qualifiziert. Der Masterplan führt innerhalb P02 als Nächstes zu den Manifest- und Projektschemata, bevor Request-/Result-Verträge und das Architekturgate folgen.",
   "priority": "P0",
-  "probable_component": "src/provoware/vertraege/datentypen",
+  "probable_component": "src/provoware/vertraege/schemata",
   "probable_files": [
-    "src/provoware/vertraege/__init__.py",
-    "src/provoware/vertraege/datentypen.py",
-    "tests/contract/test_datentypen.py",
-    "ARCHITEKTURREGISTER.json",
+    "src/provoware/vertraege/schemata.py",
+    "tests/contract/test_schemata.py",
+    "VERSIONSREGISTER.json",
     "TRACEABILITY.json",
-    "EVIDENCE/I007/"
+    "ARCHITEKTURREGISTER.json",
+    "EVIDENCE/I008/"
   ],
   "probable_symbols": [
-    "ProjektId",
-    "ObjektId",
-    "RevisionId",
-    "ChangeId",
-    "OperationId",
-    "Status",
-    "Fehlerklasse",
-    "OperationErgebnis"
+    "SchemaVersion",
+    "ManifestSchema",
+    "ProjektSchema",
+    "SchemaValidierungsfehler"
   ],
   "context_fingerprints": {
-    "i006_workflow_run_id": 31331742667,
-    "i006_artifact_id": 9043135144,
-    "i006_artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
-    "bootstrap_freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed"
+    "baseline": "BASELINE-2026-08-09-I007",
+    "i007_workflow_run_id": 31335066204,
+    "i007_artifact_id": 9044073684,
+    "i007_artifact_sha256": "007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909",
+    "i007_receipt_sha256": "11cb28d66188298496c65059918d707b17a1cb4e95087c8368e6c9aa49221d33"
   },
   "known_dependencies": [
-    "BASELINE-2026-08-09-I006",
-    "P01 Offline-Entwicklungsumgebung qualifiziert",
+    "BASELINE-2026-08-09-I007",
+    "KMP-VERTRAEGE validiert",
+    "ARCH-008 aktiv",
     "Python 3.13.15",
     "mypy 2.3.0",
     "pytest 9.1.1"
   ],
   "preconditions": [
-    "I006-Evidence gegen aktuelle Baseline revalidieren",
-    "DELTA-0003 im Precheck behandeln: I005-Workflowtrigger auf I005-relevante Eingaben verengen",
-    "öffentliche Typnamen und Semantik vor Implementierung als Contract festlegen",
-    "keine Qt-, SQLite- oder Modulabhängigkeit in die Vertragsschicht einführen"
+    "I007-Evidence gegen CURRENT_BASELINE revalidieren",
+    "bestehende Schema-Versionen im VERSIONSREGISTER als autoritative Ausgangswerte lesen",
+    "Pflichtfelder, unbekannte Felder und Versionsgrenzen vor Implementierung als Contract festlegen",
+    "keine Qt-, SQLite-, Datei-I/O- oder Modulabhängigkeit in die Schemaschicht einführen"
   ],
   "expected_tests": [
-    "mypy --strict für die neue Vertragsschicht",
-    "pytest Contracttests für gültige und ungültige IDs",
-    "Enum-/Status-Stabilität",
-    "Fehler-/Ergebnis-Serialisierbarkeit soweit in I007 definiert",
-    "Architekturprüfung auf verbotene GUI-/DB-Imports",
+    "mypy --strict für neue Schematypen",
+    "gültige Minimal- und Vollbeispiele",
+    "Ablehnung fehlender Pflichtfelder",
+    "Ablehnung ungültiger oder inkompatibler Schema-Versionen",
+    "deterministische Serialisierung soweit in I008 definiert",
+    "Architekturprüfung auf verbotene GUI-/DB-/Dateiimporte",
     "vollständige bestehende schnelle Regression"
   ],
   "done_criteria": [
-    "alle in I007 vorgesehenen IDs sind eindeutig typisiert und validierbar",
-    "Status-, Fehler- und Ergebnistypen besitzen keine Magic-String-Schnittstelle",
-    "mypy strict ist grün",
-    "Contracttests sind grün",
-    "keine GUI-/DB-Abhängigkeit",
-    "Traceability und Evidence aktualisiert"
+    "Manifest- und Projektschema sind versioniert und eindeutig validierbar",
+    "Schemafehler werden strukturiert statt als lose Magic Strings dargestellt",
+    "keine GUI-/DB-/Dateiabhängigkeit",
+    "mypy strict und Contracttests sind grün",
+    "Traceability, Versionsregister und Evidence sind aktualisiert"
   ],
   "known_risks": [
-    "zu frühe Überabstraktion der Typen kann spätere Verträge unnötig verkomplizieren",
-    "unterschiedliche Stringformate für IDs könnten später Persistenz- und Importgrenzen destabilisieren",
-    "I005-Workflow ist derzeit noch zu breit getriggert und erzeugt unnötigen I/O bei Teständerungen"
+    "zu frühe Festlegung optionaler Fachfelder könnte später unnötige Migrationen erzwingen",
+    "uneindeutige Regeln für unbekannte Felder könnten Forward-Kompatibilität destabilisieren",
+    "Schema-Version und Projektversion dürfen nicht semantisch vermischt werden"
   ],
   "open_subpoints": [
-    "DELTA-0003 als kleiner CI-Sparsamkeitspatch vor oder im I007-Precheck schließen",
-    "I008 Manifest- und Projekt-Schemata erst nach grünem I007 beginnen"
+    "I009 OperationRequest/OperationResult erst nach grünem I008 beginnen",
+    "I010 Architekturgate erst nach stabilen I007-I009-Verträgen schließen"
   ]
 }
