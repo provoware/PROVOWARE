@@ -22,15 +22,15 @@ from provoware.vertraege.schemata import (
 )
 
 __all__ = [
+    "MANIFEST_SCHEMA_VERSION",
+    "PROJEKT_SCHEMA_VERSION",
     "ChangeId",
     "FehlerInfo",
     "Fehlerklasse",
-    "MANIFEST_SCHEMA_VERSION",
     "ManifestSchema",
     "ObjektId",
     "OperationErgebnis",
     "OperationId",
-    "PROJEKT_SCHEMA_VERSION",
     "ProduktVersion",
     "ProjektId",
     "ProjektSchema",
