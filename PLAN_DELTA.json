@@ -2,13 +2,13 @@
   "schema": "1.0.0",
   "neu": [
     {
-      "id": "DELTA-0002",
-      "prioritaet": "P0",
-      "quelle": "I005 Qualifikation",
-      "zielphase": "P01",
-      "ziel_iteration": "I006",
-      "thema": "Clean-Bootstrap muss das unveraenderliche I005-Artefakt als einzige Paketquelle verwenden.",
-      "grund": "I005 beweist die Offline-Installierbarkeit des Wheelhouse; I006 muss nun den gesamten Entwicklungs-Bootstrap in einer leeren Umgebung reproduzierbar und ohne Indexzugriff nachweisen.",
+      "id": "DELTA-0003",
+      "prioritaet": "P1",
+      "quelle": "I006 Workflowbeobachtung",
+      "zielphase": "P02 Vorvalidierung",
+      "ziel_iteration": "I007",
+      "thema": "I005-Workflowpfade sind zu breit und lösen bei beliebigen Tests unnötig einen rund 294-MB-Wheelhouse-Neubau aus.",
+      "grund": "Der aktuelle Pfadfilter `tests/**` widerspricht bei unveränderter I005-Eingabe dem Sparsamkeitsprinzip. Vor I007 soll der Trigger auf tatsächlich I005-relevante Test- und Tooldateien verengt werden.",
       "blockiert_aktuelle_iteration": false
     }
   ],
@@ -26,6 +26,18 @@
         "wheel_bytes": 294428822
       },
       "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert."
+    },
+    {
+      "id": "DELTA-0002",
+      "erledigt_in": "I006",
+      "nachweis": {
+        "workflow_run_id": 31331742667,
+        "artifact_id": 9043135144,
+        "artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
+        "bootstrap_durchlaeufe": 2,
+        "freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed"
+      },
+      "ergebnis": "Zwei saubere Offline-Bootstraps aus dem validierten I005-Artefakt erzeugten byteidentische Paket-Freezes und vollständig grüne Projektprüfungen."
     }
   ],
   "blockiert": []
