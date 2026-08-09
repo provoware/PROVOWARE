@@ -1,57 +1,14 @@
 {
   "blockiert": [],
   "erledigt": [
-    {
-      "erledigt_in": "I005",
-      "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert.",
-      "id": "DELTA-0001",
-      "nachweis": {
-        "artifact_id": 9042907351,
-        "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040",
-        "pakete": 50,
-        "wheel_bytes": 294428822,
-        "workflow_run_id": 31330952896
-      }
-    },
-    {
-      "erledigt_in": "I006",
-      "ergebnis": "Zwei saubere Offline-Bootstraps aus dem validierten I005-Artefakt erzeugten byteidentische Paket-Freezes und vollständig grüne Projektprüfungen.",
-      "id": "DELTA-0002",
-      "nachweis": {
-        "artifact_id": 9043135144,
-        "artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636",
-        "bootstrap_durchlaeufe": 2,
-        "freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed",
-        "workflow_run_id": 31331742667
-      }
-    },
-    {
-      "erledigt_in": "I006-TRANSFER-V1",
-      "ergebnis": "Transfer V1 mit 24-MiB-Teilstücken, vollautomatischem Installer, Hash-/ZIP-/Baseline-Prüfung, Backup/Rollback, vollständiger Befehlsanleitung, MB-Größenangaben und repo-integriertem Actions-Builder eingeführt.",
-      "id": "DELTA-0004",
-      "nachweis": {
-        "referenz_gesamt_bytes": 295210603,
-        "referenz_gesamt_mb": 295.210603,
-        "referenz_sha256": "9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17",
-        "teil_mib": 24,
-        "teile": 12
-      },
-      "quelle": "Nutzeranforderung 2026-08-09"
-    }
+    {"erledigt_in": "I005", "ergebnis": "Wheelhouse, SHA-256-, Lizenz- und Transitivabhaengigkeitsinventar erzeugt und offline verifiziert.", "id": "DELTA-0001", "nachweis": {"artifact_id": 9042907351, "artifact_sha256": "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040", "pakete": 50, "wheel_bytes": 294428822, "workflow_run_id": 31330952896}},
+    {"erledigt_in": "I006", "ergebnis": "Zwei saubere Offline-Bootstraps aus dem validierten I005-Artefakt erzeugten byteidentische Paket-Freezes und vollständig grüne Projektprüfungen.", "id": "DELTA-0002", "nachweis": {"artifact_id": 9043135144, "artifact_sha256": "2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636", "bootstrap_durchlaeufe": 2, "freeze_sha256": "5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed", "workflow_run_id": 31331742667}},
+    {"erledigt_in": "I006-TRANSFER-V1", "ergebnis": "Transfer V1 mit 24-MiB-Teilstücken, vollautomatischem Installer, Hash-/ZIP-/Baseline-Prüfung, Backup/Rollback, vollständiger Befehlsanleitung, MB-Größenangaben und repo-integriertem Actions-Builder eingeführt.", "id": "DELTA-0004", "nachweis": {"referenz_gesamt_bytes": 295210603, "referenz_gesamt_mb": 295.210603, "referenz_sha256": "9b91cd77787ca01ada815b26920967774a918c889b69522f8d00cbc3329a6b17", "teil_mib": 24, "teile": 12}, "quelle": "Nutzeranforderung 2026-08-09"},
+    {"ergebnis": "I005-Workflow reagiert nicht mehr auf beliebige tests/**, sondern nur auf den I005-Vertragstest und echte I005-Eingaben.", "erledigt_in": "I007-PRECHECK", "id": "DELTA-0003", "nachweis": {"alter_filter": "tests/**", "neuer_filter": "tests/test_i005_contract.py", "workflow": ".github/workflows/i005-wheelhouse.yml"}},
+    {"ergebnis": "Transfer-V1-Workflow auf TRANSFER-relevante Änderungen begrenzt, damit eine neue Produktbaseline keinen veralteten I006-Transferlauf automatisch startet.", "erledigt_in": "I007-PRECHECK", "id": "DELTA-0005", "nachweis": {"entfernte_generische_trigger": ["PROJEKTSTATUS.json", "CURRENT_BASELINE.json", "README.md"], "workflow": ".github/workflows/transfer-v1.yml"}, "quelle": "I007 Vorvalidierung"}
   ],
   "geaendert": [],
-  "neu": [
-    {
-      "blockiert_aktuelle_iteration": false,
-      "grund": "Der aktuelle Pfadfilter `tests/**` widerspricht bei unveränderter I005-Eingabe dem Sparsamkeitsprinzip. Vor I007 soll der Trigger auf tatsächlich I005-relevante Test- und Tooldateien verengt werden.",
-      "id": "DELTA-0003",
-      "prioritaet": "P1",
-      "quelle": "I006 Workflowbeobachtung",
-      "thema": "I005-Workflowpfade sind zu breit und lösen bei beliebigen Tests unnötig einen rund 294-MB-Wheelhouse-Neubau aus.",
-      "ziel_iteration": "I007",
-      "zielphase": "P02 Vorvalidierung"
-    }
-  ],
+  "neu": [],
   "schema": "1.0.0",
   "verschoben": []
 }
