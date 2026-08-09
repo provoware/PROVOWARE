@@ -1,34 +1,75 @@
 # I010 — P02 Architektur- und Vertragsgate
 
-## Ausgangszustand
+## Ergebnis
 
-Kanonische Baseline ist `BASELINE-2026-08-09-I009`. I007-I009 sind als `VALIDIERT_GITHUB` dokumentiert. I010 darf keine P03-Funktion vorziehen.
+**Status: GRÜN / GitHub-validiert / P02 abgeschlossen.**
 
-## Gewählter kleiner Schritt
+Kanonische Ausgangsbasis war `BASELINE-2026-08-09-I009`. I010 hat keine P03-Produktfunktion vorgezogen, sondern ausschließlich die bereits qualifizierten I007-I009-Verträge als gemeinsame, maschinenlesbare P02-Architekturbasis eingefroren und geprüft.
 
-Die öffentliche P02-Vertragsoberfläche wird als maschinenlesbarer Snapshot erfasst und mit einem gemeinsamen Contracttest gegen unbeabsichtigte Drift gesichert. Gleichzeitig wird das exakte Python-Produktquellinventar geprüft und die Architekturgrenze über alle P02-Quellen gemeinsam revalidiert.
+Aktuelle Baseline nach Promotion: `BASELINE-2026-08-10-I010`.
 
-## Risikoanalyse
+## Kanonischer Gesamt-Freeze
 
-- Produktlogik: unverändert.
-- Persistenz/Dateiformate: unverändert.
-- Datenverlustrisiko: keines durch diesen Patch; nur Tests, Fixture und Dokumentation.
-- Rückfall: Branch kann vollständig verworfen werden.
-- Hauptrisiko: Ein zu enger Snapshot kann absichtliche API-Änderungen blockieren. Deshalb ist eine Änderung nur über expliziten Vertrags-/Migrationsschritt zulässig.
+Die öffentliche P02-Vertragsoberfläche wird jetzt über genau eine maschinenlesbare Wahrheitsquelle abgesichert:
 
-## Neue Prüfungen
+- `P02_API_SNAPSHOT.json`: öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Enumwerte, Schemaversionen, Pflichtfelder, Vertragsmarker und Fehlercodes.
+- Snapshot-Fingerprint: `2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16`.
+- `P02_QUELLINVENTAR.json`: exaktes Python-Produktquellinventar mit SHA-256 je P02-Quelle.
+- `WERKZEUGE/p02_architekturgate.py`: gemeinsames Baseline-, Inventar-, AST-, API-, Versions- und Traceability-Gate.
 
-1. öffentliche `__all__`-Symbole entsprechen exakt dem Snapshot,
-2. ID-Präfixe bleiben stabil,
-3. Status- und Fehlerklassen bleiben stabil,
-4. Manifest-, Projekt- und Operationsschemaversionen bleiben getrennt und stabil,
-5. das Produktquellinventar entspricht exakt der erwarteten P02-Schicht,
-6. alle Produktquellen bleiben frei von Qt-, SQLite-, Datei-I/O-, Handler-, Persistenz- und Modulabhängigkeiten.
+Ein früher I010-Entwurf enthielt zusätzlich einen kleineren parallelen Snapshot und einen separaten Contracttest. Diese doppelte Wahrheitsquelle wurde bewusst entfernt; der kanonische P02-Snapshot ist allein maßgeblich.
+
+## Nachgewiesene ROT-Fälle
+
+Die Architekturgrenze wurde nicht nur positiv getestet. Negative Fixtures beweisen, dass das Gate bei folgenden Verletzungen tatsächlich blockiert:
+
+1. SQLite-Import in der P02-Vertragsschicht,
+2. Qt/PySide-Import,
+3. Handler-Abhängigkeit,
+4. Datei-I/O-Aufruf,
+5. neue unregistrierte P02-Produktdatei,
+6. vorgezogene P03-Produktquelle während I010.
+
+Damit erfüllt I010 den Masterplan-Abnahmekern, dass eine absichtliche Architekturverletzung erkannt und blockiert wird.
+
+## Finale Qualifikation
+
+GitHub-Actions-Run: `31339417368`  
+Job: `93310619106`  
+Ubuntu: `22.04.5 LTS x86_64`  
+Python: `3.13.15`  
+Toolchain: verifiziertes I005-Wheelhouse, offline installiert.
+
+Ergebnisse:
+
+- P02-Gesamtgate: GRÜN
+- P02-Quellinventar: GRÜN / exakt und hashgebunden
+- API-Snapshot: GRÜN / kanonisch und fingerprintgebunden
+- AST-Architekturmatrix: GRÜN
+- Negativfixtures: GRÜN
+- P03-Scope-Freeze: GRÜN
+- Versionsräume: GRÜN
+- Traceability vor Promotion: GRÜN
+- Ruff Check: GRÜN
+- Ruff Format: GRÜN / 20 Dateien
+- mypy strict: GRÜN / 11 Quelldateien
+- Architektur-/Negativtests: 12 bestanden
+- Contracttests: 49 bestanden
+- Gesamtregression: 80 bestanden
+- I005-, I006-, I007-, I008- und I009-Regressionsworkflows auf dem finalen I010-Head: erneut GRÜN
+
+Evidence-Artefakt: `9045351696`  
+Artifact-SHA-256: `6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9`  
+Receipt-SHA-256: `cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee`.
+
+## Promotion und Rückfall
+
+Vor der Promotion wurde der validierte I009-main-Stand auf `backup/vor-i010-promotion-2026-08-10` gesichert. Der qualifizierte I010-PR wurde anschließend nach `main` promoviert. Erst danach wurden P02, Traceability und Architekturregeln auf `VALIDIERT` gesetzt.
 
 ## Wissensspeicher
 
-`ERK-I010-001` wurde als Regelentwurf E1/P0 aufgenommen. Keine Hochstufung auf E2+ vor einem tatsächlich beobachteten reproduzierbaren Qualifikationslauf.
+`ERK-I010-001` ist nach dem tatsächlich reproduzierten grünen Gesamtgate nicht mehr nur eine Hypothese. Der Regelentwurf wird auf E2 / bestätigt angehoben. Eine projektübergreifende Goldene Regel wird daraus weiterhin nicht automatisch abgeleitet; dafür wären zusätzliche unabhängige Wiederholungen in weiteren Schichten oder Projekten erforderlich.
 
-## Qualifikationsstatus
+## Nächster Schritt
 
-Die Contracttests sind implementiert, aber in dieser Iteration noch nicht als Runtime-PASS bewertet. Ein GitHub-Actions-Gesamtgate muss vor Promotion ergänzt bzw. erfolgreich ausgeführt werden. Unbekannt bleibt unbekannt; `main` wird nicht verändert.
+P03 ist freigegeben. I011 implementiert ausschließlich das read-only Linux-Systemprofil und die X11-Erkennung. Ubuntu 22.04 und 24.04 amd64 X11 bilden den Pflicht-Abnahmekern. Pfadnormalisierung, atomare Schreibprimitive und Lock-Leases bleiben I012-I014 vorbehalten.
