@@ -1,0 +1,119 @@
+name: I009 Vollpaket Split-Export
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/i009-paket-split.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: i009-paket-split-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  split_export:
+    name: I009 Voll-ZIP und Transfer getrennt exportieren
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      QUELL_RUN_ID: "31338287823"
+      QUELL_ARTIFACT_ID: "9045010082"
+      QUELL_ARTIFACT_SHA256: "2efc990546cd74a9833ea5322c50c0170eb929438067675e34de0fd6053e1dde"
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+
+      - name: Qualifiziertes I009-Vollpaket laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.QUELL_ARTIFACT_ID }}
+          path: .artefakte/i009-vollpaket
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.QUELL_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: Quellartifact prüfen und entpacken
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mapfile -t ZIPS < <(find .artefakte/i009-vollpaket -type f -name '*.zip' -print)
+          test ${#ZIPS[@]} -eq 1
+          ZIP="${ZIPS[0]}"
+          printf '%s  %s\n' "$QUELL_ARTIFACT_SHA256" "$ZIP" | sha256sum -c -
+          mkdir -p export
+          unzip -q "$ZIP" -d export
+          test -f export/PROVOWARE_v0.1.0-dev_I009_VOLLSTAENDIG_GITHUB_VALIDIERT.zip
+          test -f export/PROVOWARE_I009_STARTER.zip
+          test -f export/PROVOWARE_INSTALLIEREN.sh
+          test -f export/PROVOWARE_TRANSFER_MANIFEST.json
+          test -f export/SHA256SUMMEN.txt
+          test -f export/AENDERUNGSMETRIK_I009.json
+          test -f export/TRANSFER_TESTERGEBNIS_I009.json
+          test -f export/PAKETSTATUS_I009.json
+          test "$(find export -maxdepth 1 -type f -name 'PROVOWARE_I009.teil*.pvpart' | wc -l)" -eq 12
+          (
+            cd export
+            sha256sum -c SHA256SUMMEN.txt
+          )
+
+      - name: Voll-ZIP separat hochladen
+        id: vollzip
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I009-VOLLZIP-2fe130ce24141f6cafcea8454376dfab6096aa7a
+          path: |
+            export/PROVOWARE_v0.1.0-dev_I009_VOLLSTAENDIG_GITHUB_VALIDIERT.zip
+            export/PAKETSTATUS_I009.json
+            export/AENDERUNGSMETRIK_I009.json
+            export/TRANSFER_TESTERGEBNIS_I009.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Transferpaket separat hochladen
+        id: transfer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I009-TRANSFER-2fe130ce24141f6cafcea8454376dfab6096aa7a
+          path: |
+            export/PROVOWARE_I009.teil*.pvpart
+            export/PROVOWARE_I009_STARTER.zip
+            export/PROVOWARE_INSTALLIEREN.sh
+            export/PROVOWARE_TRANSFER_MANIFEST.json
+            export/LAIENANLEITUNG_PROVOWARE_I009.txt
+            export/SHA256SUMMEN.txt
+            export/PAKETSTATUS_I009.json
+            export/AENDERUNGSMETRIK_I009.json
+            export/TRANSFER_TESTERGEBNIS_I009.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Export zusammenfassen
+        shell: bash
+        env:
+          VOLLZIP_ID: ${{ steps.vollzip.outputs.artifact-id }}
+          VOLLZIP_DIGEST: ${{ steps.vollzip.outputs.artifact-digest }}
+          TRANSFER_ID: ${{ steps.transfer.outputs.artifact-id }}
+          TRANSFER_DIGEST: ${{ steps.transfer.outputs.artifact-digest }}
+        run: |
+          {
+            echo "## I009 Split-Export — GRÜN"
+            echo
+            echo "- Quellartifact vollständig SHA-256-verifiziert"
+            echo "- interne SHA256SUMMEN vollständig GRÜN"
+            echo "- Voll-ZIP Artifact-ID: ${VOLLZIP_ID}"
+            echo "- Voll-ZIP Digest: ${VOLLZIP_DIGEST}"
+            echo "- Transfer Artifact-ID: ${TRANSFER_ID}"
+            echo "- Transfer Digest: ${TRANSFER_DIGEST}"
+          } >> "$GITHUB_STEP_SUMMARY"
