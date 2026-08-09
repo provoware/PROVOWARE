@@ -47,24 +47,25 @@ def parse_hashliste(path: Path) -> dict[str, str]:
     return result
 
 
-def pruefe_i005(i005_root: Path, status_path: Path) -> dict[str, Any]:
-    if not i005_root.is_dir():
-        raise BootstrapPrueffehler(f"I005-Verzeichnis fehlt: {i005_root}")
-
+def pruefe_status(status_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     status = lade_json(status_path)
     if status.get("iteration") != "I005" or status.get("status") != "VALIDIERT":
-        raise BootstrapPrueffehler("WHEELHOUSE_STATUS ist nicht die validierte I005-Baseline.")
-
+        raise BootstrapPrueffehler(
+            "WHEELHOUSE_STATUS ist nicht die validierte I005-Baseline."
+        )
     evidence_hashes = status.get("evidence_hashes")
     if not isinstance(evidence_hashes, dict):
         raise BootstrapPrueffehler("evidence_hashes fehlen in WHEELHOUSE_STATUS.")
+    return status, evidence_hashes
 
+
+def pruefe_evidence_dateien(i005_root: Path, hashes: dict[str, Any]) -> None:
     expected_files = {
-        "WHEELHOUSE_MANIFEST.json": evidence_hashes.get("wheelhouse_manifest_sha256"),
-        "WHEELHOUSE_SHA256.txt": evidence_hashes.get("wheelhouse_hashliste_sha256"),
-        "ABHAENGIGKEITSINVENTAR.json": evidence_hashes.get("abhaengigkeitsinventar_sha256"),
-        "OFFLINE_FREEZE.txt": evidence_hashes.get("offline_freeze_sha256"),
-        "I005_QUALIFIKATION.json": evidence_hashes.get("qualifikation_sha256"),
+        "WHEELHOUSE_MANIFEST.json": hashes.get("wheelhouse_manifest_sha256"),
+        "WHEELHOUSE_SHA256.txt": hashes.get("wheelhouse_hashliste_sha256"),
+        "ABHAENGIGKEITSINVENTAR.json": hashes.get("abhaengigkeitsinventar_sha256"),
+        "OFFLINE_FREEZE.txt": hashes.get("offline_freeze_sha256"),
+        "I005_QUALIFIKATION.json": hashes.get("qualifikation_sha256"),
     }
     for rel, expected in expected_files.items():
         path = i005_root / rel
@@ -72,42 +73,71 @@ def pruefe_i005(i005_root: Path, status_path: Path) -> dict[str, Any]:
             raise BootstrapPrueffehler(f"Pflichtdatei fehlt: {rel}")
         actual = sha256(path)
         if actual != expected:
-            raise BootstrapPrueffehler(f"Hashabweichung {rel}: erwartet {expected}, erhalten {actual}")
+            raise BootstrapPrueffehler(
+                f"Hashabweichung {rel}: erwartet {expected}, erhalten {actual}"
+            )
 
+
+def pruefe_manifest(i005_root: Path, expected_count: int) -> None:
     manifest = lade_json(i005_root / "WHEELHOUSE_MANIFEST.json")
     qualification = lade_json(i005_root / "I005_QUALIFIKATION.json")
     if manifest.get("status") != "OFFLINE_INSTALLATION_VERIFIZIERT":
         raise BootstrapPrueffehler("I005-Manifest ist nicht offline verifiziert.")
     if qualification.get("status") != "GRUEN":
         raise BootstrapPrueffehler("I005-Qualifikation ist nicht GRUEN.")
-
-    expected_count = int(status.get("paketanzahl", -1))
     if manifest.get("paketanzahl") != expected_count:
-        raise BootstrapPrueffehler("Paketanzahl zwischen Status und Manifest weicht ab.")
+        raise BootstrapPrueffehler(
+            "Paketanzahl zwischen Status und Manifest weicht ab."
+        )
 
+
+def pruefe_wheels(i005_root: Path, expected_count: int) -> list[Path]:
     hash_entries = parse_hashliste(i005_root / "WHEELHOUSE_SHA256.txt")
-    wheel_entries = {rel: digest for rel, digest in hash_entries.items() if rel.startswith("wheelhouse/")}
-    wheels = sorted((i005_root / "wheelhouse").glob("*.whl"), key=lambda item: item.name.lower())
+    wheel_entries = {
+        rel: digest
+        for rel, digest in hash_entries.items()
+        if rel.startswith("wheelhouse/")
+    }
+    wheels = sorted(
+        (i005_root / "wheelhouse").glob("*.whl"), key=lambda item: item.name.lower()
+    )
     if len(wheels) != expected_count or len(wheel_entries) != expected_count:
         raise BootstrapPrueffehler(
-            f"Wheelanzahl abweichend: Dateien={len(wheels)}, Hashliste={len(wheel_entries)}, erwartet={expected_count}"
+            "Wheelanzahl abweichend: "
+            f"Dateien={len(wheels)}, Hashliste={len(wheel_entries)}, "
+            f"erwartet={expected_count}"
         )
 
     actual_names = {f"wheelhouse/{path.name}" for path in wheels}
     if actual_names != set(wheel_entries):
         missing = sorted(set(wheel_entries) - actual_names)
         extra = sorted(actual_names - set(wheel_entries))
-        raise BootstrapPrueffehler(f"Wheelbestand weicht ab; fehlt={missing}, extra={extra}")
+        raise BootstrapPrueffehler(
+            f"Wheelbestand weicht ab; fehlt={missing}, extra={extra}"
+        )
 
     for wheel in wheels:
         rel = f"wheelhouse/{wheel.name}"
-        actual = sha256(wheel)
-        if actual != wheel_entries[rel]:
+        if sha256(wheel) != wheel_entries[rel]:
             raise BootstrapPrueffehler(f"Wheel-Hashabweichung: {wheel.name}")
 
-    manifest_entry = hash_entries.get("WHEELHOUSE_MANIFEST.json")
-    if manifest_entry != sha256(i005_root / "WHEELHOUSE_MANIFEST.json"):
-        raise BootstrapPrueffehler("Manifesthash in WHEELHOUSE_SHA256.txt stimmt nicht.")
+    manifest_hash = sha256(i005_root / "WHEELHOUSE_MANIFEST.json")
+    if hash_entries.get("WHEELHOUSE_MANIFEST.json") != manifest_hash:
+        raise BootstrapPrueffehler(
+            "Manifesthash in WHEELHOUSE_SHA256.txt stimmt nicht."
+        )
+    return wheels
+
+
+def pruefe_i005(i005_root: Path, status_path: Path) -> dict[str, Any]:
+    if not i005_root.is_dir():
+        raise BootstrapPrueffehler(f"I005-Verzeichnis fehlt: {i005_root}")
+
+    status, evidence_hashes = pruefe_status(status_path)
+    pruefe_evidence_dateien(i005_root, evidence_hashes)
+    expected_count = int(status.get("paketanzahl", -1))
+    pruefe_manifest(i005_root, expected_count)
+    wheels = pruefe_wheels(i005_root, expected_count)
 
     return {
         "status": "GRUEN",
