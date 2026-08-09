@@ -1,0 +1,60 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I010",
+  "phase": "P02",
+  "status": "GRUEN",
+  "qualifikationslauf": {
+    "workflow_run_id": 31339417368,
+    "job_id": 93310619106,
+    "branch_head": "650efc515d9cfbc3e1a4e3e80bd1dcbde0fbe7a0",
+    "pr_merge_ref": "ed2d95d8096072a9b4732c479e9a9d9a1de7c600",
+    "main_merge_commit": "7dfe6d2cf039d9b974bad464ed0efa0aa6eec998",
+    "artifact_id": 9045351696,
+    "artifact_bytes": 683,
+    "artifact_mb": 0.000683,
+    "artifact_sha256": "6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9",
+    "receipt_sha256": "cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee"
+  },
+  "plattform": {
+    "ubuntu": "22.04.5 LTS",
+    "architektur": "x86_64",
+    "python": "3.13.15"
+  },
+  "toolchain": {
+    "quelle": "verifiziertes I005-Wheelhouse",
+    "pytest": "9.1.1",
+    "ruff": "0.16.1",
+    "mypy": "2.3.0",
+    "offline_installation": true
+  },
+  "fingerprints": {
+    "p02_api_snapshot_sha256": "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16",
+    "p02_quellinventar_datei_sha256": "9a5ee0c12d191d97f95de40ca0e7142454f17c209f9ca439829736f0bca8c376"
+  },
+  "ergebnisse": {
+    "baseline_i009": "GRUEN / 17 Register",
+    "p02_gesamtgate": "GRUEN",
+    "p02_quellinventar": "GRUEN / exakt und hashgebunden",
+    "api_snapshot": "GRUEN / kanonisch und fingerprintgebunden",
+    "ast_architekturmatrix": "GRUEN",
+    "negative_fixtures": "GRUEN / SQLite, Qt, Handler, Datei-I/O, unregistrierte P02-Quelle, vorgezogene P03-Quelle werden blockiert",
+    "p03_scope_freeze": "GRUEN / keine P03-Produktquelle",
+    "versionsraeume": "GRUEN",
+    "traceability": "GRUEN vor Promotion",
+    "ruff_check": "GRUEN",
+    "ruff_format": "GRUEN / 20 Dateien",
+    "mypy_strict": "GRUEN / 11 Quelldateien",
+    "architekturtests": "12 bestanden",
+    "contracttests": "49 bestanden",
+    "gesamtregression": "80 bestanden",
+    "historische_regressionsworkflows": "I005, I006, I007, I008 und I009 auf finalem I010-Head erneut GRUEN"
+  },
+  "korrigierte_schwachstellen": [
+    "verteilte Einzel-API-Prüfungen durch einen kanonischen maschinenlesbaren P02-Gesamtsnapshot ergänzt",
+    "unregistrierte neue Vertragsdateien werden durch exaktes Quelleninventar blockiert",
+    "Negativfixtures beweisen die tatsächliche ROT-Schaltung des Architekturgates",
+    "vorzeitig auf VALIDIERT gesetzte REQ-V1-003-Traceability bis zur P02-Gesamtpromotion wieder geöffnet",
+    "parallelen schwächeren I010-Teil-Snapshot und redundanten Contracttest entfernt; eine einzige Wahrheitsquelle bleibt",
+    "I010-Abschlusspaket darf keine Entwicklungs-Caches aus I009 fortschleppen"
+  ]
+}
