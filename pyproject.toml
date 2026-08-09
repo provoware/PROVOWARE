@@ -25,10 +25,11 @@ desktop = [
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 markers = [
   "contract: Vertrags- und Schnittstellentests",
   "struktur: Repository- und Baselinestruktur",
+  "architecture: Architektur- und Schichtgrenzentests",
 ]
 
 [tool.ruff]
