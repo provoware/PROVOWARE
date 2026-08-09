@@ -1,8 +1,8 @@
 # PROVOWARE
 
-**Status:** Neuaufbau · `0.1.0-dev` · Baseline- und Fundamentphase  
+**Status:** Neuaufbau · `0.1.0-dev` · P01 qualifiziert / P02 bereit  
 **Repository:** `provoware/PROVOWARE`  
-**Aktuelle Baseline:** `BASELINE-2026-08-09-I005`  
+**Aktuelle Baseline:** `BASELINE-2026-08-09-I006`  
 **Ziel:** portables, offline-first Linux-Desktopwerkzeug auf professioneller Engineering-Basis.
 
 Dieses Repository wurde auf Grundlage des Entwicklungs-Masterplans **EXPERT FINAL v2.0.0 vom 2026-08-09** neu initialisiert. Die frühere Browser-Prototyp-Baseline bleibt als GitHub-Backupzweig erhalten und wird nicht als neue Entwicklungsbasis weitergeführt.
@@ -16,19 +16,23 @@ Abgeschlossen und qualifiziert:
 - I003: neue Repository- und Ordnerstruktur angelegt.
 - I004: `pyproject.toml` und zentrale Qualitätskonfiguration erstellt.
 - I005: Offline-Wheelhouse auf Ubuntu 22.04 amd64 / CPython 3.13.15 erzeugt, inventarisiert und offline verifiziert.
+- I006: zwei vollständige Clean-Bootstraps ausschließlich aus dem verifizierten I005-Artefakt reproduzierbar durchgeführt.
 
-Nächster Pflichtschritt:
-- I006: reproduzierbarer Clean-Bootstrap vollständig offline aus dem verifizierten I005-Artefakt.
+**P00 und P01 sind damit qualifiziert.** Nächster Pflichtschritt ist **I007** in P02: ID-, Status-, Fehler- und Ergebnis-Typen als strikt typisierte Kernverträge.
 
 ## I005-Qualifikation
 
-Der GitHub-Actions-Lauf `31330952896` hat auf Ubuntu 22.04.5 LTS x86_64 mit CPython 3.13.15 und pip 25.2 insgesamt **50 Wheels mit 294428822 Bytes** erzeugt. Eine zweite frische Umgebung wurde ausschließlich mit `PIP_NO_INDEX=1` und `--no-index` aus diesem Wheelhouse installiert. `pip check`, Import-/CLI-Smoke, Baselineprüfung, 11 Projekttests sowie Ruff Check/Format waren grün.
+Workflow `31330952896` erzeugte auf Ubuntu 22.04.5 LTS x86_64 / CPython 3.13.15 insgesamt **50 Wheels mit 294428822 Bytes**. Das Actions-Artefakt `9042907351` besitzt SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040`; alle internen Wheel-Hashes wurden zusätzlich nachverifiziert.
 
-Das unveränderliche Actions-Artefakt besitzt die ID `9042907351` und SHA-256 `6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040`. Die internen Wheel-Hashes wurden nach dem Download zusätzlich gegen `WHEELHOUSE_SHA256.txt` geprüft.
+## I006-Qualifikation
+
+Workflow `31331742667` lud exakt dieses I005-Artefakt, prüfte vor dem Entpacken den äußeren SHA-256 und danach Manifest, Evidence und sämtliche Wheel-Hashes. Anschließend wurden zwei leere Entwicklungsumgebungen ausschließlich mit `PIP_NO_INDEX=1`, `--no-index`, lokalem `PIP_FIND_LINKS` und einer zusätzlichen Proxy-Falle aufgebaut.
+
+Beide Installationen lieferten byteidentische Paket-Freezes mit SHA-256 `5e44649e72afd6b6076f76c21bcb29b8232d17ae106bdece4e0cca122090b1ed`. In beiden Umgebungen waren `pip check`, Projektinstallation, Baseline-Prüfer, 17 Pytest-Tests, Ruff Check/Format und Import-Smoke grün. Das I006-Evidence-Artefakt `9043135144` besitzt SHA-256 `2029a08b0b772524bb023b1066bf0730a3ec2ca118723af6caf5c4f3778f7636`.
 
 ## Harte Entwicklungsregel
 
-Noch keine breite Modul-, Daten- oder UI-Implementierung. Zuerst wird P01 mit I006 vollständig qualifiziert; anschließend folgen P02 und der kritische Proof-of-Architecture-Pfad.
+Noch keine breite Modul-, Daten- oder UI-Implementierung. P02 definiert zuerst die Verträge und Architekturgrenzen. Der kritische Proof-of-Architecture-Pfad bleibt Voraussetzung für späteren Funktionsausbau.
 
 ## Lokale Baseline-Prüfung
 
