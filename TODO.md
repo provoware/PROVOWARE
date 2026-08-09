@@ -1,12 +1,15 @@
 # Offene Punkte
 
 ## P0
-- I006: Clean-Bootstrap vollständig offline aus dem verifizierten I005-Wheelhouse nachweisen; zwei saubere Aufbauten müssen dieselbe installierte Paketliste und grüne Projektprüfungen liefern.
-- I006: I005-Actions-Artefakt vor Nutzung per SHA-256 und interner Wheel-Hashliste prüfen.
+- I007: ID-, Status-, Fehler- und Ergebnistypen als strikt typisierte Kernverträge definieren.
+- I007: Contracttests und `mypy --strict` für die neue Vertragsschicht einführen.
+- I007: Qt-, SQLite- und Modulabhängigkeiten aus der Vertragsschicht technisch ausschließen.
+
+## P1 vor dem I007-Hauptpatch
+- `DELTA-0003`: I005-GitHub-Actions-Trigger verengen. Der aktuelle Filter `tests/**` erzeugt bei fachfremden Teständerungen unnötig einen kompletten rund 294-MB-Wheelhouse-Neubau.
 
 ## Danach
-- P01-Gesamtcheckpoint abschließen.
-- I007-I010: Verträge, Schemata und Architekturgate.
+- I008-I010: Manifest-/Projektschemata, OperationRequest/OperationResult und Architekturgate.
 - Anschließend P03 ff. streng nach `PLAN_MASTER.json`.
 
 ## Release-Blocker
