@@ -6,7 +6,7 @@
     {"datenbesitz": "Projektdaten", "id": "KMP-DATEN", "name": "Datenkern", "status": "GEPLANT"},
     {"datenbesitz": "keine Fachpersistenz", "id": "KMP-UI", "name": "Desktop-Adapter", "status": "GEPLANT"},
     {"datenbesitz": "keine Persistenz; reine Wert- und Ergebnistypen", "id": "KMP-VERTRAEGE", "name": "Kernverträge und Datentypen", "status": "VALIDIERT"},
-    {"datenbesitz": "keine Persistenz; versionierte Struktur- und Validierungsverträge", "id": "KMP-SCHEMATA", "name": "Manifest- und Projektschemata", "status": "IN_ARBEIT"}
+    {"datenbesitz": "keine Persistenz; versionierte Struktur- und Validierungsverträge", "id": "KMP-SCHEMATA", "name": "Manifest- und Projektschemata", "status": "VALIDIERT"}
   ],
   "schema": "1.0.0"
 }
