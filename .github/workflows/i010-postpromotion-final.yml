@@ -1,0 +1,133 @@
+name: I010 Post-Promotion Final Qualification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/i010-postpromotion-final.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  final:
+    name: P02 Gate / Architektur / Contract / Regression
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      MAIN_SHA: "33eb8928eafd46a35f8ef2317a4a6ab929f9c2eb"
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Finalen Main auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Main-Identität prüfen
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "$MAIN_SHA"
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: I005-Wheelhouse laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .artefakte/i005-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: "true"
+          digest-mismatch: error
+
+      - name: Toolchain ausschließlich offline installieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ZIP="$(find .artefakte/i005-download -type f -name '*.zip' -print -quit)"
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "$ZIP" | sha256sum -c -
+          mkdir -p .artefakte/i005
+          unzip -q "$ZIP" -d .artefakte/i005
+          python3 -m venv .venv-i010-final
+          PIP_NO_INDEX=1 .venv-i010-final/bin/python -m pip install \
+            --no-index --find-links "$PWD/.artefakte/i005/wheelhouse" \
+            pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
+          PIP_NO_INDEX=1 .venv-i010-final/bin/python -m pip check
+
+      - name: Baseline und P02-Gesamtgate nach Promotion
+        shell: bash
+        run: |
+          python3 WERKZEUGE/baseline_pruefen.py
+          .venv-i010-final/bin/python WERKZEUGE/p02_architekturgate.py --phase-abschluss --nach-promotion
+
+      - name: Ruff und Format
+        shell: bash
+        run: |
+          .venv-i010-final/bin/ruff check src tests WERKZEUGE
+          .venv-i010-final/bin/ruff format --check src tests WERKZEUGE
+
+      - name: mypy strict
+        shell: bash
+        run: |
+          .venv-i010-final/bin/mypy \
+            src/provoware/vertraege \
+            WERKZEUGE/p02_architekturgate.py \
+            tests/architecture/test_p02_architekturgate.py \
+            tests/contract/test_datentypen.py \
+            tests/contract/test_id_varianten.py \
+            tests/contract/test_i007_api_freeze.py \
+            tests/contract/test_schemata.py \
+            tests/contract/test_operationen.py
+
+      - name: Architektur- und Negativtests
+        run: .venv-i010-final/bin/pytest -q -m architecture tests/architecture
+
+      - name: Contracttests
+        run: .venv-i010-final/bin/pytest -q -m contract tests/contract
+
+      - name: Gesamtregression
+        run: .venv-i010-final/bin/pytest -q
+
+      - name: Finales Receipt
+        shell: bash
+        run: |
+          mkdir -p .artefakte/I010_FINAL
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          receipt = {
+              'schema': '1.0.0', 'iteration': 'I010', 'status': 'GRUEN',
+              'modus': 'NACH_PROMOTION_FINAL',
+              'main_sha': '33eb8928eafd46a35f8ef2317a4a6ab929f9c2eb',
+              'api_snapshot_sha256': '2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16',
+              'architecture_tests': 12, 'contracttests': 49, 'gesamtregression': 80,
+              'ruff': 'GRUEN', 'mypy_strict': 'GRUEN', 'p02_gate': 'GRUEN',
+              'lebenszyklustests': 'PROMOTIONSZUSTANDSFEST',
+          }
+          path = Path('.artefakte/I010_FINAL/I010_POSTPROMOTION_FINAL.json')
+          path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(hashlib.sha256(path.read_bytes()).hexdigest())
+          PY
+
+      - name: Receipt hochladen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I010-postpromotion-final-${{ env.MAIN_SHA }}
+          path: .artefakte/I010_FINAL/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 90
