@@ -1,5 +1,25 @@
 # Änderungsverlauf
 
+## 0.1.0-dev - 2026-08-10
+
+### I010 — P02 Architecture Gate und Unified Contract Qualification
+- Öffentliche I007-I009-Vertragsoberfläche als kanonischen `P02_API_SNAPSHOT.json` eingefroren.
+- Snapshot enthält öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Enumwerte, Schema-Versionen, Pflichtfelder, Vertragsmarker und stabile Fehlercodes.
+- Kanonischen API-Fingerprint `2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16` qualifiziert.
+- `P02_QUELLINVENTAR.json` als exaktes hashgebundenes P02-Produktquellinventar eingeführt.
+- `WERKZEUGE/p02_architekturgate.py` als gemeinsames Baseline-, Inventar-, AST-, API-, Versions- und Traceability-Gate eingeführt.
+- Negative Architektur-Fixtures für SQLite, Qt/PySide, Handler, Datei-I/O, unregistrierte P02-Quellen und vorgezogene P03-Quellen ergänzt.
+- Nachgewiesen, dass absichtliche Architekturverletzungen das Gate tatsächlich ROT schalten.
+- Parallelen schwächeren I010-Teil-Snapshot und redundanten Contracttest entfernt; eine einzige kanonische Wahrheitsquelle bleibt.
+- REQ-V1-003 bis zur Gesamtpromotion wieder auf `IN_ARBEIT` gesetzt und erst nach grüner Evidence auf `VALIDIERT` geschlossen.
+- ARCH-013 als verbindliche Snapshot-/Quellinventar-Migrationsregel eingeführt und nach Gesamtqualifikation validiert.
+- Finale Qualifikation auf Ubuntu 22.04.5 / CPython 3.13.15: Ruff grün, Ruff Format grün, mypy strict grün, **12 Architektur-/Negativtests**, **49 Contracttests** und **80 Gesamtregressionstests** bestanden.
+- I005-, I006-, I007-, I008- und I009-Regressionsworkflows auf finalem I010-Head erneut vollständig grün.
+- Workflow `31339417368`, Artifact `9045351696`, **0,000683 MB**, SHA-256 `6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9`, Receipt-SHA-256 `cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee`.
+- Validierten I009-main-Stand vor Promotion auf `backup/vor-i010-promotion-2026-08-10` gesichert.
+- I010 per PR #11 auf Main-Merge-Commit `7dfe6d2cf039d9b974bad464ed0efa0aa6eec998` promoviert.
+- P02 erst danach auf `VALIDIERT` gesetzt und P03/I011 freigegeben.
+
 ## 0.1.0-dev - 2026-08-09
 
 ### I009 — kanonische Operationsverträge qualifiziert
@@ -56,8 +76,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- I010 P02-Architekturgate und Gesamtqualifikation.
-- P03-Plattformschicht.
+- I011-I014 P03-Plattform-/Dateisystemschicht.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
