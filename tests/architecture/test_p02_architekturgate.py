@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -29,6 +30,11 @@ def _minimaler_quellbaum(tmp_path: Path) -> Path:
     shutil.copytree(ROOT / "src", ziel / "src")
     shutil.copy2(ROOT / "P02_QUELLINVENTAR.json", ziel / "P02_QUELLINVENTAR.json")
     return ziel
+
+
+def _ist_i010_promoviert() -> bool:
+    baseline = json.loads((ROOT / "CURRENT_BASELINE.json").read_text(encoding="utf-8"))
+    return baseline.get("letzte_iteration") == "I010"
 
 
 @pytest.mark.architecture
@@ -92,13 +98,15 @@ def test_versionsraeume_bleiben_getrennt() -> None:
 
 
 @pytest.mark.architecture
-def test_traceability_ist_vor_promotion_vollstaendig_aber_p02_noch_offen() -> None:
-    pruefe_traceability(ROOT, nach_promotion=False)
+def test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand() -> None:
+    pruefe_traceability(ROOT, nach_promotion=_ist_i010_promoviert())
 
 
 @pytest.mark.architecture
-def test_i010_gesamtgate_ist_vor_promotion_gruen() -> None:
-    ergebnis = pruefe_gesamtgate(ROOT, phase_abschluss=True, nach_promotion=False)
+def test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen() -> None:
+    nach_promotion = _ist_i010_promoviert()
+    ergebnis = pruefe_gesamtgate(ROOT, phase_abschluss=True, nach_promotion=nach_promotion)
     assert ergebnis["api_snapshot"] == "GRUEN"
     assert ergebnis["architekturmatrix"] == "GRUEN"
     assert ergebnis["phase_abschluss"] == "GRUEN"
+    assert ergebnis["modus"] == ("NACH_PROMOTION" if nach_promotion else "VOR_PROMOTION")
