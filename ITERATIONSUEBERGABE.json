@@ -1,68 +1,74 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I008",
-  "next_goal": "Manifest- und Projektschemata als versionierte, strikt validierbare und von GUI/Persistenz unabhängige Verträge definieren.",
-  "why_next": "I007 hat die primitive Typgrenze für Identitäten, Zustände, Fehler und Ergebnisse qualifiziert. Der Masterplan führt innerhalb P02 als Nächstes zu den Manifest- und Projektschemata, bevor Request-/Result-Verträge und das Architekturgate folgen.",
+  "next_iteration": "I009",
+  "next_goal": "OperationRequest- und OperationResult-Verträge als strikt typisierte, serialisierbare und handlerunabhängige Operationshülle definieren.",
+  "why_next": "I007 hat primitive Identitäts-, Status-, Fehler- und Ergebnistypen qualifiziert; I008 hat die versionierte Schema- und Validierungsgrenze geschlossen. Innerhalb P02 folgt nun die einheitliche Operationshülle, bevor I010 die Architekturgrenzen als Gesamtgate schließt.",
   "priority": "P0",
-  "probable_component": "src/provoware/vertraege/schemata",
+  "probable_component": "src/provoware/vertraege/operationen",
   "probable_files": [
-    "src/provoware/vertraege/schemata.py",
-    "tests/contract/test_schemata.py",
-    "VERSIONSREGISTER.json",
+    "src/provoware/vertraege/operationen.py",
+    "src/provoware/vertraege/__init__.py",
+    "tests/contract/test_operationen.py",
+    "tests/fixtures/i009/",
     "TRACEABILITY.json",
     "ARCHITEKTURREGISTER.json",
-    "EVIDENCE/I008/"
+    "KOMPONENTENREGISTER.json",
+    "EVIDENCE/I009/"
   ],
   "probable_symbols": [
-    "SchemaVersion",
-    "ManifestSchema",
-    "ProjektSchema",
-    "SchemaValidierungsfehler"
+    "OperationRequest",
+    "OperationResult",
+    "OperationArt",
+    "OperationPayload",
+    "OperationVertragsfehler"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-09-I007",
-    "i007_workflow_run_id": 31335066204,
-    "i007_artifact_id": 9044073684,
-    "i007_artifact_sha256": "007a7f0412274a1dcf72379202f87f3fa7629be4de6dd500534ed4a88373a909",
-    "i007_receipt_sha256": "11cb28d66188298496c65059918d707b17a1cb4e95087c8368e6c9aa49221d33"
+    "baseline": "BASELINE-2026-08-09-I008",
+    "i008_workflow_run_id": 31336626886,
+    "i008_artifact_id": 9044527742,
+    "i008_artifact_sha256": "f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61",
+    "i008_receipt_sha256": "60d5db55ab1b95e77ad92cd7ae99781bd5b665c071ca95648f30cada5138f7ea"
   },
   "known_dependencies": [
-    "BASELINE-2026-08-09-I007",
+    "BASELINE-2026-08-09-I008",
     "KMP-VERTRAEGE validiert",
-    "ARCH-008 aktiv",
-    "Python 3.13.15",
-    "mypy 2.3.0",
-    "pytest 9.1.1"
+    "KMP-SCHEMATA validiert",
+    "ARCH-008 bis ARCH-010 aktiv",
+    "I007 öffentliche API eingefroren",
+    "SchemaVersion und ProduktVersion technisch getrennt"
   ],
   "preconditions": [
-    "I007-Evidence gegen CURRENT_BASELINE revalidieren",
-    "bestehende Schema-Versionen im VERSIONSREGISTER als autoritative Ausgangswerte lesen",
-    "Pflichtfelder, unbekannte Felder und Versionsgrenzen vor Implementierung als Contract festlegen",
-    "keine Qt-, SQLite-, Datei-I/O- oder Modulabhängigkeit in die Schemaschicht einführen"
+    "I008-Evidence gegen CURRENT_BASELINE revalidieren",
+    "OperationRequest und OperationResult semantisch von Handlern, Persistenz und GUI trennen",
+    "OperationId und vorhandene Fehler-/Ergebnisverträge wiederverwenden statt parallele Identitäten einzuführen",
+    "Payload-Grenze und Serialisierungsregeln vor Implementierung als Contract festlegen",
+    "keine Ausführungslogik, SQLite-, Qt- oder Dateischreiblogik vorziehen"
   ],
   "expected_tests": [
-    "mypy --strict für neue Schematypen",
-    "gültige Minimal- und Vollbeispiele",
-    "Ablehnung fehlender Pflichtfelder",
-    "Ablehnung ungültiger oder inkompatibler Schema-Versionen",
-    "deterministische Serialisierung soweit in I008 definiert",
-    "Architekturprüfung auf verbotene GUI-/DB-/Dateiimporte",
-    "vollständige bestehende schnelle Regression"
+    "mypy --strict für Operationsverträge",
+    "kanonische gültige und ungültige Request-/Result-Fixtures",
+    "OperationId-Roundtrip und Zuordnung Request zu Result",
+    "Erfolgs-/Fehlerinvarianten auf Basis der I007-Verträge",
+    "deterministische Serialisierung",
+    "Ablehnung unbekannter oder widersprüchlicher Felder",
+    "Architekturprüfung auf verbotene Handler-/GUI-/DB-Abhängigkeiten",
+    "vollständige schnelle Regression einschließlich I007/I008-Verträge"
   ],
   "done_criteria": [
-    "Manifest- und Projektschema sind versioniert und eindeutig validierbar",
-    "Schemafehler werden strukturiert statt als lose Magic Strings dargestellt",
-    "keine GUI-/DB-/Dateiabhängigkeit",
-    "mypy strict und Contracttests sind grün",
-    "Traceability, Versionsregister und Evidence sind aktualisiert"
+    "OperationRequest und OperationResult besitzen eine eindeutige typisierte öffentliche Form",
+    "Request-/Result-Korrelation erfolgt über OperationId",
+    "Fehler und Ergebnisse verwenden die I007-Invarianten ohne parallele Magic-String-Schnittstelle",
+    "keine Ausführungs-, GUI-, DB- oder Dateischreibabhängigkeit",
+    "mypy strict, Contracttests und Gesamtregression sind grün",
+    "Traceability und Evidence sind aktualisiert"
   ],
   "known_risks": [
-    "zu frühe Festlegung optionaler Fachfelder könnte später unnötige Migrationen erzwingen",
-    "uneindeutige Regeln für unbekannte Felder könnten Forward-Kompatibilität destabilisieren",
-    "Schema-Version und Projektversion dürfen nicht semantisch vermischt werden"
+    "zu frühe Handler- oder Command-Semantik würde P02 und spätere Controllerphasen vermischen",
+    "beliebige untypisierte Payloads würden die gerade geschlossene Schemagrenze wieder aufweichen",
+    "eine zweite Ergebnissemantik neben OperationErgebnis würde I007 widersprechen"
   ],
   "open_subpoints": [
-    "I009 OperationRequest/OperationResult erst nach grünem I008 beginnen",
-    "I010 Architekturgate erst nach stabilen I007-I009-Verträgen schließen"
+    "I010 Architekturgate erst nach grünem I009 schließen",
+    "keine Plattform-, Persistenz- oder GUI-Funktion vor I010 vorziehen"
   ]
 }
