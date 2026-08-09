@@ -1,1 +1,11 @@
-{"schema":"1.0.0","komponenten":[{"id":"KMP-PLAN","name":"Planung und Registries","status":"AKTIV","datenbesitz":"Projektmetadaten"},{"id":"KMP-WERKZEUGE","name":"Entwicklungswerkzeuge","status":"AKTIV","datenbesitz":"Validierungsberichte"},{"id":"KMP-CORE","name":"Headless-Core","status":"GEPLANT","datenbesitz":"keine Persistenz direkt"},{"id":"KMP-DATEN","name":"Datenkern","status":"GEPLANT","datenbesitz":"Projektdaten"},{"id":"KMP-UI","name":"Desktop-Adapter","status":"GEPLANT","datenbesitz":"keine Fachpersistenz"}]}
+{
+  "komponenten": [
+    {"datenbesitz": "Projektmetadaten", "id": "KMP-PLAN", "name": "Planung und Registries", "status": "AKTIV"},
+    {"datenbesitz": "Validierungsberichte", "id": "KMP-WERKZEUGE", "name": "Entwicklungswerkzeuge", "status": "AKTIV"},
+    {"datenbesitz": "keine Persistenz direkt", "id": "KMP-CORE", "name": "Headless-Core", "status": "GEPLANT"},
+    {"datenbesitz": "Projektdaten", "id": "KMP-DATEN", "name": "Datenkern", "status": "GEPLANT"},
+    {"datenbesitz": "keine Fachpersistenz", "id": "KMP-UI", "name": "Desktop-Adapter", "status": "GEPLANT"},
+    {"datenbesitz": "keine Persistenz; reine Wert- und Ergebnistypen", "id": "KMP-VERTRAEGE", "name": "Kernverträge und Datentypen", "status": "IN_ARBEIT"}
+  ],
+  "schema": "1.0.0"
+}
