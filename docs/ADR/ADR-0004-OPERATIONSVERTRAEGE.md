@@ -1,6 +1,6 @@
 # ADR-0004 — Operationsverträge ohne Handlersemantik
 
-**Status:** vorgeschlagen für I009-Qualifikation  
+**Status:** akzeptiert nach I009-Qualifikation  
 **Datum:** 2026-08-09
 
 ## Kontext
@@ -19,6 +19,10 @@ Nach I007 und I008 existieren stabile Identitäts-, Fehler-, Ergebnis- und Schem
 8. Unbekannte Request-/Result-Felder werden fail-closed abgewiesen.
 9. Request, Result und Payload besitzen deterministische JSON-Darstellung und SHA-256-Fingerprint.
 10. Handler, Dispatcher, Datenbank, Datei-I/O und GUI bleiben außerhalb dieser Schicht.
+
+## Qualifikationsnachweis
+
+I009 wurde über PR #9 mit I007-, I008- und I009-Regressionsworkflow vollständig grün qualifiziert. Der maßgebliche I009-Lauf ist `31337914639`; 49 Contracttests und 68 Gesamtregressionstests bestanden, Ruff und mypy strict waren grün.
 
 ## Folgen
 
