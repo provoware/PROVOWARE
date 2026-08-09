@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
+from typing import cast
 
 import pytest
 from WERKZEUGE.p02_architekturgate import (
@@ -33,7 +34,10 @@ def _minimaler_quellbaum(tmp_path: Path) -> Path:
 
 
 def _ist_i010_promoviert() -> bool:
-    baseline = json.loads((ROOT / "CURRENT_BASELINE.json").read_text(encoding="utf-8"))
+    raw: object = json.loads((ROOT / "CURRENT_BASELINE.json").read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        return False
+    baseline = cast(dict[str, object], raw)
     return baseline.get("letzte_iteration") == "I010"
 
 
