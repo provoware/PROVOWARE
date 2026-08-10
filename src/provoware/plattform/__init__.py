@@ -1,5 +1,6 @@
-"""Read-only Plattformgrenzen von PROVOWARE."""
+"""Plattformgrenzen von PROVOWARE."""
 
+from provoware.plattform.atomarer_replace import ReplaceErgebnis, ReplaceStatus, atomar_ersetzen
 from provoware.plattform.dateiidentitaet import (
     DateiArt,
     DateiIdentitaet,
@@ -40,10 +41,13 @@ __all__ = [
     "PfadStatus",
     "PlattformStatus",
     "ProbeStatus",
+    "ReplaceErgebnis",
+    "ReplaceStatus",
     "SegmentBefund",
     "SessionArt",
     "StalePruefung",
     "StaleStatus",
+    "atomar_ersetzen",
     "erfasse_dateiidentitaet",
     "erkenne_linux_systemprofil",
     "parse_os_release",
