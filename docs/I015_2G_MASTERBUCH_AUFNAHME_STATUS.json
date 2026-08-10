@@ -3,32 +3,37 @@
   "iteration": "I015.2G",
   "typ": "MASTERBUCH_SYNCHRONISATIONSNACHWEIS",
   "hauptkategorie": "Wissenskonsolidierung",
-  "nebenkategorien": ["CI/CD", "Evidence & Audit", "Lebenszyklus"],
+  "nebenkategorien": ["CI/CD", "Evidence & Audit", "Lebenszyklus", "Daten & Integritaet"],
   "reifegrad": "E1",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "projektuebergreifend",
   "projektbezug": ["provoware/PROVOWARE", "provoware/PROVOWARE_MASTER_BOOK_2026"],
   "quelle_herkunft": {
-    "masterbuch_pr": 6,
-    "masterbuch_qualifizierter_head": "a43171aa963b2c24b057a403ee65613343b4e1b6",
-    "masterbuch_qualification_run": 31432429719,
-    "masterbuch_merge_commit": "7e01d838c3107893aa743db5504bcc2e482605f6",
+    "aufnahmevorschau_pr": 6,
+    "aufnahmevorschau_qualification_run": 31432429719,
+    "aufnahmevorschau_merge_commit": "7e01d838c3107893aa743db5504bcc2e482605f6",
+    "transaktionsengine_pr": 7,
+    "transaktionsengine_qualifizierter_head": "8f0c50bf6cf9e3149830fb30ed2d5f0a6a44c6b4",
+    "transaktionsengine_runs": [31437024112, 31437024047, 31437024009],
+    "transaktionsengine_merge_commit": "372dcd3b9b2010673e6e43fcb648b1817a9aea33",
     "evidence": "evidence/I015_2G_RULE_015_KANDIDAT.json"
   },
   "automatisierbarkeit": "JA",
-  "status": "VORQUALIFIKATION_PROMOVIERT",
+  "status": "TRANSAKTIONSENGINE_PROMOVIERT",
   "kanonische_masterbuch_mutation": false,
   "produktlogik_veraendert": false,
   "goldene_regel": false,
-  "aussage": "Die reversible Aufnahmevorschau fuer RULE-015 und DELTA-0016 wurde real qualifiziert und SHA-gebunden promoviert. Die eigentliche kanonische Vier-Artefakt-Aufnahme ist weiterhin ausstehend und darf nur als separate qualifizierte Transaktion erfolgen.",
+  "aussage": "Aufnahmevorschau und fail-closed Vier-Artefakt-Transaktionsengine fuer RULE-015/DELTA-0016 sind real qualifiziert und SHA-gebunden promoviert. Die kanonische Vier-Artefakt-Aufnahme selbst ist weiterhin ausstehend und wird nicht als PASS behauptet.",
   "validierungsgrenze": {
-    "masterbuch_pr_6": "PROMOVIERT",
-    "masterbuch_workflow": "SUCCESS",
-    "qualification": "PASS",
+    "aufnahmevorschau": "PASS_PROMOVIERT",
+    "transaktionsengine": "PASS_PROMOVIERT",
+    "transaktionsengine_e2e": "PASS",
+    "single_commit_qualification": "PASS",
+    "qualification_receipt_gate": "PASS",
     "kanonische_vier_artefakt_aufnahme": "AUSSTEHEND",
     "produktfreigabe": "NICHT_BETROFFEN"
   },
-  "rueckfall": "Die Vorqualifikation ist nur Evidence/Workflow-Metadaten. Die kanonische Wissensbasis wurde dabei nicht mutiert; fuer die spaetere Aufnahme ist eine eigene Rueckfalltransaktion erforderlich.",
+  "rueckfall": "Bis zur kanonischen Aufnahme wurden nur Evidence-, Workflow-, Skript- und Synchronisationsartefakte erweitert. Die Wissensbasis selbst blieb unveraendert; die spaetere Vier-Artefakt-Aufnahme erfolgt separat und muss append-only sowie derivative-konsistent rueckfallfaehig bleiben.",
   "historie": [
     {
       "datum": "2026-08-10",
@@ -36,7 +41,11 @@
     },
     {
       "datum": "2026-08-11",
-      "aktion": "Masterbuch-Qualification Run 31432429719 auf Head a43171aa erfolgreich; PR #6 SHA-gebunden als 7e01d838 promoviert. Kanonische Vier-Artefakt-Aufnahme bleibt separat ausstehend."
+      "aktion": "Masterbuch-Qualification Run 31432429719 auf Head a43171aa erfolgreich; PR #6 SHA-gebunden als 7e01d838 promoviert."
+    },
+    {
+      "datum": "2026-08-11",
+      "aktion": "PR #7 auf Head 8f0c50bf durch Runs 31437024112, 31437024047 und 31437024009 real qualifiziert und SHA-gebunden als 372dcd3b promoviert; kanonische Vier-Artefakt-Aufnahme bleibt separat ausstehend."
     }
   ]
 }
