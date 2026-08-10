@@ -1,0 +1,31 @@
+{
+  "schema": "1.0.0",
+  "id": "ERK-I012-001",
+  "typ": "Regelentwurf",
+  "titel": "Projektwurzel-Zugehörigkeit darf weder aus String-Präfixen noch aus ungeprüfter Symlink-Semantik abgeleitet werden",
+  "hauptkategorie": "Daten & Integrität",
+  "nebenkategorien": [
+    "Plattform",
+    "Dateisystem",
+    "Fehlervermeidung",
+    "Tests",
+    "Evidence & Audit"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P03",
+  "projektbezug": "I012 Pfadnormalisierung und Projektwurzel-Schutz",
+  "quelle_herkunft": "I012 Voranalyse aus ITERATIONSUEBERGABE.json und Implementierung der read-only Root-Grenze",
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Pfadzugehörigkeit muss segmentbasiert geprüft werden. Präfixähnliche Geschwisterpfade sind außerhalb. Ohne belegte Symlink-Freiheit darf ein Kandidat nicht als innerhalb qualifiziert werden.",
+  "historie": [
+    {
+      "iteration": "I012",
+      "reifegrad": "E1",
+      "status": "IN_PRUEFUNG",
+      "grund": "Vertrag und Negativtests implementiert; reale GitHub-Qualification noch nicht beobachtet."
+    }
+  ]
+}
