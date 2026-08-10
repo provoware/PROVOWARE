@@ -2,6 +2,18 @@
 
 ## 0.1.0-dev - 2026-08-10
 
+### I011 — Linux-Systemprofil und X11-Erkennung qualifiziert
+- Read-only Linux-Systemprofil mit injizierbaren Erkennungsquellen eingeführt.
+- Ubuntu 22.04 und 24.04 amd64 X11 über Golden-Profile qualifiziert.
+- `XDG_SESSION_TYPE` als primäres Session-Signal verwendet; `DISPLAY` allein qualifiziert keine echte X11-Sitzung.
+- Wayland/XWayland, unbekannte Session und nicht-amd64 als fail-closed Negativfälle abgesichert.
+- Deterministischen Profil-Fingerprint und strukturierte Plattformzustände eingeführt.
+- Historische P02-Phasenabschlussgates unverändert erhalten und im P03-Regressionslauf sauber getrennt behandelt.
+- Finale Qualifikation: **11 I011-Contracttests**, Ruff grün, Ruff Format grün, mypy strict grün, **59 P02-Runtime-Regressionstests** und **88 Gesamtregressionstests** grün; historische Freeze-Nachweise separat unverändert bestätigt.
+- Workflow `31346707865`, Artifact `9047566065`, **830 Byte**, SHA-256 `e7206090329a169437cfad847d109422f83b30eca122608d16935e02f3a33ec0`, Receipt-SHA-256 `ba8150c4a6a6454c6b2dacbf9e974394e9a0d409edf6a21d8c3b51805ac3bb76`.
+- I011 per PR #16 auf Main-Merge-Commit `66b9f5fbede68c61eb3d54185a253ff8bea81ca4` promoviert; vorherigen Stand zusätzlich auf `backup/vor-i011-promotion-2026-08-10` gesichert.
+- P03-Fortschritt auf 25 % gesetzt und I012 Pfadnormalisierung/Projektwurzel-Schutz freigegeben.
+
 ### I010 — P02 Architecture Gate und Unified Contract Qualification
 - Öffentliche I007-I009-Vertragsoberfläche als kanonischen `P02_API_SNAPSHOT.json` eingefroren.
 - Snapshot enthält öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Enumwerte, Schema-Versionen, Pflichtfelder, Vertragsmarker und stabile Fehlercodes.
@@ -76,7 +88,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- I011-I014 P03-Plattform-/Dateisystemschicht.
+- I012-I014 weitere P03-Dateisystemschicht.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
