@@ -38,6 +38,12 @@
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
       "aktion": "I010 als erster risikohoechster historischer Trigger gehaertet; I007-I009 bleiben offen."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I007 als einzelner Referenzfall auf qualifizierte Quellen begrenzt; I008-I009 bleiben offen. Keine Reifegrad- oder Goldene-Regel-Hochstufung."
     }
   ]
 }
