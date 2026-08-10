@@ -24,7 +24,10 @@
     "QUALIFIZIERTER_SCOPE.json",
     "GitHub Actions Run 31402335547",
     "GitHub Actions Run 31402618199",
-    "GitHub Actions Run 31402618783"
+    "GitHub Actions Run 31402618783",
+    "GitHub Actions Run 31407554457",
+    "GitHub Actions Run 31407554415",
+    "GitHub Actions Run 31407554446"
   ],
   "automatisierbarkeit": "JA",
   "status": "IN_PRUEFUNG",
@@ -59,6 +62,12 @@
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
       "aktion": "I007-Nachlauf 31402618783 und Scope-Gate 31402618199 real gruen; PR #26 SHA-gebunden promoviert. I008 anschliessend als naechster einzelner historischer Referenzfall auf Schema-/Fixture-Quellen und explizite Scope-Regression begrenzt; I009 bleibt offen."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I008-Nachlauf 31407554415 und Scope-Gate 31407554457 real gruen; PR #27 SHA-gebunden auf Mergecommit 790245e0d1d34a30914c72a6e67ee7bf0073a374 promoviert. Der parallel ausgelöste I009-Lauf 31407554446 blieb rot und bestaetigte die noch offene I009-Scope-Schuld. I009 danach als letzter historischer Referenzfall auf Operations-/Fixture-Quellen und explizite Scope-Regression begrenzt."
     }
   ]
 }
