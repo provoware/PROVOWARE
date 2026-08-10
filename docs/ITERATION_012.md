@@ -35,6 +35,12 @@ Ein Kandidat darf nur `INNERHALB` sein, wenn:
 
 Die Implementierung liegt auf einem separaten Branch. Sie verändert keine Nutzerdaten und kann vollständig durch Verwerfen dieses Branches zurückgenommen werden.
 
+## CI-Befund und Minimalreparatur
+
+Der erste reale I012-Lauf (`31351698536`) war rot. Gleichzeitig wurde der historische I011-Workflow durch den zu breiten Filter `src/provoware/plattform/**` erneut ausgelöst und scheiterte erwartbar an seiner historischen I010-Baseline-Prüfung. Der I012-Code enthielt außerdem eine Ruff-E501-Verletzung in einer 116 Zeichen langen Begründungszeile.
+
+Die Reparatur bleibt klein und reversibel: Die lange Zeichenkette wurde ohne Logikänderung formatiert, und der historische I011-Workflow reagiert künftig nur noch auf seine eigenen qualifizierten I011-Quellen statt auf beliebige spätere Plattformdateien. Diese Korrektur erweitert weder den Pfadvertrag noch die Schreibrechte.
+
 ## Qualifikationsstatus
 
-Die Contracttests und der CI-Vertrag sind Bestandteil des Branches. Erst ein real beobachteter grüner GitHub-Actions-Lauf darf I012 promovieren oder die Wissensregel über E1 hinaus anheben.
+Die Contracttests und der CI-Vertrag sind Bestandteil des Branches. Erst ein real beobachteter grüner GitHub-Actions-Lauf darf I012 promovieren oder die Wissensregel über E1 hinaus anheben. Nach der Minimalreparatur bleibt der Status bis zur erneuten realen CI-Auswertung ausdrücklich `PENDING_QUALIFICATION`.
