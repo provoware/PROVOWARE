@@ -1,0 +1,67 @@
+name: I015.2 Historical CI Scope Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "QUALIFIZIERTER_SCOPE.json"
+      - ".github/workflows/i010-p02-gate.yml"
+      - ".github/workflows/i015-2-historical-ci-scope.yml"
+      - "docs/WISSENSSPEICHER_I015_2_ERKENNTNIS.json"
+
+permissions:
+  contents: read
+
+jobs:
+  scope:
+    name: I010 Trigger-Scope / Manifest / Baseline-Schutz
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+
+      - name: Scope fail-closed validieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          scope = json.loads(Path('QUALIFIZIERTER_SCOPE.json').read_text(encoding='utf-8'))
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          workflow = Path('.github/workflows/i010-p02-gate.yml').read_text(encoding='utf-8')
+
+          assert scope['schema'] == '1.0.0'
+          assert scope['grundsatz']['historische_evidence_bleibt_unveraendert'] is True
+          assert scope['grundsatz']['spaetere_globale_metadaten_sind_keine_historische_requalifikationsquelle'] is True
+          assert scope['grundsatz']['unbekannter_scope'] == 'BLOCKIERT'
+
+          i010 = scope['iterationen']['I010']
+          assert i010['status'] == 'GEHAERTET_I015_2'
+          for forbidden in i010['explizit_keine_trigger']:
+              assert f'- "{forbidden}"' not in workflow, forbidden
+
+          for required in i010['eigene_quellen']:
+              assert f'- "{required}"' in workflow, required
+
+          assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I015'
+          assert status['letzte_abgeschlossene_iteration'] == 'I015'
+          assert status['naechste_iteration'] == 'I016'
+          assert status['p03_fortschritt_prozent'] == 75
+          PY
+
+      - name: Keine Produktdatei in I015.2
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin main
+          CHANGED="$(git diff --name-only origin/main...HEAD)"
+          printf '%s\n' "$CHANGED"
+          if printf '%s\n' "$CHANGED" | grep -E '^(src/|tests/platform/|tests/contract/|tests/architecture/|WERKZEUGE/)' ; then
+            echo 'Produkt-/Testlogik ausserhalb des Scope-Gates entdeckt.' >&2
+            exit 1
+          fi
