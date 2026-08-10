@@ -76,10 +76,7 @@ def _vorbedingungen_pruefen(
             "Ziel muss absolut, traversal-frei und bereits kanonisch normalisiert sein.",
         )
 
-    if (
-        pfadpruefung.status is not PfadStatus.INNERHALB
-        or pfadpruefung.normalisiert != normalisiert
-    ):
+    if pfadpruefung.status is not PfadStatus.INNERHALB or pfadpruefung.normalisiert != normalisiert:
         return _blockiert(
             normalisiert,
             "I012-Projektwurzel-Prüfung bestätigt dieses Ziel nicht eindeutig.",
