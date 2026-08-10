@@ -1,71 +1,65 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I012",
-  "next_goal": "Pfadnormalisierung und Projektwurzel-Schutz als read-only Sicherheitsgrenze implementieren; Pfade müssen deterministisch normalisiert, gegen die Projektwurzel geprüft und Escape-Versuche fail-closed blockiert werden.",
-  "why_next": "I011 ist real qualifiziert und auf main gemergt. P03 ist damit zu 25 Prozent abgeschlossen. Der bestätigte nächste P03-Schritt ist Pfadnormalisierung und Projektwurzel-Schutz; Schreibprimitive, Locks und atomare Mutationen bleiben nachgelagert.",
+  "next_iteration": "I013",
+  "next_goal": "Read-only Symlink- und reale Pfadvorprüfung als injizierbaren Dateisystemadapter ergänzen, damit die in I012 bewusst injizierte Symlink-Sicherheitsaussage reproduzierbar aus lstat-/Pfadsegment-Befunden erzeugt werden kann.",
+  "why_next": "I012 ist real qualifiziert und auf main gemergt. Die Projektwurzel-Grenze ist fail-closed, benötigt für reale Nutzung aber noch eine belastbare read-only Quelle für Symlink- und Pfadsegmentbefunde. Dieser Adapter schließt die größte Sicherheitslücke mit geringem Risiko, ohne Schreibprimitive vorzuziehen.",
   "priority": "P0",
-  "probable_component": "src/provoware/plattform/pfade.py",
+  "probable_component": "src/provoware/plattform/dateisystem_probe.py",
   "probable_files": [
-    "src/provoware/plattform/pfade.py",
+    "src/provoware/plattform/dateisystem_probe.py",
     "src/provoware/plattform/__init__.py",
-    "tests/platform/test_pfadnormalisierung.py",
-    "tests/fixtures/i012/",
-    "ARCHITEKTURREGISTER.json",
-    "KOMPONENTENREGISTER.json",
-    "TRACEABILITY.json",
-    "PROJEKTSTATUS.json",
-    "CURRENT_BASELINE.json",
-    "EVIDENCE/I012/",
-    ".github/workflows/i012-pfade.yml"
+    "tests/platform/test_dateisystem_probe.py",
+    "docs/ITERATION_013.md",
+    "docs/WISSENSSPEICHER_I013_ERKENNTNIS.json",
+    ".github/workflows/i013-dateisystem-probe.yml"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-10-I011",
-    "i011_workflow_run_id": 31346707865,
-    "i011_artifact_id": 9047566065,
-    "i011_artifact_sha256": "e7206090329a169437cfad847d109422f83b30eca122608d16935e02f3a33ec0",
-    "i011_receipt_sha256": "ba8150c4a6a6454c6b2dacbf9e974394e9a0d409edf6a21d8c3b51805ac3bb76",
-    "i011_main_merge_commit": "66b9f5fbede68c61eb3d54185a253ff8bea81ca4"
+    "baseline": "BASELINE-2026-08-10-I012",
+    "i012_workflow_run_id": 31357647745,
+    "i012_artifact_id": 9051207196,
+    "i012_artifact_sha256": "1cced27d241951ec9190f82f7bb72680193d4d325cfdae9c10e1a371309c1d3a",
+    "i012_receipt_sha256": "b88d8a6cc811b2119490cca9d6a6716b921bf9c0fe0f0e61895fa50dea825010",
+    "i012_main_merge_commit": "0402f4f910923f703eadb97243bc554ebccf2f0c"
   },
   "known_dependencies": [
     "P00-P02 vollständig VALIDIERT",
     "I011 Linux-Systemprofil VALIDIERT_GITHUB",
-    "Zielplattform Ubuntu 22.04/24.04 amd64 X11",
-    "P03 bleibt read-only bis Pfadgrenzen reproduzierbar qualifiziert sind"
+    "I012 Pfadnormalisierung und Projektwurzel-Schutz VALIDIERT_GITHUB",
+    "P03 bleibt read-only, bis reale Pfad- und Symlink-Befunde reproduzierbar qualifiziert sind"
   ],
   "preconditions": [
-    "I011-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
-    "Pfadlogik von GUI, Persistenz und Schreiboperationen trennen",
-    "keine implizite Verzeichnisanlage oder Mutation zulassen",
-    "relative und absolute Eingaben deterministisch behandeln",
-    "Symlinks und Parent-Traversal nicht ohne explizite Regel als innerhalb der Projektwurzel qualifizieren",
-    "I013-I014-Schreib- und Locklogik nicht vorziehen"
+    "I012-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
+    "Adapter ausschließlich lesend ausführen",
+    "lstat-Semantik gegenüber resolve/realpath klar trennen",
+    "nicht existente Pfade und Berechtigungsfehler strukturiert als UNBEKANNT behandeln",
+    "keine mkdir-, rename-, move-, delete-, overwrite- oder Locklogik vorziehen"
   ],
   "expected_tests": [
-    "normaler relativer Pfad innerhalb Projektwurzel",
-    "normaler absoluter Pfad innerhalb Projektwurzel",
-    "Parent-Traversal über .. wird blockiert",
-    "präfixähnlicher Geschwisterpfad wird nicht als Unterpfad akzeptiert",
-    "leere und ungültige Eingaben liefern strukturierte Fehler",
-    "deterministische Normalisierung bei gleichen Eingaben",
-    "keine Datei- oder Verzeichnisänderung durch die Prüfung",
-    "keine Qt-, SQLite- oder Fachmodulabhängigkeit",
-    "Ruff, mypy strict und vollständige Regression"
+    "normale Datei ohne Symlink-Anteil",
+    "Verzeichnis ohne Symlink-Anteil",
+    "Symlink im Kandidatenpfad wird erkannt",
+    "Symlink in einem Elternsegment wird erkannt",
+    "nicht existenter Pfad liefert strukturierten unbekannten Zustand",
+    "Berechtigungs-/lstat-Fehler werden nicht als sicher gewertet",
+    "gleiche Befunde ergeben deterministisches Prüfergebnis",
+    "keine Datei- oder Verzeichnisänderung durch die Probe",
+    "Ruff, mypy strict und Regression"
   ],
   "done_criteria": [
-    "Projektwurzel und Kandidatenpfad besitzen eindeutige typisierte Prüfergebnisse",
-    "Escape-Versuche werden fail-closed blockiert",
-    "Prüfung ist read-only und reproduzierbar testbar",
-    "I011-Verträge bleiben unverändert",
-    "I013 wird erst nach grüner I012-Promotion freigegeben"
+    "Symlink-Sicherheitsstatus wird aus injizierbaren read-only Befunden erzeugt",
+    "I012 kann den Adapter nutzen, ohne seine reine Vertragslogik mit Datei-I/O zu vermischen",
+    "Fehlerzustände bleiben fail-closed",
+    "keine Schreibprimitive eingeführt",
+    "nächster mutierender Schritt erst nach grüner I013-Promotion"
   ],
   "known_risks": [
-    "String-Präfixvergleiche können Geschwisterpfade fälschlich als Unterpfade akzeptieren",
-    "unkontrolliertes resolve kann Symlink-Semantik und nicht existente Pfade vermischen",
-    "zu frühe Schreiblogik würde I012 mit späteren P03-Iterationen vermischen"
+    "TOCTOU bleibt zwischen read-only Probe und späteren Schreiboperationen bestehen und darf nicht als gelöst gelten",
+    "resolve/realpath kann nicht existente Pfade und Symlink-Semantik vermischen",
+    "zu frühes Locking oder Schreiben würde den reversiblen P03-Aufbau verlassen"
   ],
   "open_subpoints": [
-    "I012 strikt auf Normalisierung, Root-Grenze und read-only Prüfung begrenzen",
-    "Symlink-Policy explizit dokumentieren und testen",
-    "I013 erst nach qualifizierter Root-Grenze beginnen"
+    "I013 strikt read-only halten",
+    "TOCTOU als offene spätere Schutzanforderung dokumentieren",
+    "Schreib- und Locklogik erst nach qualifizierter Dateisystemprobe beginnen"
   ]
 }
