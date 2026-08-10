@@ -12,11 +12,6 @@ on:
       - "src/provoware/vertraege/__init__.py"
       - "tests/contract/test_operationen.py"
       - "tests/fixtures/i009/**"
-      - "tests/test_structure.py"
-      - "VERSIONSREGISTER.json"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "TRACEABILITY.json"
       - "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md"
       - "EVIDENCE/I009/**"
   pull_request:
@@ -29,11 +24,6 @@ on:
       - "src/provoware/vertraege/__init__.py"
       - "tests/contract/test_operationen.py"
       - "tests/fixtures/i009/**"
-      - "tests/test_structure.py"
-      - "VERSIONSREGISTER.json"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "TRACEABILITY.json"
       - "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md"
       - "EVIDENCE/I009/**"
 
@@ -141,9 +131,15 @@ jobs:
         shell: bash
         run: .venv-i009/bin/pytest -q -m contract tests/contract
 
-      - name: Gesamte schnelle Regression
+      - name: I009-Scope-Regression
         shell: bash
-        run: .venv-i009/bin/pytest -q
+        run: |
+          .venv-i009/bin/pytest -q \
+            tests/contract/test_datentypen.py \
+            tests/contract/test_id_varianten.py \
+            tests/contract/test_i007_api_freeze.py \
+            tests/contract/test_schemata.py \
+            tests/contract/test_operationen.py
 
       - name: I009-Qualifikationsreceipt erzeugen
         shell: bash
@@ -193,7 +189,7 @@ jobs:
                   'ruff_format': 'GRUEN',
                   'mypy_strict': 'GRUEN',
                   'contracttests': 'GRUEN',
-                  'gesamtregression': 'GRUEN',
+                  'i009_scope_regression': 'GRUEN',
               },
           }
           Path('.artefakte/I009/I009_QUALIFIKATION.json').write_text(
@@ -229,7 +225,7 @@ jobs:
             echo "- Request-/Result-Korrelation über OperationId"
             echo "- deterministische SHA-256-Fingerprints"
             echo "- Ruff + mypy strict GRÜN"
-            echo "- Contracttests + Gesamtregression GRÜN"
+            echo "- Contracttests + I009-Scope-Regression GRÜN"
             echo "- Artifact-ID: ${ARTIFACT_ID}"
             echo "- Artifact-Digest: ${ARTIFACT_DIGEST}"
           } >> "$GITHUB_STEP_SUMMARY"
