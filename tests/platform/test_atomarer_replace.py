@@ -7,12 +7,16 @@ from pathlib import Path
 import pytest
 
 from provoware.plattform.atomarer_replace import ReplaceStatus, atomar_ersetzen
-from provoware.plattform.dateiidentitaet import erfasse_dateiidentitaet, pruefe_stale_guard
-from provoware.plattform.dateisystem_probe import pruefe_dateisystempfad
-from provoware.plattform.pfade import pruefe_projektpfad
+from provoware.plattform.dateiidentitaet import (
+    StalePruefung,
+    erfasse_dateiidentitaet,
+    pruefe_stale_guard,
+)
+from provoware.plattform.dateisystem_probe import DateisystemProbe, pruefe_dateisystempfad
+from provoware.plattform.pfade import PfadPruefung, pruefe_projektpfad
 
 
-def _gates(datei: Path):
+def _gates(datei: Path) -> tuple[PfadPruefung, DateisystemProbe, StalePruefung]:
     probe = pruefe_dateisystempfad(str(datei))
     pfad = pruefe_projektpfad(str(datei.parent), str(datei), symlink_frei=probe.symlink_frei)
     snapshot = erfasse_dateiidentitaet(str(datei))
