@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from provoware.plattform import (
+    LinuxSystemProfil,
     LinuxSystemQuellen,
     PlattformStatus,
     SessionArt,
@@ -18,7 +19,7 @@ pytestmark = pytest.mark.contract
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "i011"
 
 
-def _profil(*, version: str = "22.04", session: str = "x11", arch: str = "x86_64"):
+def _profil(*, version: str = "22.04", session: str = "x11", arch: str = "x86_64") -> LinuxSystemProfil:
     return erkenne_linux_systemprofil(
         LinuxSystemQuellen(
             os_release={"ID": "ubuntu", "VERSION_ID": version},
