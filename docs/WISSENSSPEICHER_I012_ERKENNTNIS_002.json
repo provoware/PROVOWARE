@@ -1,0 +1,31 @@
+{
+  "schema": "1.0.0",
+  "id": "ERK-I012-002",
+  "typ": "Regelentwurf",
+  "titel": "Historische CI-Gates müssen auf ihre eigenen qualifizierten Quellen begrenzt bleiben",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": [
+    "CI/CD",
+    "Lebenszyklus",
+    "Tests",
+    "Evidence & Audit",
+    "Fehlervermeidung"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE Phasen- und Iterationsübergänge",
+  "projektbezug": "I012 Qualification auf I011-Baseline",
+  "quelle_herkunft": "Realer CI-Befund auf PR #18: historischer I011-Workflow wurde durch neue I012-Plattformquellen ausgelöst und scheiterte erwartbar an seiner I010-Baseline-Prüfung.",
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Ein bereits qualifiziertes historisches Iterationsgate darf durch spätere, fachfremde Quellen derselben Verzeichnisfamilie nicht erneut ausgelöst werden. Pfadfilter müssen den qualifizierten Scope exakt genug abgrenzen; eine echte Änderung an historischen Quellen soll dagegen weiterhin sichtbar scheitern und Requalifikation erzwingen.",
+  "historie": [
+    {
+      "iteration": "I012",
+      "reifegrad": "E1",
+      "status": "IN_PRUEFUNG",
+      "grund": "Realer Fehler beobachtet und minimaler Scope-Fix implementiert; neue Qualification noch nicht vollständig ausgewertet."
+    }
+  ]
+}
