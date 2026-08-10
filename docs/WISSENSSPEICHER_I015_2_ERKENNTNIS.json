@@ -22,7 +22,9 @@
     ".github/workflows/i009-operationen.yml",
     ".github/workflows/i010-p02-gate.yml",
     "QUALIFIZIERTER_SCOPE.json",
-    "GitHub Actions Run 31402335547"
+    "GitHub Actions Run 31402335547",
+    "GitHub Actions Run 31402618199",
+    "GitHub Actions Run 31402618783"
   ],
   "automatisierbarkeit": "JA",
   "status": "IN_PRUEFUNG",
@@ -51,6 +53,12 @@
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
       "aktion": "Run 31402335547: Baseline, Ruff, mypy und 49 Contracttests gruen; ungescoppte Gesamtregression scheiterte ausschließlich an vier spaeteren I009/I010-Lebenszyklus-Freeze-Tests. Workflow deshalb minimal auf tests/contract als I007-Scope-Regression begrenzt."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I007-Nachlauf 31402618783 und Scope-Gate 31402618199 real gruen; PR #26 SHA-gebunden promoviert. I008 anschliessend als naechster einzelner historischer Referenzfall auf Schema-/Fixture-Quellen und explizite Scope-Regression begrenzt; I009 bleibt offen."
     }
   ]
 }

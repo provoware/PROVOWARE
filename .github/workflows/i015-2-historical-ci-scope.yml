@@ -6,6 +6,7 @@ on:
     paths:
       - "QUALIFIZIERTER_SCOPE.json"
       - ".github/workflows/i007-kernvertraege.yml"
+      - ".github/workflows/i008-schemata.yml"
       - ".github/workflows/i010-p02-gate.yml"
       - ".github/workflows/i015-2-historical-ci-scope.yml"
       - "docs/WISSENSSPEICHER_I015_2_ERKENNTNIS.json"
@@ -15,7 +16,7 @@ permissions:
 
 jobs:
   scope:
-    name: I007/I010 Trigger-Scope / Manifest / Baseline-Schutz
+    name: I007/I008/I010 Trigger-Scope / Manifest / Baseline-Schutz
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
@@ -36,6 +37,7 @@ jobs:
           scope = json.loads(Path('QUALIFIZIERTER_SCOPE.json').read_text(encoding='utf-8'))
           status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
           workflow_i007 = Path('.github/workflows/i007-kernvertraege.yml').read_text(encoding='utf-8')
+          workflow_i008 = Path('.github/workflows/i008-schemata.yml').read_text(encoding='utf-8')
           workflow_i010 = Path('.github/workflows/i010-p02-gate.yml').read_text(encoding='utf-8')
 
           assert scope['schema'] == '1.0.0'
@@ -53,6 +55,17 @@ jobs:
           assert 'run: .venv-i007/bin/pytest -q\n' not in workflow_i007
           assert '"i007_scope_regression": "GRUEN"' in workflow_i007
 
+          i008 = scope['iterationen']['I008']
+          assert i008['status'] == 'GEHAERTET_I015_2C'
+          for forbidden in i008['explizit_keine_trigger']:
+              assert f'- "{forbidden}"' not in workflow_i008, forbidden
+          for required in i008['eigene_quellen']:
+              assert f'- "{required}"' in workflow_i008, required
+          assert '- name: I008-Scope-Regression' in workflow_i008
+          assert 'run: .venv-i008/bin/pytest -q\n' not in workflow_i008
+          assert "'i008_scope_regression': 'GRUEN'" in workflow_i008
+          assert "'gesamtregression': 'GRUEN'" not in workflow_i008
+
           i010 = scope['iterationen']['I010']
           assert i010['status'] == 'GEHAERTET_I015_2'
           for forbidden in i010['explizit_keine_trigger']:
@@ -60,7 +73,6 @@ jobs:
           for required in i010['eigene_quellen']:
               assert f'- "{required}"' in workflow_i010, required
 
-          assert scope['iterationen']['I008']['status'] == 'BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN'
           assert scope['iterationen']['I009']['status'] == 'BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN'
           assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I015'
           assert status['letzte_abgeschlossene_iteration'] == 'I015'
