@@ -1,42 +1,21 @@
 {
   "schema": "1.0.0",
   "id": "ERK-I015-001",
-  "typ": "Regelentwurf",
+  "typ": "Regel",
   "titel": "Atomarer Replace braucht getrennte Vorbedingungs- und Dauerhaftigkeitsgates",
   "beschreibung": "Ein atomarer Namensersatz darf nur nach bestätigter Projektwurzel, Symlinkfreiheit und unmittelbar gleicher Dateiidentität erfolgen. Datei-fsync muss vor os.replace liegen; Verzeichnis-fsync folgt danach als eigener Dauerhaftigkeitsschritt. Ein Fehler nach erfolgreichem Replace ist kein Rollback und darf nicht als unverändertes Original dargestellt werden.",
   "hauptkategorie": "Daten & Integritaet",
-  "nebenkategorien": [
-    "Dateisystem",
-    "Atomic Replace",
-    "TOCTOU",
-    "Recovery",
-    "Fehlervermeidung",
-    "Tests",
-    "Evidence & Audit"
-  ],
-  "reifegrad": "E1",
+  "nebenkategorien": ["Dateisystem", "Atomic Replace", "TOCTOU", "Recovery", "Fehlervermeidung", "Tests", "Evidence & Audit"],
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE P03 und spaetere Einzeldatei-Schreibvertraege",
   "projektbezug": ["PROVOWARE", "PROVOWARE Knowledge & Project Intelligence"],
-  "quelle_herkunft": [
-    "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I014",
-    "docs/PLAN_DELTA_I014.json",
-    "I012 Projektwurzel-Schutz",
-    "I013 Dateisystemprobe",
-    "I014 Dateiidentitaet/Stale-Guard",
-    "Python os.fsync Dokumentation",
-    "Linux rename(2) und fsync(2)"
-  ],
+  "quelle_herkunft": ["ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I014", "docs/PLAN_DELTA_I014.json", "I012 Projektwurzel-Schutz", "I013 Dateisystemprobe", "I014 Dateiidentitaet/Stale-Guard", "GitHub Actions Run 31378734347", "Evidence Artifact 9058982637", "Python os.fsync Dokumentation", "Linux rename(2) und fsync(2)"],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
   "historie": [
-    {
-      "datum": "2026-08-10",
-      "aktion": "ANGELEGT",
-      "reifegrad_vorher": null,
-      "reifegrad_nachher": "E1",
-      "grund": "Erste mutierende P03-Primitive bewusst hinter drei qualifizierte Sicherheitsgates gestellt; Fehler nach Replace wird als eigener Unsicherheitszustand modelliert."
-    }
+    {"datum": "2026-08-10", "aktion": "ANGELEGT", "reifegrad_vorher": null, "reifegrad_nachher": "E1", "grund": "Erste mutierende P03-Primitive bewusst hinter drei qualifizierte Sicherheitsgates gestellt; Fehler nach Replace wird als eigener Unsicherheitszustand modelliert."},
+    {"datum": "2026-08-10", "aktion": "QUALIFIZIERT", "reifegrad_vorher": "E1", "reifegrad_nachher": "E2", "grund": "Realer GitHub-Actions-Lauf 31378734347 vollständig grün; Artifact 9058982637 und Receipt unabhängig gelesen und SHA-256-verifiziert. Keine Hochstufung zur Goldenen Regel."}
   ]
 }
