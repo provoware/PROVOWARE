@@ -71,7 +71,7 @@ jobs:
             --find-links "$PWD/.artefakte/i005/wheelhouse" pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
           PIP_NO_INDEX=1 .venv-i014/bin/python -m pip check
 
-      - name: I013-Baseline revalidieren
+      - name: I014 Qualifikationsanker revalidieren
         run: |
           python3 WERKZEUGE/baseline_pruefen.py
           python3 - <<'PY'
@@ -79,12 +79,9 @@ jobs:
           from pathlib import Path
           baseline = json.loads(Path('CURRENT_BASELINE.json').read_text(encoding='utf-8'))
           status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
-          assert baseline['baseline_id'] == 'BASELINE-2026-08-10-I013'
           assert baseline['status'] == 'VALIDIERT_GITHUB'
-          assert baseline['naechste_iteration'] == 'I014'
-          assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I013'
-          assert status['letzte_abgeschlossene_iteration'] == 'I013'
-          assert status['naechste_iteration'] == 'I014'
+          assert status['i014_dateiidentitaet_qualifikation']['status'] == 'VALIDIERT_GITHUB'
+          assert status['i014_dateiidentitaet_qualifikation']['workflow_run_id'] == 31373576096
           PY
 
       - name: I014 Contracttests
@@ -141,7 +138,7 @@ jobs:
                   'plan_delta': sha('docs/PLAN_DELTA_I014.json'),
               },
               'gates': {
-                  'baseline_i013': 'GRUEN', 'deterministische_identitaet': 'GRUEN',
+                  'i014_qualifikationsanker': 'GRUEN', 'deterministische_identitaet': 'GRUEN',
                   'unchanged_recheck': 'GRUEN', 'inode_exchange_stale': 'GRUEN',
                   'stat_change_stale': 'GRUEN', 'missing_negative': 'GRUEN',
                   'lstat_error_negative': 'GRUEN', 'non_mutation': 'GRUEN',
