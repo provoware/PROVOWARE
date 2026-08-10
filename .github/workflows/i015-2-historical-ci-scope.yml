@@ -49,6 +49,9 @@ jobs:
               assert f'- "{forbidden}"' not in workflow_i007, forbidden
           for required in i007['eigene_quellen']:
               assert f'- "{required}"' in workflow_i007, required
+          assert 'run: .venv-i007/bin/pytest -q tests/contract' in workflow_i007
+          assert 'run: .venv-i007/bin/pytest -q\n' not in workflow_i007
+          assert '"i007_scope_regression": "GRUEN"' in workflow_i007
 
           i010 = scope['iterationen']['I010']
           assert i010['status'] == 'GEHAERTET_I015_2'
