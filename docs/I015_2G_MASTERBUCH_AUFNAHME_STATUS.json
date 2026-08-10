@@ -10,26 +10,33 @@
   "projektbezug": ["provoware/PROVOWARE", "provoware/PROVOWARE_MASTER_BOOK_2026"],
   "quelle_herkunft": {
     "masterbuch_pr": 6,
-    "masterbuch_head": "10e45acd3ce9b29e495438be52bacf3ce3e228a6",
+    "masterbuch_qualifizierter_head": "a43171aa963b2c24b057a403ee65613343b4e1b6",
+    "masterbuch_qualification_run": 31432429719,
+    "masterbuch_merge_commit": "7e01d838c3107893aa743db5504bcc2e482605f6",
     "evidence": "evidence/I015_2G_RULE_015_KANDIDAT.json"
   },
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "VORQUALIFIKATION_PROMOVIERT",
   "kanonische_masterbuch_mutation": false,
   "produktlogik_veraendert": false,
   "goldene_regel": false,
-  "aussage": "RULE-015 und DELTA-0016 sind als reversible Aufnahmevorschau vorbereitet. Die kanonische Vier-Artefakt-Aufnahme darf erst nach real erfolgreicher Masterbuch-Qualification erfolgen.",
+  "aussage": "Die reversible Aufnahmevorschau fuer RULE-015 und DELTA-0016 wurde real qualifiziert und SHA-gebunden promoviert. Die eigentliche kanonische Vier-Artefakt-Aufnahme ist weiterhin ausstehend und darf nur als separate qualifizierte Transaktion erfolgen.",
   "validierungsgrenze": {
-    "masterbuch_pr_6_angelegt": "NACHGEWIESEN",
-    "masterbuch_workflow": "NOCH_KEIN_LAUF_SICHTBAR",
-    "qualification": "NICHT_PASS",
-    "promotion": "AUSSTEHEND"
+    "masterbuch_pr_6": "PROMOVIERT",
+    "masterbuch_workflow": "SUCCESS",
+    "qualification": "PASS",
+    "kanonische_vier_artefakt_aufnahme": "AUSSTEHEND",
+    "produktfreigabe": "NICHT_BETROFFEN"
   },
-  "rueckfall": "Branch oder Datei verwerfen; Main und Produktlogik bleiben unveraendert.",
+  "rueckfall": "Die Vorqualifikation ist nur Evidence/Workflow-Metadaten. Die kanonische Wissensbasis wurde dabei nicht mutiert; fuer die spaetere Aufnahme ist eine eigene Rueckfalltransaktion erforderlich.",
   "historie": [
     {
       "datum": "2026-08-10",
       "aktion": "Toolseitige Referenz auf die Masterbuch-Aufnahmevorschau angelegt; keine Produkt- oder Wissensmutation."
+    },
+    {
+      "datum": "2026-08-11",
+      "aktion": "Masterbuch-Qualification Run 31432429719 auf Head a43171aa erfolgreich; PR #6 SHA-gebunden als 7e01d838 promoviert. Kanonische Vier-Artefakt-Aufnahme bleibt separat ausstehend."
     }
   ]
 }
