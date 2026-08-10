@@ -27,16 +27,22 @@
     "GitHub Actions Run 31402618783",
     "GitHub Actions Run 31407554457",
     "GitHub Actions Run 31407554415",
-    "GitHub Actions Run 31407554446"
+    "GitHub Actions Run 31407554446",
+    "GitHub Actions Run 31412511727",
+    "GitHub Actions Run 31412511481",
+    "docs/WISSENSSPEICHER_I012_ERKENNTNIS_002.json",
+    "PROVOWARE_MASTER_BOOK_2026/data/masterbook_seed.json"
   ],
   "automatisierbarkeit": "JA",
   "status": "IN_PRUEFUNG",
   "goldene_regel": false,
-  "aussage": "Eine spaetere globale Register-, Traceability- oder Planänderung darf kein historisches Freeze-Gate starten, wenn diese Änderung die qualifizierte Aussage des historischen Gates fachlich nicht berührt. Auch eine ungescoppte Gesamtprojekt-Regression innerhalb eines historischen Gates darf spaetere Lebenszyklus-Freeze-Tests nicht zur historischen Gate-Aussage erheben. Unbekannter Scope ist fail-closed zu behandeln.",
+  "aussage": "Eine spaetere globale Register-, Traceability- oder Planaenderung darf kein historisches Freeze-Gate starten, wenn diese Aenderung die qualifizierte Aussage des historischen Gates fachlich nicht beruehrt. Auch eine ungescoppte Gesamtprojekt-Regression innerhalb eines historischen Gates darf spaetere Lebenszyklus-Freeze-Tests nicht zur historischen Gate-Aussage erheben. Unbekannter Scope ist fail-closed zu behandeln.",
   "dublettenpruefung": {
-    "bezug": "ERK-I012-002",
-    "bewertung": "ERWEITERUNG_STATT_NEUE_GOLDENE_REGEL",
-    "hinweis": "I015.2 formalisiert die bereits bestaetigte I012-Erkenntnis als maschinenlesbaren Scope-Vertrag; vor E2 ist Konsolidierung zu pruefen."
+    "projektregel_bezug": "ERK-I012-002",
+    "projektregel_status": "E2_BESTAETIGT",
+    "masterbook_abgleich": "RULE-001_BIS_RULE-014_GEPRUEFT_KEINE_SEMANTISCHE_DUBLETTE",
+    "bewertung": "ERWEITERUNG_DER_BESTAETIGTEN_PROJEKTREGEL_UND_KANONISCHE_MASTERBUCH_AUFNAHME_PRUEFEN",
+    "hinweis": "ERK-I012-002 ist die bestaetigte direkte Vorgaengerregel im Tool. Im kanonischen Masterbuchbestand existiert bislang keine entsprechende CI-/Lifecycle-Scope-Regel; RULE-012 behandelt stattdessen Append-only-Historie. Deshalb darf keine vermeintliche RULE-012-Revision erzeugt werden. Eine neue kanonische RULE-ID bleibt bis zur separaten Aufnahme-Qualification ausstehend."
   },
   "historie": [
     {
@@ -55,7 +61,7 @@
       "datum": "2026-08-10",
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
-      "aktion": "Run 31402335547: Baseline, Ruff, mypy und 49 Contracttests gruen; ungescoppte Gesamtregression scheiterte ausschließlich an vier spaeteren I009/I010-Lebenszyklus-Freeze-Tests. Workflow deshalb minimal auf tests/contract als I007-Scope-Regression begrenzt."
+      "aktion": "Run 31402335547: Baseline, Ruff, mypy und 49 Contracttests gruen; ungescoppte Gesamtregression scheiterte ausschliesslich an vier spaeteren I009/I010-Lebenszyklus-Freeze-Tests. Workflow deshalb minimal auf tests/contract als I007-Scope-Regression begrenzt."
     },
     {
       "datum": "2026-08-10",
@@ -67,7 +73,19 @@
       "datum": "2026-08-10",
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
-      "aktion": "I008-Nachlauf 31407554415 und Scope-Gate 31407554457 real gruen; PR #27 SHA-gebunden auf Mergecommit 790245e0d1d34a30914c72a6e67ee7bf0073a374 promoviert. Der parallel ausgelöste I009-Lauf 31407554446 blieb rot und bestaetigte die noch offene I009-Scope-Schuld. I009 danach als letzter historischer Referenzfall auf Operations-/Fixture-Quellen und explizite Scope-Regression begrenzt."
+      "aktion": "I008-Nachlauf 31407554415 und Scope-Gate 31407554457 real gruen; PR #27 SHA-gebunden auf Mergecommit 790245e0d1d34a30914c72a6e67ee7bf0073a374 promoviert. Der parallel ausgeloeste I009-Lauf 31407554446 blieb rot und bestaetigte die noch offene I009-Scope-Schuld. I009 danach als letzter historischer Referenzfall auf Operations-/Fixture-Quellen und explizite Scope-Regression begrenzt."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I009-Nachlauf 31412511481 und Scope-Gate 31412511727 real gruen; PR #28 promoviert. Toolseitige Scope-Haertung I007 bis I010 damit abgeschlossen."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I015.2F Regelauflösung: ERK-I012-002 als E2/BESTAETIGTE direkte Projektregel verifiziert. Kanonisches Masterbuch RULE-001 bis RULE-014 abgeglichen; dort existiert keine semantische CI-/Lifecycle-Scope-Dublette. Frühere Annahme eines kanonischen I012-Regelbezugs korrigiert; keine neue RULE-ID und keine Hochstufung in diesem Schritt."
     }
   ]
 }
