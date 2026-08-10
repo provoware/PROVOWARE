@@ -13,7 +13,8 @@
     {"id":"ARCH-011","regel":"OperationRequest und OperationResult sind reine, deterministisch serialisierbare Verträge ohne Handler-, GUI-, SQLite-, Datei- oder Ausführungslogik; Payloads werden vor Speicherung tief validiert und kanonisiert.","status":"VALIDIERT"},
     {"id":"ARCH-012","regel":"Request und Result korrelieren ausschließlich über die bestehende OperationId; Fehler- und Erfolgssemantik wird ausschließlich aus FehlerInfo und OperationErgebnis wiederverwendet und nicht parallel neu definiert.","status":"VALIDIERT"},
     {"id":"ARCH-013","regel":"Die öffentliche P02-API und ihre Vertragsquellen werden in I010 als kanonischer Snapshot und hashgebundenes Quellinventar eingefroren; neue P02-Quellen oder API-Drift benötigen einen expliziten migrationsfähigen Vertragswechsel.","status":"VALIDIERT"},
-    {"id":"ARCH-014","regel":"Plattformqualifikation ist read-only, injizierbar und fail-closed; DISPLAY allein qualifiziert keine echte X11-Sitzung, und unbekannte oder nicht unterstützte Plattformzustände dürfen nicht als unterstützt ausgegeben werden.","status":"VALIDIERT"}
+    {"id":"ARCH-014","regel":"Plattformqualifikation ist read-only, injizierbar und fail-closed; DISPLAY allein qualifiziert keine echte X11-Sitzung, und unbekannte oder nicht unterstützte Plattformzustände dürfen nicht als unterstützt ausgegeben werden.","status":"VALIDIERT"},
+    {"id":"ARCH-015","regel":"Projektwurzel-Zugehörigkeit wird segmentbasiert statt per String-Präfix geprüft; Parent-Traversal wird blockiert und ungeklärte Symlink-Semantik darf niemals als INNERHALB qualifiziert werden.","status":"VALIDIERT"}
   ],
   "schema":"1.0.0"
 }
