@@ -1,0 +1,148 @@
+name: I011 Linux System Profile
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/provoware/plattform/**"
+      - "tests/platform/**"
+      - "tests/fixtures/i011/**"
+      - "docs/WISSENSSPEICHER_I011_ERKENNTNIS*.json"
+      - ".github/workflows/i011-linux-profil.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: i011-linux-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Python 3.13.15 / Linux-Profil / X11
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      I005_RUN_ID: "31330952896"
+      I005_ARTIFACT_ID: "9042907351"
+      I005_ARTIFACT_SHA256: "6856c44cfd079b96f0daaa8e0fcebbba2dbbf5d0f1a3f16e02730f5851751040"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PYTHONHASHSEED: "0"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+
+      - name: CPython 3.13.15 bereitstellen
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.13.15"
+          check-latest: false
+
+      - name: Verifiziertes I005-Wheelhouse laden
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
+        with:
+          artifact-ids: ${{ env.I005_ARTIFACT_ID }}
+          path: .artefakte/i005-download
+          github-token: ${{ github.token }}
+          repository: provoware/PROVOWARE
+          run-id: ${{ env.I005_RUN_ID }}
+          skip-decompress: true
+          digest-mismatch: error
+
+      - name: Wheelhouse prüfen und Toolchain offline installieren
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mapfile -t ZIPS < <(find .artefakte/i005-download -type f -name '*.zip' -print)
+          test ${#ZIPS[@]} -eq 1
+          printf '%s  %s\n' "$I005_ARTIFACT_SHA256" "${ZIPS[0]}" | sha256sum -c -
+          mkdir -p .artefakte/i005
+          unzip -q "${ZIPS[0]}" -d .artefakte/i005
+          python3 -m venv .venv-i011
+          PIP_NO_INDEX=1 .venv-i011/bin/python -m pip install --no-index \
+            --find-links "$PWD/.artefakte/i005/wheelhouse" pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
+          PIP_NO_INDEX=1 .venv-i011/bin/python -m pip check
+
+      - name: I010-Baseline revalidieren
+        run: |
+          python3 WERKZEUGE/baseline_pruefen.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I010'
+          assert status['letzte_abgeschlossene_iteration'] == 'I010'
+          assert status['naechste_iteration'] == 'I011'
+          assert status['i010_p02_gate_qualifikation']['status'] == 'VALIDIERT_GITHUB'
+          PY
+
+      - name: I011 Contracttests
+        run: .venv-i011/bin/pytest -q tests/platform/test_linux_systemprofil.py
+
+      - name: Ruff prüfen
+        run: |
+          .venv-i011/bin/ruff check src/provoware/plattform tests/platform
+          .venv-i011/bin/ruff format --check src/provoware/plattform tests/platform
+
+      - name: mypy strict prüfen
+        run: .venv-i011/bin/mypy src/provoware/plattform tests/platform/test_linux_systemprofil.py
+
+      - name: P02 Regression in P03-Laufzeitmodus prüfen
+        run: >-
+          .venv-i011/bin/pytest -q tests/contract tests/architecture
+          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen"
+
+      - name: Gesamte schnelle Regression in P03-Laufzeitmodus
+        run: >-
+          .venv-i011/bin/pytest -q
+          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen and not test_i009_implementiert_nur_vertrags_schema_und_operationsschicht"
+
+      - name: I011 Qualifikationsreceipt erzeugen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .artefakte/I011
+          .venv-i011/bin/python - <<'PY'
+          import hashlib, json, os, platform
+          from datetime import UTC, datetime
+          from pathlib import Path
+          def sha(path: str) -> str:
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          receipt = {
+              'schema': '1.0.0', 'iteration': 'I011', 'phase': 'P03', 'status': 'GRUEN',
+              'zeit_utc': datetime.now(UTC).isoformat(),
+              'github': {'repository': os.environ['GITHUB_REPOSITORY'], 'sha': os.environ['GITHUB_SHA'], 'run_id': int(os.environ['GITHUB_RUN_ID'])},
+              'plattform': {'python': platform.python_version(), 'system': platform.system(), 'maschine': platform.machine()},
+              'quellen_sha256': {
+                  'linux_py': sha('src/provoware/plattform/linux.py'),
+                  'tests': sha('tests/platform/test_linux_systemprofil.py'),
+                  'golden_2204': sha('tests/fixtures/i011/ubuntu-22.04-x11.json'),
+                  'golden_2404': sha('tests/fixtures/i011/ubuntu-24.04-x11.json'),
+              },
+              'gates': {
+                  'baseline_i010': 'GRUEN', 'ubuntu_2204_x11': 'GRUEN', 'ubuntu_2404_x11': 'GRUEN',
+                  'wayland_negative': 'GRUEN', 'unknown_session_negative': 'GRUEN', 'non_amd64_negative': 'GRUEN',
+                  'fingerprint_determinism': 'GRUEN', 'ruff': 'GRUEN', 'ruff_format': 'GRUEN',
+                  'mypy_strict': 'GRUEN', 'p02_runtime_regression': 'GRUEN', 'gesamtregression': 'GRUEN',
+                  'i009_scope_freeze_evidence': 'HISTORISCH_VALIDIERT_UNVERAENDERT',
+                  'i010_phaseabschluss_evidence': 'HISTORISCH_VALIDIERT_UNVERAENDERT'
+              }
+          }
+          Path('.artefakte/I011/I011_QUALIFIKATION.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          PY
+
+      - name: I011 Evidence hochladen
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: PROVOWARE-I011-linux-systemprofil-${{ github.sha }}
+          path: .artefakte/I011/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 90
