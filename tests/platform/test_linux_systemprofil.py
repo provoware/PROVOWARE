@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from provoware.plattform import (
@@ -12,6 +15,8 @@ from provoware.plattform import (
 
 pytestmark = pytest.mark.contract
 
+FIXTURES = Path(__file__).parents[1] / "fixtures" / "i011"
+
 
 def _profil(*, version: str = "22.04", session: str = "x11", arch: str = "x86_64"):
     return erkenne_linux_systemprofil(
@@ -23,12 +28,26 @@ def _profil(*, version: str = "22.04", session: str = "x11", arch: str = "x86_64
     )
 
 
+@pytest.mark.parametrize("dateiname", ["ubuntu-22.04-x11.json", "ubuntu-24.04-x11.json"])
+def test_golden_zielprofile_sind_unterstuetzt(dateiname: str) -> None:
+    daten = json.loads((FIXTURES / dateiname).read_text(encoding="utf-8"))
+    profil = erkenne_linux_systemprofil(
+        LinuxSystemQuellen(
+            os_release=daten["os_release"],
+            umgebung=daten["umgebung"],
+            architektur=daten["architektur"],
+        )
+    )
+    assert profil.session.value == daten["erwartet"]["session"]
+    assert profil.status.value == daten["erwartet"]["status"]
+    assert len(profil.fingerprint_sha256) == 64
+
+
 @pytest.mark.parametrize("version", ["22.04", "24.04"])
 def test_ubuntu_zielprofile_x11_sind_unterstuetzt(version: str) -> None:
     profil = _profil(version=version)
     assert profil.session is SessionArt.X11
     assert profil.status is PlattformStatus.UNTERSTUETZT
-    assert len(profil.fingerprint_sha256) == 64
 
 
 def test_wayland_mit_display_wird_nicht_als_x11_qualifiziert() -> None:
