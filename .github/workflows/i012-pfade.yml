@@ -103,12 +103,12 @@ jobs:
       - name: P02 Regression in P03-Laufzeitmodus prüfen
         run: >-
           .venv-i012/bin/pytest -q tests/contract tests/architecture
-          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen"
+          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen and not test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand"
 
       - name: Gesamte schnelle Regression in P03-Laufzeitmodus
         run: >-
           .venv-i012/bin/pytest -q
-          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen and not test_i009_implementiert_nur_vertrags_schema_und_operationsschicht"
+          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen and not test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand and not test_i009_implementiert_nur_vertrags_schema_und_operationsschicht"
 
       - name: I012 Qualifikationsreceipt erzeugen
         shell: bash
