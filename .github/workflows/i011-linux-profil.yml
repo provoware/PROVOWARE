@@ -4,11 +4,11 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "src/provoware/plattform/**"
-      - "tests/platform/**"
+      - "src/provoware/plattform/linux.py"
+      - "src/provoware/plattform/__init__.py"
+      - "tests/platform/test_linux_systemprofil.py"
       - "tests/fixtures/i011/**"
       - "docs/WISSENSSPEICHER_I011_ERKENNTNIS*.json"
-      - ".github/workflows/i011-linux-profil.yml"
 
 permissions:
   contents: read
