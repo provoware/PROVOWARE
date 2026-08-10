@@ -7,7 +7,8 @@ on:
       - "src/provoware/plattform/**"
       - "tests/platform/**"
       - "tests/fixtures/i011/**"
-      - "docs/WISSENSSPEICHER_I011_ERKENNTNIS.json"
+      - "tests/architecture/test_p02_architekturgate.py"
+      - "docs/WISSENSSPEICHER_I011_ERKENNTNIS*.json"
       - ".github/workflows/i011-linux-profil.yml"
 
 permissions:
@@ -119,6 +120,7 @@ jobs:
               'quellen_sha256': {
                   'linux_py': sha('src/provoware/plattform/linux.py'),
                   'tests': sha('tests/platform/test_linux_systemprofil.py'),
+                  'p02_lifecycle_regression': sha('tests/architecture/test_p02_architekturgate.py'),
                   'golden_2204': sha('tests/fixtures/i011/ubuntu-22.04-x11.json'),
                   'golden_2404': sha('tests/fixtures/i011/ubuntu-24.04-x11.json'),
               },
