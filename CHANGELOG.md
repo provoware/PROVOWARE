@@ -2,6 +2,17 @@
 
 ## 0.1.0-dev - 2026-08-10
 
+### I013 — Read-only Symlink- und Dateisystemprobe qualifiziert
+- Segmentweise `lstat`-Probe ohne `resolve`/`realpath` eingeführt.
+- Zustände `SICHER`, `SYMLINK` und `UNBEKANNT` fail-closed modelliert und direkt auf I012 `symlink_frei` abgebildet.
+- Symlinks im Kandidaten- und Elternpfad, fehlende Segmente sowie `lstat`-/Berechtigungsfehler abgedeckt.
+- Nicht-Mutations-Test bestätigt, dass Inhalt, Größe und `mtime_ns` durch die Probe unverändert bleiben.
+- Historisches I012-CI-Gate auf seine eigenen qualifizierten Quellen begrenzt; historische Evidence blieb unverändert.
+- Finaler Workflow `31365831357` vollständig grün auf Head `3d6d809cf18904afa11f7d7e5c9d9f770afde0fd`; 9 I013-Contracttests, 21 I011/I012-Plattformregressionen, Ruff, Ruff Format, mypy strict, P02-Runtime-Regression und Gesamtregression grün.
+- Artifact `9054096684`, 1031 Byte, SHA-256 `a7cc14181ac15011e83f2b7e9fa7890eb2e120aa2aaf7f6439b94f268bf9fc39`.
+- Vorherige I012-Baseline auf `backup/vor-i013-promotion-2026-08-10` gesichert.
+- P03-Fortschritt auf 75 % gesetzt; I014 wird als read-only Dateiidentitäts- und Stale-Guard-Vertrag vorbereitet. TOCTOU bleibt ausdrücklich offen.
+
 ### I012 — Pfadnormalisierung und Projektwurzel-Schutz qualifiziert
 - Read-only Pfadnormalisierung und segmentbasierte Projektwurzel-Prüfung eingeführt.
 - Parent-Traversal fail-closed blockiert und präfixähnliche Geschwisterpfade ausdrücklich nicht als Unterpfade akzeptiert.
@@ -97,7 +108,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- I013-I014 weitere P03-Dateisystemschicht.
+- I014 weitere P03-Dateisystemschicht.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
