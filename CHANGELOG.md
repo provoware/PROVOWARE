@@ -2,6 +2,15 @@
 
 ## 0.1.0-dev - 2026-08-10
 
+### I012 — Pfadnormalisierung und Projektwurzel-Schutz qualifiziert
+- Read-only Pfadnormalisierung und segmentbasierte Projektwurzel-Prüfung eingeführt.
+- Parent-Traversal fail-closed blockiert und präfixähnliche Geschwisterpfade ausdrücklich nicht als Unterpfade akzeptiert.
+- Symlink-Sicherheit als expliziten Vorprüfstatus modelliert; ungeklärte Symlink-Semantik kann nicht als `INNERHALB` qualifiziert werden.
+- Historische I011-/I010-Gates auf ihren qualifizierten Quell- und Lebenszyklus-Scope begrenzt, ohne historische Evidence zu verändern.
+- Finaler Workflow `31357647745` vollständig grün; Artifact `9051207196`, 786 Byte, SHA-256 `1cced27d241951ec9190f82f7bb72680193d4d325cfdae9c10e1a371309c1d3a`, Receipt-SHA-256 `b88d8a6cc811b2119490cca9d6a6716b921bf9c0fe0f0e61895fa50dea825010`.
+- Produktstand per PR #18 auf Main-Merge-Commit `0402f4f910923f703eadb97243bc554ebccf2f0c` übernommen; vorherige I011-Baseline auf `backup/vor-i012-promotion-2026-08-10` gesichert.
+- P03-Fortschritt auf 50 % gesetzt und I013 als read-only Symlink-/Dateisystemprobe freigegeben.
+
 ### I011 — Linux-Systemprofil und X11-Erkennung qualifiziert
 - Read-only Linux-Systemprofil mit injizierbaren Erkennungsquellen eingeführt.
 - Ubuntu 22.04 und 24.04 amd64 X11 über Golden-Profile qualifiziert.
@@ -88,7 +97,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- I012-I014 weitere P03-Dateisystemschicht.
+- I013-I014 weitere P03-Dateisystemschicht.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
