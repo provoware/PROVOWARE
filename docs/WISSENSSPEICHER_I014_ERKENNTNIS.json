@@ -1,0 +1,37 @@
+{
+  "schema": "1.0.0",
+  "id": "ERK-I014-001",
+  "typ": "Regelentwurf",
+  "titel": "Eine Pfadprobe allein darf keine spaetere Dateiidentitaet garantieren",
+  "beschreibung": "Zwischen einer erfolgreichen Pfad-/Symlinkpruefung und einer spaeteren Mutation kann das Zielobjekt ausgetauscht oder veraendert werden. Deshalb muss unmittelbar vor einer spaeteren Mutation eine read-only Dateiidentitaet erneut verglichen werden; fehlende oder nicht lesbare Identitaet bleibt fail-closed UNBEKANNT.",
+  "hauptkategorie": "Daten & Integritaet",
+  "nebenkategorien": [
+    "Dateisystem",
+    "TOCTOU",
+    "Fehlervermeidung",
+    "Recovery",
+    "Tests",
+    "Evidence & Audit"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P03 und spaetere mutierende Dateisystemvertraege",
+  "projektbezug": ["PROVOWARE"],
+  "quelle_herkunft": [
+    "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I013",
+    "docs/PLAN_DELTA_I014.json",
+    "I013 Dateisystemprobe"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "historie": [
+    {
+      "datum": "2026-08-10",
+      "aktion": "ANGELEGT",
+      "reifegrad_vorher": null,
+      "reifegrad_nachher": "E1",
+      "grund": "P0-TOCTOU-Luecke vor erster mutierender Dateisystemprimitive explizit modelliert."
+    }
+  ]
+}

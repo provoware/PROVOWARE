@@ -1,0 +1,31 @@
+{
+  "schema": "1.0.0",
+  "delta_id": "PLAN-DELTA-P03-2026-08-10-001",
+  "status": "AKTIV_IN_PRUEFUNG",
+  "prioritaet": "P0",
+  "typ": "SICHERHEITSREIHENFOLGE",
+  "ausgangsplan": {
+    "version": "2.0.0",
+    "p03_i013": "atomare Temp/Replace-Primitive",
+    "p03_i014": "Lock-Lease und Prozessidentitaet"
+  },
+  "kanonischer_iststand": {
+    "i013": "read-only segmentweise Symlink- und Dateisystemprobe",
+    "i014": "read-only Dateiidentitaet und Stale-Guard"
+  },
+  "begruendung": "I012/I013 haben vor der ersten Mutation zwei P0-Sicherheitsluecken sichtbar gemacht: ungepruefte Symlink-Semantik und TOCTOU zwischen Pfadpruefung und spaeterer Mutation. Beide werden zuerst read-only geschlossen. Die urspruenglichen mutierenden P03-Bausteine werden nicht gestrichen, sondern nach erfolgreicher Qualifikation der Vorbedingungen neu eingeordnet.",
+  "nutzen": "Verhindert, dass eine spaetere atomare Replace- oder Lock-Implementierung auf veralteter oder ausgetauschter Dateiidentitaet vertraut.",
+  "risiko_delta": "NIEDRIG",
+  "reversibel": true,
+  "keine_mutation": true,
+  "aufgeschobene_planpunkte": [
+    "atomare Temp/Replace-Primitive",
+    "Lock-Lease und Prozessidentitaet"
+  ],
+  "abschlussbedingung": "I014 qualifiziert GLEICH/STALE/UNBEKANNT fail-closed und fuehrt keine Schreibprimitive ein.",
+  "quellen": [
+    "PROVOWARE_VOLLSTAENDIGER_ENTWICKLUNGSPLAN_EXPERT_FINAL_v2.0.0_2026-08-09",
+    "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I013",
+    "I013 Dateisystemprobe und TOCTOU-Risikodokumentation"
+  ]
+}
