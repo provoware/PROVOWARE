@@ -1,28 +1,34 @@
 {
   "schema": "1.0.0",
   "id": "ERK-I011-001",
-  "typ": "Regelentwurf",
+  "typ": "Regel",
   "titel": "Desktop-Sitzung darf nicht aus DISPLAY allein als X11 qualifiziert werden",
   "beschreibung": "Ein vorhandenes DISPLAY kann auch unter Wayland durch XWayland existieren. Die Plattformqualifikation muss deshalb ein explizites Session-Signal priorisieren und widersprüchliche oder fehlende Signale fail-closed als eingeschränkt oder unbekannt behandeln. Die Erkennungsquellen bleiben injizierbar, damit CI-Hostdaten die Tests nicht beeinflussen.",
   "hauptkategorie": "Plattform",
   "nebenkategorien": ["Linux", "X11", "Tests", "Fehlervermeidung", "Evidence & Audit"],
-  "reifegrad": "E1",
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE P03",
   "projektbezug": ["PROVOWARE"],
   "quelle_herkunft": [
     "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I010",
-    "PROJEKTSTATUS.json BASELINE-2026-08-10-I010",
     "I011 Implementierung src/provoware/plattform/linux.py",
-    "I011 Contracttests"
+    "I011 Contracttests",
+    "GitHub Actions Run 31346707865",
+    "Artifact 9047566065",
+    "I011_QUALIFIKATION.json Receipt-SHA-256 ba8150c4a6a6454c6b2dacbf9e974394e9a0d409edf6a21d8c3b51805ac3bb76"
   ],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
   "historie": [
     {
       "iteration": "I011",
       "aktion": "Als E1-Regelentwurf aufgenommen; Hochstufung erst nach reproduzierter I011-Runtime- und CI-Qualifikation."
+    },
+    {
+      "iteration": "I011-PROMOTION",
+      "aktion": "Nach realem grünen GitHub-Actions-Lauf 31346707865 und Evidence-Readback auf E2/BESTAETIGT hochgestuft; ausdrücklich keine Goldene Regel."
     }
   ]
 }
