@@ -11,7 +11,8 @@
     {"datenbesitz":"keine Persistenz; read-only Betriebssystem-, Architektur- und Sessionqualifikation","id":"KMP-PLATTFORM","name":"Linux-Plattformprofil","status":"VALIDIERT"},
     {"datenbesitz":"keine Persistenz; reine Pfadnormalisierung und Projektwurzel-Zugehörigkeitsprüfung","id":"KMP-PFADGRENZE","name":"Pfadnormalisierung und Projektwurzel-Schutz","status":"VALIDIERT"},
     {"datenbesitz":"keine Persistenz; read-only lstat-Befunde und Symlink-Status","id":"KMP-DATEISYSTEMPROBE","name":"Read-only Dateisystem- und Symlinkprobe","status":"VALIDIERT"},
-    {"datenbesitz":"keine Persistenz; read-only Device/Inode- und Stat-Snapshots sowie Stale-Status","id":"KMP-DATEIIDENTITAET","name":"Read-only Dateiidentität und Stale-Guard","status":"VALIDIERT"}
+    {"datenbesitz":"keine Persistenz; read-only Device/Inode- und Stat-Snapshots sowie Stale-Status","id":"KMP-DATEIIDENTITAET","name":"Read-only Dateiidentität und Stale-Guard","status":"VALIDIERT"},
+    {"datenbesitz":"genau eine qualifizierte Zieldatei; Temp-Datei im selben Verzeichnis; kein Batch/Delete","id":"KMP-ATOMARER-REPLACE","name":"Atomarer Einzeldatei-Replace","status":"VALIDIERT"}
   ],
   "schema": "1.0.0"
 }
