@@ -1,0 +1,43 @@
+{
+  "schema": "1.0.0",
+  "id": "ERK-I015-2-001",
+  "typ": "Regelentwurf",
+  "titel": "Historische Qualifikationsgates muessen an ihren qualifizierten Quell- und Lebenszyklus-Scope gebunden bleiben",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": [
+    "CI/CD",
+    "Lebenszyklus",
+    "Tests",
+    "Evidence & Audit",
+    "Fehlervermeidung"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE historische Iterations- und Phasengates",
+  "projektbezug": ["PROVOWARE", "P02", "P03", "I007", "I008", "I009", "I010", "I015.2"],
+  "quelle_herkunft": [
+    "reale Fehltrigger nach I015.1-Metadatenänderungen",
+    ".github/workflows/i007-kernvertraege.yml",
+    ".github/workflows/i008-schemata.yml",
+    ".github/workflows/i009-operationen.yml",
+    ".github/workflows/i010-p02-gate.yml",
+    "QUALIFIZIERTER_SCOPE.json"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Eine spaetere globale Register-, Traceability- oder Planänderung darf kein historisches Freeze-Gate starten, wenn diese Änderung die qualifizierte Aussage des historischen Gates fachlich nicht berührt. Unbekannter Scope ist fail-closed zu behandeln.",
+  "dublettenpruefung": {
+    "bezug": "ERK-I012-002",
+    "bewertung": "ERWEITERUNG_STATT_NEUE_GOLDENE_REGEL",
+    "hinweis": "I015.2 formalisiert die bereits bestaetigte I012-Erkenntnis als maschinenlesbaren Scope-Vertrag; vor E2 ist Konsolidierung zu pruefen."
+  },
+  "historie": [
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "I010 als erster risikohoechster historischer Trigger gehaertet; I007-I009 bleiben offen."
+    }
+  ]
+}

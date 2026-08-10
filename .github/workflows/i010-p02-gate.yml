@@ -11,12 +11,6 @@ on:
       - "tests/fixtures/i010/**"
       - "P02_API_SNAPSHOT.json"
       - "P02_QUELLINVENTAR.json"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "TRACEABILITY.json"
-      - "PLAN_MASTER.json"
-      - "VERSIONSREGISTER.json"
-      - "pyproject.toml"
       - "EVIDENCE/I010/**"
       - ".github/workflows/i010-p02-gate.yml"
 
