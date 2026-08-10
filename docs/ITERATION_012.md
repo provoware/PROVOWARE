@@ -35,12 +35,16 @@ Ein Kandidat darf nur `INNERHALB` sein, wenn:
 
 Die Implementierung liegt auf einem separaten Branch. Sie verändert keine Nutzerdaten und kann vollständig durch Verwerfen dieses Branches zurückgenommen werden.
 
-## CI-Befund und Minimalreparatur
+## CI-Befunde und Minimalreparaturen
 
 Der erste reale I012-Lauf (`31351698536`) war rot. Gleichzeitig wurde der historische I011-Workflow durch den zu breiten Filter `src/provoware/plattform/**` erneut ausgelöst und scheiterte erwartbar an seiner historischen I010-Baseline-Prüfung. Der I012-Code enthielt außerdem eine Ruff-E501-Verletzung in einer 116 Zeichen langen Begründungszeile.
 
-Die Reparatur bleibt klein und reversibel: Die lange Zeichenkette wurde ohne Logikänderung formatiert. Der historische I011-Workflow reagiert künftig nur noch auf `linux.py`, seinen eigenen Contracttest, die I011-Golden-Fixtures und die I011-Wissenseinträge. Der gemeinsame Exportpunkt `plattform/__init__.py` ist ausdrücklich kein historischer Trigger mehr, weil spätere Iterationen dort regulär neue Exporte ergänzen. Diese Korrektur erweitert weder den Pfadvertrag noch die Schreibrechte.
+Die erste Reparatur blieb klein und reversibel: Die lange Zeichenkette wurde ohne Logikänderung formatiert. Der historische I011-Workflow reagiert künftig nur noch auf `linux.py`, seinen eigenen Contracttest, die I011-Golden-Fixtures und die I011-Wissenseinträge. Der gemeinsame Exportpunkt `plattform/__init__.py` ist ausdrücklich kein historischer Trigger mehr, weil spätere Iterationen dort regulär neue Exporte ergänzen.
+
+Der zweite reale I012-Lauf (`31354578922`) lieferte den entscheidenden Nachweis: I011-Baseline, 10 I012-Contracttests, 11 I011-Regressionsprüfungen, Ruff, Ruff Format und mypy strict waren grün. Rot war ausschließlich `test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand`, ein drittes historisches I010-Phasenabschlussgate. Es erwartete den alten P02-Zustand `IN_ARBEIT`, obwohl P02 auf der kanonischen I011-Baseline bereits `VALIDIERT` ist.
+
+Die zweite Reparatur ändert keinen Produktcode und keine historische Evidence. Stattdessen wird genau dieses historische I010-Lebenszyklusgate sowohl aus der P02-Laufzeitregression als auch aus der schnellen Gesamtregression im P03-Modus getrennt. Die bereits qualifizierten historischen Abschlussgates bleiben unverändert erhalten und können separat revalidiert werden.
 
 ## Qualifikationsstatus
 
-Die Contracttests und der CI-Vertrag sind Bestandteil des Branches. Erst ein real beobachteter grüner GitHub-Actions-Lauf darf I012 promovieren oder die Wissensregel über E1 hinaus anheben. Nach der Minimalreparatur bleibt der Status bis zur erneuten realen CI-Auswertung ausdrücklich `PENDING_QUALIFICATION`.
+Produktlogik und statische Qualität sind durch Lauf `31354578922` bereits real positiv belegt. Die I012-Promotion bleibt dennoch gesperrt, bis ein neuer Lauf auf dem korrigierten Workflow vollständig grün endet und ein Qualification Receipt samt Evidence-Artefakt erzeugt wurde. Bis dahin lautet der Status weiterhin `PENDING_QUALIFICATION`.
