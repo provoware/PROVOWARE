@@ -21,12 +21,13 @@
     ".github/workflows/i008-schemata.yml",
     ".github/workflows/i009-operationen.yml",
     ".github/workflows/i010-p02-gate.yml",
-    "QUALIFIZIERTER_SCOPE.json"
+    "QUALIFIZIERTER_SCOPE.json",
+    "GitHub Actions Run 31402335547"
   ],
   "automatisierbarkeit": "JA",
   "status": "IN_PRUEFUNG",
   "goldene_regel": false,
-  "aussage": "Eine spaetere globale Register-, Traceability- oder Planänderung darf kein historisches Freeze-Gate starten, wenn diese Änderung die qualifizierte Aussage des historischen Gates fachlich nicht berührt. Unbekannter Scope ist fail-closed zu behandeln.",
+  "aussage": "Eine spaetere globale Register-, Traceability- oder Planänderung darf kein historisches Freeze-Gate starten, wenn diese Änderung die qualifizierte Aussage des historischen Gates fachlich nicht berührt. Auch eine ungescoppte Gesamtprojekt-Regression innerhalb eines historischen Gates darf spaetere Lebenszyklus-Freeze-Tests nicht zur historischen Gate-Aussage erheben. Unbekannter Scope ist fail-closed zu behandeln.",
   "dublettenpruefung": {
     "bezug": "ERK-I012-002",
     "bewertung": "ERWEITERUNG_STATT_NEUE_GOLDENE_REGEL",
@@ -44,6 +45,12 @@
       "status": "IN_PRUEFUNG",
       "reifegrad": "E1",
       "aktion": "I007 als einzelner Referenzfall auf qualifizierte Quellen begrenzt; I008-I009 bleiben offen. Keine Reifegrad- oder Goldene-Regel-Hochstufung."
+    },
+    {
+      "datum": "2026-08-10",
+      "status": "IN_PRUEFUNG",
+      "reifegrad": "E1",
+      "aktion": "Run 31402335547: Baseline, Ruff, mypy und 49 Contracttests gruen; ungescoppte Gesamtregression scheiterte ausschließlich an vier spaeteren I009/I010-Lebenszyklus-Freeze-Tests. Workflow deshalb minimal auf tests/contract als I007-Scope-Regression begrenzt."
     }
   ]
 }
