@@ -1,0 +1,38 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I015.1",
+  "typ": "METADATA_CLOSURE",
+  "status": "VORBEREITET",
+  "basis": {
+    "baseline": "BASELINE-2026-08-10-I015",
+    "main_commit_vorher": "80f1117119fa7501bce8ddc6074354285394d7fe",
+    "workflow_run_id": 31378734347,
+    "artifact_id": 9058982637,
+    "artifact_sha256": "448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f",
+    "receipt_sha256": "ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703",
+    "produktmerge": "8052d9ce42014e6037c59b0aed47d8dcd2edecc1"
+  },
+  "geschlossen": [
+    "CHANGELOG.md enthaelt I015",
+    "TRACEABILITY.json bindet ARCH-018",
+    "TRACEABILITY.json bindet KMP-ATOMARER-REPLACE",
+    "TRACEABILITY.json bindet src/provoware/plattform/atomarer_replace.py",
+    "TRACEABILITY.json bindet tests/platform/test_atomarer_replace.py",
+    "TRACEABILITY.json bindet EVIDENCE/I015/PROMOTION.json"
+  ],
+  "nicht_geaendert": [
+    "Produktlogik",
+    "Baseline-Identitaet",
+    "I015-Qualification",
+    "P03-Fortschritt",
+    "Release-Status"
+  ],
+  "datenverlustschutz": "Nur Metadaten auf isoliertem Branch; keine Nutzerdatenmutation.",
+  "rueckfall": "Branch verwerfen oder nicht mergen; main bleibt unveraendert bis expliziter Promotion.",
+  "validierung": {
+    "json_readback": "AUSSTEHEND",
+    "historienerhalt_changelog": "AUSSTEHEND",
+    "traceability_readback": "AUSSTEHEND",
+    "branch_diff": "AUSSTEHEND"
+  }
+}
