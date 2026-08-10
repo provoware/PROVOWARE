@@ -1,63 +1,68 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I014",
-  "next_goal": "Read-only Dateiidentität und Stale-Guard-Vertrag ergänzen: einen qualifizierten Stat-Snapshot erzeugen und unmittelbar vor einer späteren Mutation erneut vergleichbar machen, ohne bereits Schreiblogik einzuführen.",
-  "why_next": "I013 qualifiziert die segmentweise Symlink- und Dateisystemprobe. Die verbleibende P03-Sicherheitslücke ist TOCTOU: Ein nach der Probe veränderter oder ausgetauschter Pfad darf später nicht aufgrund alter Evidence als unverändert gelten. Ein read-only Identitäts-/Stale-Guard schließt diese Lücke mit geringem Risiko.",
+  "next_iteration": "I015",
+  "next_goal": "Die im Masterplan ursprünglich für P03/I013 vorgesehene atomare Temp/Replace-Primitive als kleinsten mutierenden Dateisystemvertrag nachholen und dabei I012-Pfadgrenze, I013-Symlinkprobe und I014-Stale-Guard zwingend als Vorbedingungen binden.",
+  "why_next": "I014 schließt die TOCTOU-Vorbedingung read-only und ist real qualifiziert. Damit kann erstmals die zuvor aus Sicherheitsgründen verschobene atomare Replace-Primitive betrachtet werden, ohne Lock-Lease, Batch-Schreiben oder weitere Mutationen vorzuziehen.",
   "priority": "P0",
-  "probable_component": "src/provoware/plattform/dateiidentitaet.py",
+  "probable_component": "src/provoware/plattform/atomarer_replace.py",
   "probable_files": [
-    "src/provoware/plattform/dateiidentitaet.py",
+    "src/provoware/plattform/atomarer_replace.py",
     "src/provoware/plattform/__init__.py",
-    "tests/platform/test_dateiidentitaet.py",
-    "docs/ITERATION_014.md",
-    "docs/WISSENSSPEICHER_I014_ERKENNTNIS.json",
-    ".github/workflows/i014-dateiidentitaet.yml"
+    "tests/platform/test_atomarer_replace.py",
+    "docs/ITERATION_015.md",
+    "docs/WISSENSSPEICHER_I015_ERKENNTNIS.json",
+    "docs/PLAN_DELTA_I014.json",
+    ".github/workflows/i015-atomarer-replace.yml"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-10-I013",
-    "i013_workflow_run_id": 31365831357,
-    "i013_artifact_id": 9054096684,
-    "i013_artifact_sha256": "a7cc14181ac15011e83f2b7e9fa7890eb2e120aa2aaf7f6439b94f268bf9fc39",
-    "i013_qualifikations_head": "3d6d809cf18904afa11f7d7e5c9d9f770afde0fd"
+    "baseline": "BASELINE-2026-08-10-I014",
+    "i014_workflow_run_id": 31373576096,
+    "i014_artifact_id": 9057041454,
+    "i014_artifact_sha256": "a7645776306118682e6c2f1d81718fdc04669647e9500c0de474625a9414a050",
+    "i014_receipt_sha256": "2bca92ad8795620ec1b1edcdcb90a14a2cb25559cb087f1d0ad282285851526b",
+    "i014_qualifikations_head": "aa2cedab013598b5f87b9981dbcf3b41675eec4b",
+    "plan_delta": "PLAN-DELTA-P03-2026-08-10-001"
   },
   "known_dependencies": [
-    "P00-P02 vollständig VALIDIERT",
     "I011 Linux-Systemprofil VALIDIERT_GITHUB",
-    "I012 Pfadnormalisierung und Projektwurzel-Schutz VALIDIERT_GITHUB",
-    "I013 read-only Dateisystem-/Symlinkprobe VALIDIERT_GITHUB",
-    "P03 bleibt ohne Nutzdatenmutation"
+    "I012 Projektwurzel-Schutz VALIDIERT_GITHUB",
+    "I013 read-only Symlinkprobe VALIDIERT_GITHUB",
+    "I014 Dateiidentität/Stale-Guard VALIDIERT_GITHUB",
+    "P0-PLAN_DELTA dokumentiert die geänderte Sicherheitsreihenfolge"
   ],
   "preconditions": [
-    "I013-Evidence und Baseline gegenseitig revalidieren",
-    "Dateiidentität ausschließlich read-only erfassen",
-    "Device/Inode und relevante Stat-Merkmale explizit modellieren",
-    "fehlende oder nicht lesbare Identität fail-closed behandeln",
-    "kein mkdir, rename, move, delete, overwrite oder produktives Locking vorziehen"
+    "I012 INNERHALB muss bestätigt sein",
+    "I013 symlink_frei muss True sein",
+    "I014 unmittelbarer Recheck muss GLEICH sein",
+    "Temp-Datei ausschließlich im qualifizierten Zielverzeichnis erzeugen",
+    "fsync/replace/dir-fsync Semantik separat und testbar kapseln",
+    "kein Lock-Lease, Batch-Schreiben oder Delete vorziehen"
   ],
   "expected_tests": [
-    "gleiche Datei ergibt reproduzierbare Identität",
-    "Austausch gegen andere Inode wird als STALE erkannt",
-    "Änderung relevanter Stat-Merkmale wird erkannt",
-    "fehlende Datei liefert UNBEKANNT statt unverändert",
-    "Symlink-Status aus I013 bleibt getrennte Voraussetzung",
-    "keine Datei- oder Verzeichnisänderung durch Snapshot und Recheck",
-    "Ruff, Ruff Format, mypy strict und Regression"
+    "erfolgreicher isolierter Temp/Replace-Pfad auf Testfixture",
+    "STALE blockiert vor jeder Mutation",
+    "UNBEKANNT blockiert vor jeder Mutation",
+    "Symlink-Befund blockiert",
+    "Pfad außerhalb Projektwurzel blockiert",
+    "Fehler vor Replace hinterlässt Original unverändert",
+    "Fehler nach Temp-Schreiben räumt oder kennzeichnet Temp-Zustand deterministisch",
+    "Ruff, Ruff Format, mypy strict und vollständige P03-Regression"
   ],
   "done_criteria": [
-    "read-only Dateiidentität ist typisiert und deterministisch vergleichbar",
-    "Stale-Guard kann GEICH/STALE/UNBEKANNT fail-closed unterscheiden",
-    "I013-Symlinkprobe und I014-Identität bleiben getrennte Sicherheitsbeweise",
-    "keine Schreibprimitive eingeführt",
-    "mutierende Verträge bleiben bis grüner I014-Promotion gesperrt"
+    "genau eine atomare Replace-Primitive ist hinter allen drei Vorprüfungen gekapselt",
+    "kein nicht qualifizierter Pfad erreicht os.replace",
+    "Original bleibt bei Vorbedingungenfehler unverändert",
+    "Recovery-/Fehlerzustände sind maschinenlesbar",
+    "Lock-Lease bleibt weiterhin gesperrt"
   ],
   "known_risks": [
-    "Device/Inode allein decken nicht jede semantische Änderung ab",
-    "Netz- und Sonderdateisysteme können abweichende Identitätssemantik besitzen",
-    "eine erfolgreiche Reprüfung ist nur unmittelbar vor einer späteren Mutation sinnvoll und keine dauerhafte Garantie"
+    "Dateisysteme unterscheiden sich bei fsync- und Atomicity-Garantien",
+    "TOCTOU wird ohne Descriptor-/Lock-Bindung nur reduziert, nicht global eliminiert",
+    "Crash zwischen Replace und Verzeichnis-fsync muss später explizit in Recovery-Evidence abgebildet werden"
   ],
   "open_subpoints": [
-    "minimale stabile Stat-Merkmalsmenge definieren",
-    "Dateisystem-/Plattformabweichungen explizit als UNBEKANNT behandeln",
-    "Schreib- und Locklogik weiterhin nicht vorziehen"
+    "Linux-Dateisystemgarantien für os.replace plus Datei-/Verzeichnis-fsync qualifizieren",
+    "Temp-Dateinamensvertrag und Cleanup-Zustände definieren",
+    "Downstream-Iterationsnummern wegen PLAN_DELTA erst nach P03-Abschluss kanonisch neu zuordnen"
   ]
 }
