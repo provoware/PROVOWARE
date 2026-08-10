@@ -7,7 +7,8 @@
     {"datenbesitz": "keine Fachpersistenz", "id": "KMP-UI", "name": "Desktop-Adapter", "status": "GEPLANT"},
     {"datenbesitz": "keine Persistenz; reine Wert- und Ergebnistypen", "id": "KMP-VERTRAEGE", "name": "Kernverträge und Datentypen", "status": "VALIDIERT"},
     {"datenbesitz": "keine Persistenz; versionierte Struktur- und Validierungsverträge", "id": "KMP-SCHEMATA", "name": "Manifest- und Projektschemata", "status": "VALIDIERT"},
-    {"datenbesitz": "keine Persistenz; kanonische Request-/Result-Hüllen und Payload-Verträge", "id": "KMP-OPERATIONEN", "name": "Operationsverträge", "status": "VALIDIERT"}
+    {"datenbesitz": "keine Persistenz; kanonische Request-/Result-Hüllen und Payload-Verträge", "id": "KMP-OPERATIONEN", "name": "Operationsverträge", "status": "VALIDIERT"},
+    {"datenbesitz": "keine Persistenz; read-only Betriebssystem-, Architektur- und Sessionqualifikation", "id": "KMP-PLATTFORM", "name": "Linux-Plattformprofil", "status": "VALIDIERT"}
   ],
   "schema": "1.0.0"
 }
