@@ -1,0 +1,77 @@
+{
+  "schema": "1.0.0",
+  "stand": "2026-08-10",
+  "zweck": "Historische Qualifikationsworkflows duerfen nur auf Quellen reagieren, deren Aenderung ihre eigene qualifizierte Aussage fachlich beruehrt.",
+  "grundsatz": {
+    "historische_evidence_bleibt_unveraendert": true,
+    "spaetere_globale_metadaten_sind_keine_historische_requalifikationsquelle": true,
+    "unbekannter_scope": "BLOCKIERT"
+  },
+  "iterationen": {
+    "I007": {
+      "lebenszyklus": "P02_KERNVERTRAEGE",
+      "status": "BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN",
+      "eigene_quellen": [
+        ".github/workflows/i007-kernvertraege.yml",
+        "src/provoware/vertraege/**",
+        "tests/contract/**",
+        "EVIDENCE/I007/**"
+      ]
+    },
+    "I008": {
+      "lebenszyklus": "P02_SCHEMATA",
+      "status": "BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN",
+      "eigene_quellen": [
+        ".github/workflows/i008-schemata.yml",
+        "src/provoware/vertraege/schemata.py",
+        "tests/contract/test_schemata.py",
+        "tests/contract/test_i007_api_freeze.py",
+        "tests/fixtures/i008/**",
+        "EVIDENCE/I008/**"
+      ]
+    },
+    "I009": {
+      "lebenszyklus": "P02_OPERATIONEN",
+      "status": "BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN",
+      "eigene_quellen": [
+        ".github/workflows/i009-operationen.yml",
+        "src/provoware/vertraege/operationen.py",
+        "tests/contract/test_operationen.py",
+        "tests/fixtures/i009/**",
+        "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md",
+        "EVIDENCE/I009/**"
+      ]
+    },
+    "I010": {
+      "lebenszyklus": "P02_PHASE_GATE",
+      "status": "GEHAERTET_I015_2",
+      "eigene_quellen": [
+        ".github/workflows/i010-p02-gate.yml",
+        "src/provoware/vertraege/**",
+        "WERKZEUGE/p02_architekturgate.py",
+        "WERKZEUGE/__init__.py",
+        "tests/architecture/**",
+        "tests/fixtures/i010/**",
+        "P02_API_SNAPSHOT.json",
+        "P02_QUELLINVENTAR.json",
+        "EVIDENCE/I010/**"
+      ],
+      "explizit_keine_trigger": [
+        "ARCHITEKTURREGISTER.json",
+        "KOMPONENTENREGISTER.json",
+        "TRACEABILITY.json",
+        "PLAN_MASTER.json",
+        "VERSIONSREGISTER.json",
+        "pyproject.toml"
+      ],
+      "begruendung": "Diese globalen Artefakte entwickeln sich nach P02 weiter und duerfen kein historisches I009→I010-Freeze-Gate auf spaeteren P03-Staenden starten."
+    }
+  },
+  "historie": [
+    {
+      "datum": "2026-08-10",
+      "iteration": "I015.2",
+      "aktion": "Scope-Manifest eingefuehrt; I010 als erster und risikohoechster historischer Trigger gehaertet. I007-I009 bleiben explizit offen."
+    }
+  ]
+}
