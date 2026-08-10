@@ -2,6 +2,18 @@
 
 ## 0.1.0-dev - 2026-08-10
 
+### I014 — Read-only Dateiidentität und Stale-Guard qualifiziert
+- `DateiIdentitaet` aus Device, Inode, Objektart, Modus, Größe, `mtime_ns` und `ctime_ns` eingeführt.
+- Fail-closed Recheck mit `GLEICH`, `STALE` und `UNBEKANNT` implementiert; fehlende oder nicht lesbare Identität kann niemals als gleich gelten.
+- Inode-Austausch und relevante Stat-Drift werden als `STALE` erkannt; Snapshot und Recheck verändern Nutzdaten nicht.
+- P0-`PLAN_DELTA-P03-2026-08-10-001` dokumentiert die sicherheitsbedingte Abweichung vom Masterplan: atomare Replace- und Lock-Lease-Bausteine bleiben aufgeschoben, bis Symlink- und TOCTOU-Vorbedingungen qualifiziert sind.
+- Erster Workflow `31373390990` nach 9 Contracttests und 30 Plattformregressionen ausschließlich an Ruff E501 gescheitert; keine übersprungenen Gates wurden als PASS gewertet.
+- Minimaler Formatfix ohne Logikänderung; finaler Workflow `31373576096` vollständig grün: 9 I014-Contracttests, 30 I011-I013-Plattformregressionen, Ruff, Ruff Format, mypy strict, P02-Runtime-Regression und Gesamtregression.
+- Artifact `9057041454`, 778 Byte, SHA-256 `a7645776306118682e6c2f1d81718fdc04669647e9500c0de474625a9414a050`; Receipt-SHA-256 `2bca92ad8795620ec1b1edcdcb90a14a2cb25559cb087f1d0ad282285851526b`.
+- I013-Baseline auf `backup/vor-i014-promotion-2026-08-10` gesichert; Produkt-PR #21 SHA-gebunden als Squash-Commit `73e8e86eb359c8f9b5baceaade259bf5eb749c14` gemergt.
+- `ERK-I014-001` nach realer Qualification von E1 auf E2 gehoben; keine Goldene Regel.
+- P03-Fortschritt bleibt konservativ bei 75 %, weil die ursprünglich vorgesehenen mutierenden P03-Bausteine durch den PLAN_DELTA noch nicht erledigt sind.
+
 ### I013 — Read-only Symlink- und Dateisystemprobe qualifiziert
 - Segmentweise `lstat`-Probe ohne `resolve`/`realpath` eingeführt.
 - Zustände `SICHER`, `SYMLINK` und `UNBEKANNT` fail-closed modelliert und direkt auf I012 `symlink_frei` abgebildet.
@@ -108,7 +120,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- I014 weitere P03-Dateisystemschicht.
+- Atomare Temp/Replace-Primitive und Lock-Lease aus P03; beide sind durch `PLAN_DELTA-P03-2026-08-10-001` bewusst aufgeschoben.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
