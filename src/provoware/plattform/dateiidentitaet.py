@@ -222,7 +222,9 @@ def pruefe_stale_guard(
     ):
         status = StaleStatus.UNBEKANNT
         geaendert: tuple[str, ...] = ()
-        begruendung = "Mindestens eine Identität ist unbekannt; Gleichheit darf nicht behauptet werden."
+        begruendung = (
+            "Mindestens eine Identität ist unbekannt; Gleichheit darf nicht behauptet werden."
+        )
     else:
         geaendert = _geaenderte_merkmale(erwartet.identitaet, aktuell.identitaet)
         if geaendert:
