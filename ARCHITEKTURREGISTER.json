@@ -16,7 +16,8 @@
     {"id":"ARCH-014","regel":"Plattformqualifikation ist read-only, injizierbar und fail-closed; DISPLAY allein qualifiziert keine echte X11-Sitzung, und unbekannte oder nicht unterstützte Plattformzustände dürfen nicht als unterstützt ausgegeben werden.","status":"VALIDIERT"},
     {"id":"ARCH-015","regel":"Projektwurzel-Zugehörigkeit wird segmentbasiert statt per String-Präfix geprüft; Parent-Traversal wird blockiert und ungeklärte Symlink-Semantik darf niemals als INNERHALB qualifiziert werden.","status":"VALIDIERT"},
     {"id":"ARCH-016","regel":"Symlink-Sicherheit wird read-only und segmentweise per lstat ohne resolve/realpath ermittelt; jeder nicht eindeutig lesbare Zustand bleibt fail-closed UNBEKANNT. Eine erfolgreiche Probe ist keine TOCTOU-Garantie für spätere Mutationen.","status":"VALIDIERT"},
-    {"id":"ARCH-017","regel":"Vor einer späteren Dateisystemmutation muss die zuvor beobachtete Objektidentität unmittelbar read-only revalidiert werden; Device/Inode und relevante Stat-Merkmale bilden den Stale-Guard, jede unlesbare Identität bleibt fail-closed UNBEKANNT. GLEICH ist keine Lock- oder Dauergarantie.","status":"VALIDIERT"}
+    {"id":"ARCH-017","regel":"Vor einer späteren Dateisystemmutation muss die zuvor beobachtete Objektidentität unmittelbar read-only revalidiert werden; Device/Inode und relevante Stat-Merkmale bilden den Stale-Guard, jede unlesbare Identität bleibt fail-closed UNBEKANNT. GLEICH ist keine Lock- oder Dauergarantie.","status":"VALIDIERT"},
+    {"id":"ARCH-018","regel":"Ein atomarer Einzeldatei-Replace darf nur hinter Projektwurzel-, Symlink- und unmittelbarem Stale-Guard erfolgen. Datei-fsync liegt vor os.replace, Verzeichnis-fsync danach; Fehler nach erfolgreichem Replace müssen mutation_erfolgt=true offen ausweisen und dürfen keinen Rollback behaupten.","status":"VALIDIERT"}
   ],
   "schema":"1.0.0"
 }
