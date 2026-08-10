@@ -1,0 +1,37 @@
+{
+  "schema": "1.0.0",
+  "id": "ERK-I012-002",
+  "typ": "Regelentwurf",
+  "titel": "Historische CI-Gates müssen auf ihre eigenen qualifizierten Quellen und Lebenszykluszustände begrenzt bleiben",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": [
+    "CI/CD",
+    "Lebenszyklus",
+    "Tests",
+    "Evidence & Audit",
+    "Fehlervermeidung"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE Phasen- und Iterationsübergänge",
+  "projektbezug": "I012 Qualification auf I011-Baseline",
+  "quelle_herkunft": "Reale CI-Befunde auf PR #18: Ein historischer I011-Workflow wurde durch neue I012-Plattformquellen ausgelöst; im Folgelauf 31354578922 scheiterte ausschließlich ein historisches I010-Traceability-Gate an seinem alten P02-Lebenszykluszustand, während I012-Contracttests, I011-Regression, Ruff und mypy grün waren.",
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Ein bereits qualifiziertes historisches Iterations- oder Phasenabschlussgate darf in späteren Phasen weder durch fachfremde Quellen unnötig ausgelöst noch als permanente Invariante des aktuellen Lebenszyklus behandelt werden. Trigger- und Testselektion müssen den qualifizierten Scope sowie den historischen Lebenszykluszustand explizit abgrenzen; echte Änderungen an historischen Quellen sollen dagegen weiterhin sichtbar scheitern und Requalifikation erzwingen.",
+  "historie": [
+    {
+      "iteration": "I012",
+      "reifegrad": "E1",
+      "status": "IN_PRUEFUNG",
+      "grund": "Historischer I011-Triggerfehler real beobachtet und minimal eingegrenzt; neue Qualification noch nicht vollständig ausgewertet."
+    },
+    {
+      "iteration": "I012",
+      "reifegrad": "E1",
+      "status": "IN_PRUEFUNG",
+      "grund": "Lauf 31354578922 isolierte zusätzlich ein historisches I010-Traceability-Gate als alleinige Restursache; Produktcode und aktuelle Qualitätsgates waren grün. Testselektion minimal korrigiert, Reifegrad bleibt bis vollständiger Qualification unverändert."
+    }
+  ]
+}
