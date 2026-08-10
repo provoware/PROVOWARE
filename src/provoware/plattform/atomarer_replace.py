@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import stat
 import tempfile
+from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import PurePosixPath
@@ -109,6 +110,16 @@ def _vorbedingungen_pruefen(
     return None
 
 
+def _temp_aufräumen(temp_pfad: str | None) -> str | None:
+    if temp_pfad is None:
+        return None
+    try:
+        os.unlink(temp_pfad)
+    except OSError:
+        return temp_pfad
+    return None
+
+
 def atomar_ersetzen(
     *,
     ziel: str,
@@ -154,10 +165,8 @@ def atomar_ersetzen(
                 handle.flush()
                 os.fsync(handle.fileno())
         except BaseException:
-            try:
+            with suppress(OSError):
                 os.close(fd)
-            except OSError:
-                pass
             raise
 
         os.replace(temp_pfad, normalisiert)
@@ -170,13 +179,7 @@ def atomar_ersetzen(
         finally:
             os.close(dir_fd)
     except OSError as exc:
-        if temp_pfad is not None:
-            try:
-                os.unlink(temp_pfad)
-                temp_pfad = None
-            except OSError:
-                pass
-
+        temp_pfad = _temp_aufräumen(temp_pfad)
         if ersetzt:
             return ReplaceErgebnis(
                 ziel=normalisiert,
