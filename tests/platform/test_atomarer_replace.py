@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import stat
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -59,7 +60,7 @@ def test_stale_blockiert_bevor_tempdatei_entsteht(
     def verboten(*args: object, **kwargs: object) -> tuple[int, str]:
         raise AssertionError("mkstemp darf bei STALE nicht erreicht werden")
 
-    monkeypatch.setattr("provoware.plattform.atomarer_replace.tempfile.mkstemp", verboten)
+    monkeypatch.setattr(tempfile, "mkstemp", verboten)
     ergebnis = atomar_ersetzen(
         ziel=str(datei),
         inhalt=b"neu",
@@ -151,7 +152,7 @@ def test_fsync_fehler_vor_replace_laesst_original_unveraendert(
             raise OSError("Datei-fsync absichtlich fehlgeschlagen")
         original_fsync(fd)
 
-    monkeypatch.setattr("provoware.plattform.atomarer_replace.os.fsync", fsync_fehler)
+    monkeypatch.setattr(os, "fsync", fsync_fehler)
     ergebnis = atomar_ersetzen(
         ziel=str(datei),
         inhalt=b"neu",
@@ -179,7 +180,7 @@ def test_dir_fsync_fehler_meldet_mutation_als_bereits_erfolgt(
             raise OSError("Verzeichnis-fsync absichtlich fehlgeschlagen")
         original_fsync(fd)
 
-    monkeypatch.setattr("provoware.plattform.atomarer_replace.os.fsync", fsync_fehler)
+    monkeypatch.setattr(os, "fsync", fsync_fehler)
     ergebnis = atomar_ersetzen(
         ziel=str(datei),
         inhalt=b"neu",
