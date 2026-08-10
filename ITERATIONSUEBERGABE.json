@@ -1,68 +1,16 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I015",
-  "next_goal": "Die im Masterplan ursprünglich für P03/I013 vorgesehene atomare Temp/Replace-Primitive als kleinsten mutierenden Dateisystemvertrag nachholen und dabei I012-Pfadgrenze, I013-Symlinkprobe und I014-Stale-Guard zwingend als Vorbedingungen binden.",
-  "why_next": "I014 schließt die TOCTOU-Vorbedingung read-only und ist real qualifiziert. Damit kann erstmals die zuvor aus Sicherheitsgründen verschobene atomare Replace-Primitive betrachtet werden, ohne Lock-Lease, Batch-Schreiben oder weitere Mutationen vorzuziehen.",
+  "next_iteration": "I016",
+  "next_goal": "Lock-Lease und konkurrierenden Schreibzugriff als separaten P0-Sicherheitsvertrag vor weiteren mutierenden P03-Schritten kapseln, ohne Batch-Schreiben, Delete oder zusätzliche Fachlogik vorzuziehen.",
+  "why_next": "I015 qualifiziert den atomaren Einzeldatei-Replace hinter I012-I014. Verbleibende zentrale P03-Lücke ist die fehlende Exklusivitäts-/Lease-Bindung: GLEICH und ein erfolgreicher Replace-Vertrag verhindern noch keinen konkurrierenden Schreiber zwischen Vorprüfung und Mutation.",
   "priority": "P0",
-  "probable_component": "src/provoware/plattform/atomarer_replace.py",
-  "probable_files": [
-    "src/provoware/plattform/atomarer_replace.py",
-    "src/provoware/plattform/__init__.py",
-    "tests/platform/test_atomarer_replace.py",
-    "docs/ITERATION_015.md",
-    "docs/WISSENSSPEICHER_I015_ERKENNTNIS.json",
-    "docs/PLAN_DELTA_I014.json",
-    ".github/workflows/i015-atomarer-replace.yml"
-  ],
-  "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-10-I014",
-    "i014_workflow_run_id": 31373576096,
-    "i014_artifact_id": 9057041454,
-    "i014_artifact_sha256": "a7645776306118682e6c2f1d81718fdc04669647e9500c0de474625a9414a050",
-    "i014_receipt_sha256": "2bca92ad8795620ec1b1edcdcb90a14a2cb25559cb087f1d0ad282285851526b",
-    "i014_qualifikations_head": "aa2cedab013598b5f87b9981dbcf3b41675eec4b",
-    "plan_delta": "PLAN-DELTA-P03-2026-08-10-001"
-  },
-  "known_dependencies": [
-    "I011 Linux-Systemprofil VALIDIERT_GITHUB",
-    "I012 Projektwurzel-Schutz VALIDIERT_GITHUB",
-    "I013 read-only Symlinkprobe VALIDIERT_GITHUB",
-    "I014 Dateiidentität/Stale-Guard VALIDIERT_GITHUB",
-    "P0-PLAN_DELTA dokumentiert die geänderte Sicherheitsreihenfolge"
-  ],
-  "preconditions": [
-    "I012 INNERHALB muss bestätigt sein",
-    "I013 symlink_frei muss True sein",
-    "I014 unmittelbarer Recheck muss GLEICH sein",
-    "Temp-Datei ausschließlich im qualifizierten Zielverzeichnis erzeugen",
-    "fsync/replace/dir-fsync Semantik separat und testbar kapseln",
-    "kein Lock-Lease, Batch-Schreiben oder Delete vorziehen"
-  ],
-  "expected_tests": [
-    "erfolgreicher isolierter Temp/Replace-Pfad auf Testfixture",
-    "STALE blockiert vor jeder Mutation",
-    "UNBEKANNT blockiert vor jeder Mutation",
-    "Symlink-Befund blockiert",
-    "Pfad außerhalb Projektwurzel blockiert",
-    "Fehler vor Replace hinterlässt Original unverändert",
-    "Fehler nach Temp-Schreiben räumt oder kennzeichnet Temp-Zustand deterministisch",
-    "Ruff, Ruff Format, mypy strict und vollständige P03-Regression"
-  ],
-  "done_criteria": [
-    "genau eine atomare Replace-Primitive ist hinter allen drei Vorprüfungen gekapselt",
-    "kein nicht qualifizierter Pfad erreicht os.replace",
-    "Original bleibt bei Vorbedingungenfehler unverändert",
-    "Recovery-/Fehlerzustände sind maschinenlesbar",
-    "Lock-Lease bleibt weiterhin gesperrt"
-  ],
-  "known_risks": [
-    "Dateisysteme unterscheiden sich bei fsync- und Atomicity-Garantien",
-    "TOCTOU wird ohne Descriptor-/Lock-Bindung nur reduziert, nicht global eliminiert",
-    "Crash zwischen Replace und Verzeichnis-fsync muss später explizit in Recovery-Evidence abgebildet werden"
-  ],
-  "open_subpoints": [
-    "Linux-Dateisystemgarantien für os.replace plus Datei-/Verzeichnis-fsync qualifizieren",
-    "Temp-Dateinamensvertrag und Cleanup-Zustände definieren",
-    "Downstream-Iterationsnummern wegen PLAN_DELTA erst nach P03-Abschluss kanonisch neu zuordnen"
-  ]
+  "probable_component": "src/provoware/plattform/datei_lease.py",
+  "probable_files": ["src/provoware/plattform/datei_lease.py","src/provoware/plattform/__init__.py","tests/platform/test_datei_lease.py","docs/ITERATION_016.md","docs/WISSENSSPEICHER_I016_ERKENNTNIS.json","docs/PLAN_DELTA_I014.json",".github/workflows/i016-datei-lease.yml"],
+  "context_fingerprints": {"baseline":"BASELINE-2026-08-10-I015","i015_workflow_run_id":31378734347,"i015_artifact_id":9058982637,"i015_artifact_sha256":"448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f","i015_receipt_sha256":"ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703","i015_qualifikations_head":"4cdbe1a2810476c1e95588dfed6199025d6b4826","plan_delta":"PLAN-DELTA-P03-2026-08-10-001"},
+  "known_dependencies": ["I012 Projektwurzel-Schutz VALIDIERT_GITHUB","I013 Symlinkprobe VALIDIERT_GITHUB","I014 Dateiidentität/Stale-Guard VALIDIERT_GITHUB","I015 atomarer Einzeldatei-Replace VALIDIERT_GITHUB"],
+  "preconditions": ["Lease-Erwerb muss fail-closed und explizit fehlschlagen können","Lease darf keine versteckte Nutzdatenänderung erzeugen","Stale-Guard muss unmittelbar vor Mutation erneut gelten","Lease-Verlust vor Replace muss Mutation blockieren","kein Batch-Schreiben oder Delete vorziehen"],
+  "expected_tests": ["exklusiver Lease-Erwerb auf isolierter Fixture","zweiter konkurrierender Erwerb blockiert","Lease-Verlust blockiert Replace","staler Identitätszustand blockiert trotz Lease","Freigabe ist idempotent bzw. deterministisch fehlerhaft","Ruff, Ruff Format, mypy strict und vollständige P03-Regression"],
+  "done_criteria": ["genau ein kleiner Lease-Vertrag ist testbar gekapselt","konkurrierender Schreiber erreicht den Replace-Pfad nicht","Lease-Verlust wird maschinenlesbar und fail-closed behandelt","I012-I015 bleiben unverändert regressionsgrün"],
+  "known_risks": ["advisory Locks schützen nicht vor nicht kooperierenden Schreibern","Lock-Semantik unterscheidet sich zwischen lokalen und Netzwerkdateisystemen","Crash-Recovery für verwaiste Lease-Metadaten muss separat definiert werden"],
+  "open_subpoints": ["Linux flock/fcntl-Semantik und Portabilitätsgrenze qualifizieren","Lease-Identität an Device/Inode bzw. offenen Descriptor binden","PLAN_DELTA nach erfolgreicher I016-Qualification schließen oder neu bewerten"]
 }
