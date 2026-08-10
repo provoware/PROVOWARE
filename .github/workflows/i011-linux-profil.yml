@@ -102,7 +102,7 @@ jobs:
       - name: Gesamte schnelle Regression in P03-Laufzeitmodus
         run: >-
           .venv-i011/bin/pytest -q
-          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen"
+          -k "not test_p02_quellinventar_ist_exakt_und_hashgebunden and not test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen and not test_i009_implementiert_nur_vertrags_schema_und_operationsschicht"
 
       - name: I011 Qualifikationsreceipt erzeugen
         shell: bash
@@ -131,6 +131,7 @@ jobs:
                   'wayland_negative': 'GRUEN', 'unknown_session_negative': 'GRUEN', 'non_amd64_negative': 'GRUEN',
                   'fingerprint_determinism': 'GRUEN', 'ruff': 'GRUEN', 'ruff_format': 'GRUEN',
                   'mypy_strict': 'GRUEN', 'p02_runtime_regression': 'GRUEN', 'gesamtregression': 'GRUEN',
+                  'i009_scope_freeze_evidence': 'HISTORISCH_VALIDIERT_UNVERAENDERT',
                   'i010_phaseabschluss_evidence': 'HISTORISCH_VALIDIERT_UNVERAENDERT'
               }
           }
