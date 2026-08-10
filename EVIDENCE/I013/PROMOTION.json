@@ -1,0 +1,32 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I013",
+  "status": "VALIDIERT_GITHUB",
+  "qualification": {
+    "workflow_run_id": 31365831357,
+    "head_sha": "3d6d809cf18904afa11f7d7e5c9d9f770afde0fd",
+    "artifact_id": 9054096684,
+    "artifact_bytes": 1031,
+    "artifact_sha256": "a7cc14181ac15011e83f2b7e9fa7890eb2e120aa2aaf7f6439b94f268bf9fc39",
+    "contracttests": 9,
+    "plattformregression_i011_i012": 21,
+    "ruff": "GRUEN",
+    "ruff_format": "GRUEN",
+    "mypy_strict": "GRUEN",
+    "p02_runtime_regression": "GRUEN",
+    "gesamtregression": "GRUEN"
+  },
+  "promotion": {
+    "mode": "FAST_FORWARD",
+    "source_branch": "promotion/i013-atomic",
+    "previous_main": "1cc3b9f2ee31076efdbb9089b583f1b99e9b6455",
+    "backup_branch": "backup/vor-i013-promotion-2026-08-10",
+    "force": false
+  },
+  "safety": {
+    "nutzerdatenmutation": false,
+    "schreibprimitive": false,
+    "rollback": "main kann auf den gesicherten I012-Stand zurückgeführt werden; keine Nutzerdaten wurden durch I013 verändert"
+  },
+  "open_risk": "TOCTOU zwischen read-only Probe und späterer Mutation bleibt offen und wird in I014 durch Dateiidentität/Stale-Guard adressiert."
+}
