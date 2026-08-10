@@ -4,9 +4,10 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "src/provoware/plattform/**"
-      - "tests/platform/**"
+      - "src/provoware/plattform/pfade.py"
+      - "tests/platform/test_pfadnormalisierung.py"
       - "docs/WISSENSSPEICHER_I012_ERKENNTNIS.json"
+      - "docs/WISSENSSPEICHER_I012_ERKENNTNIS_002.json"
       - "docs/ITERATION_012.md"
       - ".github/workflows/i012-pfade.yml"
 
