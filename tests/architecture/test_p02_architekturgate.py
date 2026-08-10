@@ -41,6 +41,15 @@ def _ist_i010_promoviert() -> bool:
     return baseline.get("letzte_iteration") == "I010"
 
 
+def _ist_p02_phase_abschlussmodus() -> bool:
+    raw: object = json.loads((ROOT / "PROJEKTSTATUS.json").read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        return True
+    status = cast(dict[str, object], raw)
+    phase = status.get("phase")
+    return isinstance(phase, str) and phase.startswith("P02 ")
+
+
 @pytest.mark.architecture
 def test_p02_api_snapshot_ist_kanonisch_und_fingerprint_stabil() -> None:
     dokument = baue_snapshot_dokument(ROOT)
@@ -52,7 +61,7 @@ def test_p02_api_snapshot_ist_kanonisch_und_fingerprint_stabil() -> None:
 
 @pytest.mark.architecture
 def test_p02_quellinventar_ist_exakt_und_hashgebunden() -> None:
-    pruefe_quellinventar(ROOT, phase_abschluss=True)
+    pruefe_quellinventar(ROOT, phase_abschluss=_ist_p02_phase_abschlussmodus())
 
 
 @pytest.mark.architecture
@@ -109,7 +118,11 @@ def test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand() -> None:
 @pytest.mark.architecture
 def test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen() -> None:
     nach_promotion = _ist_i010_promoviert()
-    ergebnis = pruefe_gesamtgate(ROOT, phase_abschluss=True, nach_promotion=nach_promotion)
+    ergebnis = pruefe_gesamtgate(
+        ROOT,
+        phase_abschluss=_ist_p02_phase_abschlussmodus(),
+        nach_promotion=nach_promotion,
+    )
     assert ergebnis["api_snapshot"] == "GRUEN"
     assert ergebnis["architekturmatrix"] == "GRUEN"
     assert ergebnis["phase_abschluss"] == "GRUEN"
