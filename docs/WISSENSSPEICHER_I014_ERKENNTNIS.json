@@ -1,7 +1,7 @@
 {
   "schema": "1.0.0",
   "id": "ERK-I014-001",
-  "typ": "Regelentwurf",
+  "typ": "Regel",
   "titel": "Eine Pfadprobe allein darf keine spaetere Dateiidentitaet garantieren",
   "beschreibung": "Zwischen einer erfolgreichen Pfad-/Symlinkpruefung und einer spaeteren Mutation kann das Zielobjekt ausgetauscht oder veraendert werden. Deshalb muss unmittelbar vor einer spaeteren Mutation eine read-only Dateiidentitaet erneut verglichen werden; fehlende oder nicht lesbare Identitaet bleibt fail-closed UNBEKANNT.",
   "hauptkategorie": "Daten & Integritaet",
@@ -13,17 +13,19 @@
     "Tests",
     "Evidence & Audit"
   ],
-  "reifegrad": "E1",
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE P03 und spaetere mutierende Dateisystemvertraege",
   "projektbezug": ["PROVOWARE"],
   "quelle_herkunft": [
     "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I013",
     "docs/PLAN_DELTA_I014.json",
-    "I013 Dateisystemprobe"
+    "I013 Dateisystemprobe",
+    "GitHub Actions Run 31373576096",
+    "Artifact 9057041454"
   ],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
   "historie": [
     {
@@ -32,6 +34,13 @@
       "reifegrad_vorher": null,
       "reifegrad_nachher": "E1",
       "grund": "P0-TOCTOU-Luecke vor erster mutierender Dateisystemprimitive explizit modelliert."
+    },
+    {
+      "datum": "2026-08-10",
+      "aktion": "QUALIFIZIERT",
+      "reifegrad_vorher": "E1",
+      "reifegrad_nachher": "E2",
+      "grund": "9 Contracttests, 30 Plattformregressionen, Ruff, Ruff Format, mypy strict, P02-Regression und Gesamtregression im realen GitHub-Actions-Lauf 31373576096 erfolgreich; Evidence-Artifact 9057041454 SHA-256-verifiziert."
     }
   ]
 }
