@@ -2,6 +2,19 @@
 
 ## 0.1.0-dev - 2026-08-10
 
+### I015 — Atomarer Einzeldatei-Replace qualifiziert
+- Ersten bewusst mutierenden P03-Baustein als isolierten Einzeldatei-Vertrag hinter den bereits qualifizierten I012–I014-Sicherheitsgates eingeführt.
+- Mutation nur bei `INNERHALB` (Projektwurzel), `SICHER` (Symlinkprobe) und unmittelbar erneut bestätigtem `GLEICH` (Stale-Guard).
+- Temp-Datei ausschließlich im Zielverzeichnis; Berechtigungsbits werden übernommen, Dateiinhalt vor `os.replace` geflusht und per Datei-fsync gesichert.
+- `os.replace` führt die Namensmutation atomar aus; anschließender Verzeichnis-fsync ist ein getrenntes Dauerhaftigkeitsgate.
+- Fehler vor `os.replace` erhalten das Original und behaupten keine Mutation; Fehler nach erfolgreichem Replace melden `mutation_erfolgt=true` und täuschen keinen Rollback vor.
+- Lock-Lease, Batch-Schreiben und Delete bleiben ausdrücklich außerhalb von I015.
+- Finaler Workflow `31378734347` vollständig grün; Artifact `9058982637`, 759 Byte, SHA-256 `448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f`, Receipt-SHA-256 `ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703`.
+- Produkt-PR #22 SHA-gebunden auf den qualifizierten Head `4cdbe1a2810476c1e95588dfed6199025d6b4826` gemergt; Produktmerge `8052d9ce42014e6037c59b0aed47d8dcd2edecc1`.
+- Vorherige I014-Baseline auf `backup/vor-i015-promotion-2026-08-10` gesichert; Promotions-PR #23 bindet Status, Register, Wissen und Evidence ohne neue Produktlogik.
+- `ERK-I015-001` nach realer Qualification von E1 auf E2 gehoben; keine Goldene Regel.
+- PLAN-DELTA-Verschluss auf 50 % erhöht; P03-Meilensteinfortschritt bleibt bis zum separat qualifizierten Lock-Lease konservativ bei 75 %.
+
 ### I014 — Read-only Dateiidentität und Stale-Guard qualifiziert
 - `DateiIdentitaet` aus Device, Inode, Objektart, Modus, Größe, `mtime_ns` und `ctime_ns` eingeführt.
 - Fail-closed Recheck mit `GLEICH`, `STALE` und `UNBEKANNT` implementiert; fehlende oder nicht lesbare Identität kann niemals als gleich gelten.
@@ -120,7 +133,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- Atomare Temp/Replace-Primitive und Lock-Lease aus P03; beide sind durch `PLAN_DELTA-P03-2026-08-10-001` bewusst aufgeschoben.
+- Lock-Lease aus P03; der zweite über `PLAN_DELTA-P03-2026-08-10-001` nachzuholende mutierende Baustein bleibt separat offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
