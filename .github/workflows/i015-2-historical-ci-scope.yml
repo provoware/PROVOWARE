@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Scope fail-closed validieren
         shell: bash
@@ -58,7 +59,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          git fetch --no-tags --depth=1 origin main
+          git fetch --no-tags origin main
           CHANGED="$(git diff --name-only origin/main...HEAD)"
           printf '%s\n' "$CHANGED"
           if printf '%s\n' "$CHANGED" | grep -E '^(src/|tests/platform/|tests/contract/|tests/architecture/|WERKZEUGE/)' ; then
