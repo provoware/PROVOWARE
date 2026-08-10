@@ -1,5 +1,15 @@
 """Read-only Plattformgrenzen von PROVOWARE."""
 
+from provoware.plattform.dateiidentitaet import (
+    DateiArt,
+    DateiIdentitaet,
+    IdentitaetsSnapshot,
+    IdentitaetsStatus,
+    StalePruefung,
+    StaleStatus,
+    erfasse_dateiidentitaet,
+    pruefe_stale_guard,
+)
 from provoware.plattform.dateisystem_probe import (
     DateisystemProbe,
     PfadArt,
@@ -18,7 +28,11 @@ from provoware.plattform.linux import (
 from provoware.plattform.pfade import PfadPruefung, PfadStatus, pruefe_projektpfad
 
 __all__ = [
+    "DateiArt",
+    "DateiIdentitaet",
     "DateisystemProbe",
+    "IdentitaetsSnapshot",
+    "IdentitaetsStatus",
     "LinuxSystemProfil",
     "LinuxSystemQuellen",
     "PfadArt",
@@ -28,8 +42,12 @@ __all__ = [
     "ProbeStatus",
     "SegmentBefund",
     "SessionArt",
+    "StalePruefung",
+    "StaleStatus",
+    "erfasse_dateiidentitaet",
     "erkenne_linux_systemprofil",
     "parse_os_release",
     "pruefe_dateisystempfad",
     "pruefe_projektpfad",
+    "pruefe_stale_guard",
 ]
