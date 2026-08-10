@@ -53,15 +53,25 @@
     },
     "I009": {
       "lebenszyklus": "P02_OPERATIONEN",
-      "status": "BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN",
+      "status": "GEHAERTET_I015_2D",
       "eigene_quellen": [
         ".github/workflows/i009-operationen.yml",
+        ".github/workflows/i008-schemata.yml",
         "src/provoware/vertraege/operationen.py",
+        "src/provoware/vertraege/__init__.py",
         "tests/contract/test_operationen.py",
         "tests/fixtures/i009/**",
         "docs/ADR/ADR-0004-OPERATIONSVERTRAEGE.md",
         "EVIDENCE/I009/**"
-      ]
+      ],
+      "explizit_keine_trigger": [
+        "tests/test_structure.py",
+        "VERSIONSREGISTER.json",
+        "ARCHITEKTURREGISTER.json",
+        "KOMPONENTENREGISTER.json",
+        "TRACEABILITY.json"
+      ],
+      "begruendung": "I009 qualifiziert Operationsvertraege und deren Golden-Fixtures. Spaetere globale Register- und Strukturstaende duerfen dieses historische Operations-Gate weder ausloesen noch ueber eine ungescoppte Gesamtregression fachfremd rot faerben."
     },
     "I010": {
       "lebenszyklus": "P02_PHASE_GATE",
@@ -103,6 +113,11 @@
       "datum": "2026-08-10",
       "iteration": "I015.2C",
       "aktion": "I008 auf qualifizierte Schema-/Fixture-Quellen und eine explizite I008-Scope-Regression begrenzt; I009 bleibt offen."
+    },
+    {
+      "datum": "2026-08-10",
+      "iteration": "I015.2D",
+      "aktion": "I009 auf qualifizierte Operations-/Fixture-Quellen und eine explizite I009-Scope-Regression begrenzt; damit sind I007-I010 im Scope-Vertrag gehaertet."
     }
   ]
 }
