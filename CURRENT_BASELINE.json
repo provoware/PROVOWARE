@@ -3,7 +3,7 @@
   "github_artifact_id": 9054096684,
   "github_artifact_sha256": "a7cc14181ac15011e83f2b7e9fa7890eb2e120aa2aaf7f6439b94f268bf9fc39",
   "github_backup_branch": "backup/vor-i013-promotion-2026-08-10",
-  "github_main_merge_commit": null,
+  "github_main_merge_commit": "4291e9f988cafc3108bf94c531134f7d1aeab684",
   "github_promotion_mode": "FAST_FORWARD",
   "github_promotion_source_branch": "promotion/i013-atomic",
   "github_qualifikations_head": "3d6d809cf18904afa11f7d7e5c9d9f770afde0fd",
@@ -15,7 +15,7 @@
   "naechste_iteration": "I014",
   "receipt_sha256": null,
   "schema": "1.0.0",
-  "source": "I013 Read-only Symlink- und Dateisystemprobe nach realem GitHub-Actions-Lauf qualifiziert; Promotion erfolgt als nicht-erzwungener Fast-Forward vom gesicherten I012-main-Stand",
+  "source": "I013 Read-only Symlink- und Dateisystemprobe nach realem GitHub-Actions-Lauf qualifiziert und per nicht-erzwungenem Fast-Forward vom gesicherten I012-main-Stand promoviert",
   "status": "VALIDIERT_GITHUB",
   "version": "0.1.0-dev"
 }
