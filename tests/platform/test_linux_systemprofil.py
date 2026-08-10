@@ -19,7 +19,9 @@ pytestmark = pytest.mark.contract
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "i011"
 
 
-def _profil(*, version: str = "22.04", session: str = "x11", arch: str = "x86_64") -> LinuxSystemProfil:
+def _profil(
+    *, version: str = "22.04", session: str = "x11", arch: str = "x86_64"
+) -> LinuxSystemProfil:
     return erkenne_linux_systemprofil(
         LinuxSystemQuellen(
             os_release={"ID": "ubuntu", "VERSION_ID": version},
@@ -81,7 +83,11 @@ def test_unbekannte_ubuntu_version_wird_nicht_als_zielprofil_ausgegeben() -> Non
 
 def test_fehlende_os_release_felder_liefern_unbekannt() -> None:
     profil = erkenne_linux_systemprofil(
-        LinuxSystemQuellen(os_release={}, umgebung={"XDG_SESSION_TYPE": "x11"}, architektur="x86_64")
+        LinuxSystemQuellen(
+            os_release={},
+            umgebung={"XDG_SESSION_TYPE": "x11"},
+            architektur="x86_64",
+        )
     )
     assert profil.status is PlattformStatus.UNBEKANNT
 
