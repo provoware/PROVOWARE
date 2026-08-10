@@ -178,11 +178,15 @@ def pruefe_projektpfad(
             begruendung="Symlink-Sicherheit ist nicht belegt.",
         )
 
+    begruendung = (
+        "Kandidatenpfad liegt lexikalisch innerhalb der Projektwurzel "
+        "und ist als symlink-frei belegt."
+    )
     return _ergebnis(
         projektwurzel=str(wurzel),
         eingabe=kandidat_roh,
         normalisiert=normalisiert,
         relativ_zur_wurzel=relativ_text,
         status=PfadStatus.INNERHALB,
-        begruendung="Kandidatenpfad liegt lexikalisch innerhalb der Projektwurzel und ist als symlink-frei belegt.",
+        begruendung=begruendung,
     )
