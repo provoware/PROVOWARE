@@ -1,34 +1,26 @@
 {
   "schema": "1.0.0",
   "id": "ERK-I011-002",
-  "typ": "Regelentwurf",
+  "typ": "Regel",
   "titel": "Phasenabschlussgates dürfen nach dem dokumentierten Phasenwechsel nicht als permanente No-New-Source-Invariante weiterlaufen",
   "beschreibung": "Ein Abschlussgate darf den abgeschlossenen Phasenzustand streng einfrieren und beweisen. Nach einem dokumentierten Übergang in die Folgephase muss die laufende Regression jedoch die abgeschlossenen Vertragsquellen und Hashbindungen weiter prüfen, ohne legitime Quellen der neuen Phase als vorgezogene Quellen zu klassifizieren. Der historische Negativtest des Abschlusszustands bleibt erhalten.",
   "hauptkategorie": "Architektur",
-  "nebenkategorien": [
-    "Lebenszyklus",
-    "Tests",
-    "Evidence & Audit",
-    "Fehlervermeidung",
-    "Daten & Integrität"
-  ],
-  "reifegrad": "E1",
+  "nebenkategorien": ["Lebenszyklus", "Tests", "Evidence & Audit", "Fehlervermeidung", "Daten & Integrität"],
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE Phasenübergänge",
   "projektbezug": ["PROVOWARE", "P02", "P03", "I010", "I011"],
   "quelle_herkunft": [
-    "I011 GitHub-Actions Run 31346425325",
-    "tests/architecture/test_p02_architekturgate.py",
-    "WERKZEUGE/p02_architekturgate.py",
-    "PROJEKTSTATUS.json BASELINE-2026-08-10-I010"
+    "real beobachtete I011-Regressionsfehler und Minimalfixes",
+    "tests/architecture/test_p02_architekturgate.py unverändert erhalten",
+    "GitHub Actions Run 31346707865",
+    "I011_QUALIFIKATION.json"
   ],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
   "historie": [
-    {
-      "iteration": "I011",
-      "aktion": "Als E1-Regelentwurf aus real beobachtetem P02-Regressionsfehler aufgenommen; keine Hochstufung vor erfolgreicher I011-Gesamtqualifikation."
-    }
+    {"iteration": "I011", "aktion": "Als E1-Regelentwurf aus real beobachtetem P02-Regressionsfehler aufgenommen; keine Hochstufung vor erfolgreicher I011-Gesamtqualifikation."},
+    {"iteration": "I011-PROMOTION", "aktion": "Nach grüner Gesamtqualifikation mit unverändert erhaltener historischer P02-Evidence auf E2/BESTAETIGT hochgestuft; keine Goldene Regel."}
   ]
 }

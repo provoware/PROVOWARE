@@ -1,75 +1,71 @@
 {
   "schema": "1.0.0",
-  "next_iteration": "I011",
-  "next_goal": "Linux-Systemprofil und X11-Erkennung als erste P03-Plattformgrenze implementieren; Ubuntu 22.04 und 24.04 müssen über deterministische Profile qualifiziert werden.",
-  "why_next": "P02 ist durch I010 vollständig qualifiziert und als VALIDIERT geschlossen. Der Masterplan gibt danach P03 frei und nennt für I011 ausdrücklich Linux-Systemprofil und X11-Erkennung im Bereich PLATTFORM/linux mit 22.04-/24.04-Profilen als Abnahmekern.",
+  "next_iteration": "I012",
+  "next_goal": "Pfadnormalisierung und Projektwurzel-Schutz als read-only Sicherheitsgrenze implementieren; Pfade müssen deterministisch normalisiert, gegen die Projektwurzel geprüft und Escape-Versuche fail-closed blockiert werden.",
+  "why_next": "I011 ist real qualifiziert und auf main gemergt. P03 ist damit zu 25 Prozent abgeschlossen. Der bestätigte nächste P03-Schritt ist Pfadnormalisierung und Projektwurzel-Schutz; Schreibprimitive, Locks und atomare Mutationen bleiben nachgelagert.",
   "priority": "P0",
-  "probable_component": "src/provoware/plattform/linux.py",
+  "probable_component": "src/provoware/plattform/pfade.py",
   "probable_files": [
+    "src/provoware/plattform/pfade.py",
     "src/provoware/plattform/__init__.py",
-    "src/provoware/plattform/linux.py",
-    "tests/platform/test_linux_systemprofil.py",
-    "tests/fixtures/i011/ubuntu-22.04-x11.json",
-    "tests/fixtures/i011/ubuntu-24.04-x11.json",
+    "tests/platform/test_pfadnormalisierung.py",
+    "tests/fixtures/i012/",
     "ARCHITEKTURREGISTER.json",
     "KOMPONENTENREGISTER.json",
     "TRACEABILITY.json",
-    "PLAN_MASTER.json",
-    "EVIDENCE/I011/",
-    ".github/workflows/i011-linux-profil.yml"
+    "PROJEKTSTATUS.json",
+    "CURRENT_BASELINE.json",
+    "EVIDENCE/I012/",
+    ".github/workflows/i012-pfade.yml"
   ],
   "context_fingerprints": {
-    "baseline": "BASELINE-2026-08-10-I010",
-    "i010_workflow_run_id": 31339417368,
-    "i010_artifact_id": 9045351696,
-    "i010_artifact_sha256": "6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9",
-    "i010_receipt_sha256": "cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee",
-    "p02_api_snapshot_sha256": "2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16",
-    "i010_main_merge_commit": "7dfe6d2cf039d9b974bad464ed0efa0aa6eec998"
+    "baseline": "BASELINE-2026-08-10-I011",
+    "i011_workflow_run_id": 31346707865,
+    "i011_artifact_id": 9047566065,
+    "i011_artifact_sha256": "e7206090329a169437cfad847d109422f83b30eca122608d16935e02f3a33ec0",
+    "i011_receipt_sha256": "ba8150c4a6a6454c6b2dacbf9e974394e9a0d409edf6a21d8c3b51805ac3bb76",
+    "i011_main_merge_commit": "66b9f5fbede68c61eb3d54185a253ff8bea81ca4"
   },
   "known_dependencies": [
     "P00-P02 vollständig VALIDIERT",
-    "P02_API_SNAPSHOT.json eingefroren",
-    "P02_QUELLINVENTAR.json hashgebunden",
-    "I010-Negativgate blockiert Architekturdrift",
+    "I011 Linux-Systemprofil VALIDIERT_GITHUB",
     "Zielplattform Ubuntu 22.04/24.04 amd64 X11",
-    "X11-first bleibt Zielstrategie"
+    "P03 bleibt read-only bis Pfadgrenzen reproduzierbar qualifiziert sind"
   ],
   "preconditions": [
-    "I010-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
-    "P02-Gate im Nach-Promotion-Modus erneut grün bestätigen",
-    "Systemerkennung von GUI, Persistenz und Dateischreiblogik trennen",
-    "Erkennungsquellen explizit und injizierbar modellieren statt Tests an den CI-Host zu koppeln",
-    "Ubuntu-/Architektur-/Sessionwerte fail-closed beziehungsweise strukturiert als unterstützt, eingeschränkt oder unbekannt klassifizieren",
-    "keine Pfadnormalisierung, atomare Dateischreibprimitive oder Lock-Logik aus I012-I014 vorziehen"
+    "I011-Evidence und CURRENT_BASELINE gegenseitig revalidieren",
+    "Pfadlogik von GUI, Persistenz und Schreiboperationen trennen",
+    "keine implizite Verzeichnisanlage oder Mutation zulassen",
+    "relative und absolute Eingaben deterministisch behandeln",
+    "Symlinks und Parent-Traversal nicht ohne explizite Regel als innerhalb der Projektwurzel qualifizieren",
+    "I013-I014-Schreib- und Locklogik nicht vorziehen"
   ],
   "expected_tests": [
-    "Ubuntu 22.04 amd64 X11 Profil",
-    "Ubuntu 24.04 amd64 X11 Profil",
-    "Wayland wird erkannt, aber nicht fälschlich als X11 qualifiziert",
-    "fehlendes oder widersprüchliches Session-Signal wird strukturiert als unbekannt gemeldet",
-    "nicht-amd64 Architektur wird nicht als V1-Zielplattform qualifiziert",
-    "os-release Parsing mit fehlenden und unbekannten Feldern",
-    "deterministischer Profil-Fingerprint bei gleichen Eingaben",
-    "keine Qt-, SQLite-, Persistenz- oder Fachmodulabhängigkeit",
-    "P02_API_SNAPSHOT bleibt byte- und fingerprintstabil",
+    "normaler relativer Pfad innerhalb Projektwurzel",
+    "normaler absoluter Pfad innerhalb Projektwurzel",
+    "Parent-Traversal über .. wird blockiert",
+    "präfixähnlicher Geschwisterpfad wird nicht als Unterpfad akzeptiert",
+    "leere und ungültige Eingaben liefern strukturierte Fehler",
+    "deterministische Normalisierung bei gleichen Eingaben",
+    "keine Datei- oder Verzeichnisänderung durch die Prüfung",
+    "keine Qt-, SQLite- oder Fachmodulabhängigkeit",
     "Ruff, mypy strict und vollständige Regression"
   ],
   "done_criteria": [
-    "Linux-Systemprofil besitzt eine eindeutige typisierte öffentliche Form",
-    "X11-Erkennung ist von Umgebungs-/OS-Probes getrennt und reproduzierbar testbar",
-    "Ubuntu 22.04 und 24.04 amd64 X11 sind über Golden-Profile grün qualifiziert",
-    "nicht unterstützte oder unbekannte Plattformzustände werden nicht als unterstützt ausgegeben",
-    "P02-Verträge und Snapshot bleiben unverändert",
-    "I012 wird erst nach grüner I011-Promotion freigegeben"
+    "Projektwurzel und Kandidatenpfad besitzen eindeutige typisierte Prüfergebnisse",
+    "Escape-Versuche werden fail-closed blockiert",
+    "Prüfung ist read-only und reproduzierbar testbar",
+    "I011-Verträge bleiben unverändert",
+    "I013 wird erst nach grüner I012-Promotion freigegeben"
   ],
   "known_risks": [
-    "nur DISPLAY zu prüfen würde XWayland und echte X11-Sitzungen vermischen",
-    "CI-Hostdaten ohne injizierbare Probes würden Tests nicht reproduzierbar machen",
-    "zu frühe Dateisystemlogik würde I011 mit I012-I014 vermischen"
+    "String-Präfixvergleiche können Geschwisterpfade fälschlich als Unterpfade akzeptieren",
+    "unkontrolliertes resolve kann Symlink-Semantik und nicht existente Pfade vermischen",
+    "zu frühe Schreiblogik würde I012 mit späteren P03-Iterationen vermischen"
   ],
   "open_subpoints": [
-    "I011 strikt auf read-only Plattformprofil und X11-Erkennung begrenzen",
-    "I012 Pfadnormalisierung und Projektwurzel-Schutz erst nach I011 beginnen"
+    "I012 strikt auf Normalisierung, Root-Grenze und read-only Prüfung begrenzen",
+    "Symlink-Policy explizit dokumentieren und testen",
+    "I013 erst nach qualifizierter Root-Grenze beginnen"
   ]
 }

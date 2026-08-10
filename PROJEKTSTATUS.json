@@ -1,5 +1,5 @@
 {
-  "aktuelle_baseline": "BASELINE-2026-08-10-I010",
+  "aktuelle_baseline": "BASELINE-2026-08-10-I011",
   "aliasnamen": ["PROVOWARE Desktop", "PROVOWARE Neuaufbau 2026"],
   "clean_bootstrap_qualifikation": {
     "artifact_id": 9043135144,
@@ -91,8 +91,29 @@
     "python": "3.13.15",
     "workflow_run_id": 31339417368
   },
+  "i011_linux_systemprofil_qualifikation": {
+    "artifact_bytes": 830,
+    "artifact_id": 9047566065,
+    "artifact_mb": 0.00083,
+    "artifact_sha256": "e7206090329a169437cfad847d109422f83b30eca122608d16935e02f3a33ec0",
+    "contracttests": 11,
+    "gesamtregression": 88,
+    "github_main_merge_commit": "66b9f5fbede68c61eb3d54185a253ff8bea81ca4",
+    "github_qualifikations_head": "ef34ec9fd26adee527bf15429b4f40b94fd93ada",
+    "mypy_strict": "GRUEN",
+    "p02_runtime_regression": 59,
+    "python": "3.13.15",
+    "receipt_sha256": "ba8150c4a6a6454c6b2dacbf9e974394e9a0d409edf6a21d8c3b51805ac3bb76",
+    "ruff": "GRUEN",
+    "ruff_format": "GRUEN",
+    "status": "VALIDIERT_GITHUB",
+    "ubuntu": "22.04.5 LTS amd64",
+    "workflow_run_id": 31346707865,
+    "x11_golden_profiles": "GRUEN",
+    "wayland_negative": "GRUEN"
+  },
   "kanonischer_projektname": "PROVOWARE",
-  "letzte_abgeschlossene_iteration": "I010",
+  "letzte_abgeschlossene_iteration": "I011",
   "letztes_validiertes_release": null,
   "masterplan": {
     "bytes": 269583,
@@ -101,10 +122,10 @@
     "sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c",
     "version": "2.0.0"
   },
-  "naechste_iteration": "I011",
+  "naechste_iteration": "I012",
   "offline_first": true,
   "p02_fortschritt_prozent": 100,
-  "p03_fortschritt_prozent": 0,
+  "p03_fortschritt_prozent": 25,
   "phase": "P03 Plattform- und Dateisystemschicht",
   "portabel": true,
   "repository": "https://github.com/provoware/PROVOWARE",
