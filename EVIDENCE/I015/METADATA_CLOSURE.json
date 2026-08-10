@@ -2,7 +2,7 @@
   "schema": "1.0.0",
   "iteration": "I015.1",
   "typ": "METADATA_CLOSURE",
-  "status": "VORBEREITET",
+  "status": "VALIDIERT_GITHUB",
   "basis": {
     "baseline": "BASELINE-2026-08-10-I015",
     "main_commit_vorher": "80f1117119fa7501bce8ddc6074354285394d7fe",
@@ -27,12 +27,28 @@
     "P03-Fortschritt",
     "Release-Status"
   ],
-  "datenverlustschutz": "Nur Metadaten auf isoliertem Branch; keine Nutzerdatenmutation.",
-  "rueckfall": "Branch verwerfen oder nicht mergen; main bleibt unveraendert bis expliziter Promotion.",
+  "datenverlustschutz": "Nur Metadaten; keine Nutzerdatenmutation.",
+  "rueckfall": "Revert des Evidence-Finalisierungscommits oder des I015.1-Mergecommits 8917e03dc08b119695967fa1bc1e3ebab1699ec4.",
   "validierung": {
-    "json_readback": "AUSSTEHEND",
-    "historienerhalt_changelog": "AUSSTEHEND",
-    "traceability_readback": "AUSSTEHEND",
-    "branch_diff": "AUSSTEHEND"
+    "workflow_name": "I015.1 Metadata Closure Gate",
+    "workflow_run_id": 31387018421,
+    "workflow_status": "SUCCESS",
+    "json_readback": "PASS",
+    "historienerhalt_changelog": "PASS",
+    "traceability_readback": "PASS",
+    "branch_diff": "PASS",
+    "produktlogik_geaendert": false,
+    "nutzerdatenmutation": false
+  },
+  "promotion": {
+    "pr": 24,
+    "qualifizierter_head": "37fbfc4458250200dbdc9a149d62a56c2aaa2a24",
+    "merge_commit": "8917e03dc08b119695967fa1bc1e3ebab1699ec4"
+  },
+  "historische_fehltrigger": {
+    "status": "OFFEN_GETRENNT",
+    "betroffen": ["I007", "I008", "I009", "I010"],
+    "bewertung": "Nicht als PASS gewertet; historische Freeze-/Lebenszyklusgates wurden durch die globale TRACEABILITY-Aenderung fachfremd ausgeloest.",
+    "naechster_schritt": "CI-Scope-Haertung der historischen Workflows separat umsetzen."
   }
 }
