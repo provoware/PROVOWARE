@@ -42,7 +42,10 @@ def test_erfolgreicher_replace_ersetzt_inhalt_und_bewahrt_modus(tmp_path: Path) 
     assert list(tmp_path.glob(".wissen.json.provoware-*")) == []
 
 
-def test_stale_blockiert_bevor_tempdatei_entsteht(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_stale_blockiert_bevor_tempdatei_entsteht(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     datei = tmp_path / "wissen.json"
     datei.write_bytes(b"alt")
     pfad, probe, stale = _gates(datei)
