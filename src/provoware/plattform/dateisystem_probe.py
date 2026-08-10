@@ -8,16 +8,16 @@ der direkt als Vorprüfung für die reine I012-Pfadgrenze verwendet werden kann.
 from __future__ import annotations
 
 import json
-import os
 import stat
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from hashlib import sha256
+from os import lstat, stat_result
 from pathlib import PurePosixPath
 
 
-LstatFunktion = Callable[[str], os.stat_result]
+LstatFunktion = Callable[[str], stat_result]
 
 
 class ProbeStatus(StrEnum):
@@ -146,7 +146,7 @@ def _segmente(pfad: PurePosixPath) -> tuple[str, ...]:
 def pruefe_dateisystempfad(
     pfad: str,
     *,
-    lstat_funktion: LstatFunktion = os.lstat,
+    lstat_funktion: LstatFunktion = lstat,
 ) -> DateisystemProbe:
     """Prüfe einen absoluten POSIX-Pfad segmentweise mit ``lstat``.
 
