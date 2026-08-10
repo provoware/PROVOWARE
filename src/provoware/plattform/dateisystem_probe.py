@@ -181,11 +181,7 @@ def pruefe_dateisystempfad(
     befunde: list[SegmentBefund] = []
     for segment in _segmente(posix_pfad):
         try:
-            stat_befund = (
-                os.lstat(segment)
-                if lstat_funktion is None
-                else lstat_funktion(segment)
-            )
+            stat_befund = os.lstat(segment) if lstat_funktion is None else lstat_funktion(segment)
         except OSError as exc:
             return _ergebnis(
                 eingabe=str(posix_pfad),
