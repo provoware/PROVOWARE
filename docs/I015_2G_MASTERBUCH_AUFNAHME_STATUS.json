@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "iteration": "I015.2G",
+  "typ": "MASTERBUCH_SYNCHRONISATIONSNACHWEIS",
+  "hauptkategorie": "Wissenskonsolidierung",
+  "nebenkategorien": ["CI/CD", "Evidence & Audit", "Lebenszyklus"],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "projektuebergreifend",
+  "projektbezug": ["provoware/PROVOWARE", "provoware/PROVOWARE_MASTER_BOOK_2026"],
+  "quelle_herkunft": {
+    "masterbuch_pr": 6,
+    "masterbuch_head": "10e45acd3ce9b29e495438be52bacf3ce3e228a6",
+    "evidence": "evidence/I015_2G_RULE_015_KANDIDAT.json"
+  },
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "kanonische_masterbuch_mutation": false,
+  "produktlogik_veraendert": false,
+  "goldene_regel": false,
+  "aussage": "RULE-015 und DELTA-0016 sind als reversible Aufnahmevorschau vorbereitet. Die kanonische Vier-Artefakt-Aufnahme darf erst nach real erfolgreicher Masterbuch-Qualification erfolgen.",
+  "validierungsgrenze": {
+    "masterbuch_pr_6_angelegt": "NACHGEWIESEN",
+    "masterbuch_workflow": "NOCH_KEIN_LAUF_SICHTBAR",
+    "qualification": "NICHT_PASS",
+    "promotion": "AUSSTEHEND"
+  },
+  "rueckfall": "Branch oder Datei verwerfen; Main und Produktlogik bleiben unveraendert.",
+  "historie": [
+    {
+      "datum": "2026-08-10",
+      "aktion": "Toolseitige Referenz auf die Masterbuch-Aufnahmevorschau angelegt; keine Produkt- oder Wissensmutation."
+    }
+  ]
+}
