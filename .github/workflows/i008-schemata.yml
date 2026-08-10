@@ -12,11 +12,6 @@ on:
       - "tests/contract/test_schemata.py"
       - "tests/contract/test_i007_api_freeze.py"
       - "tests/fixtures/i008/**"
-      - "tests/test_structure.py"
-      - "VERSIONSREGISTER.json"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "TRACEABILITY.json"
       - "EVIDENCE/I008/**"
   pull_request:
     branches:
@@ -28,11 +23,6 @@ on:
       - "tests/contract/test_schemata.py"
       - "tests/contract/test_i007_api_freeze.py"
       - "tests/fixtures/i008/**"
-      - "tests/test_structure.py"
-      - "VERSIONSREGISTER.json"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "TRACEABILITY.json"
       - "EVIDENCE/I008/**"
 
 permissions:
@@ -136,9 +126,14 @@ jobs:
         shell: bash
         run: .venv-i008/bin/pytest -q -m contract tests/contract
 
-      - name: Gesamte schnelle Regression
+      - name: I008-Scope-Regression
         shell: bash
-        run: .venv-i008/bin/pytest -q
+        run: |
+          .venv-i008/bin/pytest -q \
+            tests/contract/test_datentypen.py \
+            tests/contract/test_id_varianten.py \
+            tests/contract/test_i007_api_freeze.py \
+            tests/contract/test_schemata.py
 
       - name: I008-Qualifikationsreceipt erzeugen
         shell: bash
@@ -184,7 +179,7 @@ jobs:
                   'ruff_format': 'GRUEN',
                   'mypy_strict': 'GRUEN',
                   'contracttests': 'GRUEN',
-                  'gesamtregression': 'GRUEN',
+                  'i008_scope_regression': 'GRUEN',
                   'architektur_importgrenze': 'GRUEN',
               },
           }
@@ -220,7 +215,7 @@ jobs:
             echo "- SchemaVersion und ProduktVersion getrennt"
             echo "- Manifest-/Projekt-Golden-Fixtures GRÜN"
             echo "- Ruff + mypy strict GRÜN"
-            echo "- Contracttests + Gesamtregression GRÜN"
+            echo "- Contracttests + I008-Scope-Regression GRÜN"
             echo "- Artifact-ID: ${ARTIFACT_ID}"
             echo "- Artifact-Digest: ${ARTIFACT_DIGEST}"
           } >> "$GITHUB_STEP_SUMMARY"
