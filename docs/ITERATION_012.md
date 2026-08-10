@@ -39,7 +39,7 @@ Die Implementierung liegt auf einem separaten Branch. Sie verändert keine Nutze
 
 Der erste reale I012-Lauf (`31351698536`) war rot. Gleichzeitig wurde der historische I011-Workflow durch den zu breiten Filter `src/provoware/plattform/**` erneut ausgelöst und scheiterte erwartbar an seiner historischen I010-Baseline-Prüfung. Der I012-Code enthielt außerdem eine Ruff-E501-Verletzung in einer 116 Zeichen langen Begründungszeile.
 
-Die Reparatur bleibt klein und reversibel: Die lange Zeichenkette wurde ohne Logikänderung formatiert, und der historische I011-Workflow reagiert künftig nur noch auf seine eigenen qualifizierten I011-Quellen statt auf beliebige spätere Plattformdateien. Diese Korrektur erweitert weder den Pfadvertrag noch die Schreibrechte.
+Die Reparatur bleibt klein und reversibel: Die lange Zeichenkette wurde ohne Logikänderung formatiert. Der historische I011-Workflow reagiert künftig nur noch auf `linux.py`, seinen eigenen Contracttest, die I011-Golden-Fixtures und die I011-Wissenseinträge. Der gemeinsame Exportpunkt `plattform/__init__.py` ist ausdrücklich kein historischer Trigger mehr, weil spätere Iterationen dort regulär neue Exporte ergänzen. Diese Korrektur erweitert weder den Pfadvertrag noch die Schreibrechte.
 
 ## Qualifikationsstatus
 
