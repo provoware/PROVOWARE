@@ -1,0 +1,39 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I015",
+  "baseline": "BASELINE-2026-08-10-I015",
+  "status": "VALIDIERT_GITHUB",
+  "qualification": {
+    "workflow_run_id": 31378734347,
+    "artifact_id": 9058982637,
+    "artifact_bytes": 759,
+    "artifact_sha256": "448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f",
+    "receipt_sha256": "ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703",
+    "qualification_head": "4cdbe1a2810476c1e95588dfed6199025d6b4826",
+    "receipt_merge_ref": "5e1af4e3a5380b70914ac9a7fad85922632a9c1c",
+    "product_merge_commit": "8052d9ce42014e6037c59b0aed47d8dcd2edecc1"
+  },
+  "rollback": {
+    "backup_branch": "backup/vor-i015-promotion-2026-08-10",
+    "pre_i015_main": "813cdb15b30ecb8ff17e474f436645ca3db7d25a"
+  },
+  "gates": {
+    "i014_baseline": "GRUEN",
+    "i015_contracttests": "GRUEN",
+    "i011_i014_regression": "GRUEN",
+    "ruff": "GRUEN",
+    "ruff_format": "GRUEN",
+    "mypy_strict": "GRUEN",
+    "p02_runtime_regression": "GRUEN",
+    "gesamtregression": "GRUEN",
+    "artifact_readback": "GRUEN"
+  },
+  "knowledge": {
+    "entry": "ERK-I015-001",
+    "maturity": "E2",
+    "goldene_regel": false,
+    "masterbook_candidate": "INBOX-006",
+    "masterbook_merge_target": "RULE-008"
+  },
+  "next_iteration": "I016"
+}
