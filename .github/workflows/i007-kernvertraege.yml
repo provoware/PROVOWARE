@@ -7,35 +7,17 @@ on:
       - iteration/i007-kernvertraege
     paths:
       - ".github/workflows/i007-kernvertraege.yml"
-      - ".github/workflows/i005-wheelhouse.yml"
-      - ".github/workflows/transfer-v1.yml"
       - "src/provoware/vertraege/**"
       - "tests/contract/**"
-      - "tests/test_structure.py"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "FEHLERKLASSEN.json"
-      - "TRACEABILITY.json"
-      - "PLAN_DELTA.json"
       - "EVIDENCE/I007/**"
-      - "pyproject.toml"
   pull_request:
     branches:
       - main
     paths:
       - ".github/workflows/i007-kernvertraege.yml"
-      - ".github/workflows/i005-wheelhouse.yml"
-      - ".github/workflows/transfer-v1.yml"
       - "src/provoware/vertraege/**"
       - "tests/contract/**"
-      - "tests/test_structure.py"
-      - "ARCHITEKTURREGISTER.json"
-      - "KOMPONENTENREGISTER.json"
-      - "FEHLERKLASSEN.json"
-      - "TRACEABILITY.json"
-      - "PLAN_DELTA.json"
       - "EVIDENCE/I007/**"
-      - "pyproject.toml"
 
 permissions:
   contents: read
@@ -117,9 +99,9 @@ jobs:
         shell: bash
         run: .venv-i007/bin/pytest -q -m contract tests/contract
 
-      - name: Gesamte schnelle Regression
+      - name: I007 schnelle Scope-Regression
         shell: bash
-        run: .venv-i007/bin/pytest -q
+        run: .venv-i007/bin/pytest -q tests/contract
 
       - name: I007-Qualifikationsreceipt erzeugen
         shell: bash
@@ -161,7 +143,7 @@ jobs:
                   "ruff_format": "GRUEN",
                   "mypy_strict": "GRUEN",
                   "contracttests": "GRUEN",
-                  "gesamte_regression": "GRUEN",
+                  "i007_scope_regression": "GRUEN",
                   "qt_sqlite_importgrenze": "GRUEN"
               }
           }
@@ -196,7 +178,7 @@ jobs:
             echo "- Ruff Check/Format GRÜN"
             echo "- mypy strict GRÜN"
             echo "- Contracttests GRÜN"
-            echo "- Gesamtregression GRÜN"
+            echo "- I007 Scope-Regression GRÜN"
             echo "- Artifact-ID: ${ARTIFACT_ID}"
             echo "- Artifact-Digest: ${ARTIFACT_DIGEST}"
           } >> "$GITHUB_STEP_SUMMARY"

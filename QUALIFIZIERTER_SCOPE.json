@@ -10,13 +10,25 @@
   "iterationen": {
     "I007": {
       "lebenszyklus": "P02_KERNVERTRAEGE",
-      "status": "BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN",
+      "status": "GEHAERTET_I015_2B",
       "eigene_quellen": [
         ".github/workflows/i007-kernvertraege.yml",
         "src/provoware/vertraege/**",
         "tests/contract/**",
         "EVIDENCE/I007/**"
-      ]
+      ],
+      "explizit_keine_trigger": [
+        ".github/workflows/i005-wheelhouse.yml",
+        ".github/workflows/transfer-v1.yml",
+        "tests/test_structure.py",
+        "ARCHITEKTURREGISTER.json",
+        "KOMPONENTENREGISTER.json",
+        "FEHLERKLASSEN.json",
+        "TRACEABILITY.json",
+        "PLAN_DELTA.json",
+        "pyproject.toml"
+      ],
+      "begruendung": "Diese Quellen entwickeln sich unabhaengig nach der historischen I007-Qualification weiter oder sind keine qualifizierten I007-Eingangsquellen. Aenderungen daran duerfen das historische Kernvertraege-Gate nicht fachfremd requalifizieren."
     },
     "I008": {
       "lebenszyklus": "P02_SCHEMATA",
@@ -72,6 +84,11 @@
       "datum": "2026-08-10",
       "iteration": "I015.2",
       "aktion": "Scope-Manifest eingefuehrt; I010 als erster und risikohoechster historischer Trigger gehaertet. I007-I009 bleiben explizit offen."
+    },
+    {
+      "datum": "2026-08-10",
+      "iteration": "I015.2B",
+      "aktion": "I007 als einzelner Referenzfall auf seine qualifizierten Quellen begrenzt; I008-I009 bleiben explizit offen."
     }
   ]
 }

@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "QUALIFIZIERTER_SCOPE.json"
+      - ".github/workflows/i007-kernvertraege.yml"
       - ".github/workflows/i010-p02-gate.yml"
       - ".github/workflows/i015-2-historical-ci-scope.yml"
       - "docs/WISSENSSPEICHER_I015_2_ERKENNTNIS.json"
@@ -14,7 +15,7 @@ permissions:
 
 jobs:
   scope:
-    name: I010 Trigger-Scope / Manifest / Baseline-Schutz
+    name: I007/I010 Trigger-Scope / Manifest / Baseline-Schutz
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
@@ -34,21 +35,33 @@ jobs:
 
           scope = json.loads(Path('QUALIFIZIERTER_SCOPE.json').read_text(encoding='utf-8'))
           status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
-          workflow = Path('.github/workflows/i010-p02-gate.yml').read_text(encoding='utf-8')
+          workflow_i007 = Path('.github/workflows/i007-kernvertraege.yml').read_text(encoding='utf-8')
+          workflow_i010 = Path('.github/workflows/i010-p02-gate.yml').read_text(encoding='utf-8')
 
           assert scope['schema'] == '1.0.0'
           assert scope['grundsatz']['historische_evidence_bleibt_unveraendert'] is True
           assert scope['grundsatz']['spaetere_globale_metadaten_sind_keine_historische_requalifikationsquelle'] is True
           assert scope['grundsatz']['unbekannter_scope'] == 'BLOCKIERT'
 
+          i007 = scope['iterationen']['I007']
+          assert i007['status'] == 'GEHAERTET_I015_2B'
+          for forbidden in i007['explizit_keine_trigger']:
+              assert f'- "{forbidden}"' not in workflow_i007, forbidden
+          for required in i007['eigene_quellen']:
+              assert f'- "{required}"' in workflow_i007, required
+          assert 'run: .venv-i007/bin/pytest -q tests/contract' in workflow_i007
+          assert 'run: .venv-i007/bin/pytest -q\n' not in workflow_i007
+          assert '"i007_scope_regression": "GRUEN"' in workflow_i007
+
           i010 = scope['iterationen']['I010']
           assert i010['status'] == 'GEHAERTET_I015_2'
           for forbidden in i010['explizit_keine_trigger']:
-              assert f'- "{forbidden}"' not in workflow, forbidden
-
+              assert f'- "{forbidden}"' not in workflow_i010, forbidden
           for required in i010['eigene_quellen']:
-              assert f'- "{required}"' in workflow, required
+              assert f'- "{required}"' in workflow_i010, required
 
+          assert scope['iterationen']['I008']['status'] == 'BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN'
+          assert scope['iterationen']['I009']['status'] == 'BESTEHENDE_TRIGGER_NOCH_ZU_HAERTEN'
           assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I015'
           assert status['letzte_abgeschlossene_iteration'] == 'I015'
           assert status['naechste_iteration'] == 'I016'
