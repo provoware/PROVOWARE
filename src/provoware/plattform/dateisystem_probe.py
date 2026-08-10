@@ -15,16 +15,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from hashlib import sha256
 from pathlib import PurePosixPath
-from typing import Protocol
 
 
-class StatBefund(Protocol):
-    """Minimaler von ``os.lstat`` benötigter Rückgabevertrag."""
-
-    st_mode: int
-
-
-LstatFunktion = Callable[[str], StatBefund]
+LstatFunktion = Callable[[str], os.stat_result]
 
 
 class ProbeStatus(StrEnum):
@@ -186,7 +179,7 @@ def pruefe_dateisystempfad(
     for segment in _segmente(posix_pfad):
         try:
             stat_befund = lstat_funktion(segment)
-        except (FileNotFoundError, PermissionError, OSError) as exc:
+        except OSError as exc:
             return _ergebnis(
                 eingabe=str(posix_pfad),
                 status=ProbeStatus.UNBEKANNT,
