@@ -1,7 +1,7 @@
 {
-  "schema": "1.1.0",
+  "schema": "1.2.0",
   "delta_id": "PLAN-DELTA-P03-2026-08-10-001",
-  "status": "AKTIV_VOR_ABSCHLUSS",
+  "status": "ABGESCHLOSSEN",
   "prioritaet": "P0",
   "typ": "SICHERHEITSREIHENFOLGE",
   "ausgangsplan": {
@@ -12,22 +12,16 @@
     "p04_i016": "Versions- und Manifestregistry"
   },
   "kanonischer_iststand": {
-    "i013": {
-      "ziel": "read-only segmentweise Symlink- und Dateisystemprobe",
-      "status": "VALIDIERT_GITHUB"
-    },
-    "i014": {
-      "ziel": "read-only Dateiidentitaet und Stale-Guard",
-      "status": "VALIDIERT_GITHUB"
-    },
-    "i015": {
-      "ziel": "atomarer Einzeldatei-Replace",
-      "status": "VALIDIERT_GITHUB"
-    },
+    "i013": {"ziel": "read-only segmentweise Symlink- und Dateisystemprobe", "status": "VALIDIERT_GITHUB"},
+    "i014": {"ziel": "read-only Dateiidentitaet und Stale-Guard", "status": "VALIDIERT_GITHUB"},
+    "i015": {"ziel": "atomarer Einzeldatei-Replace", "status": "VALIDIERT_GITHUB"},
     "i016": {
-      "ziel": "Lock-Lease und Prozessidentitaet",
-      "status": "GEPLANT",
-      "herkunft": "PLAN_DELTA"
+      "ziel": "Lock-Lease, Prozessgrenze und Lease-Stale-Replace-Kopplung",
+      "status": "VALIDIERT_GITHUB",
+      "herkunft": "PLAN_DELTA",
+      "qualification_run_id": 31511070448,
+      "qualification_head": "403bba4b2ae6e8a79e573e95dca7f2308c37207f",
+      "main_merge_commit": "a4b63b758bf5ef71060d2e73eae95d584be13fbe"
     }
   },
   "iterationsidentitaet": {
@@ -36,27 +30,43 @@
     "delta_i016": "Lock-Lease und Prozessidentitaet",
     "kollision": true,
     "kollisionstyp": "NUMMER_GLEICH_ZIEL_VERSCHIEDEN",
-    "auflosung": "Die aktuelle Projektsequenz folgt bis zum Abschluss dieses P03-Deltas der qualifizierten Delta-Sequenz. Die Versions- und Manifestregistry bleibt als noch nicht neu nummerierter P04-Planpunkt erhalten und darf nicht als bereits erledigt gelten.",
+    "auflosung": "Die P03-Delta-Sequenz ist mit I016 abgeschlossen. Die noch nicht begonnenen P04-Ausgangsplanpunkte werden ohne Umschreiben des Ausgangsplans eindeutig auf I017 und I018 fortgefuehrt.",
     "fail_closed": true
   },
-  "begruendung": "I012/I013 haben vor der ersten Mutation zwei P0-Sicherheitsluecken sichtbar gemacht: ungepruefte Symlink-Semantik und TOCTOU zwischen Pfadpruefung und spaeterer Mutation. Beide wurden zuerst read-only geschlossen. Der atomare Replace wurde danach als I015 qualifiziert. Der verbliebene Lock-Lease-Baustein wird als I016 der aktivierten Delta-Sequenz abgeschlossen. Dadurch kollidiert die Nummer I016 mit dem unveraenderten P04-Ausgangsplan; diese Kollision wird nun explizit und maschinenlesbar statt durch stilles Umdeuten behandelt.",
-  "nutzen": "Verhindert sowohl unsichere Ruecknummerierung bereits qualifizierter Iterationen als auch die falsche Behauptung, der P04-Planpunkt Versions- und Manifestregistry sei durch die Delta-I016 erledigt.",
+  "begruendung": "I012/I013 haben vor der ersten Mutation P0-Sicherheitsluecken bei Symlink-Semantik und TOCTOU sichtbar gemacht. I014 qualifizierte die Dateiidentitaet, I015 den atomaren Replace und Delta-I016 den Lock-Lease inklusive echter Prozessgrenze und unmittelbarer Lease-Stale-Replace-Kopplung. Damit ist die Sicherheitsreihenfolge des Deltas real abgeschlossen.",
+  "nutzen": "Schliesst P03 nachvollziehbar ab, bewahrt die historische Planidentitaet und verhindert die falsche Behauptung, die P04-Registry sei durch Delta-I016 bereits erledigt.",
   "risiko_delta": "NIEDRIG",
   "reversibel": true,
   "keine_nutzdatenmutation": true,
-  "aufgeschobene_planpunkte": [
-    "Lock-Lease und Prozessidentitaet"
-  ],
+  "aufgeschobene_planpunkte": [],
   "bereits_nachgeholte_planpunkte": [
-    "atomare Temp/Replace-Primitive"
+    "atomare Temp/Replace-Primitive",
+    "Lock-Lease und Prozessidentitaet",
+    "Lease -> unmittelbarer Stale-Recheck -> atomarer Replace"
   ],
-  "abschlussbedingung": "Lock-Lease und Prozessidentitaet sind als Delta-I016 qualifiziert und promoviert; danach wird die P04-Fortsetzung mit einer eindeutigen neuen Iterationszuordnung dokumentiert, ohne den Ausgangsplan umzuschreiben.",
+  "abschlussbedingung": "ERFUELLT: Lock-Lease und Prozessidentitaet sowie die kooperative Lease-Stale-Replace-Kopplung sind als Delta-I016 real qualifiziert und promoviert.",
+  "abschlussnachweis": {
+    "status": "PASS_REAL",
+    "tool_pr": 36,
+    "workflow_run_id": 31511070448,
+    "workflow_status": "completed",
+    "workflow_conclusion": "success",
+    "qualification_head": "403bba4b2ae6e8a79e573e95dca7f2308c37207f",
+    "main_merge_commit": "a4b63b758bf5ef71060d2e73eae95d584be13fbe"
+  },
+  "p04_neuzuordnung": {
+    "regel": "Nur die projektinterne Fortsetzungsnummer wird neu zugeordnet; der Masterplan 2.0.0 bleibt unveraendert referenzierbar.",
+    "i017": {"ursprung": "Masterplan P04/I015", "ziel": "dauerhafte ID-Erzeugung und Validierung", "status": "NICHT_BEGONNEN"},
+    "i018": {"ursprung": "Masterplan P04/I016", "ziel": "Versions- und Manifestregistry", "status": "NICHT_BEGONNEN"}
+  },
   "quellen": [
     "PROVOWARE_VOLLSTAENDIGER_ENTWICKLUNGSPLAN_EXPERT_FINAL_v2.0.0_2026-08-09",
     "PROJEKTSTATUS.json BASELINE-2026-08-10-I015",
-    "ITERATIONSUEBERGABE.json I016",
+    "ITERATIONSUEBERGABE.json Delta-I016",
     "I013 Dateisystemprobe und TOCTOU-Risikodokumentation",
     "I014 Dateiidentitaet/Stale-Guard",
-    "I015 atomarer Einzeldatei-Replace"
+    "I015 atomarer Einzeldatei-Replace",
+    "I016 Datei-Lease und Mehrprozessnachweis",
+    "I016.3 Lease-Stale-Replace Qualification Run 31511070448"
   ]
 }
