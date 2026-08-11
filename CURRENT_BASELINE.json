@@ -11,12 +11,12 @@
   "github_staging_branch": "iteration/i015-atomarer-replace",
   "github_vorgaenger_commit": "813cdb15b30ecb8ff17e474f436645ca3db7d25a",
   "github_workflow_run_id": 31378734347,
-  "letzte_iteration": "I015",
+  "letzte_iteration": "I016",
   "masterplan_sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c",
-  "naechste_iteration": "I016",
+  "naechste_iteration": "I017",
   "receipt_sha256": "ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703",
-  "schema": "1.0.0",
-  "source": "I015 atomarer Einzeldatei-Replace hinter I012-Projektwurzel, I013-Symlinkprobe und I014-Stale-Guard real qualifiziert; Fehler vor und nach os.replace werden getrennt und fail-closed ausgewiesen.",
+  "schema": "1.1.0",
+  "source": "Artefakt- und Herkunftsbaseline bleibt der real qualifizierte I015-Stand. Die Lifecycle-Zeiger wurden nach real qualifiziertem und promoviertem Delta-I016 auf I016 -> I017 fortgeschrieben; I016.3 ist an Workflow 31511070448, Head 403bba4b2ae6e8a79e573e95dca7f2308c37207f und Merge a4b63b758bf5ef71060d2e73eae95d584be13fbe gebunden. Es wird kein nicht existentes I016-Artifact behauptet.",
   "status": "VALIDIERT_GITHUB",
   "version": "0.1.0-dev"
 }
