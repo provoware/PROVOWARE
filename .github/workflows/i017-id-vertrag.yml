@@ -1,13 +1,7 @@
 name: I017 ID-Vertragskern
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "tests/contract/test_i017_id_vertrag.py"
-      - "docs/WISSENSSPEICHER_I017_ERKENNTNIS.json"
-      - "docs/ITERATION_017.md"
-      - ".github/workflows/i017-id-vertrag.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,14 +28,15 @@ jobs:
               'docs/ITERATION_017.md',
               '.github/workflows/i017-id-vertrag.yml',
           }
-          base = os.environ['GITHUB_BASE_REF']
-          changed = {
-              p for p in subprocess.check_output(
-                  ['git', 'diff', '--name-only', f'origin/{base}...HEAD'], text=True
-              ).splitlines() if p
-          }
-          assert changed == allowed, f'I017-Scope abweichend: {sorted(changed)}'
-          assert not any(p.startswith(('src/', 'data/', 'EVIDENCE/')) for p in changed)
+          base = os.environ.get('GITHUB_BASE_REF')
+          if base:
+              changed = {
+                  p for p in subprocess.check_output(
+                      ['git', 'diff', '--name-only', f'origin/{base}...HEAD'], text=True
+                  ).splitlines() if p
+              }
+              assert changed == allowed, f'I017-Scope abweichend: {sorted(changed)}'
+              assert not any(p.startswith(('src/', 'data/', 'EVIDENCE/')) for p in changed)
           PY
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405

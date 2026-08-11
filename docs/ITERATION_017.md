@@ -22,11 +22,23 @@ Qualifiziert sind:
 
 Erster Qualification-Head: `bfea0bce26720ddb955dc3a05070040959155cbb`
 
-Workflow: `31526347950`
+Erster Workflow: `31526347950` — `completed / success`
 
-Status: `completed / success`
+Promotionsfähiger Qualification-Head: `be324f1cbbe30ee4e2c9f19e17b1855d5601c34c`
+
+Promotionsworkflow: `31526518691` — `completed / success`
+
+I007-Kernvertragsregression: `31526518704` — `completed / success`
+
+Tool-PR #38 wurde SHA-gebunden als kanonischer Main-Merge `4e0a9f961c479932ac1e72c7b68367e200451ec9` promoviert.
 
 Das Gate bestätigte den exakten Vier-Dateien-Scope, die neuen I017-Contracttests, bestehende ID-Regressionsprüfungen, Ruff/Format, mypy sowie die Wissens- und Grenzmarker.
+
+## Masterbuch-Synchronisierung
+
+`ERK-I017-001` ist als `E2 / P0 / BESTAETIGT` dokumentiert. Masterbuch-Main-Merge: `d6b80cdc534ae3567b5a037e420f0bc30884f318`.
+
+Keine Goldene Regel wurde erzeugt. Die Evidence bleibt ein bestätigter Nachweis; eine kanonische Regelaufnahme erfordert weiterhin eine vollständige Dubletten- und Widerspruchsprüfung im Masterbuch.
 
 ## Sicherheits- und Gültigkeitsgrenzen
 
@@ -38,14 +50,16 @@ Das Gate bestätigte den exakten Vier-Dateien-Scope, die neuen I017-Contracttest
 
 Die Contracttests dürfen nicht als mathematischer Kollisionsbeweis umgedeutet werden. SQLite-, Datei- oder Registry-Persistenz wird in diesem Schritt nicht eingeführt. Die Versions-/Manifestregistry bleibt I018.
 
-## Wissenseinordnung
-
-`ERK-I017-001` ist nach dem realen Workflow `31526347950` auf `E2 / P0 / BESTAETIGT` angehoben. Keine Goldene Regel. Vor einer späteren kanonischen Regelaufnahme bleibt eine Vollprüfung des Masterbuchbestands erforderlich.
+Der Masterplan fordert für die dauerhafte ID-Schicht ausdrücklich Kollisions-/Restarttests. Deshalb bleibt Projekt-I017 trotz vollständig qualifiziertem Vertragskern formal `IN_ARBEIT`, bis die Persistenz-/Restartbindung und die Konfliktsemantik separat real qualifiziert sind.
 
 ## Rückfallfähigkeit
 
-Der Patch ist vollständig additiv. Das Entfernen der vier I017-Artefakte stellt den vorherigen Produktstand wieder her; Nutzdaten, Baselines und bestehende Vertragsimplementierung werden nicht verändert.
+Der Produktpatch I017 war vollständig additiv. I017H verändert ausschließlich Metadaten und Dokumentation. Nutzdaten, Baselines und bestehende Vertragsimplementierung werden nicht verändert.
 
-## Promotion
+## Nächster technischer Schritt
 
-Der promotionsfähige Head muss nach der Evidence-Aktualisierung erneut real erfolgreich qualifiziert werden. Ein laufender, fehlender oder unbekannter CI-Zustand ist kein PASS.
+Kleinster Funktionspatch: Persistenz-Roundtrip über eine Prozess-/Neuladegrenze, ohne Registry-Vorgriff:
+
+`ID erzeugen -> serialisieren -> neu laden -> parse -> exakt identische ID`
+
+Zusätzlich muss ein vorhandener Identitätswert beim Restore erhalten bleiben; stilles Neuerzeugen ist fail-closed als Fehler zu behandeln.
