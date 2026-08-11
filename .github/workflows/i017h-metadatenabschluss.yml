@@ -5,6 +5,8 @@ on:
     paths:
       - 'PROJEKTSTATUS.json'
       - 'docs/ITERATION_017.md'
+      - '.github/workflows/i016-3h-p03-abschluss.yml'
+      - '.github/workflows/i017-id-vertrag.yml'
       - '.github/workflows/i017h-metadatenabschluss.yml'
   workflow_dispatch:
 
@@ -26,6 +28,8 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" | sort > /tmp/changed.txt
             cat > /tmp/allowed.txt <<'EOF'
+          .github/workflows/i016-3h-p03-abschluss.yml
+          .github/workflows/i017-id-vertrag.yml
           .github/workflows/i017h-metadatenabschluss.yml
           PROJEKTSTATUS.json
           docs/ITERATION_017.md
@@ -58,6 +62,20 @@ jobs:
           assert status['p04_fortschritt_prozent'] == 20
           assert status['status'] == 'IN_ARBEIT'
           PY
+
+      - name: Historische Lifecycle-Gates prüfen
+        shell: python
+        run: |
+          from pathlib import Path
+
+          for path in (
+              '.github/workflows/i016-3h-p03-abschluss.yml',
+              '.github/workflows/i017-id-vertrag.yml',
+          ):
+              text = Path(path).read_text(encoding='utf-8')
+              pre = text.split('permissions:', 1)[0]
+              assert 'workflow_dispatch:' in pre, path
+              assert 'pull_request:' not in pre, path
 
       - name: Dokumentationsgrenzen prüfen
         shell: bash
