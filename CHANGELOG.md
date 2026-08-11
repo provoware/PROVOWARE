@@ -2,13 +2,23 @@
 
 ## 0.1.0-dev - 2026-08-11
 
+### Delta-I016.3H — P03 und PLAN_DELTA formal abgeschlossen
+- Reale I016.3-Qualification nachgetragen: Workflow `31511070448` lief auf Head `403bba4b2ae6e8a79e573e95dca7f2308c37207f` mit `completed / success`.
+- Tool-PR #36 wurde als kanonischer Merge `a4b63b758bf5ef71060d2e73eae95d584be13fbe` promoviert.
+- Der qualifizierte End-to-End-Vertrag ist `Lease -> unmittelbarer I014-Stale-Recheck -> I015 atomar_ersetzen -> Lease freigeben`; belegter Lease, STALE/UNBEKANNT und Exception-Pfade bleiben fail-closed beziehungsweise geben den Lease deterministisch frei.
+- Workflow `31511070448` publizierte keine Artefakte; deshalb wird keine Artifact-ID oder SHA erfunden. Evidence ist an Run, Qualification-Head und Merge gebunden.
+- `PLAN-DELTA-P03-2026-08-10-001` erfüllt damit seine dokumentierte Abschlussbedingung und wird auf `ABGESCHLOSSEN` gesetzt.
+- P03 und PLAN_DELTA-Verschluss werden auf 100 % gesetzt; die Grenzen für nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben ausdrücklich `NICHT_QUALIFIZIERT`.
+- Die P04-Fortsetzung wird ohne Umschreiben des Masterplans eindeutig neu zugeordnet: Projekt-I017 = Masterplan P04/I015 „dauerhafte ID-Erzeugung und Validierung“, Projekt-I018 = Masterplan P04/I016 „Versions- und Manifestregistry“.
+- Diese Abschlussiteration verändert keine Produktlogik und keine Nutzdaten.
+
 ### Delta-I016.2 — Mehrprozess-Lease qualifiziert
 - Echten Prozessgrenzen-Nachweis für den bereits qualifizierten Datei-Lease ergänzt; die Produktlogik und der mutierende Replace-Pfad wurden dabei nicht verändert.
 - Testmodell verwendet getrennte Prozesse über `multiprocessing` mit `spawn`: Prozess A hält den Lease, Prozess B erhält deterministisch `BELEGT`, nach Freigabe kann ein neuer Prozess den Lease erwerben.
 - Reale Qualification auf Head `0be678f4c9bffee072253c4b117e6658145a709a` durch Workflow `31490138072` mit `completed / success`.
 - Tool-PR #34 wurde per kanonischem Merge `38f873b55a4539147458ed8a76ad4ac4f4e3e116` promoviert.
-- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`; `Lease -> unmittelbarer Stale-Recheck -> atomar_ersetzen` bleibt `NICHT_IMPLEMENTIERT`.
-- P03 und PLAN_DELTA-Verschluss bleiben deshalb konservativ bei 75 %; Delta-I016 bleibt `IN_ARBEIT`.
+- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`.
+- Die direkte Schreibkopplung wurde anschließend separat in I016.3 qualifiziert; dieser historische Abschnitt bleibt als zeitlicher Zwischenstand erhalten.
 
 ### Delta-I016 Phase 1 — Datei-Lease-Kern qualifiziert
 - Minimalen nichtblockierenden Linux-advisory-Lease für genau ein Ziel eingeführt; die Nutzdatei selbst wird beim Lease-Erwerb nicht verändert.
@@ -17,8 +27,8 @@
 - I016-Workflow `31476216289` und I015-Revalidation `31476216369` real mit `success` beendet.
 - Qualifikations-Head `4eea4591ae2296961869f567498744372aa7ff11`; Artifact `9095330662`, 899 Byte, SHA-256 `fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6`.
 - Phase 1 per kanonischem Tool-Merge `cfb9d67966ba737eb1331004890973ed2404f3ff` promoviert.
-- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`; `Lease -> Stale-Recheck -> atomar_ersetzen` bleibt `NICHT_IMPLEMENTIERT`.
-- `PROJEKTSTATUS.json` hält I016 deshalb weiterhin als laufende Iteration; PLAN_DELTA-Verschluss steigt konservativ auf 75 %, P03 bleibt bis zur vollständigen Lock-/Replace-Kopplung bei 75 %.
+- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`.
+- Die zu diesem Zeitpunkt noch offene Replace-Integration wurde später separat in I016.3 qualifiziert.
 
 ## 0.1.0-dev - 2026-08-10
 
@@ -153,7 +163,9 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- Vollständige Lock-Lease-/Replace-Integration aus P03; Lease-Kern und Mehrprozess-Nachweis sind qualifiziert, die direkte Schreibkopplung bleibt offen.
+- Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
+- P04: dauerhafte ID-Erzeugung und Validierung (projektintern I017).
+- P04: Versions- und Manifestregistry (projektintern I018).
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
