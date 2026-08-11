@@ -1,0 +1,17 @@
+{
+  "id": "ERK-I016-001",
+  "typ": "Regelentwurf",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": ["Dateisystem", "Schreibsicherheit", "Nebenläufigkeit", "Linux"],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P03 / Linux lokale Dateisysteme / kooperierende Schreiber",
+  "projektbezug": "Delta-I016 Lock-Lease und Prozessidentitaet",
+  "quelle_herkunft": ["PLAN-DELTA-P03-2026-08-10-001", "I015 atomarer Einzeldatei-Replace", "Implementierung src/provoware/plattform/datei_lease.py"],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Ein stabiler, zielbezogener advisory Lease kann konkurrierende kooperierende PROVOWARE-Schreiber vor einer spaeteren Mutation fail-closed serialisieren; er ersetzt weder Stale-Guard noch Symlink- und Projektwurzelpruefung.",
+  "grenzen": ["Nicht kooperierende Schreiber werden nicht blockiert.", "Netzwerkdateisystem-Semantik ist nicht qualifiziert.", "Lease ist in dieser Phase noch nicht mit atomar_ersetzen integriert."],
+  "historie": [{"iteration": "Delta-I016 Phase 1", "aktion": "Kandidat angelegt", "status": "IN_PRUEFUNG"}]
+}
