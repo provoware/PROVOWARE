@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "iteration": "I015.2G",
+  "typ": "MASTERBUCH_SYNCHRONISATIONSNACHWEIS",
+  "hauptkategorie": "Wissenskonsolidierung",
+  "nebenkategorien": ["CI/CD", "Evidence & Audit", "Lebenszyklus", "Daten & Integritaet", "Recovery"],
+  "reifegrad": "E2",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "projektuebergreifend",
+  "projektbezug": ["provoware/PROVOWARE", "provoware/PROVOWARE_MASTER_BOOK_2026"],
+  "quelle_herkunft": {
+    "aufnahmevorschau_pr": 6,
+    "transaktionsengine_pr": 7,
+    "rollback_pr": 8,
+    "lifecycle_gate_pr": 10,
+    "lifecycle_gate_merge_commit": "0eebf83ce8bf2d21a525cae5c20fce9fc390211f",
+    "kanonische_aufnahme_pr": 11,
+    "kanonische_aufnahme_head": "6c4915529bfdcf2b1521eca6aef27bb0b3399086",
+    "kanonische_aufnahme_merge_commit": "a70eccee1a0d7c9b9800d66f198bf4a02a6a9e53",
+    "kanonische_aufnahme_runs": [31451843387, 31451843376, 31451843400, 31451843389, 31451843386],
+    "evidence": "evidence/I015_2G_RULE_015_KANDIDAT.json"
+  },
+  "automatisierbarkeit": "JA",
+  "status": "KANONISCHE_AUFNAHME_PROMOVIERT",
+  "kanonische_masterbuch_mutation": true,
+  "produktlogik_veraendert": false,
+  "goldene_regel": false,
+  "aussage": "RULE-015 und DELTA-0016 sind nach Lifecycle-Trennung der Pre-/Post-Intake-Gates auf aktueller Main-Basis in exakt vier Wissensartefakten real qualifiziert und SHA-gebunden promoviert. Reifegrad E2/P0 bleibt bestehen; keine Goldene Regel und keine Produktlogik wurden erzeugt.",
+  "validierungsgrenze": {
+    "aufnahmevorschau": "PASS_PROMOVIERT",
+    "transaktionsengine": "PASS_PROMOVIERT",
+    "rollback_fault_injection": "PASS_PROMOVIERT",
+    "lifecycle_gate_split": "PASS_PROMOVIERT",
+    "kanonische_post_intake_qualification": "PASS",
+    "delta_append_only": "PASS",
+    "browser_derivative_sync": "PASS",
+    "qualification_receipt_gate": "PASS",
+    "single_commit_qualification": "PASS",
+    "kanonische_vier_artefakt_aufnahme_main": "PASS_PROMOVIERT",
+    "produktfreigabe": "NICHT_BETROFFEN"
+  },
+  "rueckfall": "Die kanonische Aufnahme ist über Git-Historie und den vorherigen Main-Commit 0eebf83c eindeutig rückführbar. Historische Deltas bleiben append-only; eine fachliche Korrektur soll als neues Delta erfolgen, nicht durch stilles Umschreiben von DELTA-0016.",
+  "historie": [
+    {
+      "datum": "2026-08-11",
+      "aktion": "PR #9 zeigte einen Lifecycle-Fehltrigger: drei Pre-Intake-Gates wurden durch den korrekten Post-Intake-Zustand erneut gestartet und scheiterten erwartungsgemäß."
+    },
+    {
+      "datum": "2026-08-11",
+      "aktion": "PR #10 trennte Pre- und Post-Intake-Scope; alle vier I015.2G-Lifecycle-Gates wurden auf Head d9d7048b real gruen und als 0eebf83c promoviert."
+    },
+    {
+      "datum": "2026-08-11",
+      "aktion": "Der alte Aufnahme-PR #9 wurde ohne Merge geschlossen und RULE-015/DELTA-0016 auf aktueller Main-Basis als sauberer Vier-Dateien-PR #11 neu aufgebaut."
+    },
+    {
+      "datum": "2026-08-11",
+      "aktion": "PR #11 bestand Kanonische Aufnahme, Delta Append Only, Browser Derivative Sync, Qualification Receipt und Single Commit Qualification und wurde SHA-gebunden als a70eccee promoviert."
+    }
+  ]
+}
