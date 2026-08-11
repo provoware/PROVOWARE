@@ -10,7 +10,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 from .datentypen import ChangeId, ObjektId, OperationId, ProjektId, RevisionId
 
@@ -91,7 +91,7 @@ def lade_id_datensatz(pfad: str | Path) -> IdDatensatz:
     if id_typ is None:
         raise IdPersistenzFehler(f"Unbekannter ID-Typ: {typ_name}")
     try:
-        id_wert = id_typ.parse(id_text)
+        id_wert = cast(IdWert, id_typ.parse(id_text))
         objekt = _objekt_schluessel_pruefen(objekt)
     except ValueError as exc:
         raise IdPersistenzFehler("ID-Datensatz verletzt den kanonischen ID-Vertrag.") from exc
