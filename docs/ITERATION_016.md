@@ -1,35 +1,30 @@
 # Delta-I016 — Lock-Lease und Prozessidentität
 
 ## Ziel
+Delta-I016 schließt die nach P03 verschobene Schreibkonkurrenz-Sicherheitskette ab: exklusiver kooperativer Linux-Lease, echte Prozessgrenze und unmittelbare Kopplung des gehaltenen Lease an Stale-Recheck und atomaren Replace.
 
-Kleinster reversibler P0-Schritt: ein nichtblockierender exklusiver Linux-advisory-Lease für genau ein Ziel. Die Nutzdatei wird durch den Lease selbst nicht verändert. I012–I015 bleiben fachlich unverändert.
+## Qualifizierter Gesamtvertrag
 
-## Vertrag Phase 1
+`Lease erwerben -> I014-Stale-Recheck unter gehaltenem Lease -> I015 atomar_ersetzen -> Lease freigeben`
 
 - kanonischer absoluter Zielpfad oder fail-closed `FEHLER`
 - stabile benachbarte Lockdatei `.<name>.provoware.lock`
-- `flock(LOCK_EX | LOCK_NB)`; Konkurrenz liefert `BELEGT` statt zu warten
-- maschinenlesbare Lease-Identität aus PID, Zufallstoken und Lockpfad
+- `flock(LOCK_EX | LOCK_NB)`; Konkurrenz liefert `BELEGT`
+- Lease-Identität aus PID, Zufallstoken und Lockpfad
 - deterministische, idempotente Freigabe
-- keine Integration in `atomar_ersetzen` in Phase 1
+- echte Mehrprozess-Qualification mit `multiprocessing`/`spawn`
+- frischer I014-Stale-Recheck erst unter gehaltenem Lease
+- I015-Mutation nur über den frischen Recheck; STALE/UNBEKANNT blockieren
+- Lease-Freigabe auch bei Exception im Replace-Pfad
 
 ## Sicherheitsgrenzen
 
-`flock` ist advisory und schützt nur kooperierende Schreiber. Netzwerkdateisysteme sind nicht qualifiziert. Die persistente leere Lockdatei ist PROVOWARE-Metadatenzustand und wird absichtlich nicht beim Release gelöscht, weil Löschen/Reanlegen parallele Lock-Inodes und damit Split-Locks ermöglichen könnte.
-
-Maschinenlesbarer Status der offenen Grenzen:
-
 - nicht kooperierende Schreiber: `NICHT_QUALIFIZIERT`
 - Netzwerkdateisysteme: `NICHT_QUALIFIZIERT`
-- direkte Replace-Integration: `NICHT_IMPLEMENTIERT`
-
-## Rückfall
-
-Phase 1 und I016.2 sind additiv. Die bestehende Replace-Primitive wurde nicht verändert. Rückfall erfolgt über die isolierten Git-Commits beziehungsweise Revert der jeweiligen Promotion.
+- Advisory `flock` schützt nur kooperierende Schreiber.
+- Die persistente leere Lockdatei bleibt Metadatenzustand; Löschen/Reanlegen könnte Split-Locks über unterschiedliche Inodes erzeugen.
 
 ## Qualification Phase 1
-
-Die Phase-1-Implementierung wurde real auf GitHub Actions qualifiziert.
 
 - Qualifikations-Head: `4eea4591ae2296961869f567498744372aa7ff11`
 - I016-Workflow: `31476216289` — `success`
@@ -38,27 +33,37 @@ Die Phase-1-Implementierung wurde real auf GitHub Actions qualifiziert.
 - Artefakt-SHA-256: `fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6`
 - kanonischer Tool-Merge: `cfb9d67966ba737eb1331004890973ed2404f3ff`
 
-Qualifiziert sind der exklusive Erwerb, das Blockieren eines konkurrierenden kooperierenden Erwerbs, erneuter Erwerb nach Freigabe, idempotente Freigabe, fail-closed Pfadfehler, unveränderte Nutzdatei und die Regression der I012–I015-Plattformverträge.
-
 ## Qualification I016.2 — echte Prozessgrenze
-
-Der Mehrprozess-Nachweis wurde real und getrennt von der späteren Schreibkopplung qualifiziert.
 
 - Tool-PR: `#34`
 - Qualifikations-Head: `0be678f4c9bffee072253c4b117e6658145a709a`
 - Workflow: `31490138072` — `completed / success`
 - kanonischer Tool-Merge: `38f873b55a4539147458ed8a76ad4ac4f4e3e116`
 - Testmodell: getrennte Prozesse über `multiprocessing` mit `spawn`
-- Vertrag: Prozess A hält Lease; Prozess B erhält deterministisch `BELEGT`; nach Freigabe kann ein neuer Prozess den Lease erwerben.
 
-Damit ist die Exklusivität an der realen lokalen Prozessgrenze für kooperierende Linux-Schreiber qualifiziert. Daraus folgt ausdrücklich **keine** Qualification für nicht kooperierende Schreiber oder Netzwerkdateisysteme.
+## Qualification I016.3 — Lease-Stale-Replace
+
+- Tool-PR: `#36`
+- Qualifikations-Head: `403bba4b2ae6e8a79e573e95dca7f2308c37207f`
+- Workflow: `31511070448` — `completed / success`
+- kanonischer Tool-Merge: `a4b63b758bf5ef71060d2e73eae95d584be13fbe`
+- publizierte Workflow-Artefakte: keine; es wird deshalb keine Artifact-ID erfunden.
+
+Nachgewiesen sind Erfolgsweg unter Lease, Blockade nach externer Zieländerung, Blockade bei belegtem Lease sowie deterministische Lease-Freigabe bei Exception.
 
 ## Wissensstatus
 
-Die Mehrprozess-Evidence verstärkt den bestehenden Lock-Lease-Wissenseintrag und erzeugt keine neue Goldene Regel. Sie bleibt im Gültigkeitsbereich lokaler Linux-Dateisysteme und kooperierender Schreiber. Die Dublettenkonsolidierung mit dem bestehenden I016-Wissenseintrag hat Vorrang vor einer neuen Regelnummer.
+ERK-I016-001/002/003 bilden konsolidierte E2/P0-Evidence. Es wurde keine neue Goldene Regel erzeugt. Gültigkeitsbereich bleiben lokale Linux-Dateisysteme und kooperierende Schreiber.
 
-## Status und nächster technischer Schritt
+## P03- und PLAN_DELTA-Abschluss
 
-**Phase 1: QUALIFIZIERT. I016.2 Mehrprozess-Nachweis: QUALIFIZIERT. Delta-I016 insgesamt: IN_ARBEIT.**
+`PLAN-DELTA-P03-2026-08-10-001` erfüllt seine dokumentierte Abschlussbedingung. P03 ist fachlich abgeschlossen; die Planidentität bleibt erhalten und P04 wird projektintern neu zugeordnet:
 
-Offen bleibt die sicherheitskritische Kopplung `Lease -> unmittelbarer I014-Stale-Recheck -> I015 atomar_ersetzen`. Diese Kopplung ist weiterhin `NICHT_IMPLEMENTIERT` und darf erst in einer getrennten Iteration implementiert und qualifiziert werden.
+- Projekt-I017 = Masterplan P04/I015 — dauerhafte ID-Erzeugung und Validierung
+- Projekt-I018 = Masterplan P04/I016 — Versions- und Manifestregistry
+
+**Delta-I016: QUALIFIZIERT UND PROMOVIERT. P03: ABGESCHLOSSEN. PLAN_DELTA: ABGESCHLOSSEN.**
+
+## Rückfall
+
+Die I016-Schritte bleiben über ihre isolierten Git-Promotionen rückfallfähig. Dieser Abschluss ändert keine Produktlogik und keine Nutzdaten; er synchronisiert ausschließlich Status, Planidentität und Nachweise.
