@@ -38,11 +38,16 @@ jobs:
 
           p = Path('docs/WISSENSSPEICHER_I017_1_ERKENNTNIS.json')
           data = json.loads(p.read_text(encoding='utf-8'))
-          assert data['reifegrad'] == 'E1'
+          assert data['reifegrad'] == 'E2'
           assert data['prioritaet'] == 'P0'
-          assert data['status'] == 'IN_PRUEFUNG'
+          assert data['status'] == 'BESTAETIGT'
           assert data['goldene_regel'] is False
-          assert data['qualification']['status'] == 'AUSSTEHEND'
+          q = data['qualification']
+          assert q['status'] == 'PASS_REAL'
+          assert q['workflow_run_id'] == 31536871890
+          assert q['qualifikations_head'] == '1a0a6d85e0547d6f1e0b395281a490828d40491c'
+          assert q['workflow_status'] == 'completed'
+          assert q['workflow_conclusion'] == 'success'
           text = Path('docs/ITERATION_017_1.md').read_text(encoding='utf-8')
           for marker in ('NICHT_IMPLEMENTIERT', 'NICHT_BEWIESEN', 'NICHT_QUALIFIZIERT'):
               assert marker in text
