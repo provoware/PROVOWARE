@@ -1,0 +1,29 @@
+{
+  "iteration": "I017",
+  "status": "ABSCHLUSS_KANDIDAT",
+  "prioritaet": "P0",
+  "masterplan_bezug": "P04/I015 dauerhafte ID-Erzeugung und Validierung",
+  "qualifizierte_bausteine": [
+    {"name":"ID-Vertragskern","run_id":31526518691,"merge":"4e0a9f961c479932ac1e72c7b68367e200451ec9","status":"PASS_REAL"},
+    {"name":"ID-Persistenz-Restart","run_id":31536951091,"merge":"0d2e6c8d2e042527274fb2428efe635dbbb337cc","status":"PASS_REAL"}
+  ],
+  "masterbuch": [
+    {"id":"ERK-I017-001","reifegrad":"E2","prioritaet":"P0","merge":"d6b80cdc534ae3567b5a037e420f0bc30884f318","goldene_regel":false},
+    {"id":"ERK-I017-002","reifegrad":"E2","prioritaet":"P0","merge":"5d4be8436e12937dff5e3a50aedfb8804782e0a1","goldene_regel":false}
+  ],
+  "abnahmekern": {
+    "id_format_validierung":"QUALIFIZIERT",
+    "restart_erhalt":"QUALIFIZIERT",
+    "konflikt_semantik":"QUALIFIZIERT_FAIL_CLOSED",
+    "beschaedigte_persistenz":"QUALIFIZIERT_FAIL_CLOSED",
+    "registry":"NICHT_BESTANDTEIL_I017"
+  },
+  "offene_haertung": {
+    "uuid4_mathematische_kollisionsfreiheit":"NICHT_BEWIESEN",
+    "crash_atomizitaet":"NICHT_QUALIFIZIERT",
+    "netzwerkdateisysteme":"NICHT_QUALIFIZIERT"
+  },
+  "entscheidung":"Die offenen Härtungspunkte werden nicht als PASS gewertet, blockieren aber den dokumentierten I017-Abnahmekern nicht. I018 darf erst nach real erfolgreichem I017F-Abschlussgate beginnen.",
+  "rueckfall":"I017F verändert keine Produktlogik; Lifecycle-Zeiger können durch Revert des isolierten Abschlusscommits auf I016->I017 zurückgesetzt werden.",
+  "goldene_regel":false
+}
