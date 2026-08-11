@@ -6,6 +6,7 @@ on:
       - 'PROJEKTSTATUS.json'
       - 'CHANGELOG.md'
       - 'docs/ITERATION_016.md'
+      - '.github/workflows/i016-1-metadatenabschluss.yml'
       - '.github/workflows/i016-2h-metadatenabschluss.yml'
 
 permissions:
@@ -25,7 +26,7 @@ jobs:
           git fetch origin "${{ github.base_ref }}" --depth=1
           mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
           printf '%s\n' "${files[@]}"
-          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|docs/ITERATION_016\.md|\.github/workflows/i016-2h-metadatenabschluss\.yml)$'
+          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|docs/ITERATION_016\.md|\.github/workflows/i016-1-metadatenabschluss\.yml|\.github/workflows/i016-2h-metadatenabschluss\.yml)$'
           for f in "${files[@]}"; do
             [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
           done
@@ -66,6 +67,16 @@ jobs:
           for marker in required:
               assert marker in d, f'Doku fehlt: {marker}'
               assert marker in c, f'Changelog fehlt: {marker}'
+      - name: Historischen I016.1-Lifecycle promotionsfest prüfen
+        shell: python
+        run: |
+          from pathlib import Path
+          w = Path('.github/workflows/i016-1-metadatenabschluss.yml').read_text(encoding='utf-8')
+          assert 'workflow_dispatch:' in w
+          assert 'pull_request:' not in w
+          assert 'PROJEKTSTATUS.json' not in w.split('permissions:', 1)[0]
+          assert 'CHANGELOG.md' not in w.split('permissions:', 1)[0]
+          assert 'docs/ITERATION_016.md' not in w.split('permissions:', 1)[0]
       - name: Keine Produktmutation
         shell: bash
         run: |
