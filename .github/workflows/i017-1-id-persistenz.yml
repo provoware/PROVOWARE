@@ -1,0 +1,54 @@
+name: I017.1 ID-Persistenz-Restart
+
+on:
+  pull_request:
+    paths:
+      - 'src/provoware/vertraege/id_persistenz.py'
+      - 'tests/contract/test_i017_1_id_persistenz.py'
+      - 'docs/WISSENSSPEICHER_I017_1_ERKENNTNIS.json'
+      - 'docs/ITERATION_017_1.md'
+      - '.github/workflows/i017-1-id-persistenz.yml'
+  workflow_dispatch:
+
+jobs:
+  qualifikation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Entwicklungsabhaengigkeiten installieren
+        run: python -m pip install -e '.[entwicklung]'
+      - name: I017.1 Persistenz-/Restartvertrag
+        run: python -m pytest -q tests/contract/test_i017_1_id_persistenz.py
+      - name: I017 Vertragskern Regression
+        run: python -m pytest -q tests/contract/test_i017_id_vertrag.py tests/contract/test_datentypen.py tests/contract/test_id_varianten.py
+      - name: Ruff
+        run: python -m ruff check src/provoware/vertraege/id_persistenz.py tests/contract/test_i017_1_id_persistenz.py
+      - name: Ruff Format
+        run: python -m ruff format --check src/provoware/vertraege/id_persistenz.py tests/contract/test_i017_1_id_persistenz.py
+      - name: Mypy
+        run: python -m mypy src/provoware/vertraege/id_persistenz.py
+      - name: Evidence fail-closed pruefen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path('docs/WISSENSSPEICHER_I017_1_ERKENNTNIS.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert data['reifegrad'] == 'E2'
+          assert data['prioritaet'] == 'P0'
+          assert data['status'] == 'BESTAETIGT'
+          assert data['goldene_regel'] is False
+          q = data['qualification']
+          assert q['status'] == 'PASS_REAL'
+          assert q['workflow_run_id'] == 31536871890
+          assert q['qualifikations_head'] == '1a0a6d85e0547d6f1e0b395281a490828d40491c'
+          assert q['workflow_status'] == 'completed'
+          assert q['workflow_conclusion'] == 'success'
+          text = Path('docs/ITERATION_017_1.md').read_text(encoding='utf-8')
+          for marker in ('NICHT_IMPLEMENTIERT', 'NICHT_BEWIESEN', 'NICHT_QUALIFIZIERT'):
+              assert marker in text
+          PY
