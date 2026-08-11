@@ -65,7 +65,7 @@ jobs:
           python -m ruff format --check tests/contract/test_i017_id_vertrag.py
           python -m mypy src/provoware/vertraege/datentypen.py
 
-      - name: Wissensschema und Grenzen fail-closed prüfen
+      - name: Wissensschema, reale Evidence und Grenzen fail-closed prüfen
         run: |
           python3 - <<'PY'
           import json
@@ -73,21 +73,29 @@ jobs:
 
           evidence = json.loads(Path('docs/WISSENSSPEICHER_I017_ERKENNTNIS.json').read_text(encoding='utf-8'))
           assert evidence['id'] == 'ERK-I017-001'
-          assert evidence['typ'] == 'Regelentwurf'
+          assert evidence['typ'] == 'Nachweis'
           assert evidence['hauptkategorie'] == 'Architektur'
-          assert evidence['reifegrad'] == 'E1'
+          assert evidence['reifegrad'] == 'E2'
           assert evidence['prioritaet'] == 'P0'
           assert evidence['automatisierbarkeit'] == 'JA'
-          assert evidence['status'] == 'IN_PRUEFUNG'
+          assert evidence['status'] == 'BESTAETIGT'
           assert evidence['goldene_regel'] is False
           assert evidence['widersprueche'] == []
+          q = evidence['qualification']
+          assert q['status'] == 'PASS_REAL'
+          assert q['workflow_run_id'] == 31526347950
+          assert q['qualifikations_head'] == 'bfea0bce26720ddb955dc3a05070040959155cbb'
+          assert q['workflow_status'] == 'completed'
+          assert q['workflow_conclusion'] == 'success'
 
           doc = Path('docs/ITERATION_017.md').read_text(encoding='utf-8')
           for marker in (
+              '31526347950',
+              'bfea0bce26720ddb955dc3a05070040959155cbb',
               'PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT',
               'REGISTRY_ANBINDUNG = NICHT_IMPLEMENTIERT',
               'KOLLISIONSFREIHEIT = NICHT_BEWIESEN',
-              'E1 / P0 / IN_PRUEFUNG',
+              'E2 / P0 / BESTAETIGT',
           ):
               assert marker in doc
           PY
