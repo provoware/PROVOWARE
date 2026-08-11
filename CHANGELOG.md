@@ -1,5 +1,18 @@
 # Änderungsverlauf
 
+## 0.1.0-dev - 2026-08-12
+
+### I017.1H — ID-Persistenz/Restart metadatenseitig synchronisiert
+- I017.1 funktionaler Kandidatenlauf `31536871890` auf Head `1a0a6d85e0547d6f1e0b395281a490828d40491c` real mit `completed / success`.
+- Promotions-/Evidence-Lauf `31536951091` auf Head `739f0b8368ad79f418a800d5d98b5aea70e0ab54` real mit `completed / success`.
+- Tool-PR #40 wurde als Main-Merge `0d2e6c8d2e042527274fb2428efe635dbbb337cc` promoviert.
+- Masterbuch-Evidence `ERK-I017-002` ist als `E2 / P0 / BESTAETIGT` ohne Goldene Regel konsolidiert; Masterbuch-Merge `5d4be8436e12937dff5e3a50aedfb8804782e0a1`.
+- `PROJEKTSTATUS.json` führt den Persistenz-/Restartnachweis in einem eigenen Qualifikationsblock, ohne die historische I017-Kernaussage `ID_VERTRAGSKERN_OHNE_PERSISTENZ` umzuschreiben.
+- Qualifiziert sind Restart-Erhalt, idempotente Wiederverwendung, Konfliktblockade und fail-closed Behandlung beschädigter Persistenz. Registry bleibt `NICHT_IMPLEMENTIERT`; UUID4-Kollisionsfreiheit bleibt `NICHT_BEWIESEN`; Crash-Atomizität und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`.
+- I017 bleibt bis zur formalen Abschlussbewertung `IN_ARBEIT`; P04 bleibt in diesem reinen Metadatenabschluss konservativ bei 20 %, I018 wird nicht vorgezogen.
+- Historische I017- und I017.1-Candidate-Gates werden nach erfolgreicher Qualification auf read-only `workflow_dispatch` begrenzt.
+- Keine Produkt-, Test-, Persistenz-, Registry-, Baseline- oder Nutzdatenmutation in I017.1H.
+
 ## 0.1.0-dev - 2026-08-11
 
 ### I017H — ID-Vertragskern metadatenseitig synchronisiert
@@ -174,7 +187,7 @@
 
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
-- P04: dauerhafte ID-Erzeugung und Validierung (projektintern I017).
+- I017: formaler Abschluss und Entscheidung über zusätzlichen Crash-/Teilwrite-Härtungsnachweis; Crash-Atomizität bleibt derzeit `NICHT_QUALIFIZIERT`.
 - P04: Versions- und Manifestregistry (projektintern I018).
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
