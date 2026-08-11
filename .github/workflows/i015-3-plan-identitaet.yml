@@ -1,24 +1,14 @@
 name: I015.3 PLAN_DELTA-Iterationsidentitaet
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "docs/PLAN_DELTA_I014.json"
-      - "ITERATIONSUEBERGABE.json"
-      - "docs/WISSENSSPEICHER_I015_3_ERKENNTNIS.json"
-      - ".github/workflows/i015-3-plan-identitaet.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: i015-3-plan-identitaet-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
-  gate:
-    name: Planidentitaet fail-closed pruefen
+  historical-evidence:
+    name: Historische Planidentitaet read-only prüfen
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -26,29 +16,19 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
           persist-credentials: false
-          fetch-depth: 0
 
-      - name: JSON und Identitaetsvertrag pruefen
-        shell: bash
+      - name: Historische Kollision und heutigen Abschluss gemeinsam prüfen
+        shell: python
         run: |
-          set -Eeuo pipefail
-          python3 - <<'PY'
           import json
           from pathlib import Path
 
           delta = json.loads(Path('docs/PLAN_DELTA_I014.json').read_text(encoding='utf-8'))
           handoff = json.loads(Path('ITERATIONSUEBERGABE.json').read_text(encoding='utf-8'))
           wissen = json.loads(Path('docs/WISSENSSPEICHER_I015_3_ERKENNTNIS.json').read_text(encoding='utf-8'))
-          status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
 
           assert delta['delta_id'] == 'PLAN-DELTA-P03-2026-08-10-001'
-          assert delta['prioritaet'] == 'P0'
-          assert delta['status'] == 'AKTIV_VOR_ABSCHLUSS'
-          assert delta['ausgangsplan']['version'] == '2.0.0'
-          assert delta['ausgangsplan']['p03_i014'] == 'Lock-Lease und Prozessidentitaet'
-          assert delta['ausgangsplan']['p04_i016'] == 'Versions- und Manifestregistry'
-          assert delta['kanonischer_iststand']['i015']['status'] == 'VALIDIERT_GITHUB'
-          assert delta['kanonischer_iststand']['i016']['herkunft'] == 'PLAN_DELTA'
+          assert delta['status'] == 'ABGESCHLOSSEN'
           ident = delta['iterationsidentitaet']
           assert ident['kollision'] is True
           assert ident['kollisionstyp'] == 'NUMMER_GLEICH_ZIEL_VERSCHIEDEN'
@@ -56,61 +36,14 @@ jobs:
           assert ident['delta_i016'] == 'Lock-Lease und Prozessidentitaet'
           assert ident['fail_closed'] is True
 
-          assert handoff['next_iteration'] == 'I016'
-          assert handoff['next_iteration_origin'] == 'PLAN_DELTA'
-          assert handoff['priority'] == 'P0'
-          pi = handoff['plan_identity']
-          assert pi['masterplan_version'] == '2.0.0'
-          assert pi['masterplan_i016'] == 'Versions- und Manifestregistry'
-          assert pi['active_delta_id'] == delta['delta_id']
-          assert pi['delta_i016'] == 'Lock-Lease und Prozessidentitaet'
-          assert pi['number_collision_known'] is True
-          assert pi['p04_i016_status'] == 'NICHT_BEGONNEN_NICHT_ERLEDIGT'
-          assert pi['fail_closed_on_ambiguity'] is True
-
           assert wissen['id'] == 'ERK-I015-3-001'
-          assert wissen['typ'] == 'Regelentwurf'
-          assert wissen['reifegrad'] == 'E1'
-          assert wissen['prioritaet'] == 'P0'
-          assert wissen['status'] == 'IN_PRUEFUNG'
           assert wissen['goldene_regel'] is False
-          assert wissen['automatisierbarkeit'] == 'JA'
           assert wissen['widerspruch']['vorhanden'] is True
           assert wissen['widerspruch']['art'] == 'NUMMERNKOLLISION_OHNE_FACHLICHEN_WIDERSPRUCH'
 
-          assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I015'
-          assert status['letzte_abgeschlossene_iteration'] == 'I015'
-          assert status['naechste_iteration'] == 'I016'
-          assert status['masterplan']['version'] == '2.0.0'
-          assert status['phase'] == 'P03 Plattform- und Dateisystemschicht'
-          assert status['p03_plan_delta_verschluss_prozent'] == 50
-          print('I015.3 Identitaetsvertrag: PASS')
-          PY
-
-      - name: Diff-Scope fail-closed pruefen
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" | sort > /tmp/changed.txt
-          cat > /tmp/allowed.txt <<'EOF'
-          .github/workflows/i015-3-plan-identitaet.yml
-          ITERATIONSUEBERGABE.json
-          docs/PLAN_DELTA_I014.json
-          docs/WISSENSSPEICHER_I015_3_ERKENNTNIS.json
-          EOF
-          sort -o /tmp/allowed.txt /tmp/allowed.txt
-          diff -u /tmp/allowed.txt /tmp/changed.txt
-
-      - name: Sicherheitsgrenzen pruefen
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          changed = set(Path('/tmp/changed.txt').read_text(encoding='utf-8').splitlines())
-          forbidden_prefixes = ('src/', 'tests/', 'data/', 'KERN/', 'PLATTFORM/')
-          assert not any(path.startswith(forbidden_prefixes) for path in changed)
-          assert 'PROJEKTSTATUS.json' not in changed
-          assert 'CURRENT_BASELINE.json' not in changed
-          print('Keine Produkt-/Baseline-Mutation: PASS')
-          PY
+          assert handoff['next_iteration'] == 'I017'
+          pi = handoff['plan_identity']
+          assert pi['closed_delta_id'] == delta['delta_id']
+          assert pi['number_collision_resolved'] is True
+          assert pi['project_mapping_p04_i017'] == 'dauerhafte ID-Erzeugung und Validierung'
+          assert pi['project_mapping_p04_i018'] == 'Versions- und Manifestregistry'
