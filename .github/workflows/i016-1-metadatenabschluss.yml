@@ -1,0 +1,115 @@
+name: I016.1 Metadatenabschluss
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "PROJEKTSTATUS.json"
+      - "CHANGELOG.md"
+      - "docs/ITERATION_016.md"
+      - ".github/workflows/i016-1-metadatenabschluss.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: i016-1-metadatenabschluss-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Read-only Evidence- und Scope-Gate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Diff-Scope fail-closed pruefen
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import os, subprocess
+          allowed = {
+              'PROJEKTSTATUS.json',
+              'CHANGELOG.md',
+              'docs/ITERATION_016.md',
+              '.github/workflows/i016-1-metadatenabschluss.yml',
+          }
+          base = os.environ['GITHUB_BASE_REF']
+          changed = {
+              line.strip()
+              for line in subprocess.check_output(
+                  ['git', 'diff', '--name-only', f'origin/{base}...HEAD'], text=True
+              ).splitlines()
+              if line.strip()
+          }
+          assert changed, 'Leerer Metadaten-Diff ist nicht qualifizierbar.'
+          unexpected = sorted(changed - allowed)
+          assert not unexpected, f'Unerwarteter Scope: {unexpected}'
+          required = {'PROJEKTSTATUS.json', 'CHANGELOG.md', 'docs/ITERATION_016.md'}
+          missing = sorted(required - changed)
+          assert not missing, f'Pflichtartefakte fehlen: {missing}'
+          PY
+
+      - name: Projektstatus und Evidence binden
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          q = status['i016_datei_lease_phase1_qualifikation']
+          assert q['status'] == 'VALIDIERT_GITHUB'
+          assert q['scope'] == 'PHASE_1_LEASE_KERN'
+          assert q['workflow_run_id'] == 31476216289
+          assert q['i015_revalidation_workflow_run_id'] == 31476216369
+          assert q['github_qualifikations_head'] == '4eea4591ae2296961869f567498744372aa7ff11'
+          assert q['github_main_merge_commit'] == 'cfb9d67966ba737eb1331004890973ed2404f3ff'
+          assert q['artifact_id'] == 9095330662
+          assert q['artifact_bytes'] == 899
+          assert q['artifact_sha256'] == 'fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6'
+          assert q['nicht_kooperierende_schreiber'] == 'NICHT_QUALIFIZIERT'
+          assert q['netzwerkdateisysteme'] == 'NICHT_QUALIFIZIERT'
+          assert q['replace_integration'] == 'NICHT_IMPLEMENTIERT'
+          assert status['letzte_abgeschlossene_iteration'] == 'I015'
+          assert status['naechste_iteration'] == 'I016'
+          assert status['p03_fortschritt_prozent'] == 75
+          assert status['p03_plan_delta_verschluss_prozent'] == 75
+          PY
+
+      - name: Dokumentationskonsistenz pruefen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          doc = Path('docs/ITERATION_016.md').read_text(encoding='utf-8')
+          changelog = Path('CHANGELOG.md').read_text(encoding='utf-8')
+          required = [
+              '31476216289', '31476216369',
+              '4eea4591ae2296961869f567498744372aa7ff11',
+              'cfb9d67966ba737eb1331004890973ed2404f3ff',
+              'fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6',
+          ]
+          for token in required:
+              assert token in doc, f'I016-Dokumentation fehlt: {token}'
+              assert token in changelog, f'Changelog fehlt: {token}'
+          assert 'Phase 1: QUALIFIZIERT' in doc
+          assert 'NICHT_QUALIFIZIERT' in doc
+          assert 'NICHT_IMPLEMENTIERT' in doc
+          PY
+
+      - name: Keine Produktmutation bestaetigen
+        run: |
+          python3 - <<'PY'
+          import os, subprocess
+          base = os.environ['GITHUB_BASE_REF']
+          changed = subprocess.check_output(
+              ['git', 'diff', '--name-only', f'origin/{base}...HEAD'], text=True
+          ).splitlines()
+          forbidden_prefixes = ('src/', 'tests/', 'data/', 'baselines/', 'CURRENT_BASELINE.json')
+          bad = [p for p in changed if p.startswith(forbidden_prefixes)]
+          assert not bad, f'Produkt-/Test-/Baseline-Mutation unerlaubt: {bad}'
+          PY
