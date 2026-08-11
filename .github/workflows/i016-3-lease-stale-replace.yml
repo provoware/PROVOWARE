@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - "src/provoware/plattform/sicherer_replace.py"
-      - "src/provoware/plattform/__init__.py"
       - "tests/platform/test_sicherer_replace.py"
       - "docs/WISSENSSPEICHER_I016_3_ERKENNTNIS.json"
       - "docs/ITERATION_016_3.md"
@@ -30,7 +29,6 @@ jobs:
           import os, subprocess
           allowed={
             'src/provoware/plattform/sicherer_replace.py',
-            'src/provoware/plattform/__init__.py',
             'tests/platform/test_sicherer_replace.py',
             'docs/WISSENSSPEICHER_I016_3_ERKENNTNIS.json',
             'docs/ITERATION_016_3.md',
@@ -65,8 +63,8 @@ jobs:
 
       - name: Statische Qualitaet
         run: |
-          python -m ruff check src/provoware/plattform/sicherer_replace.py src/provoware/plattform/__init__.py tests/platform/test_sicherer_replace.py
-          python -m ruff format --check src/provoware/plattform/sicherer_replace.py src/provoware/plattform/__init__.py tests/platform/test_sicherer_replace.py
+          python -m ruff check src/provoware/plattform/sicherer_replace.py tests/platform/test_sicherer_replace.py
+          python -m ruff format --check src/provoware/plattform/sicherer_replace.py tests/platform/test_sicherer_replace.py
           python -m mypy src/provoware/plattform
 
       - name: Wissensschema und Grenzen pruefen
