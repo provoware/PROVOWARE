@@ -17,6 +17,12 @@ Kleinster reversibler P0-Schritt: ein nichtblockierender exklusiver Linux-adviso
 
 `flock` ist advisory und schützt nur kooperierende Schreiber. Netzwerkdateisysteme sind nicht qualifiziert. Die persistente leere Lockdatei ist PROVOWARE-Metadatenzustand und wird absichtlich nicht beim Release gelöscht, weil Löschen/Reanlegen parallele Lock-Inodes und damit Split-Locks ermöglichen könnte.
 
+Maschinenlesbarer Status der offenen Grenzen:
+
+- nicht kooperierende Schreiber: `NICHT_QUALIFIZIERT`
+- Netzwerkdateisysteme: `NICHT_QUALIFIZIERT`
+- direkte Replace-Integration: `NICHT_IMPLEMENTIERT`
+
 ## Rückfall
 
 Der Patch ist additiv: neues Modul, neue Tests und Evidence. Die bestehende Replace-Primitive wird nicht verändert. Rückfall erfolgt durch Revert dieses isolierten Patches.
