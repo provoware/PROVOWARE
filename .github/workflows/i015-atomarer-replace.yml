@@ -70,7 +70,7 @@ jobs:
             --find-links "$PWD/.artefakte/i005/wheelhouse" pytest==9.1.1 ruff==0.16.1 mypy==2.3.0
           PIP_NO_INDEX=1 .venv-i015/bin/python -m pip check
 
-      - name: I014-Baseline revalidieren
+      - name: I015 Qualifikationsanker revalidieren
         run: |
           python3 WERKZEUGE/baseline_pruefen.py
           python3 - <<'PY'
@@ -78,12 +78,13 @@ jobs:
           from pathlib import Path
           baseline = json.loads(Path('CURRENT_BASELINE.json').read_text(encoding='utf-8'))
           status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
-          assert baseline['baseline_id'] == 'BASELINE-2026-08-10-I014'
+          anchor = status['i015_atomarer_replace_qualifikation']
           assert baseline['status'] == 'VALIDIERT_GITHUB'
-          assert baseline['naechste_iteration'] == 'I015'
-          assert status['aktuelle_baseline'] == 'BASELINE-2026-08-10-I014'
-          assert status['letzte_abgeschlossene_iteration'] == 'I014'
-          assert status['naechste_iteration'] == 'I015'
+          assert anchor['status'] == 'VALIDIERT_GITHUB'
+          assert anchor['workflow_run_id'] == 31378734347
+          assert anchor['github_qualifikations_head'] == '4cdbe1a2810476c1e95588dfed6199025d6b4826'
+          assert anchor['artifact_sha256'] == '448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f'
+          assert anchor['receipt_sha256'] == 'ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703'
           PY
 
       - name: I015 Contracttests
@@ -140,7 +141,7 @@ jobs:
                   'wissen': sha('docs/WISSENSSPEICHER_I015_ERKENNTNIS.json'),
               },
               'gates': {
-                  'baseline_i014': 'GRUEN', 'i012_i014_vorbedingungen': 'GRUEN',
+                  'i015_qualifikationsanker': 'GRUEN', 'i012_i014_vorbedingungen': 'GRUEN',
                   'replace_success': 'GRUEN', 'stale_blocks': 'GRUEN',
                   'unknown_blocks': 'GRUEN', 'symlink_blocks': 'GRUEN',
                   'outside_root_blocks': 'GRUEN', 'pre_replace_failure_preserves_original': 'GRUEN',
