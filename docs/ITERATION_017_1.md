@@ -26,3 +26,16 @@ Nicht qualifiziert werden:
 ## Reversibilitaet
 
 Der Patch ist additiv: ein neues Vertragsmodul, ein gezielter Test, Evidence, diese Dokumentation und ein eigenes CI-Gate. Bestehende I017-ID-Klassen und historische Qualification-Evidence bleiben unveraendert.
+
+## Reale Qualification und Promotion
+
+- funktionaler Kandidatenlauf `31536871890` auf Head `1a0a6d85e0547d6f1e0b395281a490828d40491c`: `completed / success`
+- Promotions-/Evidence-Lauf `31536951091` auf Head `739f0b8368ad79f418a800d5d98b5aea70e0ab54`: `completed / success`
+- Tool-PR #40 wurde als Main-Merge `0d2e6c8d2e042527274fb2428efe635dbbb337cc` promoviert.
+- Masterbuch-Evidence `ERK-I017-002` wurde als `E2 / P0 / BESTAETIGT` ohne Goldene Regel konsolidiert; Masterbuch-Merge `5d4be8436e12937dff5e3a50aedfb8804782e0a1`.
+
+## I017.1H Metadatenabschluss
+
+Der qualifizierte Persistenz-/Restartvertrag wird getrennt vom historischen I017-Vertragskern in `PROJEKTSTATUS.json` nachgewiesen. Dadurch bleibt die fruehere Aussage `ID_VERTRAGSKERN_OHNE_PERSISTENZ` historisch korrekt, waehrend die spaetere Persistenzqualification maschinenlesbar separat gebunden ist.
+
+I017 bleibt in dieser Metadateniteration formal `IN_ARBEIT`. P04 wird nicht allein aufgrund des Nachtrags hochgerechnet. Vor dem formalen I017-Abschluss wird separat entschieden, ob der bereits erfuellte Restart-/Konflikt-Abnahmekern genuegt oder noch ein Crash-/Teilwrite-Haertungsnachweis erforderlich ist. Die I018 Versions-/Manifestregistry wird nicht vorgezogen.
