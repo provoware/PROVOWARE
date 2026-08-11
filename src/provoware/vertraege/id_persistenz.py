@@ -54,7 +54,13 @@ def _kodieren(datensatz: IdDatensatz) -> bytes:
         "id_wert": str(datensatz.id_wert),
         "objekt_schluessel": _objekt_schluessel_pruefen(datensatz.objekt_schluessel),
     }
-    return (json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    text = json.dumps(
+        payload,
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return (text + "\n").encode()
 
 
 def lade_id_datensatz(pfad: str | Path) -> IdDatensatz:
@@ -67,7 +73,12 @@ def lade_id_datensatz(pfad: str | Path) -> IdDatensatz:
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise IdPersistenzFehler(f"ID-Datensatz nicht sicher lesbar: {datei}") from exc
 
-    if not isinstance(payload, dict) or set(payload) != _SCHLUESSEL or payload.get("schema") != _SCHEMA:
+    schema_ungueltig = (
+        not isinstance(payload, dict)
+        or set(payload) != _SCHLUESSEL
+        or payload.get("schema") != _SCHEMA
+    )
+    if schema_ungueltig:
         raise IdPersistenzFehler("ID-Datensatz besitzt unbekanntes oder unvollstaendiges Schema.")
 
     typ_name = payload.get("id_typ")
@@ -88,12 +99,17 @@ def lade_id_datensatz(pfad: str | Path) -> IdDatensatz:
 
 
 def speichere_id_datensatz(
-    pfad: str | Path, id_wert: IdWert, objekt_schluessel: str
+    pfad: str | Path,
+    id_wert: IdWert,
+    objekt_schluessel: str,
 ) -> IdDatensatz:
     """Speichert erstmalig exklusiv; vorhandene Bindungen werden nie still ueberschrieben."""
 
     datei = Path(pfad)
-    datensatz = IdDatensatz(id_wert=id_wert, objekt_schluessel=_objekt_schluessel_pruefen(objekt_schluessel))
+    datensatz = IdDatensatz(
+        id_wert=id_wert,
+        objekt_schluessel=_objekt_schluessel_pruefen(objekt_schluessel),
+    )
     daten = _kodieren(datensatz)
     datei.parent.mkdir(parents=True, exist_ok=True)
 
@@ -103,7 +119,9 @@ def speichere_id_datensatz(
         vorhanden = lade_id_datensatz(datei)
         if vorhanden == datensatz:
             return vorhanden
-        raise IdKonfliktFehler("Bestehende ID-Bindung widerspricht dem angeforderten Datensatz.") from None
+        raise IdKonfliktFehler(
+            "Bestehende ID-Bindung widerspricht dem angeforderten Datensatz."
+        ) from None
     except OSError as exc:
         raise IdPersistenzFehler(f"ID-Datensatz konnte nicht angelegt werden: {datei}") from exc
 
