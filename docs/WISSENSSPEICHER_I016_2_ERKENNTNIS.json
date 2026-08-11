@@ -1,0 +1,32 @@
+{
+  "id": "ERK-I016-002",
+  "typ": "Nachweisentwurf",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": ["Dateisystem", "Schreibsicherheit", "Nebenlaeufigkeit", "Prozessgrenzen", "Linux"],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P03 / Linux lokale Dateisysteme / kooperierende getrennte Prozesse",
+  "projektbezug": "Delta-I016.2 Mehrprozess-Lease-Qualification",
+  "quelle_herkunft": [
+    "ERK-I016-001",
+    "src/provoware/plattform/datei_lease.py",
+    "tests/platform/test_datei_lease_mehrprozess.py"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Der bereits qualifizierte Datei-Lease soll seine Exklusivitaet auch ueber echte, per spawn getrennte Prozesse beweisen: A haelt, B wird fail-closed als BELEGT abgewiesen, nach Freigabe kann C erwerben.",
+  "grenzen": [
+    "Der Nachweis gilt nur fuer kooperierende PROVOWARE-Prozesse.",
+    "Netzwerkdateisysteme bleiben nicht qualifiziert.",
+    "Die Replace-Integration bleibt nicht implementiert.",
+    "Vor real erfolgreicher CI-Qualification darf die Aussage nicht auf E2 angehoben werden."
+  ],
+  "historie": [
+    {
+      "iteration": "Delta-I016.2",
+      "aktion": "Mehrprozess-Nachweiskandidat angelegt",
+      "status": "IN_PRUEFUNG"
+    }
+  ]
+}
