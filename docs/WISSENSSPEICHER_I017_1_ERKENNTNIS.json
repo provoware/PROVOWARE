@@ -1,0 +1,46 @@
+{
+  "id": "ERK-I017-002",
+  "typ": "Nachweisentwurf",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": ["Identitaet", "Persistenz", "Restart", "Konflikt", "Datenintegritaet"],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P04 / lokale portable Projektartefakte / einzelne ID-Bindungsdatei",
+  "projektbezug": "I017.1 dauerhafter ID-Persistenz- und Restartvertrag",
+  "quelle_herkunft": [
+    "Masterplan P04/I015",
+    "docs/WISSENSSPEICHER_I017_ERKENNTNIS.json",
+    "src/provoware/vertraege/id_persistenz.py",
+    "tests/contract/test_i017_1_id_persistenz.py"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Eine bereits persistierte gueltige PROVOWARE-ID muss ueber eine echte Prozess-/Neuladegrenze exakt erhalten bleiben. Vorhandene widerspruechliche oder beschaedigte ID-Bindungen werden fail-closed behandelt; sie duerfen weder still ueberschrieben noch durch neu erzeugte IDs ersetzt werden.",
+  "grenzen": [
+    "Noch keine Versions-/Manifestregistry; diese bleibt I018.",
+    "Keine mathematische Kollisionsfreiheit von UUID4 behauptet.",
+    "Der Schritt qualifiziert keine Crash-Atomizitaet ueber Stromausfall oder Dateisystemfehler hinweg.",
+    "E1 bleibt bis zum real erfolgreichen GitHub-Qualification-Lauf bestehen."
+  ],
+  "dublettenpruefung": {
+    "status": "KONSOLIDIERUNG_BEABSICHTIGT",
+    "kandidaten": ["ERK-I017-001"],
+    "hinweis": "ERK-I017-002 erweitert den bestehenden ID-Vertragskern um Persistenz-/Restart-Evidence und soll bevorzugt mit ERK-I017-001 konsolidiert werden statt einen neuen Regelkern zu erzeugen."
+  },
+  "widersprueche": [],
+  "qualification": {
+    "status": "AUSSTEHEND",
+    "workflow_run_id": null,
+    "qualifikations_head": null,
+    "workflow_status": "unknown",
+    "workflow_conclusion": "unknown"
+  },
+  "historie": [
+    {
+      "iteration": "I017.1",
+      "aktion": "Persistenz-/Restartvertrag als additive E1-Evidence vorbereitet",
+      "status": "IN_PRUEFUNG"
+    }
+  ]
+}
