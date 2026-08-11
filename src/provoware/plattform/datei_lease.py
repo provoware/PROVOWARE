@@ -8,6 +8,7 @@ dieses ersten qualifizierbaren Scopes.
 
 from __future__ import annotations
 
+import contextlib
 import fcntl
 import os
 import uuid
@@ -99,10 +100,8 @@ def erwerbe_datei_lease(ziel: str) -> DateiLease:
         return DateiLease(ziel, LeaseStatus.ERWORBEN, identitaet, "Exklusiver Lease erworben.", fd)
     except OSError as exc:
         if fd is not None:
-            try:
+            with contextlib.suppress(OSError):
                 os.close(fd)
-            except OSError:
-                pass
         return DateiLease(
             ziel,
             LeaseStatus.FEHLER,
