@@ -21,6 +21,21 @@ Kleinster reversibler P0-Schritt: ein nichtblockierender exklusiver Linux-adviso
 
 Der Patch ist additiv: neues Modul, neue Tests und Evidence. Die bestehende Replace-Primitive wird nicht verändert. Rückfall erfolgt durch Revert dieses isolierten Patches.
 
-## Nächste Qualification
+## Qualification Phase 1
 
-Erforderlich sind mindestens: exklusiver Erwerb, konkurrierender Erwerb blockiert, erneuter Erwerb nach Freigabe, idempotente Freigabe, ungültiger Pfad fail-closed sowie vollständige P03-Regression. Erst danach darf eine Integration `Lease -> unmittelbarer Stale-Guard -> Replace` folgen.
+Die Phase-1-Implementierung wurde real auf GitHub Actions qualifiziert.
+
+- Qualifikations-Head: `4eea4591ae2296961869f567498744372aa7ff11`
+- I016-Workflow: `31476216289` — `success`
+- I015-Revalidation: `31476216369` — `success`
+- I016-Artefakt: `9095330662`, 899 Byte
+- Artefakt-SHA-256: `fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6`
+- kanonischer Tool-Merge: `cfb9d67966ba737eb1331004890973ed2404f3ff`
+
+Qualifiziert sind der exklusive Erwerb, das Blockieren eines konkurrierenden kooperierenden Erwerbs, erneuter Erwerb nach Freigabe, idempotente Freigabe, fail-closed Pfadfehler, unveränderte Nutzdatei und die Regression der I012–I015-Plattformverträge. Nicht qualifiziert bleiben nicht kooperierende Schreiber und Netzwerkdateisysteme. Die direkte Kopplung `Lease -> unmittelbarer Stale-Recheck -> atomar_ersetzen` ist noch nicht implementiert.
+
+## Status und nächste Qualification
+
+**Phase 1: QUALIFIZIERT. Delta-I016 insgesamt: IN_ARBEIT.**
+
+Als nächster kleiner Schritt folgt ein echter Mehrprozess-Test des Lease-Kerns. Erst danach soll die mutierende Integration `Lease -> unmittelbarer Stale-Recheck -> atomar_ersetzen` erfolgen, damit Prozessgrenzen separat von der Schreibkopplung qualifiziert bleiben.
