@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'PROJEKTSTATUS.json'
+      - 'CURRENT_BASELINE.json'
       - 'CHANGELOG.md'
       - 'ITERATIONSUEBERGABE.json'
       - 'docs/PLAN_DELTA_I014.json'
@@ -33,11 +34,11 @@ jobs:
           git fetch origin "${{ github.base_ref }}" --depth=1
           mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
           printf '%s\n' "${files[@]}"
-          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i014-dateiidentitaet\.yml|\.github/workflows/i015-3-plan-identitaet\.yml|\.github/workflows/i016-2h-metadatenabschluss\.yml|\.github/workflows/i016-3-lease-stale-replace\.yml|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
+          allowed='^(PROJEKTSTATUS\.json|CURRENT_BASELINE\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i014-dateiidentitaet\.yml|\.github/workflows/i015-3-plan-identitaet\.yml|\.github/workflows/i016-2h-metadatenabschluss\.yml|\.github/workflows/i016-3-lease-stale-replace\.yml|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
           for f in "${files[@]}"; do
             [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
           done
-          [[ ${#files[@]} -eq 11 ]] || { echo "Erwartet exakt 11 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
+          [[ ${#files[@]} -eq 12 ]] || { echo "Erwartet exakt 12 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
 
       - name: Maschinenlesbaren P03-Abschluss prüfen
         shell: python
@@ -46,6 +47,7 @@ jobs:
           from pathlib import Path
 
           p = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          b = json.loads(Path('CURRENT_BASELINE.json').read_text(encoding='utf-8'))
           d = json.loads(Path('docs/PLAN_DELTA_I014.json').read_text(encoding='utf-8'))
           h = json.loads(Path('ITERATIONSUEBERGABE.json').read_text(encoding='utf-8'))
 
@@ -66,6 +68,13 @@ jobs:
           assert p['letzte_abgeschlossene_iteration'] == 'I016'
           assert p['naechste_iteration'] == 'I017'
           assert p['status'] == 'IN_ARBEIT'
+
+          assert b['baseline_id'] == p['aktuelle_baseline'] == 'BASELINE-2026-08-10-I015'
+          assert b['github_artifact_id'] == 9058982637
+          assert b['github_artifact_sha256'] == '448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f'
+          assert b['letzte_iteration'] == 'I016'
+          assert b['naechste_iteration'] == 'I017'
+          assert 'kein nicht existentes I016-Artifact' in b['source']
 
           assert d['delta_id'] == 'PLAN-DELTA-P03-2026-08-10-001'
           assert d['status'] == 'ABGESCHLOSSEN'
@@ -106,6 +115,9 @@ jobs:
           assert 'src/provoware/plattform/dateiidentitaet.py' in pre014
           assert 'tests/platform/test_dateiidentitaet.py' in pre014
 
+      - name: Baseline-Validator ausführen
+        run: python3 WERKZEUGE/baseline_pruefen.py
+
       - name: Dokumentation und Changelog konsistent prüfen
         shell: python
         run: |
@@ -128,11 +140,11 @@ jobs:
           for marker in required:
               assert marker in docs, f'Dokumentation fehlt: {marker}'
 
-      - name: Keine Produkt-, Test-, Daten- oder Baseline-Mutation
+      - name: Keine Produkt-, Test-, Daten- oder Werkzeugmutation
         shell: bash
         run: |
           set -euo pipefail
           if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Eq '^(src/|tests/|data/|baselines?/|WERKZEUGE/)'; then
-            echo 'Produkt-, Test-, Daten-, Baseline- oder Werkzeugmutation erkannt'
+            echo 'Produkt-, Test-, Daten-, Baseline-Verzeichnis- oder Werkzeugmutation erkannt'
             exit 1
           fi
