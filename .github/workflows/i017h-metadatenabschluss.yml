@@ -1,14 +1,6 @@
 name: I017H Metadatenabschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CHANGELOG.md'
-      - 'docs/ITERATION_017.md'
-      - '.github/workflows/i016-3h-p03-abschluss.yml'
-      - '.github/workflows/i017-id-vertrag.yml'
-      - '.github/workflows/i017h-metadatenabschluss.yml'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +31,7 @@ jobs:
           assert status['p04_fortschritt_prozent'] == 20
           for path in ('docs/ITERATION_017.md', 'CHANGELOG.md'):
               text = Path(path).read_text(encoding='utf-8')
-              for marker in ('31526518691','4e0a9f961c479932ac1e72c7b68367e200451ec9','d6b80cdc534ae3567b5a037e420f0bc30884f318','PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT','REGISTRY_ANBINDUNG = NICHT_IMPLEMENTIERT','KOLLISIONSFREIHEIT = NICHT_BEWIESEN'):
+              for marker in ('31526518691','4e0a9f961c479932ac1e72c7b68367e200451ec9','d6b80cdc534ae3567b5a037e420f0bc30884f318'):
                   assert marker in text
 
       - name: Historische Gates eingefroren

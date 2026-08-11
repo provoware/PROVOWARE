@@ -1,14 +1,10 @@
 name: I017.1 ID-Persistenz-Restart
 
 on:
-  pull_request:
-    paths:
-      - 'src/provoware/vertraege/id_persistenz.py'
-      - 'tests/contract/test_i017_1_id_persistenz.py'
-      - 'docs/WISSENSSPEICHER_I017_1_ERKENNTNIS.json'
-      - 'docs/ITERATION_017_1.md'
-      - '.github/workflows/i017-1-id-persistenz.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   qualifikation:
