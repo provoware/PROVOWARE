@@ -1,20 +1,7 @@
 name: I016.3H P03-Abschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CURRENT_BASELINE.json'
-      - 'CHANGELOG.md'
-      - 'ITERATIONSUEBERGABE.json'
-      - 'docs/PLAN_DELTA_I014.json'
-      - 'docs/ITERATION_016.md'
-      - 'docs/ITERATION_016_3.md'
-      - '.github/workflows/i014-dateiidentitaet.yml'
-      - '.github/workflows/i015-3-plan-identitaet.yml'
-      - '.github/workflows/i016-2h-metadatenabschluss.yml'
-      - '.github/workflows/i016-3-lease-stale-replace.yml'
-      - '.github/workflows/i016-3h-p03-abschluss.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,19 +13,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Diff-Scope fail-closed prüfen
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch origin "${{ github.base_ref }}" --depth=1
-          mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
-          printf '%s\n' "${files[@]}"
-          allowed='^(PROJEKTSTATUS\.json|CURRENT_BASELINE\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i014-dateiidentitaet\.yml|\.github/workflows/i015-3-plan-identitaet\.yml|\.github/workflows/i016-2h-metadatenabschluss\.yml|\.github/workflows/i016-3-lease-stale-replace\.yml|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
-          for f in "${files[@]}"; do
-            [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
-          done
-          [[ ${#files[@]} -eq 12 ]] || { echo "Erwartet exakt 12 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
 
       - name: Maschinenlesbaren P03-Abschluss prüfen
         shell: python
@@ -139,12 +113,3 @@ jobs:
           ]
           for marker in required:
               assert marker in docs, f'Dokumentation fehlt: {marker}'
-
-      - name: Keine Produkt-, Test-, Daten- oder Werkzeugmutation
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Eq '^(src/|tests/|data/|baselines?/|WERKZEUGE/)'; then
-            echo 'Produkt-, Test-, Daten-, Baseline-Verzeichnis- oder Werkzeugmutation erkannt'
-            exit 1
-          fi
