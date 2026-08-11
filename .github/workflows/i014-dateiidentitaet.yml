@@ -7,7 +7,6 @@ on:
       - "src/provoware/plattform/dateiidentitaet.py"
       - "tests/platform/test_dateiidentitaet.py"
       - "docs/WISSENSSPEICHER_I014_ERKENNTNIS.json"
-      - "docs/PLAN_DELTA_I014.json"
       - "docs/ITERATION_014.md"
       - ".github/workflows/i014-dateiidentitaet.yml"
 
