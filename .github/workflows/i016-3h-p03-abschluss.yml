@@ -1,0 +1,110 @@
+name: I016.3H P03-Abschluss
+
+on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'CHANGELOG.md'
+      - 'ITERATIONSUEBERGABE.json'
+      - 'docs/PLAN_DELTA_I014.json'
+      - 'docs/ITERATION_016.md'
+      - 'docs/ITERATION_016_3.md'
+      - '.github/workflows/i016-3h-p03-abschluss.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  p03-abschluss:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Diff-Scope fail-closed prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          printf '%s\n' "${files[@]}"
+          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
+          for f in "${files[@]}"; do
+            [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
+          done
+          [[ ${#files[@]} -eq 7 ]] || { echo "Erwartet exakt 7 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
+
+      - name: Maschinenlesbaren P03-Abschluss prüfen
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          p = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          d = json.loads(Path('docs/PLAN_DELTA_I014.json').read_text(encoding='utf-8'))
+          h = json.loads(Path('ITERATIONSUEBERGABE.json').read_text(encoding='utf-8'))
+
+          q = p['i016_lease_stale_replace_qualifikation']
+          assert q['status'] == 'VALIDIERT_GITHUB'
+          assert q['workflow_run_id'] == 31511070448
+          assert q['workflow_status'] == 'completed'
+          assert q['workflow_conclusion'] == 'success'
+          assert q['github_qualifikations_head'] == '403bba4b2ae6e8a79e573e95dca7f2308c37207f'
+          assert q['github_main_merge_commit'] == 'a4b63b758bf5ef71060d2e73eae95d584be13fbe'
+          assert q['tool_pr'] == 36
+          assert q['workflow_artifacts'] == 'KEINE_PUBLIZIERT'
+          assert q['nicht_kooperierende_schreiber'] == 'NICHT_QUALIFIZIERT'
+          assert q['netzwerkdateisysteme'] == 'NICHT_QUALIFIZIERT'
+
+          assert p['p03_fortschritt_prozent'] == 100
+          assert p['p03_plan_delta_verschluss_prozent'] == 100
+          assert p['letzte_abgeschlossene_iteration'] == 'I016'
+          assert p['naechste_iteration'] == 'I017'
+          assert p['status'] == 'IN_ARBEIT'
+
+          assert d['delta_id'] == 'PLAN-DELTA-P03-2026-08-10-001'
+          assert d['status'] == 'ABGESCHLOSSEN'
+          assert d['abschlussnachweis']['status'] == 'PASS_REAL'
+          assert d['abschlussnachweis']['workflow_run_id'] == 31511070448
+          assert d['abschlussnachweis']['main_merge_commit'] == 'a4b63b758bf5ef71060d2e73eae95d584be13fbe'
+          assert d['aufgeschobene_planpunkte'] == []
+          assert d['p04_neuzuordnung']['i017']['ziel'] == 'dauerhafte ID-Erzeugung und Validierung'
+          assert d['p04_neuzuordnung']['i018']['ziel'] == 'Versions- und Manifestregistry'
+
+          assert h['next_iteration'] == 'I017'
+          assert h['plan_identity']['closed_delta_id'] == 'PLAN-DELTA-P03-2026-08-10-001'
+          assert h['plan_identity']['project_mapping_p04_i017'] == 'dauerhafte ID-Erzeugung und Validierung'
+          assert h['plan_identity']['project_mapping_p04_i018'] == 'Versions- und Manifestregistry'
+          assert h['plan_identity']['number_collision_resolved'] is True
+
+      - name: Dokumentation und Changelog konsistent prüfen
+        shell: python
+        run: |
+          from pathlib import Path
+
+          docs = '\n'.join([
+              Path('docs/ITERATION_016.md').read_text(encoding='utf-8'),
+              Path('docs/ITERATION_016_3.md').read_text(encoding='utf-8'),
+              Path('CHANGELOG.md').read_text(encoding='utf-8'),
+          ])
+          required = [
+              '31511070448',
+              '403bba4b2ae6e8a79e573e95dca7f2308c37207f',
+              'a4b63b758bf5ef71060d2e73eae95d584be13fbe',
+              'PLAN-DELTA-P03-2026-08-10-001',
+              'NICHT_QUALIFIZIERT',
+              'I017',
+              'I018',
+          ]
+          for marker in required:
+              assert marker in docs, f'Dokumentation fehlt: {marker}'
+
+      - name: Keine Produkt-, Test-, Daten- oder Baseline-Mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Eq '^(src/|tests/|data/|baselines?/|WERKZEUGE/)'; then
+            echo 'Produkt-, Test-, Daten-, Baseline- oder Werkzeugmutation erkannt'
+            exit 1
+          fi
