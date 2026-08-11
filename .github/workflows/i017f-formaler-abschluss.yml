@@ -1,0 +1,57 @@
+name: I017F formaler Abschluss
+
+on:
+  pull_request:
+    paths:
+      - 'CURRENT_BASELINE.json'
+      - 'ITERATIONSUEBERGABE.json'
+      - 'docs/I017_ABSCHLUSS.json'
+      - '.github/workflows/i017f-formaler-abschluss.yml'
+  workflow_dispatch:
+
+jobs:
+  abschluss:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: I017 Abschlussvertrag fail-closed pruefen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('docs/I017_ABSCHLUSS.json').read_text())
+          b=json.loads(Path('CURRENT_BASELINE.json').read_text())
+          u=json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
+          assert a['iteration']=='I017'
+          assert a['status']=='ABSCHLUSS_KANDIDAT'
+          assert all(x['status']=='PASS_REAL' for x in a['qualifizierte_bausteine'])
+          assert [x['run_id'] for x in a['qualifizierte_bausteine']]==[31526518691,31536951091]
+          assert a['abnahmekern']['restart_erhalt']=='QUALIFIZIERT'
+          assert a['abnahmekern']['konflikt_semantik']=='QUALIFIZIERT_FAIL_CLOSED'
+          assert a['abnahmekern']['registry']=='NICHT_BESTANDTEIL_I017'
+          assert a['offene_haertung']['crash_atomizitaet']=='NICHT_QUALIFIZIERT'
+          assert a['offene_haertung']['netzwerkdateisysteme']=='NICHT_QUALIFIZIERT'
+          assert a['goldene_regel'] is False
+          assert b['letzte_iteration']=='I017' and b['naechste_iteration']=='I018'
+          assert b['baseline_id']=='BASELINE-2026-08-10-I015'
+          assert u['next_iteration']=='I018'
+          assert u['context_fingerprints']['i017_persistenz_workflow_run_id']==31536951091
+          assert 'Versions- und Manifestregistry' in u['next_goal']
+          PY
+      - name: Historische Evidence auf GitHub verifizieren
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for run in 31526518691 31536951091; do
+            state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run}" --jq '.status+":"+.conclusion')"
+            test "$state" = 'completed:success'
+          done
+      - name: Produktmutation ausschliessen
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          printf '%s\n' "$changed"
+          forbidden="$(printf '%s\n' "$changed" | grep -E '^(src/|tests/|data/|evidence/)' || true)"
+          test -z "$forbidden"
