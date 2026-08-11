@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-11
 
+### I017H — ID-Vertragskern metadatenseitig synchronisiert
+- I017-ID-Vertragskern real qualifiziert: Promotionsworkflow `31526518691` auf Head `be324f1cbbe30ee4e2c9f19e17b1855d5601c34c` mit `completed / success`.
+- I007-Kernvertragsregression `31526518704` auf demselben Head real erfolgreich.
+- Tool-PR #38 wurde SHA-gebunden als Main-Merge `4e0a9f961c479932ac1e72c7b68367e200451ec9` promoviert.
+- Masterbuch-Evidence `ERK-I017-001` ist mit Main-Merge `d6b80cdc534ae3567b5a037e420f0bc30884f318` als `E2 / P0 / BESTAETIGT` synchronisiert; keine Goldene Regel.
+- Projekt-I017 bleibt formal `IN_ARBEIT`: `PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT`, `REGISTRY_ANBINDUNG = NICHT_IMPLEMENTIERT`, `KOLLISIONSFREIHEIT = NICHT_BEWIESEN`.
+- P04-Fortschritt wird konservativ mit 20 % geführt; der Masterplan-Abnahmekern Kollisions-/Restarttest ist noch nicht vollständig erfüllt.
+- Historische I016.3H- und I017-Candidate-Gates werden nach abgeschlossener Qualification auf read-only `workflow_dispatch` begrenzt, damit spätere gemeinsame Metadaten sie nicht fälschlich reaktivieren.
+- Keine Produkt-, Test-, Persistenz-, Registry-, Baseline- oder Nutzdatenmutation.
+
 ### Delta-I016.3H — P03 und PLAN_DELTA formal abgeschlossen
 - Reale I016.3-Qualification nachgetragen: Workflow `31511070448` lief auf Head `403bba4b2ae6e8a79e573e95dca7f2308c37207f` mit `completed / success`.
 - Tool-PR #36 wurde als kanonischer Merge `a4b63b758bf5ef71060d2e73eae95d584be13fbe` promoviert.
