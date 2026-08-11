@@ -1,0 +1,79 @@
+name: I017H Metadatenabschluss
+
+on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'docs/ITERATION_017.md'
+      - '.github/workflows/i017h-metadatenabschluss.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  i017h-metadatenabschluss:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Exakten Scope prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" | sort > /tmp/changed.txt
+            cat > /tmp/allowed.txt <<'EOF'
+          .github/workflows/i017h-metadatenabschluss.yml
+          PROJEKTSTATUS.json
+          docs/ITERATION_017.md
+          EOF
+            sort -o /tmp/allowed.txt /tmp/allowed.txt
+            diff -u /tmp/allowed.txt /tmp/changed.txt
+          fi
+
+      - name: Projektstatus und Evidence prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          q = status['i017_id_vertragskern_qualifikation']
+          assert q['status'] == 'VALIDIERT_GITHUB'
+          assert q['workflow_run_id'] == 31526518691
+          assert q['github_qualifikations_head'] == 'be324f1cbbe30ee4e2c9f19e17b1855d5601c34c'
+          assert q['github_main_merge_commit'] == '4e0a9f961c479932ac1e72c7b68367e200451ec9'
+          assert q['i007_regression_workflow_run_id'] == 31526518704
+          assert q['masterbuch_main_merge_commit'] == 'd6b80cdc534ae3567b5a037e420f0bc30884f318'
+          assert q['persistenz_anbindung'] == 'NICHT_IMPLEMENTIERT'
+          assert q['registry_anbindung'] == 'NICHT_IMPLEMENTIERT'
+          assert q['kollisionsfreiheit'] == 'NICHT_BEWIESEN'
+          assert status['letzte_abgeschlossene_iteration'] == 'I016'
+          assert status['naechste_iteration'] == 'I017'
+          assert status['p04_fortschritt_prozent'] == 20
+          assert status['status'] == 'IN_ARBEIT'
+          PY
+
+      - name: Dokumentationsgrenzen prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq '31526518691' docs/ITERATION_017.md
+          grep -Fq '4e0a9f961c479932ac1e72c7b68367e200451ec9' docs/ITERATION_017.md
+          grep -Fq 'd6b80cdc534ae3567b5a037e420f0bc30884f318' docs/ITERATION_017.md
+          grep -Fq 'PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT' docs/ITERATION_017.md
+          grep -Fq 'REGISTRY_ANBINDUNG = NICHT_IMPLEMENTIERT' docs/ITERATION_017.md
+          grep -Fq 'KOLLISIONSFREIHEIT = NICHT_BEWIESEN' docs/ITERATION_017.md
+
+      - name: Keine Produktmutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            ! git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" | grep -E '^(src/|tests/|data/|BASELINE|CURRENT_BASELINE)'
+          fi
