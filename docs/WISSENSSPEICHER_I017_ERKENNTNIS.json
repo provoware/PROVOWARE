@@ -1,0 +1,40 @@
+{
+  "id": "ERK-I017-001",
+  "typ": "Regelentwurf",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": ["Identitaet", "Datenmodell", "Serialisierung", "Validierung", "Portabilitaet"],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE P04 / Kernvertraege / lokale und portable Projektartefakte",
+  "projektbezug": "I017 dauerhafte ID-Erzeugung und Validierung — Vertragskern",
+  "quelle_herkunft": [
+    "Masterplan P04/I015",
+    "src/provoware/vertraege/datentypen.py",
+    "tests/contract/test_datentypen.py",
+    "tests/contract/test_id_varianten.py",
+    "tests/contract/test_i017_id_vertrag.py"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "IN_PRUEFUNG",
+  "goldene_regel": false,
+  "aussage": "Persistierbare Kernidentitaeten verwenden domänenspezifische stabile Praefixe und eine kanonische 32-stellige lowercase UUID-Hexdarstellung. Neu erzeugte IDs stammen aus UUID4; Parser akzeptieren nur exakt das jeweilige Domaenenformat und verweigern nichtkanonische oder fremd praefigierte Werte fail-closed.",
+  "grenzen": [
+    "Dieser Schritt qualifiziert den ID-Vertragskern, noch keine SQLite-, Datei- oder Registry-Persistenz.",
+    "Kollisionsfreiheit wird nicht mathematisch bewiesen; UUID4 liefert nur die Erzeugungsgrundlage.",
+    "Die Versions-/Manifestregistry gehoert separat zu I018.",
+    "Vor real erfolgreicher CI-Qualification darf die Erkenntnis nicht auf E2 angehoben oder als Goldene Regel behandelt werden."
+  ],
+  "dublettenpruefung": {
+    "status": "VORGEPRUEFT",
+    "kandidaten": [],
+    "hinweis": "Die bestehenden I016-Evidenzen betreffen Schreibserialisierung und TOCTOU, nicht dauerhafte Objektidentitaet. Im Tool existiert bereits ID-Code; I017 qualifiziert diesen bestehenden Kern statt ihn zu duplizieren."
+  },
+  "widersprueche": [],
+  "historie": [
+    {
+      "iteration": "I017",
+      "aktion": "Bestehenden ID-Kern als P04-Vertragskandidat eingeordnet und gezielte Qualification vorbereitet",
+      "status": "IN_PRUEFUNG"
+    }
+  ]
+}
