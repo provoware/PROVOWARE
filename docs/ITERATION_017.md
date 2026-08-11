@@ -8,7 +8,7 @@ P03 ist abgeschlossen. Der Masterplan führt P04 mit dauerhafter ID-Erzeugung un
 
 Diese Teiliteration verändert keine Produktlogik und keine Persistenz. Sie ergänzt ausschließlich gezielte Contracttests, Wissensevidence, Dokumentation und ein eigenes fail-closed CI-Gate.
 
-Zu qualifizieren sind:
+Qualifiziert sind:
 
 - stabile Präfixe `prj`, `obj`, `rev`, `chg`, `op`,
 - exakt 32 lowercase Hex-Zeichen hinter dem Präfix,
@@ -18,6 +18,16 @@ Zu qualifizieren sind:
 - Ablehnung von Leerraum, Uppercase, Bindestrichformat sowie falscher Länge,
 - unveränderte bestehende Kernverträge.
 
+## Reale Qualification
+
+Erster Qualification-Head: `bfea0bce26720ddb955dc3a05070040959155cbb`
+
+Workflow: `31526347950`
+
+Status: `completed / success`
+
+Das Gate bestätigte den exakten Vier-Dateien-Scope, die neuen I017-Contracttests, bestehende ID-Regressionsprüfungen, Ruff/Format, mypy sowie die Wissens- und Grenzmarker.
+
 ## Sicherheits- und Gültigkeitsgrenzen
 
 `PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT`
@@ -26,11 +36,11 @@ Zu qualifizieren sind:
 
 `KOLLISIONSFREIHEIT = NICHT_BEWIESEN`
 
-Die Stichproben- und Contracttests dürfen nicht als mathematischer Kollisionsbeweis umgedeutet werden. SQLite-, Datei- oder Registry-Persistenz wird in diesem Schritt nicht eingeführt. Die Versions-/Manifestregistry bleibt I018.
+Die Contracttests dürfen nicht als mathematischer Kollisionsbeweis umgedeutet werden. SQLite-, Datei- oder Registry-Persistenz wird in diesem Schritt nicht eingeführt. Die Versions-/Manifestregistry bleibt I018.
 
 ## Wissenseinordnung
 
-`ERK-I017-001` bleibt bis zu einem real erfolgreichen I017-Workflow auf `E1 / P0 / IN_PRUEFUNG`. Keine Goldene Regel.
+`ERK-I017-001` ist nach dem realen Workflow `31526347950` auf `E2 / P0 / BESTAETIGT` angehoben. Keine Goldene Regel. Vor einer späteren kanonischen Regelaufnahme bleibt eine Vollprüfung des Masterbuchbestands erforderlich.
 
 ## Rückfallfähigkeit
 
@@ -38,4 +48,4 @@ Der Patch ist vollständig additiv. Das Entfernen der vier I017-Artefakte stellt
 
 ## Promotion
 
-Eine Promotion ist nur nach real erfolgreicher Qualification auf dem exakten PR-Head zulässig. Ein laufender, fehlender oder unbekannter CI-Zustand ist kein PASS.
+Der promotionsfähige Head muss nach der Evidence-Aktualisierung erneut real erfolgreich qualifiziert werden. Ein laufender, fehlender oder unbekannter CI-Zustand ist kein PASS.
