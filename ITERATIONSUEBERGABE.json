@@ -1,16 +1,27 @@
 {
-  "schema": "1.0.0",
+  "schema": "1.1.0",
   "next_iteration": "I016",
+  "next_iteration_origin": "PLAN_DELTA",
   "next_goal": "Lock-Lease und konkurrierenden Schreibzugriff als separaten P0-Sicherheitsvertrag vor weiteren mutierenden P03-Schritten kapseln, ohne Batch-Schreiben, Delete oder zusätzliche Fachlogik vorzuziehen.",
   "why_next": "I015 qualifiziert den atomaren Einzeldatei-Replace hinter I012-I014. Verbleibende zentrale P03-Lücke ist die fehlende Exklusivitäts-/Lease-Bindung: GLEICH und ein erfolgreicher Replace-Vertrag verhindern noch keinen konkurrierenden Schreiber zwischen Vorprüfung und Mutation.",
   "priority": "P0",
   "probable_component": "src/provoware/plattform/datei_lease.py",
   "probable_files": ["src/provoware/plattform/datei_lease.py","src/provoware/plattform/__init__.py","tests/platform/test_datei_lease.py","docs/ITERATION_016.md","docs/WISSENSSPEICHER_I016_ERKENNTNIS.json","docs/PLAN_DELTA_I014.json",".github/workflows/i016-datei-lease.yml"],
+  "plan_identity": {
+    "masterplan_version": "2.0.0",
+    "masterplan_i016": "Versions- und Manifestregistry",
+    "active_delta_id": "PLAN-DELTA-P03-2026-08-10-001",
+    "delta_i016": "Lock-Lease und Prozessidentitaet",
+    "number_collision_known": true,
+    "resolution": "DELTA_SEQUENCE_UNTIL_P03_CLOSURE",
+    "p04_i016_status": "NICHT_BEGONNEN_NICHT_ERLEDIGT",
+    "fail_closed_on_ambiguity": true
+  },
   "context_fingerprints": {"baseline":"BASELINE-2026-08-10-I015","i015_workflow_run_id":31378734347,"i015_artifact_id":9058982637,"i015_artifact_sha256":"448c1aa364596e78ad3fe73a86aaafdda10dfd2e1253ae8ce14858876700f73f","i015_receipt_sha256":"ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703","i015_qualifikations_head":"4cdbe1a2810476c1e95588dfed6199025d6b4826","plan_delta":"PLAN-DELTA-P03-2026-08-10-001"},
   "known_dependencies": ["I012 Projektwurzel-Schutz VALIDIERT_GITHUB","I013 Symlinkprobe VALIDIERT_GITHUB","I014 Dateiidentität/Stale-Guard VALIDIERT_GITHUB","I015 atomarer Einzeldatei-Replace VALIDIERT_GITHUB"],
   "preconditions": ["Lease-Erwerb muss fail-closed und explizit fehlschlagen können","Lease darf keine versteckte Nutzdatenänderung erzeugen","Stale-Guard muss unmittelbar vor Mutation erneut gelten","Lease-Verlust vor Replace muss Mutation blockieren","kein Batch-Schreiben oder Delete vorziehen"],
   "expected_tests": ["exklusiver Lease-Erwerb auf isolierter Fixture","zweiter konkurrierender Erwerb blockiert","Lease-Verlust blockiert Replace","staler Identitätszustand blockiert trotz Lease","Freigabe ist idempotent bzw. deterministisch fehlerhaft","Ruff, Ruff Format, mypy strict und vollständige P03-Regression"],
-  "done_criteria": ["genau ein kleiner Lease-Vertrag ist testbar gekapselt","konkurrierender Schreiber erreicht den Replace-Pfad nicht","Lease-Verlust wird maschinenlesbar und fail-closed behandelt","I012-I015 bleiben unverändert regressionsgrün"],
-  "known_risks": ["advisory Locks schützen nicht vor nicht kooperierenden Schreibern","Lock-Semantik unterscheidet sich zwischen lokalen und Netzwerkdateisystemen","Crash-Recovery für verwaiste Lease-Metadaten muss separat definiert werden"],
-  "open_subpoints": ["Linux flock/fcntl-Semantik und Portabilitätsgrenze qualifizieren","Lease-Identität an Device/Inode bzw. offenen Descriptor binden","PLAN_DELTA nach erfolgreicher I016-Qualification schließen oder neu bewerten"]
+  "done_criteria": ["genau ein kleiner Lease-Vertrag ist testbar gekapselt","konkurrierender Schreiber erreicht den Replace-Pfad nicht","Lease-Verlust wird maschinenlesbar und fail-closed behandelt","I012-I015 bleiben unverändert regressionsgrün","PLAN_DELTA wird nach erfolgreicher I016-Qualification geschlossen oder mit expliziter P04-Neuzuordnung fortgeschrieben"],
+  "known_risks": ["advisory Locks schützen nicht vor nicht kooperierenden Schreibern","Lock-Semantik unterscheidet sich zwischen lokalen und Netzwerkdateisystemen","Crash-Recovery für verwaiste Lease-Metadaten muss separat definiert werden","I016 ist im Ausgangsplan bereits als Versions- und Manifestregistry belegt; ohne PLAN_DELTA-Herkunft wäre die Iterationsidentität mehrdeutig"],
+  "open_subpoints": ["Linux flock/fcntl-Semantik und Portabilitätsgrenze qualifizieren","Lease-Identität an Device/Inode bzw. offenen Descriptor binden","PLAN_DELTA nach erfolgreicher I016-Qualification schließen oder neu bewerten","P04-Fortsetzung nach Delta-Abschluss eindeutig neu zuordnen"]
 }
