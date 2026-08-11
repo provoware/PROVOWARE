@@ -1,9 +1,9 @@
 {
   "id": "ERK-I017-002",
-  "typ": "Nachweisentwurf",
+  "typ": "Nachweis",
   "hauptkategorie": "Architektur",
   "nebenkategorien": ["Identitaet", "Persistenz", "Restart", "Konflikt", "Datenintegritaet"],
-  "reifegrad": "E1",
+  "reifegrad": "E2",
   "prioritaet": "P0",
   "gueltigkeitsbereich": "PROVOWARE P04 / lokale portable Projektartefakte / einzelne ID-Bindungsdatei",
   "projektbezug": "I017.1 dauerhafter ID-Persistenz- und Restartvertrag",
@@ -11,36 +11,49 @@
     "Masterplan P04/I015",
     "docs/WISSENSSPEICHER_I017_ERKENNTNIS.json",
     "src/provoware/vertraege/id_persistenz.py",
-    "tests/contract/test_i017_1_id_persistenz.py"
+    "tests/contract/test_i017_1_id_persistenz.py",
+    "GitHub Actions Run 31536871890",
+    "Qualification-Head 1a0a6d85e0547d6f1e0b395281a490828d40491c"
   ],
   "automatisierbarkeit": "JA",
-  "status": "IN_PRUEFUNG",
+  "status": "BESTAETIGT",
   "goldene_regel": false,
-  "aussage": "Eine bereits persistierte gueltige PROVOWARE-ID muss ueber eine echte Prozess-/Neuladegrenze exakt erhalten bleiben. Vorhandene widerspruechliche oder beschaedigte ID-Bindungen werden fail-closed behandelt; sie duerfen weder still ueberschrieben noch durch neu erzeugte IDs ersetzt werden.",
+  "aussage": "Eine bereits persistierte gueltige PROVOWARE-ID bleibt ueber eine echte Prozess-/Neuladegrenze exakt erhalten. Vorhandene widerspruechliche oder beschaedigte ID-Bindungen werden fail-closed behandelt; sie duerfen weder still ueberschrieben noch durch neu erzeugte IDs ersetzt werden.",
   "grenzen": [
     "Noch keine Versions-/Manifestregistry; diese bleibt I018.",
     "Keine mathematische Kollisionsfreiheit von UUID4 behauptet.",
-    "Der Schritt qualifiziert keine Crash-Atomizitaet ueber Stromausfall oder Dateisystemfehler hinweg.",
-    "E1 bleibt bis zum real erfolgreichen GitHub-Qualification-Lauf bestehen."
+    "Crash-Atomizitaet ueber Stromausfall oder Dateisystemfehler ist nicht qualifiziert.",
+    "Netzwerkdateisysteme sind nicht qualifiziert.",
+    "E2 bezeichnet den real qualifizierten Persistenz-/Restartvertrag und ist keine Goldene Regel."
   ],
   "dublettenpruefung": {
     "status": "KONSOLIDIERUNG_BEABSICHTIGT",
     "kandidaten": ["ERK-I017-001"],
-    "hinweis": "ERK-I017-002 erweitert den bestehenden ID-Vertragskern um Persistenz-/Restart-Evidence und soll bevorzugt mit ERK-I017-001 konsolidiert werden statt einen neuen Regelkern zu erzeugen."
+    "hinweis": "ERK-I017-002 erweitert den bestehenden ID-Vertragskern um Persistenz-/Restart-Evidence; kein neuer Regelkern wird erzeugt."
   },
   "widersprueche": [],
   "qualification": {
-    "status": "AUSSTEHEND",
-    "workflow_run_id": null,
-    "qualifikations_head": null,
-    "workflow_status": "unknown",
-    "workflow_conclusion": "unknown"
+    "status": "PASS_REAL",
+    "workflow_run_id": 31536871890,
+    "qualifikations_head": "1a0a6d85e0547d6f1e0b395281a490828d40491c",
+    "workflow_status": "completed",
+    "workflow_conclusion": "success"
   },
   "historie": [
     {
       "iteration": "I017.1",
       "aktion": "Persistenz-/Restartvertrag als additive E1-Evidence vorbereitet",
       "status": "IN_PRUEFUNG"
+    },
+    {
+      "iteration": "I017.1",
+      "aktion": "Ruff-Zeilenlaengen und mypy-Typinferenz nach realen CI-Fehlern korrigiert",
+      "status": "IN_PRUEFUNG"
+    },
+    {
+      "iteration": "I017.1",
+      "aktion": "Nach real erfolgreichem Workflow 31536871890 auf E2 angehoben",
+      "status": "BESTAETIGT"
     }
   ]
 }
