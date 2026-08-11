@@ -2,6 +2,14 @@
 
 ## 0.1.0-dev - 2026-08-11
 
+### Delta-I016.2 — Mehrprozess-Lease qualifiziert
+- Echten Prozessgrenzen-Nachweis für den bereits qualifizierten Datei-Lease ergänzt; die Produktlogik und der mutierende Replace-Pfad wurden dabei nicht verändert.
+- Testmodell verwendet getrennte Prozesse über `multiprocessing` mit `spawn`: Prozess A hält den Lease, Prozess B erhält deterministisch `BELEGT`, nach Freigabe kann ein neuer Prozess den Lease erwerben.
+- Reale Qualification auf Head `0be678f4c9bffee072253c4b117e6658145a709a` durch Workflow `31490138072` mit `completed / success`.
+- Tool-PR #34 wurde per kanonischem Merge `38f873b55a4539147458ed8a76ad4ac4f4e3e116` promoviert.
+- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`; `Lease -> unmittelbarer Stale-Recheck -> atomar_ersetzen` bleibt `NICHT_IMPLEMENTIERT`.
+- P03 und PLAN_DELTA-Verschluss bleiben deshalb konservativ bei 75 %; Delta-I016 bleibt `IN_ARBEIT`.
+
 ### Delta-I016 Phase 1 — Datei-Lease-Kern qualifiziert
 - Minimalen nichtblockierenden Linux-advisory-Lease für genau ein Ziel eingeführt; die Nutzdatei selbst wird beim Lease-Erwerb nicht verändert.
 - Exklusiver Erwerb, konkurrierender kooperierender Erwerb, erneuter Erwerb nach Freigabe, idempotente Freigabe und fail-closed Pfadfehler qualifiziert.
@@ -145,7 +153,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- Vollständige Lock-Lease-/Replace-Integration aus P03; der Lease-Kern ist qualifiziert, Mehrprozess-Nachweis und direkte Schreibkopplung bleiben offen.
+- Vollständige Lock-Lease-/Replace-Integration aus P03; Lease-Kern und Mehrprozess-Nachweis sind qualifiziert, die direkte Schreibkopplung bleibt offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
