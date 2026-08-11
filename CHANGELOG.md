@@ -49,7 +49,7 @@
 - `DateiIdentitaet` aus Device, Inode, Objektart, Modus, Größe, `mtime_ns` und `ctime_ns` eingeführt.
 - Fail-closed Recheck mit `GLEICH`, `STALE` und `UNBEKANNT` implementiert; fehlende oder nicht lesbare Identität kann niemals als gleich gelten.
 - Inode-Austausch und relevante Stat-Drift werden als `STALE` erkannt; Snapshot und Recheck verändern Nutzdaten nicht.
-- P0-`PLAN-DELTA-P03-2026-08-10-001` dokumentiert die sicherheitsbedingte Abweichung vom Masterplan: atomare Replace- und Lock-Lease-Bausteine bleiben aufgeschoben, bis Symlink- und TOCTOU-Vorbedingungen qualifiziert sind.
+- P0-`PLAN_DELTA-P03-2026-08-10-001` dokumentiert die sicherheitsbedingte Abweichung vom Masterplan: atomare Replace- und Lock-Lease-Bausteine bleiben aufgeschoben, bis Symlink- und TOCTOU-Vorbedingungen qualifiziert sind.
 - Erster Workflow `31373390990` nach 9 Contracttests und 30 Plattformregressionen ausschließlich an Ruff E501 gescheitert; keine übersprungenen Gates wurden als PASS gewertet.
 - Minimaler Formatfix ohne Logikänderung; finaler Workflow `31373576096` vollständig grün: 9 I014-Contracttests, 30 I011-I013-Plattformregressionen, Ruff, Ruff Format, mypy strict, P02-Runtime-Regression und Gesamtregression.
 - Artifact `9057041454`, 778 Byte, SHA-256 `a7645776306118682e6c2f1d81718fdc04669647e9500c0de474625a9414a050`; Receipt-SHA-256 `2bca92ad8795620ec1b1edcdcb90a14a2cb25559cb087f1d0ad282285851526b`.
@@ -92,7 +92,7 @@
 ### I010 — P02 Architecture Gate und Unified Contract Qualification
 - Öffentliche I007-I009-Vertragsoberfläche als kanonischen `P02_API_SNAPSHOT.json` eingefroren.
 - Snapshot enthält öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Enumwerte, Schema-Versionen, Pflichtfelder, Vertragsmarker und stabile Fehlercodes.
-- Kanonischen API-Fingerprint `2e74f555a8c7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16` qualifiziert.
+- Kanonischen API-Fingerprint `2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16` qualifiziert.
 - `P02_QUELLINVENTAR.json` als exaktes hashgebundenes P02-Produktquellinventar eingeführt.
 - `WERKZEUGE/p02_architekturgate.py` als gemeinsames Baseline-, Inventar-, AST-, API-, Versions- und Traceability-Gate eingeführt.
 - Negative Architektur-Fixtures für SQLite, Qt/PySide, Handler, Datei-I/O, unregistrierte P02-Quellen und vorgezogene P03-Quellen ergänzt.
