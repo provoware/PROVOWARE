@@ -1,6 +1,12 @@
 """Plattformgrenzen von PROVOWARE."""
 
 from provoware.plattform.atomarer_replace import ReplaceErgebnis, ReplaceStatus, atomar_ersetzen
+from provoware.plattform.datei_lease import (
+    DateiLease,
+    LeaseIdentitaet,
+    LeaseStatus,
+    erwerbe_datei_lease,
+)
 from provoware.plattform.dateiidentitaet import (
     DateiArt,
     DateiIdentitaet,
@@ -31,9 +37,12 @@ from provoware.plattform.pfade import PfadPruefung, PfadStatus, pruefe_projektpf
 __all__ = [
     "DateiArt",
     "DateiIdentitaet",
+    "DateiLease",
     "DateisystemProbe",
     "IdentitaetsSnapshot",
     "IdentitaetsStatus",
+    "LeaseIdentitaet",
+    "LeaseStatus",
     "LinuxSystemProfil",
     "LinuxSystemQuellen",
     "PfadArt",
@@ -50,6 +59,7 @@ __all__ = [
     "atomar_ersetzen",
     "erfasse_dateiidentitaet",
     "erkenne_linux_systemprofil",
+    "erwerbe_datei_lease",
     "parse_os_release",
     "pruefe_dateisystempfad",
     "pruefe_projektpfad",
