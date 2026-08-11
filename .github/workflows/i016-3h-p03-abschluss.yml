@@ -9,6 +9,9 @@ on:
       - 'docs/PLAN_DELTA_I014.json'
       - 'docs/ITERATION_016.md'
       - 'docs/ITERATION_016_3.md'
+      - '.github/workflows/i014-dateiidentitaet.yml'
+      - '.github/workflows/i015-3-plan-identitaet.yml'
+      - '.github/workflows/i016-2h-metadatenabschluss.yml'
       - '.github/workflows/i016-3-lease-stale-replace.yml'
       - '.github/workflows/i016-3h-p03-abschluss.yml'
 
@@ -30,11 +33,11 @@ jobs:
           git fetch origin "${{ github.base_ref }}" --depth=1
           mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
           printf '%s\n' "${files[@]}"
-          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i016-3-lease-stale-replace\.yml|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
+          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|ITERATIONSUEBERGABE\.json|docs/PLAN_DELTA_I014\.json|docs/ITERATION_016\.md|docs/ITERATION_016_3\.md|\.github/workflows/i014-dateiidentitaet\.yml|\.github/workflows/i015-3-plan-identitaet\.yml|\.github/workflows/i016-2h-metadatenabschluss\.yml|\.github/workflows/i016-3-lease-stale-replace\.yml|\.github/workflows/i016-3h-p03-abschluss\.yml)$'
           for f in "${files[@]}"; do
             [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
           done
-          [[ ${#files[@]} -eq 8 ]] || { echo "Erwartet exakt 8 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
+          [[ ${#files[@]} -eq 11 ]] || { echo "Erwartet exakt 11 Abschlussdateien, gefunden: ${#files[@]}"; exit 1; }
 
       - name: Maschinenlesbaren P03-Abschluss prüfen
         shell: python
@@ -68,6 +71,7 @@ jobs:
           assert d['status'] == 'ABGESCHLOSSEN'
           assert d['abschlussnachweis']['status'] == 'PASS_REAL'
           assert d['abschlussnachweis']['workflow_run_id'] == 31511070448
+          assert d['abschlussnachweis']['workflow_conclusion'] == 'success'
           assert d['abschlussnachweis']['main_merge_commit'] == 'a4b63b758bf5ef71060d2e73eae95d584be13fbe'
           assert d['aufgeschobene_planpunkte'] == []
           assert d['p04_neuzuordnung']['i017']['ziel'] == 'dauerhafte ID-Erzeugung und Validierung'
@@ -79,17 +83,28 @@ jobs:
           assert h['plan_identity']['project_mapping_p04_i018'] == 'Versions- und Manifestregistry'
           assert h['plan_identity']['number_collision_resolved'] is True
 
-      - name: Historischen I016.3-Lifecycle promotionsfest prüfen
+      - name: Historische Lifecycle-Gates promotionsfest prüfen
         shell: python
         run: |
           from pathlib import Path
-          w = Path('.github/workflows/i016-3-lease-stale-replace.yml').read_text(encoding='utf-8')
-          pre = w.split('permissions:', 1)[0]
-          assert 'workflow_dispatch:' in pre
-          assert 'pull_request:' not in pre
-          assert 'docs/ITERATION_016_3.md' not in pre
-          assert 'PROJEKTSTATUS.json' not in pre
-          assert 'CHANGELOG.md' not in pre
+
+          manual_only = [
+              '.github/workflows/i015-3-plan-identitaet.yml',
+              '.github/workflows/i016-2h-metadatenabschluss.yml',
+              '.github/workflows/i016-3-lease-stale-replace.yml',
+          ]
+          for path in manual_only:
+              w = Path(path).read_text(encoding='utf-8')
+              pre = w.split('permissions:', 1)[0]
+              assert 'workflow_dispatch:' in pre, path
+              assert 'pull_request:' not in pre, path
+
+          i014 = Path('.github/workflows/i014-dateiidentitaet.yml').read_text(encoding='utf-8')
+          pre014 = i014.split('permissions:', 1)[0]
+          assert 'pull_request:' in pre014
+          assert 'docs/PLAN_DELTA_I014.json' not in pre014
+          assert 'src/provoware/plattform/dateiidentitaet.py' in pre014
+          assert 'tests/platform/test_dateiidentitaet.py' in pre014
 
       - name: Dokumentation und Changelog konsistent prüfen
         shell: python
