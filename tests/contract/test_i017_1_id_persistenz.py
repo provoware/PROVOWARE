@@ -20,7 +20,10 @@ ID_TYPEN = (ProjektId, ObjektId, RevisionId, ChangeId, OperationId)
 
 @pytest.mark.contract
 @pytest.mark.parametrize("id_typ", ID_TYPEN)
-def test_persistenz_roundtrip_erhaelt_exakt_die_id(tmp_path: Path, id_typ: type[ProjektId]) -> None:
+def test_persistenz_roundtrip_erhaelt_exakt_die_id(
+    tmp_path: Path,
+    id_typ: type[ProjektId],
+) -> None:
     pfad = tmp_path / "id.json"
     id_wert = id_typ.neu()
     gespeichert = speichere_id_datensatz(pfad, id_wert, "objekt:alpha")
@@ -86,7 +89,9 @@ def test_gleicher_objektschluessel_andere_id_blockiert_fail_closed(tmp_path: Pat
 
 
 @pytest.mark.contract
-def test_beschaedigte_persistenz_wird_nicht_still_repariert_oder_neu_erzeugt(tmp_path: Path) -> None:
+def test_beschaedigte_persistenz_wird_nicht_still_repariert_oder_neu_erzeugt(
+    tmp_path: Path,
+) -> None:
     pfad = tmp_path / "id.json"
     pfad.write_text('{"schema":1,"id_typ":"ObjektId"', encoding="utf-8")
     vorher = pfad.read_bytes()
