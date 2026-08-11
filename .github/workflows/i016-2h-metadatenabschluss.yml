@@ -1,0 +1,75 @@
+name: I016.2H Metadatenabschluss
+
+on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'CHANGELOG.md'
+      - 'docs/ITERATION_016.md'
+      - '.github/workflows/i016-2h-metadatenabschluss.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  metadatenabschluss:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Diff-Scope fail-closed prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          printf '%s\n' "${files[@]}"
+          allowed='^(PROJEKTSTATUS\.json|CHANGELOG\.md|docs/ITERATION_016\.md|\.github/workflows/i016-2h-metadatenabschluss\.yml)$'
+          for f in "${files[@]}"; do
+            [[ "$f" =~ $allowed ]] || { echo "Unerlaubter Pfad: $f"; exit 1; }
+          done
+      - name: Maschinenlesbare Evidence prüfen
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          p = json.loads(Path('PROJEKTSTATUS.json').read_text(encoding='utf-8'))
+          q = p['i016_datei_lease_mehrprozess_qualifikation']
+          assert q['status'] == 'VALIDIERT_GITHUB'
+          assert q['workflow_run_id'] == 31490138072
+          assert q['workflow_status'] == 'completed'
+          assert q['workflow_conclusion'] == 'success'
+          assert q['github_qualifikations_head'] == '0be678f4c9bffee072253c4b117e6658145a709a'
+          assert q['github_main_merge_commit'] == '38f873b55a4539147458ed8a76ad4ac4f4e3e116'
+          assert q['tool_pr'] == 34
+          assert q['nicht_kooperierende_schreiber'] == 'NICHT_QUALIFIZIERT'
+          assert q['netzwerkdateisysteme'] == 'NICHT_QUALIFIZIERT'
+          assert q['replace_integration'] == 'NICHT_IMPLEMENTIERT'
+          assert p['status'] == 'IN_ARBEIT'
+          assert p['p03_fortschritt_prozent'] == 75
+          assert p['p03_plan_delta_verschluss_prozent'] == 75
+      - name: Dokumentationskonsistenz prüfen
+        shell: python
+        run: |
+          from pathlib import Path
+          d = Path('docs/ITERATION_016.md').read_text(encoding='utf-8')
+          c = Path('CHANGELOG.md').read_text(encoding='utf-8')
+          required = [
+              '31490138072',
+              '0be678f4c9bffee072253c4b117e6658145a709a',
+              '38f873b55a4539147458ed8a76ad4ac4f4e3e116',
+              'NICHT_QUALIFIZIERT',
+              'NICHT_IMPLEMENTIERT',
+          ]
+          for marker in required:
+              assert marker in d, f'Doku fehlt: {marker}'
+              assert marker in c, f'Changelog fehlt: {marker}'
+      - name: Keine Produktmutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -Eq '^(src/|tests/|data/|baselines?/)' && {
+            echo 'Produkt-, Test-, Daten- oder Baseline-Mutation erkannt'; exit 1;
+          } || true
