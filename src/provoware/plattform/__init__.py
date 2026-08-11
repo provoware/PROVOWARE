@@ -33,6 +33,7 @@ from provoware.plattform.linux import (
     parse_os_release,
 )
 from provoware.plattform.pfade import PfadPruefung, PfadStatus, pruefe_projektpfad
+from provoware.plattform.sicherer_replace import sicher_atomar_ersetzen
 
 __all__ = [
     "DateiArt",
@@ -64,4 +65,5 @@ __all__ = [
     "pruefe_dateisystempfad",
     "pruefe_projektpfad",
     "pruefe_stale_guard",
+    "sicher_atomar_ersetzen",
 ]
