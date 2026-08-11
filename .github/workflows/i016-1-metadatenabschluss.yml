@@ -7,6 +7,8 @@ on:
       - "PROJEKTSTATUS.json"
       - "CHANGELOG.md"
       - "docs/ITERATION_016.md"
+      - ".github/workflows/i015-1-metadata-closure.yml"
+      - ".github/workflows/i016-datei-lease.yml"
       - ".github/workflows/i016-1-metadatenabschluss.yml"
 
 permissions:
@@ -38,6 +40,8 @@ jobs:
               'PROJEKTSTATUS.json',
               'CHANGELOG.md',
               'docs/ITERATION_016.md',
+              '.github/workflows/i015-1-metadata-closure.yml',
+              '.github/workflows/i016-datei-lease.yml',
               '.github/workflows/i016-1-metadatenabschluss.yml',
           }
           base = os.environ['GITHUB_BASE_REF']
@@ -51,7 +55,13 @@ jobs:
           assert changed, 'Leerer Metadaten-Diff ist nicht qualifizierbar.'
           unexpected = sorted(changed - allowed)
           assert not unexpected, f'Unerwarteter Scope: {unexpected}'
-          required = {'PROJEKTSTATUS.json', 'CHANGELOG.md', 'docs/ITERATION_016.md'}
+          required = {
+              'PROJEKTSTATUS.json',
+              'CHANGELOG.md',
+              'docs/ITERATION_016.md',
+              '.github/workflows/i015-1-metadata-closure.yml',
+              '.github/workflows/i016-datei-lease.yml',
+          }
           missing = sorted(required - changed)
           assert not missing, f'Pflichtartefakte fehlen: {missing}'
           PY
@@ -99,6 +109,22 @@ jobs:
           assert 'Phase 1: QUALIFIZIERT' in doc
           assert 'NICHT_QUALIFIZIERT' in doc
           assert 'NICHT_IMPLEMENTIERT' in doc
+          PY
+
+      - name: Historische Lifecycle-Trigger getrennt halten
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          i015 = Path('.github/workflows/i015-1-metadata-closure.yml').read_text(encoding='utf-8')
+          i016 = Path('.github/workflows/i016-datei-lease.yml').read_text(encoding='utf-8')
+          assert '- "CHANGELOG.md"' not in i015
+          assert '- ".github/workflows/i015-1-metadata-closure.yml"' not in i015
+          assert '- "docs/ITERATION_016.md"' not in i016
+          assert '- ".github/workflows/i016-datei-lease.yml"' not in i016
+          assert '- "TRACEABILITY.json"' in i015
+          assert '- "EVIDENCE/I015/METADATA_CLOSURE.json"' in i015
+          assert '- "src/provoware/plattform/datei_lease.py"' in i016
+          assert '- "tests/platform/test_datei_lease.py"' in i016
           PY
 
       - name: Keine Produktmutation bestaetigen
