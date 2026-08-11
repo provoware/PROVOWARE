@@ -1,31 +1,62 @@
 {
-  "schema": "1.0.0",
+  "schema": "1.1.0",
   "delta_id": "PLAN-DELTA-P03-2026-08-10-001",
-  "status": "AKTIV_IN_PRUEFUNG",
+  "status": "AKTIV_VOR_ABSCHLUSS",
   "prioritaet": "P0",
   "typ": "SICHERHEITSREIHENFOLGE",
   "ausgangsplan": {
     "version": "2.0.0",
     "p03_i013": "atomare Temp/Replace-Primitive",
-    "p03_i014": "Lock-Lease und Prozessidentitaet"
+    "p03_i014": "Lock-Lease und Prozessidentitaet",
+    "p04_i015": "dauerhafte ID-Erzeugung und Validierung",
+    "p04_i016": "Versions- und Manifestregistry"
   },
   "kanonischer_iststand": {
-    "i013": "read-only segmentweise Symlink- und Dateisystemprobe",
-    "i014": "read-only Dateiidentitaet und Stale-Guard"
+    "i013": {
+      "ziel": "read-only segmentweise Symlink- und Dateisystemprobe",
+      "status": "VALIDIERT_GITHUB"
+    },
+    "i014": {
+      "ziel": "read-only Dateiidentitaet und Stale-Guard",
+      "status": "VALIDIERT_GITHUB"
+    },
+    "i015": {
+      "ziel": "atomarer Einzeldatei-Replace",
+      "status": "VALIDIERT_GITHUB"
+    },
+    "i016": {
+      "ziel": "Lock-Lease und Prozessidentitaet",
+      "status": "GEPLANT",
+      "herkunft": "PLAN_DELTA"
+    }
   },
-  "begruendung": "I012/I013 haben vor der ersten Mutation zwei P0-Sicherheitsluecken sichtbar gemacht: ungepruefte Symlink-Semantik und TOCTOU zwischen Pfadpruefung und spaeterer Mutation. Beide werden zuerst read-only geschlossen. Die urspruenglichen mutierenden P03-Bausteine werden nicht gestrichen, sondern nach erfolgreicher Qualifikation der Vorbedingungen neu eingeordnet.",
-  "nutzen": "Verhindert, dass eine spaetere atomare Replace- oder Lock-Implementierung auf veralteter oder ausgetauschter Dateiidentitaet vertraut.",
+  "iterationsidentitaet": {
+    "regel": "Projektinterne Iterationsnummern nach aktiviertem PLAN_DELTA werden nicht still auf die Nummern des Ausgangsplans zurueckgebogen. Ausgangsplan und Delta-Sequenz bleiben getrennt referenzierbar.",
+    "ausgangsplan_i016": "Versions- und Manifestregistry",
+    "delta_i016": "Lock-Lease und Prozessidentitaet",
+    "kollision": true,
+    "kollisionstyp": "NUMMER_GLEICH_ZIEL_VERSCHIEDEN",
+    "auflosung": "Die aktuelle Projektsequenz folgt bis zum Abschluss dieses P03-Deltas der qualifizierten Delta-Sequenz. Die Versions- und Manifestregistry bleibt als noch nicht neu nummerierter P04-Planpunkt erhalten und darf nicht als bereits erledigt gelten.",
+    "fail_closed": true
+  },
+  "begruendung": "I012/I013 haben vor der ersten Mutation zwei P0-Sicherheitsluecken sichtbar gemacht: ungepruefte Symlink-Semantik und TOCTOU zwischen Pfadpruefung und spaeterer Mutation. Beide wurden zuerst read-only geschlossen. Der atomare Replace wurde danach als I015 qualifiziert. Der verbliebene Lock-Lease-Baustein wird als I016 der aktivierten Delta-Sequenz abgeschlossen. Dadurch kollidiert die Nummer I016 mit dem unveraenderten P04-Ausgangsplan; diese Kollision wird nun explizit und maschinenlesbar statt durch stilles Umdeuten behandelt.",
+  "nutzen": "Verhindert sowohl unsichere Ruecknummerierung bereits qualifizierter Iterationen als auch die falsche Behauptung, der P04-Planpunkt Versions- und Manifestregistry sei durch die Delta-I016 erledigt.",
   "risiko_delta": "NIEDRIG",
   "reversibel": true,
-  "keine_mutation": true,
+  "keine_nutzdatenmutation": true,
   "aufgeschobene_planpunkte": [
-    "atomare Temp/Replace-Primitive",
     "Lock-Lease und Prozessidentitaet"
   ],
-  "abschlussbedingung": "I014 qualifiziert GLEICH/STALE/UNBEKANNT fail-closed und fuehrt keine Schreibprimitive ein.",
+  "bereits_nachgeholte_planpunkte": [
+    "atomare Temp/Replace-Primitive"
+  ],
+  "abschlussbedingung": "Lock-Lease und Prozessidentitaet sind als Delta-I016 qualifiziert und promoviert; danach wird die P04-Fortsetzung mit einer eindeutigen neuen Iterationszuordnung dokumentiert, ohne den Ausgangsplan umzuschreiben.",
   "quellen": [
     "PROVOWARE_VOLLSTAENDIGER_ENTWICKLUNGSPLAN_EXPERT_FINAL_v2.0.0_2026-08-09",
-    "ITERATIONSUEBERGABE.json BASELINE-2026-08-10-I013",
-    "I013 Dateisystemprobe und TOCTOU-Risikodokumentation"
+    "PROJEKTSTATUS.json BASELINE-2026-08-10-I015",
+    "ITERATIONSUEBERGABE.json I016",
+    "I013 Dateisystemprobe und TOCTOU-Risikodokumentation",
+    "I014 Dateiidentitaet/Stale-Guard",
+    "I015 atomarer Einzeldatei-Replace"
   ]
 }
