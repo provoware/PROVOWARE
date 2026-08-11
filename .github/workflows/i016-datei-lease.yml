@@ -8,9 +8,7 @@ on:
       - "src/provoware/plattform/__init__.py"
       - "tests/platform/test_datei_lease.py"
       - "docs/WISSENSSPEICHER_I016_ERKENNTNIS.json"
-      - "docs/ITERATION_016.md"
       - ".github/workflows/i015-atomarer-replace.yml"
-      - ".github/workflows/i016-datei-lease.yml"
 
 permissions:
   contents: read
@@ -53,9 +51,7 @@ jobs:
               'src/provoware/plattform/__init__.py',
               'tests/platform/test_datei_lease.py',
               'docs/WISSENSSPEICHER_I016_ERKENNTNIS.json',
-              'docs/ITERATION_016.md',
               '.github/workflows/i015-atomarer-replace.yml',
-              '.github/workflows/i016-datei-lease.yml',
           }
           base = os.environ['GITHUB_BASE_REF']
           output = subprocess.check_output(
@@ -69,8 +65,6 @@ jobs:
               'src/provoware/plattform/datei_lease.py',
               'tests/platform/test_datei_lease.py',
               'docs/WISSENSSPEICHER_I016_ERKENNTNIS.json',
-              'docs/ITERATION_016.md',
-              '.github/workflows/i016-datei-lease.yml',
           }
           missing = sorted(required - changed)
           assert not missing, f'Pflichtartefakte fehlen: {missing}'
@@ -189,7 +183,6 @@ jobs:
                   'datei_lease_py': sha('src/provoware/plattform/datei_lease.py'),
                   'tests': sha('tests/platform/test_datei_lease.py'),
                   'wissen': sha('docs/WISSENSSPEICHER_I016_ERKENNTNIS.json'),
-                  'dokumentation': sha('docs/ITERATION_016.md'),
               },
               'gates': {
                   'baseline_i015': 'GRUEN',

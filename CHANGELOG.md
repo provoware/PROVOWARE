@@ -1,5 +1,17 @@
 # Änderungsverlauf
 
+## 0.1.0-dev - 2026-08-11
+
+### Delta-I016 Phase 1 — Datei-Lease-Kern qualifiziert
+- Minimalen nichtblockierenden Linux-advisory-Lease für genau ein Ziel eingeführt; die Nutzdatei selbst wird beim Lease-Erwerb nicht verändert.
+- Exklusiver Erwerb, konkurrierender kooperierender Erwerb, erneuter Erwerb nach Freigabe, idempotente Freigabe und fail-closed Pfadfehler qualifiziert.
+- I012–I015-Plattformverträge auf dem Qualifikations-Head erneut regressionsgeprüft.
+- I016-Workflow `31476216289` und I015-Revalidation `31476216369` real mit `success` beendet.
+- Qualifikations-Head `4eea4591ae2296961869f567498744372aa7ff11`; Artifact `9095330662`, 899 Byte, SHA-256 `fd7d62679176faf3a3dcd90b7675f492e40b620c9fb5a7035273a1f5876b2ec6`.
+- Phase 1 per kanonischem Tool-Merge `cfb9d67966ba737eb1331004890973ed2404f3ff` promoviert.
+- Nicht kooperierende Schreiber und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`; `Lease -> Stale-Recheck -> atomar_ersetzen` bleibt `NICHT_IMPLEMENTIERT`.
+- `PROJEKTSTATUS.json` hält I016 deshalb weiterhin als laufende Iteration; PLAN_DELTA-Verschluss steigt konservativ auf 75 %, P03 bleibt bis zur vollständigen Lock-/Replace-Kopplung bei 75 %.
+
 ## 0.1.0-dev - 2026-08-10
 
 ### I015 — Atomarer Einzeldatei-Replace qualifiziert
@@ -133,7 +145,7 @@
 - Struktur- und Baseline-Validator sowie zentrale Qualitätskonfiguration.
 
 ### Bewusst noch nicht enthalten
-- Lock-Lease aus P03; der zweite über `PLAN_DELTA-P03-2026-08-10-001` nachzuholende mutierende Baustein bleibt separat offen.
+- Vollständige Lock-Lease-/Replace-Integration aus P03; der Lease-Kern ist qualifiziert, Mehrprozess-Nachweis und direkte Schreibkopplung bleiben offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.

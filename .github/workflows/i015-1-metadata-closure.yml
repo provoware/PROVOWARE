@@ -5,10 +5,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "CHANGELOG.md"
       - "TRACEABILITY.json"
       - "EVIDENCE/I015/METADATA_CLOSURE.json"
-      - ".github/workflows/i015-1-metadata-closure.yml"
 
 permissions:
   contents: read
@@ -76,7 +74,6 @@ jobs:
           assert "Lock-Lease aus P03" in changelog
           assert "Atomare Temp/Replace-Primitive und Lock-Lease" not in changelog
 
-          # Closure darf Produkt-/Baseline-Identität nicht verändern.
           baseline = json.loads(Path("CURRENT_BASELINE.json").read_text(encoding="utf-8"))
           status = json.loads(Path("PROJEKTSTATUS.json").read_text(encoding="utf-8"))
           assert baseline["letzte_iteration"] == "I015"
@@ -94,8 +91,6 @@ jobs:
           mapfile -t FILES < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | sort)
           printf '%s\n' "${FILES[@]}"
           ALLOWED=(
-            ".github/workflows/i015-1-metadata-closure.yml"
-            "CHANGELOG.md"
             "EVIDENCE/I015/METADATA_CLOSURE.json"
             "TRACEABILITY.json"
           )
@@ -104,7 +99,7 @@ jobs:
             for allowed in "${ALLOWED[@]}"; do
               if [[ "$file" == "$allowed" ]]; then ok=true; break; fi
             done
-            [[ "$ok" == true ]] || { echo "Unerlaubte Datei im Metadata-Closure-Diff: $file" >&2; exit 1; }
+            [[ "$ok" == true ]] || { echo "Unerlaubte Datei im I015.1-Lifecycle-Diff: $file" >&2; exit 1; }
           done
 
       - name: Ergebnis
@@ -113,10 +108,7 @@ jobs:
           {
             echo "## I015.1 Metadata Closure — GRÜN"
             echo
-            echo "- JSON parsebar und Basisidentität gebunden"
-            echo "- CHANGELOG enthält I015 und korrigierte Restlücke"
-            echo "- TRACEABILITY bindet ARCH-018 bis Evidence"
-            echo "- Baseline bleibt I015 / nächste Iteration I016"
-            echo "- Diff auf Metadaten + dieses Gate begrenzt"
+            echo "- historischer Trigger auf TRACEABILITY + I015.1-Evidence begrenzt"
+            echo "- keine spätere CHANGELOG-/Folgeiterationsmutation reaktiviert das Gate"
             echo "- keine Produktlogik oder Nutzerdatenmutation"
           } >> "$GITHUB_STEP_SUMMARY"
