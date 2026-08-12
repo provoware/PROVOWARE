@@ -1,16 +1,7 @@
 name: I015.2 Historical CI Scope Gate
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "QUALIFIZIERTER_SCOPE.json"
-      - ".github/workflows/i007-kernvertraege.yml"
-      - ".github/workflows/i008-schemata.yml"
-      - ".github/workflows/i009-operationen.yml"
-      - ".github/workflows/i010-p02-gate.yml"
-      - ".github/workflows/i015-2-historical-ci-scope.yml"
-      - "docs/WISSENSSPEICHER_I015_2_ERKENNTNIS.json"
+  workflow_dispatch:
 
 permissions:
   contents: read
