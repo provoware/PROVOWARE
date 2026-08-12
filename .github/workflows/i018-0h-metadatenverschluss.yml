@@ -6,6 +6,7 @@ on:
       - 'PROJEKTSTATUS.json'
       - 'CHANGELOG.md'
       - 'docs/I018_0H_METADATENVERSCHLUSS.json'
+      - '.github/workflows/i017fm-metadatenverschluss.yml'
       - '.github/workflows/i018-0h-metadatenverschluss.yml'
   workflow_dispatch:
 
@@ -75,6 +76,17 @@ jobs:
           grep -F '168' CHANGELOG.md
           grep -F '1 historischer I010-Test SKIP' CHANGELOG.md
 
+      - name: Historisches I017FM-Gate eingefroren prüfen
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          pre = Path('.github/workflows/i017fm-metadatenverschluss.yml').read_text().split('permissions:', 1)[0]
+          assert 'workflow_dispatch:' in pre
+          assert 'pull_request:' not in pre
+          assert 'push:' not in pre
+          print('Historisches I017FM-Gate: workflow_dispatch-only')
+          PY
+
       - name: Exakten Metadaten-Scope fail-closed prüfen
         if: github.event_name == 'pull_request'
         env:
@@ -89,6 +101,7 @@ jobs:
               'PROJEKTSTATUS.json',
               'CHANGELOG.md',
               'docs/I018_0H_METADATENVERSCHLUSS.json',
+              '.github/workflows/i017fm-metadatenverschluss.yml',
               '.github/workflows/i018-0h-metadatenverschluss.yml',
           }
           req = urllib.request.Request(
