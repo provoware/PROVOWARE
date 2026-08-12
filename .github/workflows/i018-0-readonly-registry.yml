@@ -1,0 +1,75 @@
+name: I018.0 Read-only Registry
+
+on:
+  pull_request:
+    paths:
+      - 'src/provoware/vertraege/registry.py'
+      - 'tests/contract/test_i018_registry.py'
+      - 'docs/ITERATION_018_0.md'
+      - 'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json'
+      - '.github/workflows/i018-0-readonly-registry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  qualifizieren:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Abhaengigkeiten installieren
+        run: python -m pip install -e '.[dev]'
+      - name: I018.0 Contracttests
+        run: python -m pytest -q tests/contract/test_i018_registry.py
+      - name: Gesamtregression
+        run: python -m pytest -q
+      - name: Ruff
+        run: python -m ruff check src tests
+      - name: Ruff Format
+        run: python -m ruff format --check src tests
+      - name: mypy strict
+        run: python -m mypy src
+      - name: Wissensevidence fail-closed pruefen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('docs/WISSENSSPEICHER_I018_ERKENNTNIS.json').read_text())
+          assert data['erkenntnis_id'] == 'ERK-I018-001'
+          assert data['reifegrad'] == 'E1'
+          assert data['prioritaet'] == 'P0'
+          assert data['status'] == 'KANDIDAT'
+          assert data['goldene_regel'] is False
+          assert data['qualification']['status'] == 'AUSSTEHEND'
+          assert data['qualification']['pass_real'] is False
+          print('Wissensevidence: E1/KANDIDAT/AUSSTEHEND')
+          PY
+      - name: Exakten Scope pruefen
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          allowed = {
+              'src/provoware/vertraege/registry.py',
+              'tests/contract/test_i018_registry.py',
+              'docs/ITERATION_018_0.md',
+              'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json',
+              '.github/workflows/i018-0-readonly-registry.yml',
+          }
+          req = urllib.request.Request(
+              f'https://api.github.com/repos/provoware/PROVOWARE/pulls/{os.environ["PR_NUMBER"]}/files?per_page=100',
+              headers={'Authorization': f'Bearer {os.environ["GH_TOKEN"]}', 'Accept': 'application/vnd.github+json'},
+          )
+          with urllib.request.urlopen(req) as response:
+              paths = {item['filename'] for item in json.load(response)}
+          assert paths == allowed, sorted(paths)
+          print('Exakter Fuenf-Dateien-Scope: PASS')
+          PY
