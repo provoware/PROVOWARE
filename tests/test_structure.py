@@ -11,15 +11,16 @@ def test_p01_ordnerstruktur() -> None:
         assert (ROOT / rel).is_dir(), rel
 
 
-def test_i009_implementiert_nur_vertrags_schema_und_operationsschicht() -> None:
-    files = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / "src").rglob("*.py"))
-    assert files == [
+def test_i009_vertragsschicht_bleibt_vollstaendig_erhalten() -> None:
+    files = {p.relative_to(ROOT).as_posix() for p in (ROOT / "src").rglob("*.py")}
+    historische_i009_dateien = {
         "src/provoware/__init__.py",
         "src/provoware/vertraege/__init__.py",
         "src/provoware/vertraege/datentypen.py",
         "src/provoware/vertraege/operationen.py",
         "src/provoware/vertraege/schemata.py",
-    ]
+    }
+    assert historische_i009_dateien.issubset(files)
 
 
 def _pruefe_architekturgrenze(rel: str) -> None:
