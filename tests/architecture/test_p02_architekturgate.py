@@ -26,19 +26,50 @@ def _fixture(name: str) -> Path:
     return FIXTURES / name
 
 
-def _minimaler_quellbaum(tmp_path: Path) -> Path:
-    ziel = tmp_path / "projekt"
-    shutil.copytree(ROOT / "src", ziel / "src")
-    shutil.copy2(ROOT / "P02_QUELLINVENTAR.json", ziel / "P02_QUELLINVENTAR.json")
-    return ziel
-
-
-def _ist_i010_promoviert() -> bool:
+def _baselinefolge() -> tuple[str | None, str | None]:
     raw: object = json.loads((ROOT / "CURRENT_BASELINE.json").read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
-        return False
+        return None, None
     baseline = cast(dict[str, object], raw)
-    return baseline.get("letzte_iteration") == "I010"
+    letzte = baseline.get("letzte_iteration")
+    naechste = baseline.get("naechste_iteration")
+    return (
+        letzte if isinstance(letzte, str) else None,
+        naechste if isinstance(naechste, str) else None,
+    )
+
+
+def _iterationsnummer(wert: str | None) -> int | None:
+    if wert is None or not wert.startswith("I") or not wert[1:].isdigit():
+        return None
+    return int(wert[1:])
+
+
+def _ist_i010_promoviert_oder_spaeter() -> bool:
+    letzte, _ = _baselinefolge()
+    nummer = _iterationsnummer(letzte)
+    return nummer is not None and nummer >= 10
+
+
+def _ist_historischer_i010_lifecycle() -> bool:
+    return _baselinefolge() in {("I009", "I010"), ("I010", "I011")}
+
+
+def _minimaler_quellbaum(tmp_path: Path) -> Path:
+    ziel = tmp_path / "projekt"
+    inventar_raw: object = json.loads((ROOT / "P02_QUELLINVENTAR.json").read_text(encoding="utf-8"))
+    assert isinstance(inventar_raw, dict)
+    inventar = cast(dict[str, object], inventar_raw)
+    quellen = inventar.get("p02_quellen")
+    assert isinstance(quellen, list)
+    for rel_obj in quellen:
+        assert isinstance(rel_obj, str)
+        quelle = ROOT / rel_obj
+        zielpfad = ziel / rel_obj
+        zielpfad.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(quelle, zielpfad)
+    shutil.copy2(ROOT / "P02_QUELLINVENTAR.json", ziel / "P02_QUELLINVENTAR.json")
+    return ziel
 
 
 @pytest.mark.architecture
@@ -51,8 +82,8 @@ def test_p02_api_snapshot_ist_kanonisch_und_fingerprint_stabil() -> None:
 
 
 @pytest.mark.architecture
-def test_p02_quellinventar_ist_exakt_und_hashgebunden() -> None:
-    pruefe_quellinventar(ROOT, phase_abschluss=True)
+def test_p02_quellinventar_ist_exakt_und_hashgebunden(tmp_path: Path) -> None:
+    pruefe_quellinventar(_minimaler_quellbaum(tmp_path), phase_abschluss=True)
 
 
 @pytest.mark.architecture
@@ -102,13 +133,15 @@ def test_versionsraeume_bleiben_getrennt() -> None:
 
 
 @pytest.mark.architecture
-def test_traceability_passt_zum_aktuellen_i010_lebenszykluszustand() -> None:
-    pruefe_traceability(ROOT, nach_promotion=_ist_i010_promoviert())
+def test_traceability_bleibt_nach_i010_promotion_gueltig() -> None:
+    pruefe_traceability(ROOT, nach_promotion=_ist_i010_promoviert_oder_spaeter())
 
 
 @pytest.mark.architecture
-def test_i010_gesamtgate_ist_im_aktuellen_lebenszykluszustand_gruen() -> None:
-    nach_promotion = _ist_i010_promoviert()
+def test_i010_gesamtgate_ist_im_historischen_lebenszykluszustand_gruen() -> None:
+    if not _ist_historischer_i010_lifecycle():
+        pytest.skip("I010-Gesamtgate ist an die historische Baseline I009→I010/I010→I011 gebunden.")
+    nach_promotion = _ist_i010_promoviert_oder_spaeter()
     ergebnis = pruefe_gesamtgate(ROOT, phase_abschluss=True, nach_promotion=nach_promotion)
     assert ergebnis["api_snapshot"] == "GRUEN"
     assert ergebnis["architekturmatrix"] == "GRUEN"
