@@ -1,25 +1,14 @@
 name: I010 P02 Architecture Gate
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "src/provoware/vertraege/**"
-      - "WERKZEUGE/p02_architekturgate.py"
-      - "WERKZEUGE/__init__.py"
-      - "tests/architecture/**"
-      - "tests/fixtures/i010/**"
-      - "P02_API_SNAPSHOT.json"
-      - "P02_QUELLINVENTAR.json"
-      - "EVIDENCE/I010/**"
-      - ".github/workflows/i010-p02-gate.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: i010-p02-${{ github.event.pull_request.number }}
+  group: i010-p02-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
