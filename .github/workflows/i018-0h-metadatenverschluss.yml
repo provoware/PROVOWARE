@@ -1,0 +1,108 @@
+name: I018.0H Metadatenverschluss
+
+on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'CHANGELOG.md'
+      - 'docs/I018_0H_METADATENVERSCHLUSS.json'
+      - '.github/workflows/i018-0h-metadatenverschluss.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  metadatenverschluss:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JSON und Lifecycle-Invarianten prüfen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text())
+          proof = json.loads(Path('docs/I018_0H_METADATENVERSCHLUSS.json').read_text())
+          baseline = json.loads(Path('CURRENT_BASELINE.json').read_text())
+          handoff = json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
+
+          q = status.get('i018_0_registry_readonly_qualifikation', {})
+          assert q.get('status') == 'VALIDIERT_GITHUB'
+          assert q.get('tool_pr') == 45
+          assert q.get('workflow_run_id') == 31573547771
+          assert q.get('workflow_conclusion') == 'success'
+          assert q.get('github_qualifikations_head') == '45e9edec963dfd4f0a7c3e23c264b1c28d08a3d1'
+          assert q.get('github_main_merge_commit') == 'f9c5a065231329a668ae9a3dc1a65783252f6362'
+          assert q.get('masterbuch_main_merge_commit') == '650896dcee6826d141cf7a17e83bc378671d4db5'
+          assert q.get('contracttests') == 6
+          assert q.get('gesamtregression_pass') == 168
+          assert q.get('historischer_i010_skip') == 1
+          assert q.get('registry_source_count') == 1
+          assert q.get('registry_persistenz') == 'NICHT_IMPLEMENTIERT'
+          assert q.get('automatische_quellensuche') == 'NICHT_IMPLEMENTIERT'
+          assert q.get('registry_source_fingerprint') == 'NICHT_IMPLEMENTIERT'
+          assert q.get('gui') == 'NICHT_IMPLEMENTIERT'
+
+          assert status.get('letzte_abgeschlossene_iteration') == 'I017'
+          assert status.get('naechste_iteration') == 'I018'
+          assert 50 < status.get('p04_fortschritt_prozent', 0) < 100
+          assert baseline.get('letzte_iteration') == 'I017'
+          assert baseline.get('naechste_iteration') == 'I018'
+          assert handoff.get('next_iteration') == 'I018'
+
+          assert proof.get('status') == 'KANDIDAT'
+          mb = proof.get('masterbuch_evidence', {})
+          assert mb.get('erk_id') == 'ERK-I018-001'
+          assert mb.get('reifegrad') == 'E2'
+          assert mb.get('prioritaet') == 'P0'
+          assert mb.get('status') == 'BESTAETIGT'
+          assert mb.get('goldene_regel') is False
+          assert proof.get('produktmutation') is False
+          assert proof.get('nutzdatenmutation') is False
+          assert proof.get('masterbuchmutation') is False
+          PY
+
+      - name: Changelog-Evidence prüfen
+        run: |
+          grep -F 'I018.0H' CHANGELOG.md
+          grep -F '31573547771' CHANGELOG.md
+          grep -F 'f9c5a065231329a668ae9a3dc1a65783252f6362' CHANGELOG.md
+          grep -F '650896dcee6826d141cf7a17e83bc378671d4db5' CHANGELOG.md
+          grep -F '168' CHANGELOG.md
+          grep -F '1 historischer I010-Test SKIP' CHANGELOG.md
+
+      - name: Exakten Metadaten-Scope fail-closed prüfen
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+
+          allowed = {
+              'PROJEKTSTATUS.json',
+              'CHANGELOG.md',
+              'docs/I018_0H_METADATENVERSCHLUSS.json',
+              '.github/workflows/i018-0h-metadatenverschluss.yml',
+          }
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['REPO']}/pulls/{os.environ['PR']}/files?per_page=100",
+              headers={
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'Accept': 'application/vnd.github+json',
+              },
+          )
+          with urllib.request.urlopen(req) as r:
+              files = {x['filename'] for x in json.load(r)}
+          assert files == allowed, (files, allowed)
+          assert not any(p.startswith(('src/', 'tests/', 'data/', 'evidence/')) for p in files)
+          PY
+
+      - name: Abschluss
+        run: echo 'I018.0H Metadatenverschluss qualifiziert'
