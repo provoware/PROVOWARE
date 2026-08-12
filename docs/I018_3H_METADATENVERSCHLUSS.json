@@ -1,0 +1,60 @@
+{
+  "iteration": "I018.3H",
+  "status": "KANDIDAT",
+  "zweck": "Kanonische Metadatensynchronisation des real qualifizierten und promovierten I018.3 Source+Contract Binding Receipts ohne neue Produktlogik.",
+  "tool_evidence": {
+    "tool_pr": 51,
+    "workflow_run_id": 31621026866,
+    "workflow_status": "completed",
+    "workflow_conclusion": "success",
+    "qualifikations_head": "31828051212af237a4df837ba1fe7640515a9b37",
+    "main_merge_commit": "9967dc70fcda1d12c5d34602f7bb2178908e4ff3"
+  },
+  "masterbuch_evidence": {
+    "erk_id": "ERK-I018-004",
+    "typ": "Nachweis",
+    "hauptkategorie": "Architektur",
+    "nebenkategorien": ["Registry", "Integritaet", "Binding-Receipt", "Source-Fingerprint", "Contract-Fingerprint", "SHA-256", "Fail-Closed", "Lifecycle"],
+    "reifegrad": "E2",
+    "prioritaet": "P0",
+    "automatisierbarkeit": "JA",
+    "status": "BESTAETIGT",
+    "goldene_regel": false,
+    "widersprueche": [],
+    "evidence_binding": "PASS_REAL",
+    "masterbuch_workflow_run_id": 31621213201,
+    "masterbuch_main_merge_commit": "d876dc52ea788419a6e77cb4ce7b8e4f3a16d928"
+  },
+  "zielzustand": {
+    "p04_fortschritt_prozent": 95,
+    "projektstatus": "IN_ARBEIT",
+    "letzte_abgeschlossene_iteration": "I017",
+    "naechste_iteration": "I018",
+    "binding_receipt": "SHA256_KANONISCHE_GESAMTZUSTANDSBINDUNG_QUALIFIZIERT",
+    "receipt_pin": "FAIL_CLOSED_GRUEN"
+  },
+  "grenzen": {
+    "registry_persistenz": "NICHT_IMPLEMENTIERT",
+    "automatische_quellensuche": "NICHT_IMPLEMENTIERT",
+    "receipt_persistenz": "NICHT_IMPLEMENTIERT",
+    "mehrprojekt_registry": "NICHT_IMPLEMENTIERT",
+    "gui": "NICHT_IMPLEMENTIERT",
+    "signatur_herkunftsgarantie": "NICHT_QUALIFIZIERT",
+    "crash_atomizitaet": "NICHT_QUALIFIZIERT",
+    "netzwerkdateisysteme": "NICHT_QUALIFIZIERT"
+  },
+  "mutation": {
+    "produktlogik": false,
+    "tests": false,
+    "registry_persistenz": false,
+    "baseline": false,
+    "evidence": false,
+    "masterbuch": false,
+    "nutzdaten": false
+  },
+  "lifecycle": {
+    "historisches_i018_2h_gate": "WORKFLOW_DISPATCH_ONLY",
+    "promotion_nur_nach_realem_pass": true
+  },
+  "rollback": "Vollständig durch Revert des isolierten I018.3H-Squash-Merges; keine Produkt- oder Nutzdaten sind Bestandteil des Scopes."
+}
