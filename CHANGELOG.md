@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-12
 
+### I018.2H — Registry-Contract-Fingerprint metadatenseitig synchronisiert
+- I018.2-Qualification `31605278784` lief auf Head `21a7a2e95340fe2abfa371161d98487e3a04e8ac` real mit `completed / success`; Tool-PR #49 wurde als Main-Merge `5fa8eca05bfbebe50898fafad26d31d7f26a14fd` promoviert.
+- Der explizite Registry-Interpretationsvertrag ist unabhängig vom Registryquellinhalt über kanonische Vertragsrepräsentation und SHA-256 `contract_fingerprint` gebunden; Abweichungen gegen den Contract-Pin blockieren fail-closed.
+- Source- und Contract-Fingerprint bleiben getrennte Nachweise; bestehende I018.0-/I018.1-Verträge bleiben unverändert erhalten.
+- Masterbuch-Evidence `ERK-I018-003` bleibt `E2 / P0 / BESTAETIGT` ohne Goldene Regel; die Evidence-Bindung wurde in PR #21 workflow- und PR-sicher gehärtet und mit Run `31610977691` real revalidiert; kanonischer Masterbuch-Merge `8ba463735908a66175cc9c59886c392817072986`, `evidence_binding = PASS_REAL`.
+- `PROJEKTSTATUS.json` wird um den I018.2-Nachweis ergänzt; P04 wird konservativ auf 90 % geführt. I018 bleibt `IN_ARBEIT`.
+- Registry-Persistenz, automatische Quellensuche, Source+Contract-Binding-Receipt, Mehrprojekt-Registry und GUI bleiben `NICHT_IMPLEMENTIERT`; Signatur/Herkunftsgarantie bleibt `NICHT_QUALIFIZIERT`.
+- Das bereits qualifizierte I018.1H-Metadatengate wird nach Promotion auf `workflow_dispatch` eingefroren, damit spätere Status-/Changelog-Fortschreibungen keinen historischen Kandidatenvertrag reaktivieren.
+- Keine Produkt-, Test-, Registry-Persistenz-, Baseline-, Evidence-, Masterbuch- oder Nutzdatenmutation in I018.2H.
+
 ### I018.1H — Registry-Source-Fingerprint metadatenseitig synchronisiert
 - I018.1-Qualification `31590478317` lief auf Head `d4c85ffc7b28c0e33dcd504c2155794caca8eaea` real mit `completed / success`; Tool-PR #47 wurde als Main-Merge `c6322ec2251fc8c54c2648c586572e34a14409e0` promoviert.
 - Die autoritative Registryquelle ist über kanonische Serialisierung und SHA-256 `source_fingerprint` gebunden; ein erwarteter Fingerprint kann als Pin verwendet werden und Abweichungen blockieren fail-closed.
@@ -218,7 +228,7 @@
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
 - I017: optionaler Crash-/Teilwrite-Härtungsnachweis; der formale I017-Abschluss ist erfolgt, Crash-Atomizität bleibt dennoch `NICHT_QUALIFIZIERT`.
-- P04: I018 ist nach I018.1 read-only Registry-Source-Fingerprint fortgeschritten; Registry-Persistenz, automatische Quellensuche, separater Contract-Fingerprint, Mehrprojekt-Registry und GUI bleiben offen.
+- P04: I018 ist nach I018.2 read-only Registry-Contract-Fingerprint fortgeschritten; Registry-Persistenz, automatische Quellensuche, Source+Contract-Binding-Receipt, Mehrprojekt-Registry und GUI bleiben offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
