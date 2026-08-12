@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import pytest
+
 from provoware.vertraege.datentypen import ProjektId
 from provoware.vertraege.registry import (
     RegistryAufloesungsfehler,
     RegistryQuelle,
     registry_aufloesen,
 )
-import pytest
 
 PROJEKT_ID = ProjektId.parse("prj_0123456789abcdef0123456789abcdef")
 
