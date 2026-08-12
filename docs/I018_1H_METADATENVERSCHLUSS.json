@@ -1,0 +1,65 @@
+{
+  "schema": "1.0.0",
+  "iteration": "I018.1H",
+  "titel": "Kanonischer Metadatenverschluss fuer I018.1 Registry-Source-Fingerprint",
+  "status": "KANDIDAT",
+  "zweck": "Den bereits real qualifizierten und promovierten I018.1-Source-Fingerprint-Vertrag ohne neue Produktlogik in Projektstatus, Changelog und Lifecycle-Evidence synchronisieren.",
+  "ausgangszustand": {
+    "tool_main": "c6322ec2251fc8c54c2648c586572e34a14409e0",
+    "i018_1_tool_pr": 47,
+    "i018_1_tool_run": 31590478317,
+    "i018_1_qualifikations_head": "d4c85ffc7b28c0e33dcd504c2155794caca8eaea",
+    "masterbuch_run": 31590656723,
+    "masterbuch_main": "6666c37071312424d24c118428bffa1cf19a46c0",
+    "masterbuch_erk": "ERK-I018-002"
+  },
+  "masterbuch_evidence": {
+    "erk_id": "ERK-I018-002",
+    "typ": "Nachweis",
+    "hauptkategorie": "Architektur",
+    "nebenkategorien": ["Registry", "Integritaet", "Fingerprint", "SHA-256", "Fail-Closed", "Lifecycle"],
+    "reifegrad": "E2",
+    "prioritaet": "P0",
+    "gueltigkeitsbereich": "I018.1 read-only Registry-Source-Fingerprint",
+    "projektbezug": "PROVOWARE Wissensspeicher",
+    "quelle_herkunft": "Tool-PR #47, Tool-Run 31590478317, Tool-Merge c6322ec2251fc8c54c2648c586572e34a14409e0, Masterbuch-Run 31590656723, Masterbuch-Merge 6666c37071312424d24c118428bffa1cf19a46c0",
+    "automatisierbarkeit": "JA",
+    "status": "BESTAETIGT",
+    "goldene_regel": false,
+    "dubletten": "Von ERK-I018-001 getrennt: I018.0 qualifiziert eindeutige Aufloesung, I018.1 qualifiziert Inhaltsbindung der Quelle.",
+    "widersprueche": []
+  },
+  "grenzen": {
+    "registry_persistenz": "NICHT_IMPLEMENTIERT",
+    "automatische_quellensuche": "NICHT_IMPLEMENTIERT",
+    "signatur_herkunftsgarantie": "NICHT_QUALIFIZIERT",
+    "registry_contract_fingerprint": "NICHT_IMPLEMENTIERT",
+    "mehrprojekt_registry": "NICHT_IMPLEMENTIERT",
+    "gui": "NICHT_IMPLEMENTIERT",
+    "crash_atomizitaet": "NICHT_QUALIFIZIERT",
+    "netzwerkdateisysteme": "NICHT_QUALIFIZIERT"
+  },
+  "mutation": {
+    "produktmutation": false,
+    "testmutation": false,
+    "registry_persistenzmutation": false,
+    "baseline_mutation": false,
+    "evidence_mutation": false,
+    "masterbuchmutation": false,
+    "nutzdatenmutation": false
+  },
+  "lifecycle_hardening": {
+    "historisches_gate": ".github/workflows/i018-0h-metadatenverschluss.yml",
+    "massnahme": "Nach abgeschlossener Qualification auf workflow_dispatch-only einfrieren",
+    "grund": "Spaetere PROJEKTSTATUS-/CHANGELOG-Fortschreibung darf den historischen I018.0H-Kandidatenvertrag nicht erneut ausloesen."
+  },
+  "erwarteter_pr_scope": [
+    "PROJEKTSTATUS.json",
+    "CHANGELOG.md",
+    "docs/I018_1H_METADATENVERSCHLUSS.json",
+    ".github/workflows/i018-0h-metadatenverschluss.yml",
+    ".github/workflows/i018-1h-metadatenverschluss.yml"
+  ],
+  "rollback": "Isolierter Metadaten-PR kann vollständig revertiert werden; Produktcode und Nutzdaten bleiben unberuehrt.",
+  "promotion": "Nur nach realem completed/success des I018.1H-Gates auf exakt dem finalen PR-Head; unbekannt oder nicht ausgefuehrt bleibt NICHT_PASS."
+}
