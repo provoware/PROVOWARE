@@ -5,8 +5,12 @@ on:
     paths:
       - 'src/provoware/vertraege/registry.py'
       - 'tests/contract/test_i018_registry.py'
+      - 'tests/architecture/test_p02_architekturgate.py'
+      - 'tests/test_structure.py'
       - 'docs/ITERATION_018_0.md'
       - 'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json'
+      - '.github/workflows/i007-kernvertraege.yml'
+      - '.github/workflows/i010-p02-gate.yml'
       - '.github/workflows/i018-0-readonly-registry.yml'
   workflow_dispatch:
 
@@ -34,6 +38,20 @@ jobs:
         run: python -m ruff format --check src tests
       - name: mypy strict
         run: python -m mypy src
+      - name: Historische Candidate-Gates eingefroren
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for rel in (
+              '.github/workflows/i007-kernvertraege.yml',
+              '.github/workflows/i010-p02-gate.yml',
+          ):
+              text = Path(rel).read_text(encoding='utf-8')
+              assert 'workflow_dispatch:' in text, rel
+              assert '\n  pull_request:' not in text, rel
+              assert '\n  push:' not in text, rel
+          print('Historische I007/I010-Candidate-Gates: workflow_dispatch only')
+          PY
       - name: Wissensevidence fail-closed pruefen
         run: |
           python - <<'PY'
@@ -60,8 +78,12 @@ jobs:
           allowed = {
               'src/provoware/vertraege/registry.py',
               'tests/contract/test_i018_registry.py',
+              'tests/architecture/test_p02_architekturgate.py',
+              'tests/test_structure.py',
               'docs/ITERATION_018_0.md',
               'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json',
+              '.github/workflows/i007-kernvertraege.yml',
+              '.github/workflows/i010-p02-gate.yml',
               '.github/workflows/i018-0-readonly-registry.yml',
           }
           req = urllib.request.Request(
@@ -71,5 +93,5 @@ jobs:
           with urllib.request.urlopen(req) as response:
               paths = {item['filename'] for item in json.load(response)}
           assert paths == allowed, sorted(paths)
-          print('Exakter Fuenf-Dateien-Scope: PASS')
+          print('Exakter Neun-Dateien-Scope: PASS')
           PY
