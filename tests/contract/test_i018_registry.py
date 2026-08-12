@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import pytest
-
 from provoware.vertraege.datentypen import ProjektId
 from provoware.vertraege.registry import (
     RegistryAufloesungsfehler,
     RegistryQuelle,
     registry_aufloesen,
 )
-
+import pytest
 
 PROJEKT_ID = ProjektId.parse("prj_0123456789abcdef0123456789abcdef")
 
@@ -18,7 +16,11 @@ def quelle(*, version: str = "0.1.0-dev", manifest_version: str | None = None) -
         name="kanonisch",
         projekt_id=PROJEKT_ID,
         versionsregister={"projektversion": version, "manifest_schema": "1.0.0"},
-        manifest={"schema": "1.0.0", "version": manifest_version or version, "projekt": "PROVOWARE"},
+        manifest={
+            "schema": "1.0.0",
+            "version": manifest_version or version,
+            "projekt": "PROVOWARE",
+        },
     )
 
 
