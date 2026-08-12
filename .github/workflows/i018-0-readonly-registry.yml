@@ -11,6 +11,7 @@ on:
       - 'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json'
       - '.github/workflows/i007-kernvertraege.yml'
       - '.github/workflows/i010-p02-gate.yml'
+      - '.github/workflows/i015-2-historical-ci-scope.yml'
       - '.github/workflows/i018-0-readonly-registry.yml'
   workflow_dispatch:
 
@@ -45,12 +46,13 @@ jobs:
           for rel in (
               '.github/workflows/i007-kernvertraege.yml',
               '.github/workflows/i010-p02-gate.yml',
+              '.github/workflows/i015-2-historical-ci-scope.yml',
           ):
               text = Path(rel).read_text(encoding='utf-8')
               assert 'workflow_dispatch:' in text, rel
               assert '\n  pull_request:' not in text, rel
               assert '\n  push:' not in text, rel
-          print('Historische I007/I010-Candidate-Gates: workflow_dispatch only')
+          print('Historische I007/I010/I015.2-Candidate-Gates: workflow_dispatch only')
           PY
       - name: Wissensevidence fail-closed pruefen
         run: |
@@ -84,6 +86,7 @@ jobs:
               'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json',
               '.github/workflows/i007-kernvertraege.yml',
               '.github/workflows/i010-p02-gate.yml',
+              '.github/workflows/i015-2-historical-ci-scope.yml',
               '.github/workflows/i018-0-readonly-registry.yml',
           }
           req = urllib.request.Request(
@@ -93,5 +96,5 @@ jobs:
           with urllib.request.urlopen(req) as response:
               paths = {item['filename'] for item in json.load(response)}
           assert paths == allowed, sorted(paths)
-          print('Exakter Neun-Dateien-Scope: PASS')
+          print('Exakter Zehn-Dateien-Scope: PASS')
           PY
