@@ -1,0 +1,44 @@
+{
+  "erkenntnis_id": "ERK-I018-003",
+  "typ": "Nachweis",
+  "hauptkategorie": "Architektur",
+  "nebenkategorien": [
+    "Registry",
+    "Integritaet",
+    "Contract-Fingerprint",
+    "SHA-256",
+    "Fail-Closed",
+    "Lifecycle"
+  ],
+  "reifegrad": "E1",
+  "prioritaet": "P0",
+  "gueltigkeitsbereich": "PROVOWARE I018.2 read-only Registry-Contract-Fingerprint",
+  "projektbezug": ["PROVOWARE"],
+  "quelle_herkunft": [
+    "I018.0 qualifizierter read-only Registry-Vertrag",
+    "I018.1 qualifizierter Registry-Source-Fingerprint",
+    "I018.2 Implementierung"
+  ],
+  "automatisierbarkeit": "JA",
+  "status": "KANDIDAT",
+  "historie": [
+    {
+      "datum": "2026-08-12",
+      "ereignis": "I018.2 Kandidat angelegt; reale Qualification ausstehend"
+    }
+  ],
+  "kernaussage": "Eine Registryauflösung ist revisionsfester, wenn neben dem konkreten Quellinhalt auch der explizite Interpretationsvertrag kanonisch und unabhängig per SHA-256 gebunden wird; eine nicht autorisierte Vertragsänderung muss gegen einen erwarteten Contract-Pin fail-closed blockieren.",
+  "dubletten": [
+    {
+      "bezug": "ERK-I018-002",
+      "bewertung": "KEINE_DUBLETTE",
+      "begruendung": "ERK-I018-002 bindet den Quellinhalt; ERK-I018-003 bindet unabhängig davon die Interpretationsregeln."
+    }
+  ],
+  "widersprueche": [],
+  "goldene_regel": false,
+  "qualification": {
+    "status": "AUSSTEHEND",
+    "pass_real": false
+  }
+}
