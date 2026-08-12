@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-12
 
+### I018.1H — Registry-Source-Fingerprint metadatenseitig synchronisiert
+- I018.1-Qualification `31590478317` lief auf Head `d4c85ffc7b28c0e33dcd504c2155794caca8eaea` real mit `completed / success`; Tool-PR #47 wurde als Main-Merge `c6322ec2251fc8c54c2648c586572e34a14409e0` promoviert.
+- Die autoritative Registryquelle ist über kanonische Serialisierung und SHA-256 `source_fingerprint` gebunden; ein erwarteter Fingerprint kann als Pin verwendet werden und Abweichungen blockieren fail-closed.
+- Nicht kanonisierbare Registryinhalte werden fail-closed abgewiesen; bestehende I018.0-Single-Source-of-Truth- und ID-Referenzverträge bleiben erhalten.
+- Masterbuch-Evidence `ERK-I018-002` ist als `E2 / P0 / BESTAETIGT` ohne Goldene Regel kanonisch; Masterbuch-Run `31590656723`, Masterbuch-Merge `6666c37071312424d24c118428bffa1cf19a46c0`.
+- Registry-Persistenz, automatische Quellensuche, separater Registry-Contract-Fingerprint, Mehrprojekt-Registry und GUI bleiben `NICHT_IMPLEMENTIERT`; Signatur/Herkunftsgarantie bleibt `NICHT_QUALIFIZIERT`.
+- `PROJEKTSTATUS.json` wird um den I018.1-Nachweis ergänzt; P04 wird aus abgeschlossenem I017 und konservativem I018-Teilfortschritt auf 80 % geführt. I018 bleibt `IN_ARBEIT`.
+- Das bereits qualifizierte I018.0H-Metadatengate wird nach Promotion auf `workflow_dispatch` eingefroren, damit spätere Status-/Changelog-Fortschreibungen keinen historischen Kandidatenvertrag reaktivieren.
+- Keine Produkt-, Test-, Registry-Persistenz-, Baseline-, Evidence-, Masterbuch- oder Nutzdatenmutation in I018.1H.
+
 ### I018.0H — read-only Registry metadatenseitig synchronisiert
 - I018.0-Qualification `31573547771` lief auf Head `45e9edec963dfd4f0a7c3e23c264b1c28d08a3d1` real mit `completed / success`; Tool-PR #45 wurde als Main-Merge `f9c5a065231329a668ae9a3dc1a65783252f6362` promoviert.
 - Qualifiziert wurden 6/6 neue Registry-Contracttests, 168 Gesamtregressionstests PASS sowie 1 historischer I010-Test SKIP; der SKIP wird ausdrücklich nicht als PASS umgedeutet.
@@ -208,7 +218,7 @@
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
 - I017: optionaler Crash-/Teilwrite-Härtungsnachweis; der formale I017-Abschluss ist erfolgt, Crash-Atomizität bleibt dennoch `NICHT_QUALIFIZIERT`.
-- P04: I018 ist nach I018.0 read-only Registryvertrag begonnen; Registry-Persistenz, automatische Quellensuche und Source-Fingerprint bleiben offen.
+- P04: I018 ist nach I018.1 read-only Registry-Source-Fingerprint fortgeschritten; Registry-Persistenz, automatische Quellensuche, separater Contract-Fingerprint, Mehrprojekt-Registry und GUI bleiben offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
