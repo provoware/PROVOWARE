@@ -1,14 +1,6 @@
 name: I017.1H Metadatenabschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CHANGELOG.md'
-      - 'docs/ITERATION_017_1.md'
-      - '.github/workflows/i017-1-id-persistenz.yml'
-      - '.github/workflows/i017h-metadatenabschluss.yml'
-      - '.github/workflows/i017-1h-metadatenabschluss.yml'
   workflow_dispatch:
 
 permissions:
