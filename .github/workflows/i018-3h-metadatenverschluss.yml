@@ -1,6 +1,13 @@
-name: I018.2H Metadatenverschluss
+name: I018.3H Metadatenverschluss
 
 on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'CHANGELOG.md'
+      - 'docs/I018_3H_METADATENVERSCHLUSS.json'
+      - '.github/workflows/i018-2h-metadatenverschluss.yml'
+      - '.github/workflows/i018-3h-metadatenverschluss.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,41 +27,51 @@ jobs:
           from pathlib import Path
 
           status = json.loads(Path('PROJEKTSTATUS.json').read_text())
-          proof = json.loads(Path('docs/I018_2H_METADATENVERSCHLUSS.json').read_text())
+          proof = json.loads(Path('docs/I018_3H_METADATENVERSCHLUSS.json').read_text())
           baseline = json.loads(Path('CURRENT_BASELINE.json').read_text())
           handoff = json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
 
-          q = status.get('i018_2_registry_contract_fingerprint_qualifikation', {})
+          q = status.get('i018_3_binding_receipt_qualifikation', {})
           assert q.get('status') == 'VALIDIERT_GITHUB'
-          assert q.get('tool_pr') == 49
-          assert q.get('workflow_run_id') == 31605278784
+          assert q.get('scope') == 'READ_ONLY_SOURCE_CONTRACT_BINDING_RECEIPT'
+          assert q.get('tool_pr') == 51
+          assert q.get('workflow_run_id') == 31621026866
+          assert q.get('workflow_status') == 'completed'
           assert q.get('workflow_conclusion') == 'success'
-          assert q.get('github_qualifikations_head') == '21a7a2e95340fe2abfa371161d98487e3a04e8ac'
-          assert q.get('github_main_merge_commit') == '5fa8eca05bfbebe50898fafad26d31d7f26a14fd'
-          assert q.get('masterbuch_hardening_run_id') == 31610977691
-          assert q.get('masterbuch_main_merge_commit') == '8ba463735908a66175cc9c59886c392817072986'
-          assert q.get('masterbuch_evidence') == 'ERK-I018-003'
+          assert q.get('github_qualifikations_head') == '31828051212af237a4df837ba1fe7640515a9b37'
+          assert q.get('github_main_merge_commit') == '9967dc70fcda1d12c5d34602f7bb2178908e4ff3'
+          assert q.get('masterbuch_workflow_run_id') == 31621213201
+          assert q.get('masterbuch_main_merge_commit') == 'd876dc52ea788419a6e77cb4ce7b8e4f3a16d928'
+          assert q.get('masterbuch_evidence') == 'ERK-I018-004'
           assert q.get('evidence_binding') == 'PASS_REAL'
-          assert q.get('contract_fingerprint') == 'SHA256_KANONISCHE_VERTRAGSREPRAESENTATION_QUALIFIZIERT'
-          assert q.get('contract_pin') == 'FAIL_CLOSED_GRUEN'
-          assert q.get('source_contract_trennung') == 'GRUEN'
+          assert q.get('binding_receipt') == 'SHA256_KANONISCHE_GESAMTZUSTANDSBINDUNG_QUALIFIZIERT'
+          assert q.get('receipt_pin') == 'FAIL_CLOSED_GRUEN'
+          assert q.get('source_contract_binding') == 'GRUEN'
           assert q.get('registry_persistenz') == 'NICHT_IMPLEMENTIERT'
           assert q.get('automatische_quellensuche') == 'NICHT_IMPLEMENTIERT'
           assert q.get('signatur_herkunftsgarantie') == 'NICHT_QUALIFIZIERT'
-          assert q.get('source_contract_binding_receipt') == 'NICHT_IMPLEMENTIERT'
+          assert q.get('receipt_persistenz') == 'NICHT_IMPLEMENTIERT'
           assert q.get('mehrprojekt_registry') == 'NICHT_IMPLEMENTIERT'
           assert q.get('gui') == 'NICHT_IMPLEMENTIERT'
 
           assert status.get('letzte_abgeschlossene_iteration') == 'I017'
           assert status.get('naechste_iteration') == 'I018'
-          assert 80 < status.get('p04_fortschritt_prozent', 0) < 100
+          assert status.get('status') == 'IN_ARBEIT'
+          assert status.get('p04_fortschritt_prozent') == 95
           assert baseline.get('letzte_iteration') == 'I017'
           assert baseline.get('naechste_iteration') == 'I018'
           assert handoff.get('next_iteration') == 'I018'
 
+          assert proof.get('iteration') == 'I018.3H'
           assert proof.get('status') == 'KANDIDAT'
+          tool = proof.get('tool_evidence', {})
+          assert tool.get('tool_pr') == 51
+          assert tool.get('workflow_run_id') == 31621026866
+          assert tool.get('workflow_conclusion') == 'success'
+          assert tool.get('qualifikations_head') == '31828051212af237a4df837ba1fe7640515a9b37'
+          assert tool.get('main_merge_commit') == '9967dc70fcda1d12c5d34602f7bb2178908e4ff3'
           mb = proof.get('masterbuch_evidence', {})
-          assert mb.get('erk_id') == 'ERK-I018-003'
+          assert mb.get('erk_id') == 'ERK-I018-004'
           assert mb.get('typ') == 'Nachweis'
           assert mb.get('hauptkategorie') == 'Architektur'
           assert mb.get('reifegrad') == 'E2'
@@ -64,31 +81,31 @@ jobs:
           assert mb.get('goldene_regel') is False
           assert mb.get('widersprueche') == []
           assert mb.get('evidence_binding') == 'PASS_REAL'
-          assert mb.get('masterbuch_hardening_run_id') == 31610977691
-          assert mb.get('masterbuch_main_merge_commit') == '8ba463735908a66175cc9c59886c392817072986'
-          mutation = proof.get('mutation', {})
-          assert all(value is False for value in mutation.values())
+          assert mb.get('masterbuch_workflow_run_id') == 31621213201
+          assert mb.get('masterbuch_main_merge_commit') == 'd876dc52ea788419a6e77cb4ce7b8e4f3a16d928'
+          assert all(value is False for value in proof.get('mutation', {}).values())
           PY
 
       - name: Changelog-Evidence prüfen
         run: |
-          grep -F 'I018.2H' CHANGELOG.md
-          grep -F '31605278784' CHANGELOG.md
-          grep -F '5fa8eca05bfbebe50898fafad26d31d7f26a14fd' CHANGELOG.md
-          grep -F '31610977691' CHANGELOG.md
-          grep -F '8ba463735908a66175cc9c59886c392817072986' CHANGELOG.md
-          grep -F 'ERK-I018-003' CHANGELOG.md
+          grep -F 'I018.3H' CHANGELOG.md
+          grep -F '31621026866' CHANGELOG.md
+          grep -F '31828051212af237a4df837ba1fe7640515a9b37' CHANGELOG.md
+          grep -F '9967dc70fcda1d12c5d34602f7bb2178908e4ff3' CHANGELOG.md
+          grep -F '31621213201' CHANGELOG.md
+          grep -F 'd876dc52ea788419a6e77cb4ce7b8e4f3a16d928' CHANGELOG.md
+          grep -F 'ERK-I018-004' CHANGELOG.md
           grep -F 'PASS_REAL' CHANGELOG.md
 
-      - name: Historisches I018.1H-Gate eingefroren prüfen
+      - name: Historisches I018.2H-Gate eingefroren prüfen
         run: |
           python - <<'PY'
           from pathlib import Path
-          pre = Path('.github/workflows/i018-1h-metadatenverschluss.yml').read_text().split('permissions:', 1)[0]
+          pre = Path('.github/workflows/i018-2h-metadatenverschluss.yml').read_text().split('permissions:', 1)[0]
           assert 'workflow_dispatch:' in pre
           assert 'pull_request:' not in pre
           assert 'push:' not in pre
-          print('Historisches I018.1H-Gate: workflow_dispatch-only')
+          print('Historisches I018.2H-Gate: workflow_dispatch-only')
           PY
 
       - name: Exakten Metadaten-Scope fail-closed prüfen
@@ -104,9 +121,9 @@ jobs:
           allowed = {
               'PROJEKTSTATUS.json',
               'CHANGELOG.md',
-              'docs/I018_2H_METADATENVERSCHLUSS.json',
-              '.github/workflows/i018-1h-metadatenverschluss.yml',
+              'docs/I018_3H_METADATENVERSCHLUSS.json',
               '.github/workflows/i018-2h-metadatenverschluss.yml',
+              '.github/workflows/i018-3h-metadatenverschluss.yml',
           }
           req = urllib.request.Request(
               f"https://api.github.com/repos/{os.environ['REPO']}/pulls/{os.environ['PR']}/files?per_page=100",
@@ -122,4 +139,4 @@ jobs:
           PY
 
       - name: Abschluss
-        run: echo 'I018.2H Metadatenverschluss qualifiziert'
+        run: echo 'I018.3H Metadatenverschluss qualifiziert'

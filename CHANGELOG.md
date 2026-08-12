@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-12
 
+### I018.3H — Source+Contract Binding Receipt metadatenseitig synchronisiert
+- I018.3-Qualification `31621026866` lief auf Head `31828051212af237a4df837ba1fe7640515a9b37` real mit `completed / success`; Tool-PR #51 wurde SHA-gebunden als Main-Merge `9967dc70fcda1d12c5d34602f7bb2178908e4ff3` promoviert.
+- Das read-only `RegistryBindingReceipt` bindet Projekt-ID, Source-Fingerprint, Contract-Fingerprint, aufgelöste Produktversion und Manifest-Schema gemeinsam über kanonische Repräsentation und SHA-256 `binding_receipt_sha256`; Abweichungen gegen den Receipt-Pin blockieren fail-closed.
+- Source- und Contract-Fingerprint bleiben getrennte Einzelbelege; I018.3 ergänzt lediglich die gemeinsame Gesamtzustandsbindung und ersetzt keinen bestehenden Integritätsnachweis.
+- Masterbuch-Evidence `ERK-I018-004` wurde nach Tool-PASS auf `E2 / P0 / BESTAETIGT` ohne Goldene Regel angehoben; Masterbuch-Run `31621213201` verifizierte Tool-Workflow-ID/-Pfad, Event, Branch, PR, Head und Merge-Commit fail-closed; kanonischer Masterbuch-Merge `d876dc52ea788419a6e77cb4ce7b8e4f3a16d928`.
+- `PROJEKTSTATUS.json` erhält den I018.3-Nachweis; P04 wird konservativ auf 95 % geführt. I018 bleibt `IN_ARBEIT`.
+- Registry-Persistenz, automatische Quellensuche, Receipt-Persistenz, Mehrprojekt-Registry und GUI bleiben `NICHT_IMPLEMENTIERT`; Signatur/Herkunftsgarantie bleibt `NICHT_QUALIFIZIERT`.
+- Das bereits qualifizierte I018.2H-Metadatengate wird nach Promotion auf `workflow_dispatch` eingefroren, damit spätere Status-/Changelog-Fortschreibungen keinen historischen Kandidatenvertrag reaktivieren.
+- Keine Produkt-, Test-, Registry-Persistenz-, Baseline-, Evidence-, Masterbuch- oder Nutzdatenmutation in I018.3H.
+
 ### I018.2H — Registry-Contract-Fingerprint metadatenseitig synchronisiert
 - I018.2-Qualification `31605278784` lief auf Head `21a7a2e95340fe2abfa371161d98487e3a04e8ac` real mit `completed / success`; Tool-PR #49 wurde als Main-Merge `5fa8eca05bfbebe50898fafad26d31d7f26a14fd` promoviert.
 - Der explizite Registry-Interpretationsvertrag ist unabhängig vom Registryquellinhalt über kanonische Vertragsrepräsentation und SHA-256 `contract_fingerprint` gebunden; Abweichungen gegen den Contract-Pin blockieren fail-closed.
@@ -63,7 +73,7 @@
 - Projekt-I017 bleibt formal `IN_ARBEIT`: `PERSISTENZ_ANBINDUNG = NICHT_IMPLEMENTIERT`, `REGISTRY_ANBINDUNG = NICHT_IMPLEMENTIERT`, `KOLLISIONSFREIHEIT = NICHT_BEWIESEN`.
 - P04-Fortschritt wird konservativ mit 20 % geführt; der Masterplan-Abnahmekern Kollisions-/Restarttest ist noch nicht vollständig erfüllt.
 - Historische I016.3H- und I017-Candidate-Gates werden nach abgeschlossener Qualification auf read-only `workflow_dispatch` begrenzt, damit spätere gemeinsame Metadaten sie nicht fälschlich reaktivieren.
-- Keine Produkt-, Test-, Persistenz-, Registry-, Baseline- oder Nutzdatenmutation.
+- Keine Produkt-, Test-, Persistenz-, Registry-, Baseline-, Evidence- oder Nutzdatenmutation.
 
 ### Delta-I016.3H — P03 und PLAN_DELTA formal abgeschlossen
 - Reale I016.3-Qualification nachgetragen: Workflow `31511070448` lief auf Head `403bba4b2ae6e8a79e573e95dca7f2308c37207f` mit `completed / success`.
@@ -138,7 +148,7 @@
 - Historische I011-/I010-Gates auf ihren qualifizierten Quell- und Lebenszyklus-Scope begrenzt, ohne historische Evidence zu verändern.
 - Finaler Workflow `31357647745` vollständig grün; Artifact `9051207196`, 786 Byte, SHA-256 `1cced27d241951ec9190f82f7bb72680193d4d325cfdae9c10e1a371309c1d3a`, Receipt-SHA-256 `b88d8a6cc811b2119490cca9d6a6716b921bf9c0fe0f0e61895fa50dea825010`.
 - Produktstand per PR #18 auf Main-Merge-Commit `0402f4f910923f703eadb97243bc554ebccf2f0c` übernommen; vorherige I011-Baseline auf `backup/vor-i012-promotion-2026-08-10` gesichert.
-- P03-Fortschritt auf 50 % gesetzt und I013 als read-only Symlink-/Dateisystemprobe freigegeben.
+- P03-Fortschritt auf 50 % gesetzt und I013 Pfadnormalisierung/Projektwurzel-Schutz freigegeben.
 
 ### I011 — Linux-Systemprofil und X11-Erkennung qualifiziert
 - Read-only Linux-Systemprofil mit injizierbaren Erkennungsquellen eingeführt.
@@ -228,7 +238,7 @@
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
 - I017: optionaler Crash-/Teilwrite-Härtungsnachweis; der formale I017-Abschluss ist erfolgt, Crash-Atomizität bleibt dennoch `NICHT_QUALIFIZIERT`.
-- P04: I018 ist nach I018.2 read-only Registry-Contract-Fingerprint fortgeschritten; Registry-Persistenz, automatische Quellensuche, Source+Contract-Binding-Receipt, Mehrprojekt-Registry und GUI bleiben offen.
+- P04: I018 ist nach I018.3 read-only Source+Contract Binding Receipt fortgeschritten; Registry-Persistenz, automatische Quellensuche, Receipt-Persistenz, Mehrprojekt-Registry und GUI bleiben offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
