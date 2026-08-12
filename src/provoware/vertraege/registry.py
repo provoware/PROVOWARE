@@ -1,11 +1,14 @@
-"""Read-only Versions-/Manifestregistry-Vertrag für I018.0.
+"""Read-only Versions-/Manifestregistry-Vertrag für I018.
 
 Die Schicht mutiert weder Register noch IDs. Sie akzeptiert genau eine bereits
-vorhandene Registryquelle und löst Version und Manifest deterministisch auf.
+vorhandene Registryquelle, bindet deren kanonischen Inhalt per SHA-256 und löst
+Version und Manifest deterministisch auf.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
@@ -36,6 +39,7 @@ class RegistryErgebnis:
     produktversion: ProduktVersion
     manifest_schema: SchemaVersion
     manifest: Mapping[str, object]
+    source_fingerprint: str
 
 
 def _text(mapping: Mapping[str, object], feld: str, quelle: str) -> str:
@@ -45,8 +49,38 @@ def _text(mapping: Mapping[str, object], feld: str, quelle: str) -> str:
     return wert
 
 
-def registry_aufloesen(quellen: Sequence[RegistryQuelle]) -> RegistryErgebnis:
-    """Löst exakt eine Quelle auf; Mehrdeutigkeit und Widersprüche blockieren."""
+def registry_source_fingerprint(quelle: RegistryQuelle) -> str:
+    """Bildet einen deterministischen SHA-256-Fingerprint der gesamten Quelle.
+
+    Die Serialisierung ist absichtlich streng: Nicht JSON-kompatible Werte,
+    NaN/Infinity und andere nicht kanonisierbare Inhalte blockieren fail-closed.
+    """
+
+    payload = {
+        "manifest": quelle.manifest,
+        "name": quelle.name,
+        "projekt_id": str(quelle.projekt_id),
+        "versionsregister": quelle.versionsregister,
+    }
+    try:
+        kanonisch = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise RegistryAufloesungsfehler(
+            "Registryquelle kann nicht kanonisch serialisiert werden."
+        ) from exc
+    return hashlib.sha256(kanonisch).hexdigest()
+
+
+def registry_aufloesen(
+    quellen: Sequence[RegistryQuelle], *, erwarteter_fingerprint: str | None = None
+) -> RegistryErgebnis:
+    """Löst exakt eine Quelle auf; Mehrdeutigkeit, Austausch und Widersprüche blockieren."""
 
     if len(quellen) != 1:
         raise RegistryAufloesungsfehler(
@@ -56,6 +90,10 @@ def registry_aufloesen(quellen: Sequence[RegistryQuelle]) -> RegistryErgebnis:
     quelle = quellen[0]
     if not quelle.name.strip():
         raise RegistryAufloesungsfehler("Registryquellenname darf nicht leer sein.")
+
+    source_fingerprint = registry_source_fingerprint(quelle)
+    if erwarteter_fingerprint is not None and source_fingerprint != erwarteter_fingerprint:
+        raise RegistryAufloesungsfehler("Registryquelle weicht vom erwarteten Fingerprint ab.")
 
     versions_version = ProduktVersion.parse(
         _text(quelle.versionsregister, "projektversion", "VERSIONSREGISTER")
@@ -81,4 +119,5 @@ def registry_aufloesen(quellen: Sequence[RegistryQuelle]) -> RegistryErgebnis:
         produktversion=manifest_version,
         manifest_schema=manifest_schema,
         manifest=quelle.manifest,
+        source_fingerprint=source_fingerprint,
     )
