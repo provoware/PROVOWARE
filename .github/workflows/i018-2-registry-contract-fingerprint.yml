@@ -1,14 +1,6 @@
 name: I018.2 Registry-Contract-Fingerprint
 
 on:
-  pull_request:
-    paths:
-      - 'src/provoware/vertraege/registry.py'
-      - 'tests/contract/test_i018_registry.py'
-      - 'docs/ITERATION_018_2.md'
-      - 'docs/WISSENSSPEICHER_I018_2_ERKENNTNIS.json'
-      - '.github/workflows/i018-1-registry-source-fingerprint.yml'
-      - '.github/workflows/i018-2-registry-contract-fingerprint.yml'
   workflow_dispatch:
 
 permissions:
