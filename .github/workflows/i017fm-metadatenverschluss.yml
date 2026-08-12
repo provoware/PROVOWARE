@@ -1,13 +1,6 @@
 name: I017FM Metadatenverschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CHANGELOG.md'
-      - 'docs/I017FM_ABSCHLUSS.json'
-      - '.github/workflows/i017-1h-metadatenabschluss.yml'
-      - '.github/workflows/i017fm-metadatenverschluss.yml'
   workflow_dispatch:
 
 permissions:
