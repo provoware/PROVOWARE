@@ -1,0 +1,145 @@
+name: I017FM Metadatenverschluss
+
+on:
+  pull_request:
+    paths:
+      - 'PROJEKTSTATUS.json'
+      - 'CHANGELOG.md'
+      - 'docs/I017FM_ABSCHLUSS.json'
+      - '.github/workflows/i017-1h-metadatenabschluss.yml'
+      - '.github/workflows/i017fm-metadatenverschluss.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JSON und Lifecycle-Invarianten prüfen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('PROJEKTSTATUS.json').read_text())
+          baseline = json.loads(Path('CURRENT_BASELINE.json').read_text())
+          uebergabe = json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
+          abschluss = json.loads(Path('docs/I017FM_ABSCHLUSS.json').read_text())
+
+          assert status['letzte_abgeschlossene_iteration'] == 'I017'
+          assert status['naechste_iteration'] == 'I018'
+          assert status['i017_formaler_abschluss']['status'] == 'VALIDIERT_GITHUB'
+          assert status['i017_formaler_abschluss']['i017f_workflow_run_id'] == 31549054588
+          assert status['i017_formaler_abschluss']['i017fh_workflow_run_id'] == 31555861084
+          assert status['i017_formaler_abschluss']['registry_anbindung'] == 'NICHT_IMPLEMENTIERT'
+          assert status['i017_formaler_abschluss']['crash_atomizitaet'] == 'NICHT_QUALIFIZIERT'
+          assert baseline['letzte_iteration'] == 'I017'
+          assert baseline['naechste_iteration'] == 'I018'
+          assert uebergabe['next_iteration'] == 'I018'
+          assert abschluss['status'] == 'IN_PRUEFUNG'
+          assert abschluss['zielzustand']['i018_fachlogik'] == 'NICHT_IMPLEMENTIERT'
+          print('Lifecycle-Invarianten: PASS')
+          PY
+
+      - name: Vorbedingungs-Evidence gegen GitHub prüfen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+
+          checks = {
+              31549054588: 'f4e3c6907d7a587dd688d7ce7578a70e0b0f5c4a',
+              31555861084: '5a4f7465cc14eda7b363b339c72e87a80ca2f326',
+          }
+          for run_id, sha in checks.items():
+              req = urllib.request.Request(
+                  f'https://api.github.com/repos/provoware/PROVOWARE/actions/runs/{run_id}',
+                  headers={
+                      'Authorization': f'Bearer {os.environ["GH_TOKEN"]}',
+                      'Accept': 'application/vnd.github+json',
+                      'X-GitHub-Api-Version': '2022-11-28',
+                  },
+              )
+              with urllib.request.urlopen(req) as response:
+                  data = json.load(response)
+              assert data['status'] == 'completed', (run_id, data['status'])
+              assert data['conclusion'] == 'success', (run_id, data['conclusion'])
+              assert data['head_sha'] == sha, (run_id, data['head_sha'])
+          print('Historische Evidence: PASS_REAL verifiziert')
+          PY
+
+      - name: Changelog-Konsistenz prüfen
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('CHANGELOG.md').read_text()
+          required = [
+              'I017FM',
+              '31549054588',
+              '31555861084',
+              'c3e28ce098b9b2f5d63d4fe53dffaae1e088b26e',
+              'a04d2510e05cd3d5fb12771bad29f7fd74f48b0e',
+              'I018',
+              'NICHT_QUALIFIZIERT',
+          ]
+          missing = [item for item in required if item not in text]
+          assert not missing, missing
+          print('Changelog-Konsistenz: PASS')
+          PY
+
+      - name: Historisches I017.1H-Gate eingefroren prüfen
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          pre = Path('.github/workflows/i017-1h-metadatenabschluss.yml').read_text().split('permissions:', 1)[0]
+          assert 'workflow_dispatch:' in pre
+          assert 'pull_request:' not in pre
+          print('Historisches I017.1H-Gate: workflow_dispatch-only')
+          PY
+
+      - name: Produkt- und Nutzdatenmutation ausschließen
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+
+          allowed = {
+              'PROJEKTSTATUS.json',
+              'CHANGELOG.md',
+              'docs/I017FM_ABSCHLUSS.json',
+              '.github/workflows/i017-1h-metadatenabschluss.yml',
+              '.github/workflows/i017fm-metadatenverschluss.yml',
+          }
+          page = 1
+          paths = []
+          while True:
+              req = urllib.request.Request(
+                  f'https://api.github.com/repos/provoware/PROVOWARE/pulls/{os.environ["PR_NUMBER"]}/files?per_page=100&page={page}',
+                  headers={
+                      'Authorization': f'Bearer {os.environ["GH_TOKEN"]}',
+                      'Accept': 'application/vnd.github+json',
+                      'X-GitHub-Api-Version': '2022-11-28',
+                  },
+              )
+              with urllib.request.urlopen(req) as response:
+                  chunk = json.load(response)
+              if not chunk:
+                  break
+              paths.extend(item['filename'] for item in chunk)
+              if len(chunk) < 100:
+                  break
+              page += 1
+          unexpected = sorted(set(paths) - allowed)
+          assert not unexpected, unexpected
+          assert set(paths) == allowed, paths
+          print('Exakter Fünf-Dateien-Scope: PASS')
+          PY

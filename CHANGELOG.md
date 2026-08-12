@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-12
 
+### I017FM — I017 kanonisch abgeschlossen
+- I017F-Abschlussgate `31549054588` lief auf Head `f4e3c6907d7a587dd688d7ce7578a70e0b0f5c4a` real mit `completed / success`; Tool-Merge `c3e28ce098b9b2f5d63d4fe53dffaae1e088b26e`.
+- I017FH-Status-Readback `31555861084` lief auf Head `5a4f7465cc14eda7b363b339c72e87a80ca2f326` real mit `completed / success`; Tool-Merge `a04d2510e05cd3d5fb12771bad29f7fd74f48b0e`.
+- Der qualifizierte Readback belegte die verbliebene Abweichung zwischen `CURRENT_BASELINE`/`ITERATIONSUEBERGABE` (`I017 -> I018`) und dem nachlaufenden `PROJEKTSTATUS` (`I016 -> I017`).
+- `PROJEKTSTATUS.json` wird deshalb ausschließlich metadatenseitig auf `letzte_abgeschlossene_iteration = I017` und `naechste_iteration = I018` synchronisiert; I018-Fachlogik bleibt `NICHT_IMPLEMENTIERT`.
+- P04 wird nach der dokumentierten Zweischritt-Zuordnung I017/I018 mit abgeschlossenem I017 konservativ auf 50 % geführt; I018 bleibt vollständig offen.
+- UUID4-Kollisionsfreiheit bleibt `NICHT_BEWIESEN`; Crash-Atomizität und Netzwerkdateisysteme bleiben `NICHT_QUALIFIZIERT`.
+- Keine neue Masterbuchregel und keine Goldene Regel: I017FM ist reiner Metadatenverschluss bereits qualifizierter E2/P0-Evidence.
+- Keine Produkt-, Test-, Persistenz-, Registry-, Baseline-, Evidence- oder Nutzdatenmutation.
+
 ### I017.1H — ID-Persistenz/Restart metadatenseitig synchronisiert
 - I017.1 funktionaler Kandidatenlauf `31536871890` auf Head `1a0a6d85e0547d6f1e0b395281a490828d40491c` real mit `completed / success`.
 - Promotions-/Evidence-Lauf `31536951091` auf Head `739f0b8368ad79f418a800d5d98b5aea70e0ab54` real mit `completed / success`.
@@ -187,7 +197,7 @@
 
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
-- I017: formaler Abschluss und Entscheidung über zusätzlichen Crash-/Teilwrite-Härtungsnachweis; Crash-Atomizität bleibt derzeit `NICHT_QUALIFIZIERT`.
+- I017: optionaler Crash-/Teilwrite-Härtungsnachweis; der formale I017-Abschluss ist erfolgt, Crash-Atomizität bleibt dennoch `NICHT_QUALIFIZIERT`.
 - P04: Versions- und Manifestregistry (projektintern I018).
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
