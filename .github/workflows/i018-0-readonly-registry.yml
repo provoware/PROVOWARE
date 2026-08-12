@@ -1,18 +1,6 @@
 name: I018.0 Read-only Registry
 
 on:
-  pull_request:
-    paths:
-      - 'src/provoware/vertraege/registry.py'
-      - 'tests/contract/test_i018_registry.py'
-      - 'tests/architecture/test_p02_architekturgate.py'
-      - 'tests/test_structure.py'
-      - 'docs/ITERATION_018_0.md'
-      - 'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json'
-      - '.github/workflows/i007-kernvertraege.yml'
-      - '.github/workflows/i010-p02-gate.yml'
-      - '.github/workflows/i015-2-historical-ci-scope.yml'
-      - '.github/workflows/i018-0-readonly-registry.yml'
   workflow_dispatch:
 
 permissions:
@@ -69,32 +57,7 @@ jobs:
           assert data['qualification']['pass_real'] is False
           print('Wissensevidence: E1/KANDIDAT/AUSSTEHEND')
           PY
-      - name: Exakten Scope pruefen
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+      - name: Historischen Scope dokumentieren
         run: |
-          python - <<'PY'
-          import json, os, urllib.request
-          allowed = {
-              'src/provoware/vertraege/registry.py',
-              'tests/contract/test_i018_registry.py',
-              'tests/architecture/test_p02_architekturgate.py',
-              'tests/test_structure.py',
-              'docs/ITERATION_018_0.md',
-              'docs/WISSENSSPEICHER_I018_ERKENNTNIS.json',
-              '.github/workflows/i007-kernvertraege.yml',
-              '.github/workflows/i010-p02-gate.yml',
-              '.github/workflows/i015-2-historical-ci-scope.yml',
-              '.github/workflows/i018-0-readonly-registry.yml',
-          }
-          req = urllib.request.Request(
-              f'https://api.github.com/repos/provoware/PROVOWARE/pulls/{os.environ["PR_NUMBER"]}/files?per_page=100',
-              headers={'Authorization': f'Bearer {os.environ["GH_TOKEN"]}', 'Accept': 'application/vnd.github+json'},
-          )
-          with urllib.request.urlopen(req) as response:
-              paths = {item['filename'] for item in json.load(response)}
-          assert paths == allowed, sorted(paths)
-          print('Exakter Zehn-Dateien-Scope: PASS')
-          PY
+          echo 'Historisches I018.0-Candidate-Gate ist nach Promotion eingefroren.'
+          echo 'Die damalige Zehn-Dateien-Scope-Pruefung gilt nur fuer den qualifizierten I018.0-Kandidaten.'
