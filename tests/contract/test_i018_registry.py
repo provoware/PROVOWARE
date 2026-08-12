@@ -10,6 +10,7 @@ from provoware.vertraege.registry import (
     RegistryAufloesungsfehler,
     RegistryQuelle,
     registry_aufloesen,
+    registry_binding_receipt_fingerprint,
     registry_contract_fingerprint,
     registry_source_fingerprint,
 )
@@ -40,6 +41,7 @@ def test_eine_quelle_wird_deterministisch_aufgeloest() -> None:
     assert ergebnis.manifest["projekt"] == "PROVOWARE"
     assert len(ergebnis.source_fingerprint) == 64
     assert len(ergebnis.contract_fingerprint) == 64
+    assert len(ergebnis.binding_receipt_sha256) == 64
 
 
 def test_keine_quelle_blockiert_fail_closed() -> None:
@@ -72,6 +74,7 @@ def test_bestehende_id_wird_nur_referenziert() -> None:
     ergebnis = registry_aufloesen([quelle()])
 
     assert ergebnis.projekt_id is PROJEKT_ID
+    assert ergebnis.binding_receipt.projekt_id is PROJEKT_ID
 
 
 def test_source_fingerprint_ist_deterministisch_und_reihenfolgeunabhaengig() -> None:
@@ -143,3 +146,61 @@ def test_ungueltige_contract_quellenanzahl_blockiert_fail_closed() -> None:
 
     with pytest.raises(RegistryAufloesungsfehler, match="exakt eine Quelle verlangen"):
         registry_aufloesen([quelle()], vertrag=vertrag)
+
+
+def test_binding_receipt_bindet_alle_qualifizierten_werte_deterministisch() -> None:
+    a = registry_aufloesen([quelle()])
+    b = registry_aufloesen([quelle()])
+
+    assert a.binding_receipt.projekt_id == PROJEKT_ID
+    assert a.binding_receipt.source_fingerprint == a.source_fingerprint
+    assert a.binding_receipt.contract_fingerprint == a.contract_fingerprint
+    assert a.binding_receipt.produktversion == a.produktversion
+    assert a.binding_receipt.manifest_schema == a.manifest_schema
+    assert a.binding_receipt_sha256 == b.binding_receipt_sha256
+    assert a.binding_receipt_sha256 == registry_binding_receipt_fingerprint(a.binding_receipt)
+
+
+def test_quellenaenderung_aendert_binding_receipt() -> None:
+    a = registry_aufloesen([quelle()])
+    veraendert = RegistryQuelle(
+        name="kanonisch",
+        projekt_id=PROJEKT_ID,
+        versionsregister={"projektversion": "0.1.0-dev", "manifest_schema": "1.0.0"},
+        manifest={
+            "schema": "1.0.0",
+            "version": "0.1.0-dev",
+            "projekt": "PROVOWARE-NEU",
+        },
+    )
+    b = registry_aufloesen([veraendert])
+
+    assert a.contract_fingerprint == b.contract_fingerprint
+    assert a.source_fingerprint != b.source_fingerprint
+    assert a.binding_receipt_sha256 != b.binding_receipt_sha256
+
+
+def test_vertragsaenderung_aendert_binding_receipt() -> None:
+    a = registry_aufloesen([quelle()])
+    vertrag = replace(STANDARD_REGISTRY_VERTRAG, identitaetsregel="id_nur_referenzieren_v2")
+    b = registry_aufloesen([quelle()], vertrag=vertrag)
+
+    assert a.source_fingerprint == b.source_fingerprint
+    assert a.contract_fingerprint != b.contract_fingerprint
+    assert a.binding_receipt_sha256 != b.binding_receipt_sha256
+
+
+def test_binding_receipt_pin_blockiert_veraenderte_aufloesung_fail_closed() -> None:
+    original = registry_aufloesen([quelle()])
+    veraendert = RegistryQuelle(
+        name="kanonisch",
+        projekt_id=PROJEKT_ID,
+        versionsregister={"projektversion": "0.2.0-dev", "manifest_schema": "1.0.0"},
+        manifest={"schema": "1.0.0", "version": "0.2.0-dev", "projekt": "PROVOWARE"},
+    )
+
+    with pytest.raises(RegistryAufloesungsfehler, match="Binding-Receipt weicht"):
+        registry_aufloesen(
+            [veraendert],
+            erwarteter_binding_receipt_sha256=original.binding_receipt_sha256,
+        )
