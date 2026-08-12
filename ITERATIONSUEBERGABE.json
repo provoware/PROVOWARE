@@ -1,65 +1,72 @@
 {
-  "schema": "1.3.0",
-  "next_iteration": "I018",
-  "next_iteration_origin": "MASTERPLAN_P04_NEUZUORDNUNG_NACH_PLAN_DELTA",
-  "next_goal": "Versions- und Manifestregistry als kleinsten Single-Source-of-Truth-Vertrag definieren, ohne breitere Registry- oder GUI-Logik vorzuziehen.",
-  "why_next": "I017-ID-Vertragskern und I017.1-Persistenz-/Restartvertrag sind real qualifiziert. Der dokumentierte I017-Abnahmekern aus deterministischer Validierung, Restart-Erhalt und fail-closed Konfliktbehandlung ist erfüllt; Registry blieb bewusst ausgeschlossen und ist der nächste P04-Planpunkt.",
+  "schema": "1.4.0",
+  "next_iteration": "I019",
+  "next_iteration_origin": "MASTERPLAN_P04_I017_NACH_PLAN_DELTA_P04_2026_08_12_001",
+  "next_goal": "Auditjournal mit monotoner sequence und Hash-Kette als kleinsten read-only/manipulationserkennenden Vertragskern definieren.",
+  "why_next": "Projekt-I017 qualifiziert dauerhafte ID/Persistenz, Projekt-I018 qualifiziert die Versions-/Manifestregistry einschließlich Source-, Contract- und Binding-Fingerprints. PLAN-DELTA-P04-2026-08-12-001 bewahrt die zwei noch fehlenden Masterplan-P04-Pflichtkerne und ordnet Auditjournal auf Projekt-I019 sowie Speichertrennung/Retention auf Projekt-I020 ab.",
   "priority": "P0",
-  "probable_component": "Versions- und Manifestregistry / Single Source of Truth",
-  "probable_files": ["PROJEKTSTATUS.json", "ITERATIONSUEBERGABE.json", "docs/ITERATION_018.md"],
+  "probable_component": "KERN/auditjournal",
+  "probable_files": ["src/provoware/vertraege/auditjournal.py", "tests/contract/test_i019_auditjournal.py", "docs/ITERATION_019.md"],
   "plan_identity": {
     "masterplan_version": "2.0.0",
     "closed_delta_id": "PLAN-DELTA-P03-2026-08-10-001",
+    "active_delta_id": "PLAN-DELTA-P04-2026-08-12-001",
     "masterplan_p04_i015": "dauerhafte ID-Erzeugung und Validierung",
     "masterplan_p04_i016": "Versions- und Manifestregistry",
+    "masterplan_p04_i017": "Auditjournal mit sequence + hash chain",
+    "masterplan_p04_i018": "Audit/Debug/Evidence-Speichertrennung",
     "project_mapping_p04_i017": "dauerhafte ID-Erzeugung und Validierung",
     "project_mapping_p04_i018": "Versions- und Manifestregistry",
+    "project_mapping_p04_i019": "Auditjournal mit sequence + hash chain",
+    "project_mapping_p04_i020": "Audit/Debug/Evidence-Speichertrennung",
     "number_collision_resolved": true,
-    "resolution": "P04_CONTINUES_AS_I017_I018_WITH_MASTERPLAN_ORIGIN_PRESERVED",
+    "resolution": "P04_CONTINUES_AS_PROJECT_I017_TO_I020_WITH_MASTERPLAN_ORIGIN_PRESERVED",
     "fail_closed_on_ambiguity": true
   },
   "context_fingerprints": {
-    "i017_contract_merge": "4e0a9f961c479932ac1e72c7b68367e200451ec9",
-    "i017_contract_workflow_run_id": 31526518691,
-    "i017_persistenz_merge": "0d2e6c8d2e042527274fb2428efe635dbbb337cc",
-    "i017_persistenz_workflow_run_id": 31536951091,
-    "i017_masterbuch_contract_merge": "d6b80cdc534ae3567b5a037e420f0bc30884f318",
-    "i017_masterbuch_persistenz_merge": "5d4be8436e12937dff5e3a50aedfb8804782e0a1"
+    "plan_delta_tool_pr": 53,
+    "plan_delta_tool_head": "2e38b17e1c688e7cf3ec4fbea540131329fb0451",
+    "plan_delta_tool_workflow_run_id": 31626001490,
+    "plan_delta_tool_merge": "2e31127f0ea9ca2332c1f18e6d1ca116995dff9e",
+    "plan_delta_masterbuch_id": "ERK-PLANDELTA-P04-001",
+    "plan_delta_masterbuch_merge": "1d2b2ed23be842898f6491815ccefb1683747d3d"
   },
   "known_dependencies": [
-    "I017 ID-Vertragskern VALIDIERT_GITHUB",
-    "I017.1 ID-Persistenz/Restart VALIDIERT_GITHUB",
-    "ERK-I017-001 E2/P0 BESTAETIGT",
-    "ERK-I017-002 E2/P0 BESTAETIGT"
+    "Projekt-I017 ID/Persistenz qualifiziert",
+    "Projekt-I018 Registry/Binding-Receipt qualifiziert",
+    "ERK-PLANDELTA-P04-001 E2/P0 BESTAETIGT",
+    "PLAN-DELTA-P04-2026-08-12-001 bewahrt Masterplan-P04/I017 und P04/I018 als Projekt-I019/I020"
   ],
   "preconditions": [
-    "I017 bleibt inhaltlich eingefroren; keine stillen ID-Formatänderungen in I018",
-    "Registry muss bestehende IDs referenzieren und darf sie nicht neu erzeugen",
-    "Single Source of Truth vor Mutation explizit festlegen",
-    "unbekannte oder nicht ausgeführte Qualification bleibt NICHT_PASS"
+    "I017- und I018-Evidence bleibt historisch unveraendert",
+    "Auditjournal beginnt read-only/in-memory; keine persistente Mutation vor qualifiziertem Kettenvertrag",
+    "sequence muss deterministisch monoton sein",
+    "jede Kettenunterbrechung oder Payload-Manipulation muss fail-closed erkannt werden",
+    "unbekannte oder nicht ausgefuehrte Qualification bleibt NICHT_PASS"
   ],
   "expected_tests": [
-    "deterministische Registry-Auflösung",
-    "Manifest-/Versionskonflikt fail-closed",
-    "bestehende I017-ID-Roundtrips unverändert grün",
-    "P03-Regression unverändert grün",
+    "deterministische sequence-Fortschreibung",
+    "prev_hash verkettet jeden Eintrag mit dem Vorgaenger",
+    "Payload-Manipulation wird erkannt",
+    "Reihenfolge-Manipulation wird erkannt",
+    "bestehende I017/I018-Vertraege bleiben regressionsgruen",
     "Ruff, Ruff Format, mypy strict und Gesamtregression"
   ],
   "done_criteria": [
-    "genau eine kanonische Registry-Quelle ist maschinenlesbar definiert",
-    "Version und Manifest sind widerspruchsfrei auflösbar",
-    "Konflikte überschreiben keine bestehende Identität",
-    "I017- und P03-Verträge bleiben regressionsgrün",
-    "Wissensevidence wird erst nach realer Qualification auf E2 oder höher angehoben"
+    "Auditjournal-Eintrag besitzt mindestens sequence, payload_hash, prev_hash und entry_hash",
+    "Genesis-Semantik ist explizit und deterministisch",
+    "Manipulation an Payload, Reihenfolge oder Kettenlink blockiert fail-closed",
+    "keine persistente Auditmutation ist fuer I019-Kernqualification erforderlich",
+    "Wissensevidence wird erst nach realer Qualification auf E2 oder hoeher angehoben"
   ],
   "known_risks": [
-    "mehrere konkurrierende Registry-Quellen würden die Single-Source-of-Truth verletzen",
-    "Registry darf ID-Persistenz nicht duplizieren",
-    "Crash-Atomizität und Netzwerkdateisysteme aus I017 bleiben außerhalb der Qualification, solange sie nicht separat belegt werden"
+    "Hash-Kette beweist Integritaet innerhalb des qualifizierten Modells, aber noch keine externe Herkunft oder Signatur",
+    "Crash-Atomizitaet und persistente Journal-Retention gehoeren nicht in den ersten I019-Kern",
+    "Projekt-I020 Speichertrennung/Retention bleibt eigener P04-Pflichtkern"
   ],
   "open_subpoints": [
-    "I018 Registry-Schema und kanonische Quelle festlegen",
-    "Versions-/Manifestkonfliktsemantik definieren",
-    "read-only Auflösung vor erster Registry-Mutation qualifizieren"
+    "I019 Auditjournal-Vertragsdatentyp definieren",
+    "Genesis- und sequence-Semantik festlegen",
+    "Manipulationsmatrix fuer Payload, Reihenfolge und prev_hash qualifizieren"
   ]
 }
