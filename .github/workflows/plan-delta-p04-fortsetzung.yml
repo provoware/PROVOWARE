@@ -1,85 +1,16 @@
-name: PLAN_DELTA P04 Fortsetzung
+name: PLAN_DELTA P04 Fortsetzung (historisch)
 
 on:
-  pull_request:
-    paths:
-      - 'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json'
-      - '.github/workflows/plan-delta-p04-fortsetzung.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  historical:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Plan-Delta und bestehendes Mapping fail-closed pruefen
+      - name: Historisches Gate eingefroren
         run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          delta = json.loads(Path('docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json').read_text())
-          handover = json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
-          status = json.loads(Path('PROJEKTSTATUS.json').read_text())
-
-          assert delta['delta_id'] == 'PLAN-DELTA-P04-2026-08-12-001'
-          assert delta['status'] == 'KANDIDAT'
-          assert delta['reifegrad'] == 'E1'
-          assert delta['prioritaet'] == 'P0'
-          assert delta['goldene_regel'] is False
-
-          ident = handover['plan_identity']
-          assert ident['masterplan_version'] == '2.0.0'
-          assert ident['closed_delta_id'] == 'PLAN-DELTA-P03-2026-08-10-001'
-          assert ident['masterplan_p04_i015'] == 'dauerhafte ID-Erzeugung und Validierung'
-          assert ident['masterplan_p04_i016'] == 'Versions- und Manifestregistry'
-          assert ident['project_mapping_p04_i017'] == 'dauerhafte ID-Erzeugung und Validierung'
-          assert ident['project_mapping_p04_i018'] == 'Versions- und Manifestregistry'
-          assert ident['number_collision_resolved'] is True
-          assert ident['fail_closed_on_ambiguity'] is True
-
-          mapping = delta['kleinste_sichere_fortsetzung']
-          assert mapping['project_I019']['masterplan_origin'] == 'P04/I017'
-          assert mapping['project_I019']['abnahmekern'] == 'Manipulation wird erkannt'
-          assert mapping['project_I020']['masterplan_origin'] == 'P04/I018'
-          assert mapping['project_I020']['abnahmekern'] == 'Retentionregeln greifen'
-
-          assert status['letzte_abgeschlossene_iteration'] == 'I017'
-          assert status['naechste_iteration'] == 'I018'
-          assert status['p04_fortschritt_prozent'] == 95
-          assert 'I018.3' in status['p04_hinweis']
-
-          # Schutz vor verfruehtem P05-Sprung:
-          text = json.dumps(delta, ensure_ascii=False)
-          assert 'P04 wird erst geschlossen' in text
-          assert 'P05 darf keinen roten oder unbekannten P04-Pflichtcheck ueberdecken' in text
-          print('PLAN_DELTA_P04_FORTSETZUNG=PASS')
-          PY
-      - name: Scope auf additive Plan-/Gate-Dateien begrenzen
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 - <<'PY'
-          import json, os, urllib.request
-          repo = os.environ['GITHUB_REPOSITORY']
-          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
-          number = event.get('pull_request', {}).get('number')
-          if not number:
-              print('workflow_dispatch: PR-Scope nicht anwendbar; kein PASS fuer PR-Scope behauptet')
-              raise SystemExit(0)
-          req = urllib.request.Request(
-              f'https://api.github.com/repos/{repo}/pulls/{number}/files?per_page=100',
-              headers={'Authorization': f'Bearer {os.environ["GH_TOKEN"]}', 'Accept': 'application/vnd.github+json'},
-          )
-          files = json.load(urllib.request.urlopen(req))
-          changed = {item['filename'] for item in files}
-          expected = {
-              'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json',
-              '.github/workflows/plan-delta-p04-fortsetzung.yml',
-          }
-          assert changed == expected, (changed, expected)
-          print('EXAKTER_SCOPE=PASS')
-          PY
+          echo 'PLAN_DELTA-P04-2026-08-12-001 wurde durch Run 31626001490 auf Head 2e38b17e1c688e7cf3ec4fbea540131329fb0451 qualifiziert.'
+          echo 'Dieses Candidate-Gate wird nach Promotion nicht automatisch requalifiziert.'
