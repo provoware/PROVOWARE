@@ -1,13 +1,6 @@
 name: I018.0H Metadatenverschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CHANGELOG.md'
-      - 'docs/I018_0H_METADATENVERSCHLUSS.json'
-      - '.github/workflows/i017fm-metadatenverschluss.yml'
-      - '.github/workflows/i018-0h-metadatenverschluss.yml'
   workflow_dispatch:
 
 permissions:
