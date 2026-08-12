@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from provoware.vertraege.datentypen import ProjektId
 from provoware.vertraege.registry import (
+    STANDARD_REGISTRY_VERTRAG,
     RegistryAufloesungsfehler,
     RegistryQuelle,
     registry_aufloesen,
+    registry_contract_fingerprint,
     registry_source_fingerprint,
 )
 
@@ -35,6 +39,7 @@ def test_eine_quelle_wird_deterministisch_aufgeloest() -> None:
     assert str(ergebnis.manifest_schema) == "1.0.0"
     assert ergebnis.manifest["projekt"] == "PROVOWARE"
     assert len(ergebnis.source_fingerprint) == 64
+    assert len(ergebnis.contract_fingerprint) == 64
 
 
 def test_keine_quelle_blockiert_fail_closed() -> None:
@@ -105,3 +110,36 @@ def test_nicht_kanonisierbare_quelle_blockiert_fail_closed() -> None:
 
     with pytest.raises(RegistryAufloesungsfehler, match="kanonisch serialisiert"):
         registry_source_fingerprint(q)
+
+
+def test_contract_fingerprint_ist_deterministisch() -> None:
+    assert registry_contract_fingerprint() == registry_contract_fingerprint(
+        STANDARD_REGISTRY_VERTRAG
+    )
+
+
+def test_geaenderter_vertrag_wird_gegen_contract_pin_blockiert() -> None:
+    fingerprint = registry_contract_fingerprint()
+    veraendert = replace(STANDARD_REGISTRY_VERTRAG, konfliktregel="abweichung_warnen")
+
+    with pytest.raises(RegistryAufloesungsfehler, match="Registryvertrag weicht"):
+        registry_aufloesen(
+            [quelle()],
+            vertrag=veraendert,
+            erwarteter_contract_fingerprint=fingerprint,
+        )
+
+
+def test_contract_fingerprint_ist_vom_quellinhalt_unabhaengig() -> None:
+    a = registry_aufloesen([quelle()])
+    b = registry_aufloesen([quelle(version="0.2.0-dev")])
+
+    assert a.contract_fingerprint == b.contract_fingerprint
+    assert a.source_fingerprint != b.source_fingerprint
+
+
+def test_ungueltige_contract_quellenanzahl_blockiert_fail_closed() -> None:
+    vertrag = replace(STANDARD_REGISTRY_VERTRAG, registry_source_count=2)
+
+    with pytest.raises(RegistryAufloesungsfehler, match="exakt eine Quelle verlangen"):
+        registry_aufloesen([quelle()], vertrag=vertrag)
