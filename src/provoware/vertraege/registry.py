@@ -1,8 +1,8 @@
 """Read-only Versions-/Manifestregistry-Vertrag für I018.
 
 Die Schicht mutiert weder Register noch IDs. Sie akzeptiert genau eine bereits
-vorhandene Registryquelle, bindet deren kanonischen Inhalt per SHA-256 und löst
-Version und Manifest deterministisch auf.
+vorhandene Registryquelle, bindet deren kanonischen Inhalt sowie den expliziten
+Interpretationsvertrag per SHA-256 und löst Version und Manifest deterministisch auf.
 """
 
 from __future__ import annotations
@@ -31,6 +31,21 @@ class RegistryQuelle:
 
 
 @dataclass(frozen=True, slots=True)
+class RegistryVertrag:
+    """Explizite, stabile Repräsentation der Registry-Interpretationsregeln."""
+
+    contract_schema_version: str = "1.0.0"
+    registry_source_count: int = 1
+    produktversion_felder: tuple[str, str] = ("projektversion", "version")
+    manifest_schema_felder: tuple[str, str] = ("manifest_schema", "schema")
+    identitaetsregel: str = "bestehende_projekt_id_nur_referenzieren"
+    konfliktregel: str = "abweichung_oder_mehrdeutigkeit_fail_closed"
+
+
+STANDARD_REGISTRY_VERTRAG = RegistryVertrag()
+
+
+@dataclass(frozen=True, slots=True)
 class RegistryErgebnis:
     """Deterministisches Ergebnis einer erfolgreichen Registryauflösung."""
 
@@ -40,6 +55,21 @@ class RegistryErgebnis:
     manifest_schema: SchemaVersion
     manifest: Mapping[str, object]
     source_fingerprint: str
+    contract_fingerprint: str
+
+
+def _kanonischer_sha256(payload: Mapping[str, object], fehlertext: str) -> str:
+    try:
+        kanonisch = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise RegistryAufloesungsfehler(fehlertext) from exc
+    return hashlib.sha256(kanonisch).hexdigest()
 
 
 def _text(mapping: Mapping[str, object], feld: str, quelle: str) -> str:
@@ -50,11 +80,7 @@ def _text(mapping: Mapping[str, object], feld: str, quelle: str) -> str:
 
 
 def registry_source_fingerprint(quelle: RegistryQuelle) -> str:
-    """Bildet einen deterministischen SHA-256-Fingerprint der gesamten Quelle.
-
-    Die Serialisierung ist absichtlich streng: Nicht JSON-kompatible Werte,
-    NaN/Infinity und andere nicht kanonisierbare Inhalte blockieren fail-closed.
-    """
+    """Bildet einen deterministischen SHA-256-Fingerprint der gesamten Quelle."""
 
     payload = {
         "manifest": quelle.manifest,
@@ -62,27 +88,48 @@ def registry_source_fingerprint(quelle: RegistryQuelle) -> str:
         "projekt_id": str(quelle.projekt_id),
         "versionsregister": quelle.versionsregister,
     }
-    try:
-        kanonisch = json.dumps(
-            payload,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode("utf-8")
-    except (TypeError, ValueError) as exc:
-        raise RegistryAufloesungsfehler(
-            "Registryquelle kann nicht kanonisch serialisiert werden."
-        ) from exc
-    return hashlib.sha256(kanonisch).hexdigest()
+    return _kanonischer_sha256(
+        payload,
+        "Registryquelle kann nicht kanonisch serialisiert werden.",
+    )
+
+
+def registry_contract_fingerprint(vertrag: RegistryVertrag = STANDARD_REGISTRY_VERTRAG) -> str:
+    """Bindet ausschließlich den expliziten Interpretationsvertrag per SHA-256."""
+
+    payload = {
+        "contract_schema_version": vertrag.contract_schema_version,
+        "identitaetsregel": vertrag.identitaetsregel,
+        "konfliktregel": vertrag.konfliktregel,
+        "manifest_schema_felder": list(vertrag.manifest_schema_felder),
+        "produktversion_felder": list(vertrag.produktversion_felder),
+        "registry_source_count": vertrag.registry_source_count,
+    }
+    return _kanonischer_sha256(
+        payload,
+        "Registryvertrag kann nicht kanonisch serialisiert werden.",
+    )
 
 
 def registry_aufloesen(
-    quellen: Sequence[RegistryQuelle], *, erwarteter_fingerprint: str | None = None
+    quellen: Sequence[RegistryQuelle],
+    *,
+    erwarteter_fingerprint: str | None = None,
+    erwarteter_contract_fingerprint: str | None = None,
+    vertrag: RegistryVertrag = STANDARD_REGISTRY_VERTRAG,
 ) -> RegistryErgebnis:
-    """Löst exakt eine Quelle auf; Mehrdeutigkeit, Austausch und Widersprüche blockieren."""
+    """Löst exakt eine Quelle unter einem explizit gebundenen Vertrag auf."""
 
-    if len(quellen) != 1:
+    contract_fingerprint = registry_contract_fingerprint(vertrag)
+    if (
+        erwarteter_contract_fingerprint is not None
+        and contract_fingerprint != erwarteter_contract_fingerprint
+    ):
+        raise RegistryAufloesungsfehler("Registryvertrag weicht vom erwarteten Fingerprint ab.")
+
+    if vertrag.registry_source_count != 1:
+        raise RegistryAufloesungsfehler("Registryvertrag muss exakt eine Quelle verlangen.")
+    if len(quellen) != vertrag.registry_source_count:
         raise RegistryAufloesungsfehler(
             f"Genau eine Registryquelle ist erlaubt; erhalten: {len(quellen)}."
         )
@@ -96,18 +143,22 @@ def registry_aufloesen(
         raise RegistryAufloesungsfehler("Registryquelle weicht vom erwarteten Fingerprint ab.")
 
     versions_version = ProduktVersion.parse(
-        _text(quelle.versionsregister, "projektversion", "VERSIONSREGISTER")
+        _text(quelle.versionsregister, vertrag.produktversion_felder[0], "VERSIONSREGISTER")
     )
-    manifest_version = ProduktVersion.parse(_text(quelle.manifest, "version", "MANIFEST"))
+    manifest_version = ProduktVersion.parse(
+        _text(quelle.manifest, vertrag.produktversion_felder[1], "MANIFEST")
+    )
     if versions_version != manifest_version:
         raise RegistryAufloesungsfehler(
             "Produktversion widerspricht sich zwischen VERSIONSREGISTER und MANIFEST."
         )
 
     versions_manifest_schema = SchemaVersion.parse(
-        _text(quelle.versionsregister, "manifest_schema", "VERSIONSREGISTER")
+        _text(quelle.versionsregister, vertrag.manifest_schema_felder[0], "VERSIONSREGISTER")
     )
-    manifest_schema = SchemaVersion.parse(_text(quelle.manifest, "schema", "MANIFEST"))
+    manifest_schema = SchemaVersion.parse(
+        _text(quelle.manifest, vertrag.manifest_schema_felder[1], "MANIFEST")
+    )
     if versions_manifest_schema != manifest_schema:
         raise RegistryAufloesungsfehler(
             "Manifest-Schema widerspricht sich zwischen VERSIONSREGISTER und MANIFEST."
@@ -120,4 +171,5 @@ def registry_aufloesen(
         manifest_schema=manifest_schema,
         manifest=quelle.manifest,
         source_fingerprint=source_fingerprint,
+        contract_fingerprint=contract_fingerprint,
     )
