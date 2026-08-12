@@ -1,0 +1,61 @@
+name: I018.1 Registry-Source-Fingerprint
+
+on:
+  pull_request:
+    paths:
+      - 'src/provoware/vertraege/registry.py'
+      - 'tests/contract/test_i018_registry.py'
+      - '.github/workflows/i018-0-readonly-registry.yml'
+      - '.github/workflows/i018-1-registry-source-fingerprint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualifikation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Entwicklungsabhängigkeiten installieren
+        run: python -m pip install -e '.[entwicklung]'
+      - name: I018 Registry-Vertrag
+        run: python -m pytest -q tests/contract/test_i018_registry.py
+      - name: Gesamtregression
+        run: python -m pytest -q
+      - name: Ruff
+        run: python -m ruff check src tests
+      - name: Ruff Format
+        run: python -m ruff format --check src tests
+      - name: mypy
+        run: python -m mypy src
+      - name: Historisches I018.0-Gate eingefroren
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          rel = '.github/workflows/i018-0-readonly-registry.yml'
+          text = Path(rel).read_text(encoding='utf-8')
+          assert 'workflow_dispatch:' in text
+          assert '\n  pull_request:' not in text
+          assert '\n  push:' not in text
+          print('Historisches I018.0-Candidate-Gate: workflow_dispatch only')
+          PY
+      - name: Scope fail-closed
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          test -n "$PR"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR}/files?per_page=100" --paginate --jq '.[].filename' | sort > /tmp/files
+          cat > /tmp/allowed <<'EOF'
+          .github/workflows/i018-0-readonly-registry.yml
+          .github/workflows/i018-1-registry-source-fingerprint.yml
+          src/provoware/vertraege/registry.py
+          tests/contract/test_i018_registry.py
+          EOF
+          sort -o /tmp/allowed /tmp/allowed
+          diff -u /tmp/allowed /tmp/files
