@@ -1,13 +1,6 @@
 name: I018.1H Metadatenverschluss
 
 on:
-  pull_request:
-    paths:
-      - 'PROJEKTSTATUS.json'
-      - 'CHANGELOG.md'
-      - 'docs/I018_1H_METADATENVERSCHLUSS.json'
-      - '.github/workflows/i018-0h-metadatenverschluss.yml'
-      - '.github/workflows/i018-1h-metadatenverschluss.yml'
   workflow_dispatch:
 
 permissions:
@@ -91,35 +84,5 @@ jobs:
           print('Historisches I018.0H-Gate: workflow_dispatch-only')
           PY
 
-      - name: Exakten Metadaten-Scope fail-closed prüfen
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-        run: |
-          python - <<'PY'
-          import json, os, urllib.request
-
-          allowed = {
-              'PROJEKTSTATUS.json',
-              'CHANGELOG.md',
-              'docs/I018_1H_METADATENVERSCHLUSS.json',
-              '.github/workflows/i018-0h-metadatenverschluss.yml',
-              '.github/workflows/i018-1h-metadatenverschluss.yml',
-          }
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/{os.environ['REPO']}/pulls/{os.environ['PR']}/files?per_page=100",
-              headers={
-                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
-                  'Accept': 'application/vnd.github+json',
-              },
-          )
-          with urllib.request.urlopen(req) as r:
-              files = {x['filename'] for x in json.load(r)}
-          assert files == allowed, (files, allowed)
-          assert not any(p.startswith(('src/', 'tests/', 'data/', 'evidence/')) for p in files)
-          PY
-
       - name: Abschluss
-        run: echo 'I018.1H Metadatenverschluss qualifiziert'
+        run: echo 'I018.1H historisches Gate eingefroren'
