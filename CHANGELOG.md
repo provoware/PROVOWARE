@@ -2,6 +2,16 @@
 
 ## 0.1.0-dev - 2026-08-12
 
+### I018.0H — read-only Registry metadatenseitig synchronisiert
+- I018.0-Qualification `31573547771` lief auf Head `45e9edec963dfd4f0a7c3e23c264b1c28d08a3d1` real mit `completed / success`; Tool-PR #45 wurde als Main-Merge `f9c5a065231329a668ae9a3dc1a65783252f6362` promoviert.
+- Qualifiziert wurden 6/6 neue Registry-Contracttests, 168 Gesamtregressionstests PASS sowie 1 historischer I010-Test SKIP; der SKIP wird ausdrücklich nicht als PASS umgedeutet.
+- Ruff, Ruff Format, mypy strict, Lifecycle-Freeze, E1-Fail-Closed-Evidence und der qualifizierte PR-Scope waren grün.
+- Masterbuch-Evidence `ERK-I018-001` ist als `E2 / P0 / BESTAETIGT` ohne Goldene Regel kanonisch; Masterbuch-Merge `650896dcee6826d141cf7a17e83bc378671d4db5`.
+- Der qualifizierte Vertrag erzwingt genau eine autoritative Registryquelle, referenziert bestehende IDs nur read-only und löst Produktversion sowie Manifest-Schema deterministisch auf; Mehrdeutigkeit und Versions-/Manifestwiderspruch bleiben fail-closed.
+- Registry-Persistenz, automatische Quellensuche, Registry-Source-Fingerprint und GUI bleiben `NICHT_IMPLEMENTIERT`; Crash-Atomizität und Netzwerkdateisysteme aus I017 bleiben `NICHT_QUALIFIZIERT`.
+- `PROJEKTSTATUS.json` wird metadatenseitig um den I018.0-Nachweis ergänzt; P04 wird aus I017=100 % und dem konservativen I018-Teilfortschritt auf 67 % geführt. I018 bleibt `IN_ARBEIT`.
+- Keine Produkt-, Test-, Registry-Persistenz-, Baseline-, Evidence-, Masterbuch- oder Nutzdatenmutation in I018.0H.
+
 ### I017FM — I017 kanonisch abgeschlossen
 - I017F-Abschlussgate `31549054588` lief auf Head `f4e3c6907d7a587dd688d7ce7578a70e0b0f5c4a` real mit `completed / success`; Tool-Merge `c3e28ce098b9b2f5d63d4fe53dffaae1e088b26e`.
 - I017FH-Status-Readback `31555861084` lief auf Head `5a4f7465cc14eda7b363b339c72e87a80ca2f326` real mit `completed / success`; Tool-Merge `a04d2510e05cd3d5fb12771bad29f7fd74f48b0e`.
@@ -198,7 +208,7 @@
 ### Bewusst noch nicht enthalten
 - Netzwerkdateisystem-Qualification und Schutz gegen nicht kooperierende fremde Schreiber; beide bleiben außerhalb des qualifizierten lokalen advisory-Lease-Vertrags.
 - I017: optionaler Crash-/Teilwrite-Härtungsnachweis; der formale I017-Abschluss ist erfolgt, Crash-Atomizität bleibt dennoch `NICHT_QUALIFIZIERT`.
-- P04: Versions- und Manifestregistry (projektintern I018).
+- P04: I018 ist nach I018.0 read-only Registryvertrag begonnen; Registry-Persistenz, automatische Quellensuche und Source-Fingerprint bleiben offen.
 - SQLite-Datenkern.
 - PySide6-Oberfläche.
 - Module.
