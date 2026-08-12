@@ -1,0 +1,64 @@
+{
+  "delta_id": "PLAN-DELTA-P04-2026-08-12-001",
+  "status": "KANDIDAT",
+  "typ": "Planabweichung",
+  "prioritaet": "P0",
+  "reifegrad": "E1",
+  "gueltigkeitsbereich": "PROVOWARE P04 Iterationszuordnung nach PLAN-DELTA-P03-2026-08-10-001",
+  "projektbezug": "PROVOWARE",
+  "quelle_herkunft": [
+    "PROVOWARE_VOLLSTAENDIGER_ENTWICKLUNGSPLAN_EXPERT_FINAL_v2.0.0_2026-08-09",
+    "ITERATIONSUEBERGABE.json auf main",
+    "PROJEKTSTATUS.json auf main"
+  ],
+  "automatisierbarkeit": "JA",
+  "goldene_regel": false,
+  "ausgangslage": {
+    "masterplan_p04": {
+      "I015": "dauerhafte ID-Erzeugung und Validierung",
+      "I016": "Versions- und Manifestregistry",
+      "I017": "Auditjournal mit sequence + hash chain",
+      "I018": "Audit/Debug/Evidence-Speichertrennung"
+    },
+    "projekt_mapping_bestaetigt": {
+      "I017": "dauerhafte ID-Erzeugung und Validierung",
+      "I018": "Versions- und Manifestregistry"
+    },
+    "ursache": "PLAN-DELTA-P03-2026-08-10-001 beanspruchte die Projektnummern I015 und I016 fuer zusaetzliche P03-Arbeit. Die Herkunftsnummern des Masterplans bleiben erhalten, die Projektlaufnummern wurden ab P04 verschoben.",
+    "befund": "Die beiden verbleibenden P04-Pflichtkerne duerfen nicht durch einen vorgezogenen P05-Start uebersprungen werden."
+  },
+  "kleinste_sichere_fortsetzung": {
+    "project_I019": {
+      "masterplan_origin": "P04/I017",
+      "ziel": "Auditjournal mit sequence + hash chain",
+      "hauptartefakt": "KERN/auditjournal",
+      "abnahmekern": "Manipulation wird erkannt"
+    },
+    "project_I020": {
+      "masterplan_origin": "P04/I018",
+      "ziel": "Audit/Debug/Evidence-Speichertrennung",
+      "hauptartefakt": "PROTOKOLLE",
+      "abnahmekern": "Retentionregeln greifen"
+    }
+  },
+  "nicht_festgelegt": [
+    "Neunummerierung von P05 und spaeteren Phasen",
+    "fachliche Implementierung von I019/I020",
+    "Aenderung historischer Iterationskennungen",
+    "Aenderung bereits qualifizierter Evidence"
+  ],
+  "invarianten": [
+    "I017- und I018-Evidence bleibt unveraendert und historisch gueltig.",
+    "P04 wird erst geschlossen, wenn auch Auditjournal und Speichertrennung ihren Abnahmekern real qualifiziert haben.",
+    "P05 darf keinen roten oder unbekannten P04-Pflichtcheck ueberdecken.",
+    "Unbekannte oder nicht ausgefuehrte Qualification bleibt NICHT_PASS.",
+    "Keine Goldene Regel entsteht allein aus dieser Planabwaegung."
+  ],
+  "historie": [
+    {
+      "datum": "2026-08-12",
+      "status": "KANDIDAT",
+      "aenderung": "Restliche P04-Pflichtkerne nach dokumentierter P03-Neuzuordnung explizit auf Projekt-I019/I020 abgebildet."
+    }
+  ]
+}
