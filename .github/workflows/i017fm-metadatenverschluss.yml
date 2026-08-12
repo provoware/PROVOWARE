@@ -6,6 +6,7 @@ on:
       - 'PROJEKTSTATUS.json'
       - 'CHANGELOG.md'
       - 'docs/I017FM_ABSCHLUSS.json'
+      - '.github/workflows/i017-1h-metadatenabschluss.yml'
       - '.github/workflows/i017fm-metadatenverschluss.yml'
   workflow_dispatch:
 
@@ -92,6 +93,16 @@ jobs:
           print('Changelog-Konsistenz: PASS')
           PY
 
+      - name: Historisches I017.1H-Gate eingefroren prüfen
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          pre = Path('.github/workflows/i017-1h-metadatenabschluss.yml').read_text().split('permissions:', 1)[0]
+          assert 'workflow_dispatch:' in pre
+          assert 'pull_request:' not in pre
+          print('Historisches I017.1H-Gate: workflow_dispatch-only')
+          PY
+
       - name: Produkt- und Nutzdatenmutation ausschließen
         if: github.event_name == 'pull_request'
         env:
@@ -105,6 +116,7 @@ jobs:
               'PROJEKTSTATUS.json',
               'CHANGELOG.md',
               'docs/I017FM_ABSCHLUSS.json',
+              '.github/workflows/i017-1h-metadatenabschluss.yml',
               '.github/workflows/i017fm-metadatenverschluss.yml',
           }
           page = 1
@@ -129,5 +141,5 @@ jobs:
           unexpected = sorted(set(paths) - allowed)
           assert not unexpected, unexpected
           assert set(paths) == allowed, paths
-          print('Exakter Vier-Dateien-Scope: PASS')
+          print('Exakter Fünf-Dateien-Scope: PASS')
           PY
