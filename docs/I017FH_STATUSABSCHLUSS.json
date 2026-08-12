@@ -1,0 +1,34 @@
+{
+  "iteration": "I017FH",
+  "typ": "Status-Readback und Konsistenznachweis",
+  "prioritaet": "P0",
+  "status": "IN_PRUEFUNG",
+  "ausgangs_merge": "c3e28ce098b9b2f5d63d4fe53dffaae1e088b26e",
+  "befund": {
+    "i017f_promoviert": true,
+    "current_baseline_lifecycle": "I017 -> I018",
+    "iterationsuebergabe_next": "I018",
+    "projektstatus_letzte_abgeschlossene_iteration": "I016",
+    "projektstatus_naechste_iteration": "I017",
+    "changelog_oberster_abschnitt": "I017.1H",
+    "konsistenz": "NICHT_SYNCHRON"
+  },
+  "erlaubter_folgeschritt": "PROJEKTSTATUS.json und CHANGELOG.md ausschließlich metadatenseitig auf den real promovierten I017F-Stand synchronisieren",
+  "verboten": [
+    "Produktcode ändern",
+    "Tests fachlich ändern",
+    "I018-Fachlogik vorziehen",
+    "offene I017-Härtungsgrenzen als PASS markieren"
+  ],
+  "offene_grenzen": {
+    "uuid4_kollisionsfreiheit": "NICHT_BEWIESEN",
+    "crash_atomizitaet": "NICHT_QUALIFIZIERT",
+    "netzwerkdateisysteme": "NICHT_QUALIFIZIERT"
+  },
+  "masterbuch": {
+    "neue_fachliche_erkenntnis": false,
+    "neue_goldene_regel": false,
+    "erk_i017_001": "E2/P0/BESTAETIGT",
+    "erk_i017_002": "E2/P0/BESTAETIGT"
+  }
+}
