@@ -176,7 +176,7 @@
 ### I010 — P02 Architecture Gate und Unified Contract Qualification
 - Öffentliche I007-I009-Vertragsoberfläche als kanonischen `P02_API_SNAPSHOT.json` eingefroren.
 - Snapshot enthält öffentliche Symbole, Typklassen, Dataclass-Felder, ID-Präfixe, Enumwerte, Schema-Versionen, Pflichtfelder, Vertragsmarker und stabile Fehlercodes.
-- Kanonischen API-Fingerprint `2e74f555a8b7c4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16` qualifiziert.
+- Kanonischen API-Fingerprint `2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16` qualifiziert.
 - `P02_QUELLINVENTAR.json` als exaktes hashgebundenes P02-Produktquellinventar eingeführt.
 - `WERKZEUGE/p02_architekturgate.py` als gemeinsames Baseline-, Inventar-, AST-, API-, Versions- und Traceability-Gate eingeführt.
 - Negative Architektur-Fixtures für SQLite, Qt/PySide, Handler, Datei-I/O, unregistrierte P02-Quellen und vorgezogene P03-Quellen ergänzt.
