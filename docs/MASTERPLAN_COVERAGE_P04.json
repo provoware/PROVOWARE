@@ -56,6 +56,23 @@
     "PROJEKTSTATUS.p04_fortschritt_prozent": "ALTSTAND_95_NICHT_COVERAGE_BASIERT",
     "behandlung": "NICHT_ALS_PHASE_CLOSE_BELEG_VERWENDEN"
   },
+  "wissensschema": {
+    "typ": "Nachweisentwurf",
+    "hauptkategorie": "Qualitaetssicherung",
+    "nebenkategorien": ["Masterplan", "Coverage", "Lifecycle", "Evidence", "Fail-Closed"],
+    "reifegrad": "E1",
+    "prioritaet": "P0",
+    "gueltigkeitsbereich": "PROVOWARE P04 Phasenabdeckung",
+    "projektbezug": ["PROVOWARE Wissensspeicher", "PROVOWARE Tool"],
+    "quelle_herkunft": ["PLAN-DELTA-P04-2026-08-12-001", "ITERATIONSUEBERGABE.json", "I017/I018 Qualification Evidence"],
+    "automatisierbarkeit": "JA",
+    "status": "KANDIDAT",
+    "historie": ["2026-08-13: P04-Coverage als fail-closed Kandidat mit vier Pflichtkernen angelegt."],
+    "goldene_regel": false
+  },
+  "qualification": {
+    "status": "AUSSTEHEND"
+  },
   "mutation": {
     "produktlogik": false,
     "nutzdaten": false,
