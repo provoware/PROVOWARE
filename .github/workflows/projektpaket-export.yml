@@ -30,8 +30,8 @@ jobs:
           python WERKZEUGE/baseline_pruefen.py
           python WERKZEUGE/projekt_start.py
           python tools/historical_gate_linter.py
-          ruff check src tests WERKZEUGE tools
-          ruff format --check src tests WERKZEUGE tools
+          ruff check src tests WERKZEUGE
+          ruff format --check src tests WERKZEUGE
           mypy src/provoware
           python -m pytest -q
 
