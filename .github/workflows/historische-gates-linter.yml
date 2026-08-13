@@ -1,0 +1,21 @@
+name: Historische Candidate-Gates Linter
+
+on:
+  pull_request:
+    paths:
+      - 'docs/HISTORISCHE_GATES.json'
+      - 'tools/historical_gate_linter.py'
+      - '.github/workflows/*.yml'
+      - '.github/workflows/*.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Promovierte historische Gates fail-closed pruefen
+        run: python3 tools/historical_gate_linter.py
