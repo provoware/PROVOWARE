@@ -1,175 +1,141 @@
 # PROVOWARE
 
-**Status:** Neuaufbau · `0.1.0-dev` · P00/P01/P02 qualifiziert · P03 freigegeben  
+**Status:** Entwicklung · `0.1.0-dev` · P02/P03 qualifiziert · P04 in Arbeit  
 **Repository:** `provoware/PROVOWARE`  
-**Aktuelle Baseline:** `BASELINE-2026-08-10-I010`  
-**Letzte abgeschlossene Iteration:** `I010`  
-**Nächste Iteration:** `I011`  
-**P02-Fortschritt:** **100 %**  
-**P03-Fortschritt:** **0 %**  
-**Ziel:** portables, offline-first Linux-Desktopwerkzeug auf professioneller Engineering-Basis.
+**Aktuelle Herkunftsbaseline:** `BASELINE-2026-08-10-I015`  
+**Letzte abgeschlossene Projektiteration:** `I018`  
+**Nächste Projektiteration:** `I019`  
+**P04-Fortschritt:** **50 % (2/4 Pflichtkerne qualifiziert)**  
+**Ziel:** portables, offline-first Linux-Desktopwerkzeug und Wissensspeicher auf professioneller Engineering-Basis.
 
-## Aktueller Implementierungsstand
+## Klick & Start
 
-Abgeschlossen und qualifiziert sind I000-I010. P00, P01 und P02 sind vollständig qualifiziert. I007-I009 definieren die Kern-, Schema- und Operationsverträge. I010 friert diese drei Schichten als gemeinsame P02-Architekturbasis ein und beweist mit positiven und negativen Tests, dass API- und Architekturdrift erkannt werden. Erst nach dieser grünen Gesamtqualifikation wurde P03 freigegeben.
+Nach dem Entpacken im Projektordner:
 
-## P02 — qualifizierte Vertragsbasis
+```bash
+chmod +x PROVOWARE_STARTEN.sh
+./PROVOWARE_STARTEN.sh
+```
 
-### I007 — öffentliche Kern-API
+Die Startdatei installiert **nichts automatisch aus dem Internet**. Sie sucht Python 3.13, zeigt den aktuellen Projektstand und führt eine read-only Schnellprüfung aus:
 
-Qualifiziert und geschützt sind `ProjektId`, `ObjektId`, `RevisionId`, `ChangeId`, `OperationId`, `Status`, `Fehlerklasse`, `FehlerInfo` und die Erfolgs-/Fehlerinvarianten von `OperationErgebnis[T]`.
+- JSON-Struktur,
+- Baseline-Konsistenz,
+- P04-Masterplan-Coverage,
+- historische Candidate-/Closure-Gates.
 
-### I008 — Manifest- und Projektschemata
+Für die vollständige Entwicklerprüfung, wenn die Entwicklungswerkzeuge bereits installiert sind:
 
-`SchemaVersion` und `ProduktVersion` sind technisch getrennt. `ManifestSchema` und `ProjektSchema` sind strikt versioniert, lehnen unbekannte Felder ab und serialisieren deterministisch. Golden-Fixtures und eine AST-basierte Architekturgrenze sichern die Schicht ab.
+```bash
+./PROVOWARE_STARTEN.sh --vollpruefung
+```
 
-Finale I008-Qualifikation: Run `31336626886`, Artifact `9044527742`, **0,000618 MB**, SHA-256 `f58529730ac88675ab1b002130abca1f33e8ceffc4df8727c7a09e7ebf194e61`.
+## Aktueller P04-Stand
 
-### I009 — Operationsverträge
+Das qualifizierte `MASTERPLAN_COVERAGE_GATE` bindet die P04-Pflichtkerne fail-closed:
 
-`src/provoware/vertraege/operationen.py` definiert die serialisierbare Operationshülle ohne Handler-, Datei-, SQLite-, Qt- oder Ausführungslogik.
+| Masterplan-Ursprung | Projektiteration | Zustand |
+|---|---|---|
+| P04/I015 — dauerhafte ID | I017 | QUALIFIZIERT |
+| P04/I016 — Versions-/Manifestregistry | I018 | QUALIFIZIERT |
+| P04/I017 — Auditjournal | I019 | EXPLIZIT_WEITERGEFUEHRT |
+| P04/I018 — Audit/Debug/Evidence-Trennung | I020 | EXPLIZIT_WEITERGEFUEHRT |
 
-Qualifiziert sind `OperationArt`, die unveränderliche kanonische `OperationPayload`, `OperationRequest` und `OperationResult`. Request und Result korrelieren ausschließlich über `OperationId`; Resultate verwenden ausschließlich `OperationErgebnis[OperationPayload]` und `FehlerInfo`. Payloads sind tief begrenzt und Fließkommazahlen werden für eindeutige kanonische Semantik abgewiesen.
+Damit gilt aktuell:
 
-Finale I009-Qualifikation: Run `31337914639`, Artifact `9044902480`, **0,000663 MB**, SHA-256 `962e8e45bb2df60a6ead6750bf9b737520ea30290eabf3df73510a10ef7ec5f9`; 49 Contracttests und 68 Gesamtregressionstests bestanden.
+```text
+2 von 4 Pflichtkernen qualifiziert
+P04-Fortschritt = 50 %
+P04-Abschluss = NICHT ERLAUBT
+Nächster Pflichtkern = I019
+```
 
-## I010 — P02 Architecture Gate
+Unbekannte oder nicht ausgeführte Qualification wird niemals als PASS behandelt.
 
-I010 führt die bisher getrennten Schutzmechanismen zu einem einzigen reproduzierbaren Gesamtgate zusammen.
+## I017 — dauerhafte Identität
+
+Qualifiziert sind typisierte IDs, Persistenz-/Restart-Erhalt, Konfliktblockade und fail-closed Behandlung beschädigter Persistenz. UUID4-Kollisionsfreiheit ist nicht mathematisch bewiesen; Crash-Atomizität und Netzwerkdateisysteme bleiben außerhalb der Qualification.
+
+## I018 — Versions-/Manifestregistry
 
 Qualifiziert sind:
 
-- `P02_API_SNAPSHOT.json` als kanonische maschinenlesbare öffentliche P02-API,
-- Snapshot-Fingerprint `2e74f555a8b7cc4aaa45f7cb109eaf22a1c255953d9ff98bb159ad2df895ed16`,
-- Symbolnamen und Typklassen,
-- Dataclass-Felder,
-- ID-Präfixe und Enumwerte,
-- Manifest-, Projekt- und Operationsschemaversionen,
-- Pflichtfelder und Vertragsmarker,
-- stabile Schema-/Operationsfehlercodes,
-- `P02_QUELLINVENTAR.json` als exaktes hashgebundenes Quelleninventar,
-- AST-Abhängigkeitsmatrix über sämtliche P02-Vertragsquellen,
-- Versionsraum- und Traceability-Prüfung,
-- Scope-Freeze gegen vorgezogene P03-Produktquellen.
+- read-only Single Source of Truth,
+- Source-Fingerprint über kanonische Serialisierung und SHA-256,
+- separater Contract-Fingerprint für den Interpretationsvertrag,
+- gemeinsames Source+Contract Binding Receipt,
+- fail-closed Pins und Evidence-Bindung.
 
-### Negativnachweis
+Nicht vorgezogen werden Registry-Persistenz, automatische Quellensuche, Receipt-Persistenz, Mehrprojekt-Registry und GUI.
 
-Absichtliche Verletzungen werden tatsächlich blockiert. Test-Fixtures erzwingen ROT bei:
+## I019 — nächster Pflichtkern
 
-- SQLite-Import,
-- Qt/PySide-Import,
-- Handler-Abhängigkeit,
-- Datei-I/O,
-- neuer unregistrierter P02-Produktdatei,
-- vorgezogener P03-Produktquelle.
+I019 definiert zunächst einen kleinen, read-only/in-memory Auditjournal-Vertrag mit mindestens:
 
-### Finale I010-Qualifikation
+```text
+sequence
+payload_hash
+prev_hash
+entry_hash
+```
 
-- PR: `#11`
-- Workflow-Run: `31339417368`
-- Job: `93310619106`
-- Branch-Head: `650efc515d9cfbc3e1a4e3e80bd1dcbde0fbe7a0`
-- Qualifikations-Merge-Ref: `ed2d95d8096072a9b4732c479e9a9d9a1de7c600`
-- Main-Merge-Commit: `7dfe6d2cf039d9b974bad464ed0efa0aa6eec998`
-- Artifact-ID: `9045351696`
-- Artifact-Größe: **0,000683 MB** (`683 Byte`)
-- Artifact-SHA-256: `6ebf3d679a063eaf4b09f8cc7b8adcc51cea16643596d545796d1acd0f22a9b9`
-- Receipt-SHA-256: `cb0b092abd5b2356e5c0197a5e8df48c6e50612d822772d049bb374a6d1c5fee`
-- Ruff Check: GRÜN
-- Ruff Format: GRÜN / 20 Dateien
-- `mypy --strict`: GRÜN / 11 Quelldateien
-- Architektur-/Negativtests: **12 bestanden**
-- Contracttests: **49 bestanden**
-- Gesamtregression: **80 bestanden**
-- I005-, I006-, I007-, I008- und I009-Regressionsworkflows auf dem finalen I010-Head: erneut GRÜN
+Abnahmekern: Manipulation an Payload, Reihenfolge oder Kettenlink muss fail-closed erkannt werden. Persistente Journal-Retention gehört erst in den nachfolgenden Pflichtkern I020.
 
-## Projekt lokal prüfen — alle Befehle
+## Lokale Basisprüfung
+
+Voraussetzung: Python `>=3.13,<3.14`.
 
 ```bash
-cd "$HOME/PROVOWARE"
-python3 WERKZEUGE/baseline_pruefen.py
-python3 WERKZEUGE/p02_architekturgate.py --phase-abschluss --nach-promotion
-ruff check src tests WERKZEUGE
-ruff format --check src tests WERKZEUGE
-mypy \
-  src/provoware/vertraege \
-  WERKZEUGE/p02_architekturgate.py \
-  tests/architecture/test_p02_architekturgate.py \
-  tests/contract/test_datentypen.py \
-  tests/contract/test_id_varianten.py \
-  tests/contract/test_i007_api_freeze.py \
-  tests/contract/test_schemata.py \
-  tests/contract/test_operationen.py
-pytest -q -m architecture tests/architecture
-pytest -q -m contract tests/contract
+python3.13 WERKZEUGE/baseline_pruefen.py
+python3.13 WERKZEUGE/projekt_start.py
+python3.13 tools/historical_gate_linter.py
+```
+
+## Entwicklungsumgebung
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[entwicklung]'
+```
+
+Danach:
+
+```bash
+ruff check src tests WERKZEUGE tools
+ruff format --check src tests WERKZEUGE tools
+mypy src/provoware
 pytest -q
 ```
 
-Die Qualitätswerkzeuge werden produktiv aus dem verifizierten I005-Wheelhouse verwendet. Für die reine Baselineprüfung genügt:
+## Projektidentität und Nachweise
 
-```bash
-cd "$HOME/PROVOWARE"
-python3 WERKZEUGE/baseline_pruefen.py
+Wichtige maschinenlesbare Dateien:
+
+- `PROJEKTSTATUS.json` — aktueller Projektstand,
+- `CURRENT_BASELINE.json` — Herkunftsbaseline plus aktuelle Lifecycle-Zeiger,
+- `ITERATIONSUEBERGABE.json` — nächster technischer Pflichtschritt,
+- `docs/MASTERPLAN_COVERAGE_P04.json` — P04-Abdeckung,
+- `docs/HISTORISCHE_GATES.json` — eingefrorene historische Gates,
+- `CHANGELOG.md` — nachvollziehbarer Entwicklungsverlauf.
+
+Der ursprüngliche Masterplan bleibt unverändert referenziert: Version `2.0.0`, Stand `2026-08-09`, SHA-256 `e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c`.
+
+## Paketstruktur
+
+Das vollständige Wissensspeicher-Paket enthält:
+
+```text
+PROVOWARE_WISSENSSPEICHER_AKTUELL/
+├── START_HIER.sh
+├── PAKETINFO.json
+├── PROVOWARE/
+│   └── PROVOWARE_STARTEN.sh
+└── PROVOWARE_MASTER_BOOK_2026/
 ```
 
-## Repository frisch klonen
-
-```bash
-cd "$HOME"
-git clone https://github.com/provoware/PROVOWARE.git
-cd PROVOWARE
-python3 WERKZEUGE/baseline_pruefen.py
-python3 WERKZEUGE/p02_architekturgate.py --phase-abschluss --nach-promotion
-```
-
-## Vorhandenes Repository aktualisieren
-
-```bash
-cd "$HOME/PROVOWARE"
-git status
-git pull --ff-only
-python3 WERKZEUGE/baseline_pruefen.py
-python3 WERKZEUGE/p02_architekturgate.py --phase-abschluss --nach-promotion
-```
-
-## I010-GitHub-Evidence ansehen und herunterladen
-
-```bash
-gh auth status
-gh run view 31339417368 -R provoware/PROVOWARE
-gh run download 31339417368 -R provoware/PROVOWARE
-```
-
-## Rückfall auf I009 ansehen
-
-```bash
-git fetch origin backup/vor-i010-promotion-2026-08-10
-git log --oneline --decorate -5 origin/backup/vor-i010-promotion-2026-08-10
-```
-
-## Transfer V1
-
-Der repo-integrierte Transfermechanismus arbeitet mit maximal **24 MiB / 25,17 MB** großen Teilstücken, prüft Einzel- und Gesamthashes, validiert ZIP und Baseline, sichert einen vorhandenen Zielstand und rollt bei Fehler automatisch zurück.
-
-```bash
-mkdir -p "$HOME/Downloads/PROVOWARE_TRANSFER"
-cd "$HOME/Downloads/PROVOWARE_TRANSFER"
-ls -lh PROVOWARE_INSTALLIEREN.sh *.pvpart
-chmod +x PROVOWARE_INSTALLIEREN.sh
-bash PROVOWARE_INSTALLIEREN.sh
-cd "$HOME/PROVOWARE"
-python3 WERKZEUGE/baseline_pruefen.py
-cat TRANSFER/INSTALLATIONSNACHWEIS.json
-```
-
-## Nächster Pflichtschritt
-
-**I011 — Linux-Systemprofil und X11-Erkennung.** I011 beginnt P03 als read-only Plattformprofil. Ubuntu 22.04 und 24.04 amd64 X11 bilden den Abnahmekern. Pfadnormalisierung, atomare Dateischreibprimitive und Lock-Leases bleiben ausdrücklich I012-I014 vorbehalten.
-
-## Masterplan-Identität
-
-Version `2.0.0` · Stand `2026-08-09` · **0,270 MB** · 81 Seiten · SHA-256 `e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c`.
+`START_HIER.sh` ist der direkte Einstieg im Gesamtpaket. Das Masterbuch wird im Paket an den qualifizierten kanonischen Stand gebunden.
 
 ## Dokumentationsregel
 
-Jede Installations-, Wiederherstellungs-, Build- oder Bedienanleitung enthält alle benötigten Befehle vollständig, kopierbar und in richtiger Reihenfolge. Bei Downloads, Paketen und Artefakten wird die Größe zusätzlich in **MB** angegeben.
+Alle sichtbaren Bezeichnungen sollen möglichst auf Deutsch geführt werden. Technische Fachbegriffe werden bei Bedarf ergänzend in Klammern genannt. Installations-, Build- und Prüfanleitungen enthalten vollständige, kopierbare Befehle in richtiger Reihenfolge.
