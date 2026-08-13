@@ -11,12 +11,12 @@
   "github_staging_branch": "iteration/i015-atomarer-replace",
   "github_vorgaenger_commit": "813cdb15b30ecb8ff17e474f436645ca3db7d25a",
   "github_workflow_run_id": 31378734347,
-  "letzte_iteration": "I017",
+  "letzte_iteration": "I018",
   "masterplan_sha256": "e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c",
-  "naechste_iteration": "I018",
+  "naechste_iteration": "I019",
   "receipt_sha256": "ef11d8315907029c31c19d0c003a6f42573d72ab0387c48e434121d549201703",
   "schema": "1.1.0",
-  "source": "Artefakt- und Herkunftsbaseline bleibt der real qualifizierte I015-Stand. Die Lifecycle-Zeiger wurden nach real qualifiziertem I017-ID-Vertragskern und I017.1-Persistenz-/Restartvertrag auf I017 -> I018 fortgeschrieben. I017 ist an Tool-Merges 4e0a9f961c479932ac1e72c7b68367e200451ec9 und 0d2e6c8d2e042527274fb2428efe635dbbb337cc sowie Masterbuch-Merges d6b80cdc534ae3567b5a037e420f0bc30884f318 und 5d4be8436e12937dff5e3a50aedfb8804782e0a1 gebunden. Es wird kein nicht existentes I017-Artifact behauptet.",
+  "source": "Artefakt- und Herkunftsbaseline bleibt bewusst der real qualifizierte I015-Stand; nur die Lifecycle-Zeiger folgen dem kanonischen Projektfortschritt. Projekt-I017 dauerhafte ID/Persistenz und Projekt-I018 Versions-/Manifestregistry einschließlich Binding-Receipt sind qualifiziert. P04-COVERAGE-H bindet den aktuellen fachlichen Stand 2/4 = 50 Prozent und führt als nächsten Pflichtkern Projekt-I019 Auditjournal weiter. Es wird kein nicht existentes neuer Baseline-Artifact behauptet.",
   "status": "VALIDIERT_GITHUB",
   "version": "0.1.0-dev"
 }
