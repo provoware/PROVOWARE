@@ -7,6 +7,7 @@ on:
       - 'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json'
       - 'docs/PLAN_DELTA_P04H_METADATENABGLEICH_2026-08-12.json'
       - '.github/workflows/plan-delta-p04-fortsetzung.yml'
+      - '.github/workflows/i017f-formaler-abschluss.yml'
       - '.github/workflows/plan-delta-p04h-metadatenabgleich.yml'
   workflow_dispatch:
 
@@ -48,14 +49,19 @@ jobs:
           assert 'PROJEKTSTATUS.json Fortschrittswert' in close['nicht_in_diesem_teilschritt']
           print('PLAN_DELTA_P04H_KONSISTENZ=PASS')
           PY
-      - name: Historisches Candidate-Gate muss eingefroren sein
+      - name: Historische Candidate-Gates muessen eingefroren sein
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          text = Path('.github/workflows/plan-delta-p04-fortsetzung.yml').read_text()
-          assert 'pull_request:' not in text
-          assert 'workflow_dispatch:' in text
-          print('HISTORISCHES_GATE_FREEZE=PASS')
+          for path in (
+              '.github/workflows/plan-delta-p04-fortsetzung.yml',
+              '.github/workflows/i017f-formaler-abschluss.yml',
+          ):
+              text = Path(path).read_text()
+              assert 'pull_request:' not in text, path
+              assert 'push:' not in text, path
+              assert 'workflow_dispatch:' in text, path
+          print('HISTORISCHE_GATES_FREEZE=PASS')
           PY
       - name: Exakten PR-Scope pruefen
         env:
@@ -76,6 +82,7 @@ jobs:
             'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json',
             'docs/PLAN_DELTA_P04H_METADATENABGLEICH_2026-08-12.json',
             '.github/workflows/plan-delta-p04-fortsetzung.yml',
+            '.github/workflows/i017f-formaler-abschluss.yml',
             '.github/workflows/plan-delta-p04h-metadatenabgleich.yml',
           }
           assert changed == expected, (changed, expected)
