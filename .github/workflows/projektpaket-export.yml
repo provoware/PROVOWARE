@@ -35,6 +35,17 @@ jobs:
           mypy src/provoware
           python -m pytest -q
 
+      - name: Portable Laufzeit bauen und ohne System-Python prüfen
+        run: |
+          python -m PyInstaller \
+            --clean \
+            --noconfirm \
+            --onefile \
+            --name PROVOWARE_START \
+            WERKZEUGE/projekt_start.py
+          chmod +x dist/PROVOWARE_START
+          env -i HOME="$HOME" PATH="" ./dist/PROVOWARE_START
+
       - name: Masterbuch auschecken
         uses: actions/checkout@v4
         with:
@@ -61,17 +72,38 @@ jobs:
           master_target = root / 'PROVOWARE_MASTER_BOOK_2026'
 
           def ignore_tool(directory, names):
-              blocked = {'.git', '.venv', '_paket', '_masterbuch_quelle', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache'}
+              blocked = {
+                  '.git', '.venv', '_paket', '_masterbuch_quelle', '__pycache__',
+                  '.pytest_cache', '.mypy_cache', '.ruff_cache', 'build', 'dist'
+              }
               return [name for name in names if name in blocked]
 
           shutil.copytree(workspace, tool_target, ignore=ignore_tool)
-          shutil.copytree(workspace / '_masterbuch_quelle', master_target, ignore=shutil.ignore_patterns('.git'))
+          shutil.copytree(
+              workspace / '_masterbuch_quelle',
+              master_target,
+              ignore=shutil.ignore_patterns('.git'),
+          )
+
+          runtime_target = tool_target / 'RUNTIME'
+          runtime_target.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(workspace / 'dist' / 'PROVOWARE_START', runtime_target / 'PROVOWARE_START')
 
           start = tool_target / 'PROVOWARE_STARTEN.sh'
           start.chmod(start.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+          runtime = runtime_target / 'PROVOWARE_START'
+          runtime.chmod(runtime.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
           outer_start = root / 'START_HIER.sh'
-          outer_start.write_text('#!/usr/bin/env bash\nROOT="$(cd "$(dirname "$0")" && pwd)"\n"$ROOT/PROVOWARE/PROVOWARE_STARTEN.sh" "$@"\n', encoding='utf-8')
-          outer_start.chmod(outer_start.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+          outer_start.write_text(
+              '#!/usr/bin/env bash\n'
+              'ROOT="$(cd "$(dirname "$0")" && pwd)"\n'
+              '"$ROOT/PROVOWARE/PROVOWARE_STARTEN.sh" "$@"\n',
+              encoding='utf-8',
+          )
+          outer_start.chmod(
+              outer_start.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+          )
 
           info = {
               'paket': 'PROVOWARE_WISSENSSPEICHER_AKTUELL',
@@ -80,13 +112,35 @@ jobs:
               'masterbuch_commit': '30a96a1c445fc34ff4a2c8883d9374b540a60d43',
               'github_workflow_run_id': int(os.environ['RUN_ID']),
               'startdatei': 'START_HIER.sh',
-              'pruefungen': ['Baseline', 'Schnellstart', 'Historische Gates', 'Ruff', 'Ruff Format', 'mypy strict', 'pytest Gesamtregression'],
-              'projektstand': 'P04 50 Prozent; I019 ist der nächste Pflichtkern'
+              'portable_runtime': 'PROVOWARE/RUNTIME/PROVOWARE_START',
+              'system_python_erforderlich': False,
+              'pruefungen': [
+                  'Baseline',
+                  'Schnellstart',
+                  'Historische Gates',
+                  'Ruff',
+                  'Ruff Format',
+                  'mypy strict',
+                  'pytest Gesamtregression',
+                  'Portable Runtime ohne System-Python',
+              ],
+              'projektstand': 'P04 50 Prozent; I019 ist der nächste Pflichtkern',
           }
-          (root / 'PAKETINFO.json').write_text(json.dumps(info, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-          shutil.make_archive(str(workspace / 'PROVOWARE_WISSENSSPEICHER_AKTUELL'), 'zip', root.parent, root.name)
+          (root / 'PAKETINFO.json').write_text(
+              json.dumps(info, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          shutil.make_archive(
+              str(workspace / 'PROVOWARE_WISSENSSPEICHER_AKTUELL'),
+              'zip',
+              root.parent,
+              root.name,
+          )
           PY
-          sha256sum PROVOWARE_WISSENSSPEICHER_AKTUELL.zip > PROVOWARE_WISSENSSPEICHER_AKTUELL.zip.sha256
+          PROVOWARE_KEIN_WARTEN=1 \
+            _paket/PROVOWARE_WISSENSSPEICHER_AKTUELL/START_HIER.sh
+          unzip -t PROVOWARE_WISSENSSPEICHER_AKTUELL.zip
+          sha256sum PROVOWARE_WISSENSSPEICHER_AKTUELL.zip \
+            > PROVOWARE_WISSENSSPEICHER_AKTUELL.zip.sha256
 
       - uses: actions/upload-artifact@v4
         with:

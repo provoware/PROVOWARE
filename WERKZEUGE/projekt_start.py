@@ -2,15 +2,24 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import io
 import json
 import shutil
 import subprocess
 import sys
 from collections.abc import Callable
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+
+def ermittle_root() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent.parent
+    return Path(__file__).resolve().parents[1]
+
+
+ROOT = ermittle_root()
 Pruefung = tuple[str, Callable[[], list[str]]]
 
 
@@ -41,14 +50,19 @@ def pruefe_json_dateien() -> list[str]:
     return fehler
 
 
+def lade_pythonmodul(name: str, pfad: Path) -> Any:
+    spec = importlib.util.spec_from_file_location(name, pfad)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Pythonmodul kann nicht geladen werden: {pfad}")
+    modul = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(modul)
+    return modul
+
+
 def pruefe_baseline() -> list[str]:
     pfad = ROOT / "WERKZEUGE" / "baseline_pruefen.py"
     try:
-        spec = importlib.util.spec_from_file_location("baseline_pruefen", pfad)
-        if spec is None or spec.loader is None:
-            return ["Baseline-Prüfer kann nicht geladen werden."]
-        modul = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(modul)
+        modul = lade_pythonmodul("baseline_pruefen", pfad)
         return [str(eintrag) for eintrag in modul.pruefe()]
     except Exception as exc:
         return [f"Baseline-Prüfung nicht ausführbar: {exc}"]
@@ -89,13 +103,17 @@ def pruefe_coverage() -> list[str]:
 
 
 def pruefe_historische_gates() -> list[str]:
-    skript = ROOT / "tools" / "historical_gate_linter.py"
-    prozess = subprocess.run(
-        [sys.executable, str(skript)], cwd=ROOT, text=True, capture_output=True, check=False
-    )
-    if prozess.returncode == 0:
+    pfad = ROOT / "tools" / "historical_gate_linter.py"
+    ausgabe = io.StringIO()
+    try:
+        modul = lade_pythonmodul("historical_gate_linter", pfad)
+        with redirect_stdout(ausgabe), redirect_stderr(ausgabe):
+            returncode = int(modul.main())
+    except Exception as exc:
+        return [f"Historische-Gates-Linter nicht ausführbar: {exc}"]
+    if returncode == 0:
         return []
-    text = (prozess.stderr or prozess.stdout).strip()
+    text = ausgabe.getvalue().strip()
     return [f"Historische-Gates-Linter ROT: {text or 'unbekannter Fehler'}"]
 
 
@@ -116,6 +134,11 @@ def zeige_status() -> None:
 
 
 def vollpruefung() -> list[str]:
+    if getattr(sys, "frozen", False):
+        return [
+            "Die Entwickler-Vollprüfung benötigt die Python-3.13-Entwicklerumgebung; "
+            "die portable Laufzeit führt nur die qualifizierte Startprüfung aus."
+        ]
     befehle = [
         ["ruff", "check", "src", "tests", "WERKZEUGE"],
         ["ruff", "format", "--check", "src", "tests", "WERKZEUGE"],
