@@ -1,5 +1,16 @@
 # Änderungsverlauf
 
+## 0.1.0-dev - 2026-08-13
+
+### P04-COVERAGE-H — MASTERPLAN-Coverage kanonisch synchronisiert
+- Das bereits real qualifizierte `MASTERPLAN_COVERAGE_GATE` wird metadatenseitig auf `E2 / P0 / BESTAETIGT / PASS_REAL` synchronisiert; keine neue fachliche Regel und keine Goldene Regel.
+- Tool-PR #56 wurde auf Head `9579a71bd029a874f885d63f3c10dad5204b3174` durch Run `31711344686` real mit `completed / success` qualifiziert und als Main-Merge `17fa418771e6ca7e3a8085fa88e564847dbb13d5` promoviert; der Historische-Gates-Linter lief parallel als Run `31711344627` erfolgreich.
+- Masterbuch-Coverage-Evidence wurde mit `ERK-PLANDELTA-P04-001` konsolidiert; Masterbuch-Run `31711978359` lief real erfolgreich und PR #26 wurde als Main-Merge `30a96a1c445fc34ff4a2c8883d9374b540a60d43` promoviert.
+- Der fachliche P04-Coverage-Stand ist `2/4 QUALIFIZIERT`, `2/4 EXPLIZIT_WEITERGEFUEHRT`, `0 BLOCKIERT`; daraus folgt `p04_fortschritt_prozent = 50` und `phase_close_allowed = false`.
+- `PROJEKTSTATUS.json` wird vom nicht coverage-basierten Altstand 95 % auf 50 % korrigiert, `letzte_abgeschlossene_iteration` auf `I018` und `naechste_iteration` auf `I019` synchronisiert.
+- I019 Auditjournal mit monotoner `sequence` und Hash-Kette bleibt der direkt folgende Pflichtkern; I020 Speichertrennung/Retention bleibt explizit weitergeführt.
+- Keine Produkt-, Test-, Nutzdaten- oder bestehende Evidence-Mutation; dieser Schritt schließt ausschließlich die kanonische Metadatenabweichung.
+
 ## 0.1.0-dev - 2026-08-12
 
 ### I018.3H — Source+Contract Binding Receipt metadatenseitig synchronisiert
