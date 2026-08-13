@@ -1,0 +1,90 @@
+name: PLAN_DELTA P04H Metadatenabgleich
+
+on:
+  pull_request:
+    paths:
+      - 'ITERATIONSUEBERGABE.json'
+      - 'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json'
+      - 'docs/PLAN_DELTA_P04H_METADATENABGLEICH_2026-08-12.json'
+      - '.github/workflows/plan-delta-p04-fortsetzung.yml'
+      - '.github/workflows/i017f-formaler-abschluss.yml'
+      - '.github/workflows/plan-delta-p04h-metadatenabgleich.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Plan- und Uebergabekonsistenz fail-closed pruefen
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          delta = json.loads(Path('docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json').read_text())
+          handover = json.loads(Path('ITERATIONSUEBERGABE.json').read_text())
+          close = json.loads(Path('docs/PLAN_DELTA_P04H_METADATENABGLEICH_2026-08-12.json').read_text())
+          assert delta['delta_id'] == 'PLAN-DELTA-P04-2026-08-12-001'
+          assert delta['status'] == 'BESTAETIGT'
+          assert delta['reifegrad'] == 'E2'
+          assert delta['qualification']['status'] == 'PASS_REAL'
+          assert delta['qualification']['tool_workflow_run_id'] == 31626001490
+          assert delta['qualification']['masterbuch_status'] == 'BESTAETIGT'
+          assert delta['qualification']['masterbuch_reifegrad'] == 'E2'
+          assert delta['goldene_regel'] is False
+          assert handover['schema'] == '1.4.0'
+          assert handover['next_iteration'] == 'I019'
+          ident = handover['plan_identity']
+          assert ident['active_delta_id'] == delta['delta_id']
+          assert ident['project_mapping_p04_i019'] == 'Auditjournal mit sequence + hash chain'
+          assert ident['project_mapping_p04_i020'] == 'Audit/Debug/Evidence-Speichertrennung'
+          assert ident['fail_closed_on_ambiguity'] is True
+          assert close['status'] == 'KANDIDAT'
+          assert close['reifegrad'] == 'E1'
+          assert close['zielzustand']['p04_fachlicher_kernfortschritt'] == '2_VON_4_PFLICHTKERNEN_QUALIFIZIERT'
+          assert 'PROJEKTSTATUS.json Fortschrittswert' in close['nicht_in_diesem_teilschritt']
+          print('PLAN_DELTA_P04H_KONSISTENZ=PASS')
+          PY
+      - name: Historische Candidate-Gates muessen eingefroren sein
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in (
+              '.github/workflows/plan-delta-p04-fortsetzung.yml',
+              '.github/workflows/i017f-formaler-abschluss.yml',
+          ):
+              text = Path(path).read_text()
+              assert 'pull_request:' not in text, path
+              assert 'push:' not in text, path
+              assert 'workflow_dispatch:' in text, path
+          print('HISTORISCHE_GATES_FREEZE=PASS')
+          PY
+      - name: Exakten PR-Scope pruefen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          number = event.get('pull_request', {}).get('number')
+          if not number:
+              print('workflow_dispatch: PR-Scope nicht anwendbar; kein PASS fuer PR-Scope behauptet')
+              raise SystemExit(0)
+          repo = os.environ['GITHUB_REPOSITORY']
+          req = urllib.request.Request(f'https://api.github.com/repos/{repo}/pulls/{number}/files?per_page=100', headers={'Authorization': f'Bearer {os.environ["GH_TOKEN"]}', 'Accept': 'application/vnd.github+json'})
+          changed = {x['filename'] for x in json.load(urllib.request.urlopen(req))}
+          expected = {
+            'ITERATIONSUEBERGABE.json',
+            'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json',
+            'docs/PLAN_DELTA_P04H_METADATENABGLEICH_2026-08-12.json',
+            '.github/workflows/plan-delta-p04-fortsetzung.yml',
+            '.github/workflows/i017f-formaler-abschluss.yml',
+            '.github/workflows/plan-delta-p04h-metadatenabgleich.yml',
+          }
+          assert changed == expected, (changed, expected)
+          print('EXAKTER_SCOPE=PASS')
+          PY

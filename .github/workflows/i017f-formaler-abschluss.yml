@@ -1,12 +1,6 @@
 name: I017F formaler Abschluss
 
 on:
-  pull_request:
-    paths:
-      - 'CURRENT_BASELINE.json'
-      - 'ITERATIONSUEBERGABE.json'
-      - 'docs/I017_ABSCHLUSS.json'
-      - '.github/workflows/i017f-formaler-abschluss.yml'
   workflow_dispatch:
 
 jobs:
@@ -52,7 +46,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test "${{ github.event_name }}" = 'pull_request'
+          if [ "${{ github.event_name }}" != 'pull_request' ]; then
+            echo 'workflow_dispatch: historisches Gate nur manuell; PR-Scope nicht anwendbar.'
+            exit 0
+          fi
           pr="${{ github.event.pull_request.number }}"
           test -n "$pr"
           changed="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${pr}/files" --jq '.[].filename')"
