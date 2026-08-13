@@ -3,7 +3,7 @@
   "phase": "P04",
   "masterplan_version": "2.0.0",
   "active_plan_delta": "PLAN-DELTA-P04-2026-08-12-001",
-  "status": "KANDIDAT",
+  "status": "BESTAETIGT",
   "allowed_states": [
     "QUALIFIZIERT",
     "EXPLIZIT_WEITERGEFUEHRT",
@@ -53,25 +53,52 @@
     "next_iteration": "I019"
   },
   "known_metadata_drift": {
-    "PROJEKTSTATUS.p04_fortschritt_prozent": "ALTSTAND_95_NICHT_COVERAGE_BASIERT",
-    "behandlung": "NICHT_ALS_PHASE_CLOSE_BELEG_VERWENDEN"
+    "status": "AUFGELOEST_DURCH_P04_COVERAGE_H",
+    "vorheriger_wert": 95,
+    "kanonischer_wert": 50,
+    "behandlung": "COVERAGE_BASIERT_SYNCHRONISIERT"
   },
   "wissensschema": {
-    "typ": "Nachweisentwurf",
+    "typ": "Nachweis",
     "hauptkategorie": "Qualitaetssicherung",
     "nebenkategorien": ["Masterplan", "Coverage", "Lifecycle", "Evidence", "Fail-Closed"],
-    "reifegrad": "E1",
+    "reifegrad": "E2",
     "prioritaet": "P0",
     "gueltigkeitsbereich": "PROVOWARE P04 Phasenabdeckung",
     "projektbezug": ["PROVOWARE Wissensspeicher", "PROVOWARE Tool"],
-    "quelle_herkunft": ["PLAN-DELTA-P04-2026-08-12-001", "ITERATIONSUEBERGABE.json", "I017/I018 Qualification Evidence"],
+    "quelle_herkunft": [
+      "PLAN-DELTA-P04-2026-08-12-001",
+      "ITERATIONSUEBERGABE.json",
+      "I017/I018 Qualification Evidence",
+      "Tool-PR #56 / MASTERPLAN Coverage Gate P04",
+      "Masterbuch ERK-PLANDELTA-P04-001 Coverage-Revalidierung"
+    ],
     "automatisierbarkeit": "JA",
-    "status": "KANDIDAT",
-    "historie": ["2026-08-13: P04-Coverage als fail-closed Kandidat mit vier Pflichtkernen angelegt."],
+    "status": "BESTAETIGT",
+    "historie": [
+      "2026-08-13: P04-Coverage als fail-closed Kandidat mit vier Pflichtkernen angelegt.",
+      "2026-08-13: Tool-Run 31711344686 auf Head 9579a71bd029a874f885d63f3c10dad5204b3174 real erfolgreich; Tool-PR #56 SHA-gebunden als 17fa418771e6ca7e3a8085fa88e564847dbb13d5 promoviert.",
+      "2026-08-13: Masterbuch-Run 31711978359 real erfolgreich; Coverage-Evidence mit ERK-PLANDELTA-P04-001 konsolidiert und als 30a96a1c445fc34ff4a2c8883d9374b540a60d43 promoviert."
+    ],
     "goldene_regel": false
   },
   "qualification": {
-    "status": "AUSSTEHEND"
+    "status": "PASS_REAL",
+    "tool_pr": 56,
+    "tool_head": "9579a71bd029a874f885d63f3c10dad5204b3174",
+    "tool_workflow_run_id": 31711344686,
+    "tool_workflow_id": 333644439,
+    "tool_workflow_conclusion": "success",
+    "historische_gates_linter_run_id": 31711344627,
+    "historische_gates_linter_conclusion": "success",
+    "tool_merge": "17fa418771e6ca7e3a8085fa88e564847dbb13d5",
+    "masterbuch_pr": 26,
+    "masterbuch_head": "640262f96ca50a7511a48cf1c637b5769d409188",
+    "masterbuch_workflow_run_id": 31711978359,
+    "masterbuch_workflow_conclusion": "success",
+    "masterbuch_merge": "30a96a1c445fc34ff4a2c8883d9374b540a60d43",
+    "masterbuch_evidence": "ERK-PLANDELTA-P04-001",
+    "sha_bound_promotion": true
   },
   "mutation": {
     "produktlogik": false,
