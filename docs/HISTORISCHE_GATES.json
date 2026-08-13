@@ -24,6 +24,11 @@
       "grund": "I018.2H ist historischer Metadatenverschluss und darf nach Promotion nur manuell reproduziert werden."
     },
     {
+      "path": ".github/workflows/i018-3h-metadatenverschluss.yml",
+      "status": "PROMOTED_FROZEN",
+      "grund": "I018.3H ist historischer Metadatenverschluss; die Reaktivierung durch P04-COVERAGE-H bestaetigte, dass dieses Gate nach Promotion nur noch manuell reproduziert werden darf."
+    },
+    {
       "path": ".github/workflows/plan-delta-p04-fortsetzung.yml",
       "status": "PROMOTED_FROZEN",
       "grund": "Das PLAN-DELTA-P04-Candidate-Gate wurde real qualifiziert und darf nach Promotion nicht automatisch requalifiziert werden."
@@ -49,7 +54,8 @@
     "status": "QUALIFIZIERT_KANDIDAT",
     "historie": [
       "2026-08-13: initialer generischer Registry-Vertrag nach erneutem I017F-Lifecycle-Konflikt vorbereitet.",
-      "2026-08-13: Run 31709233315 auf Head 25441b30645b6afdaaf20bafc02e09aff79e802a real erfolgreich; E1 -> E2. Finaler Head muss nach Evidence-Fortschreibung erneut qualifiziert werden."
+      "2026-08-13: Run 31709233315 auf Head 25441b30645b6afdaaf20bafc02e09aff79e802a real erfolgreich; E1 -> E2. Finaler Head muss nach Evidence-Fortschreibung erneut qualifiziert werden.",
+      "2026-08-13: I018.3H nach realer Reaktivierung durch P04-COVERAGE-H als PROMOTED_FROZEN registriert; Vollstaendigkeitsautomatik fuer neu promovierte Gates bleibt separater Folgeschritt."
     ],
     "goldene_regel": false
   }
