@@ -7,9 +7,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
+Pruefung = tuple[str, Callable[[], list[str]]]
 
 
 def lade_json(relativ: str) -> dict[str, Any]:
@@ -26,18 +27,17 @@ def ausgabe(titel: str, wert: object) -> None:
 
 
 def pruefe_python() -> list[str]:
-    fehler: list[str] = []
-    if sys.version_info[:2] != (3, 13):
-        fehler.append(
-            f"Python {sys.version_info.major}.{sys.version_info.minor} erkannt; erwartet wird Python 3.13."
-        )
-    return fehler
+    if sys.version_info[:2] == (3, 13):
+        return []
+    version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    return [f"Python {version} erkannt; erwartet wird Python 3.13."]
 
 
 def pruefe_json_dateien() -> list[str]:
     fehler: list[str] = []
+    ignoriert = {".git", ".venv", "build", "dist"}
     for pfad in sorted(ROOT.rglob("*.json")):
-        if any(teil in {".git", ".venv", "build", "dist"} for teil in pfad.parts):
+        if any(teil in ignoriert for teil in pfad.parts):
             continue
         try:
             json.loads(pfad.read_text(encoding="utf-8"))
@@ -58,15 +58,44 @@ def lade_baseline_pruefer() -> Any:
 
 def pruefe_baseline() -> list[str]:
     try:
-        modul = lade_baseline_pruefer()
-        ergebnis = modul.pruefe()
-    except Exception as exc:  # noqa: BLE001 - Startdiagnose muss Fehler verständlich melden
+        ergebnis = lade_baseline_pruefer().pruefe()
+    except Exception as exc:
         return [f"Baseline-Prüfung nicht ausführbar: {exc}"]
     return [str(eintrag) for eintrag in ergebnis]
 
 
-def pruefe_coverage() -> list[str]:
+def pruefe_wissensschema(coverage: dict[str, Any]) -> list[str]:
+    schema = coverage.get("wissensschema")
+    if not isinstance(schema, dict):
+        return ["Coverage-Wissensschema fehlt."]
+    erwartet = {
+        "reifegrad": "E2",
+        "status": "BESTAETIGT",
+        "goldene_regel": False,
+    }
+    return [
+        f"Coverage-{schluessel} ist nicht {wert}."
+        for schluessel, wert in erwartet.items()
+        if schema.get(schluessel) != wert
+    ]
+
+
+def pruefe_coverage_konsistenz(
+    status: dict[str, Any], handover: dict[str, Any], summary: dict[str, Any]
+) -> list[str]:
     fehler: list[str] = []
+    if status.get("p04_fortschritt_prozent") != summary.get("fachfortschritt_prozent"):
+        fehler.append("P04-Fortschritt widerspricht MASTERPLAN-Coverage.")
+    if status.get("naechste_iteration") != summary.get("next_iteration"):
+        fehler.append("Nächste Iteration widerspricht MASTERPLAN-Coverage.")
+    if handover.get("next_iteration") != summary.get("next_iteration"):
+        fehler.append("ITERATIONSUEBERGABE widerspricht MASTERPLAN-Coverage.")
+    if summary.get("phase_close_allowed") is not False:
+        fehler.append("P04 darf im aktuellen 2/4-Stand nicht geschlossen sein.")
+    return fehler
+
+
+def pruefe_coverage() -> list[str]:
     try:
         status = lade_json("PROJEKTSTATUS.json")
         handover = lade_json("ITERATIONSUEBERGABE.json")
@@ -76,30 +105,13 @@ def pruefe_coverage() -> list[str]:
 
     summary = coverage.get("expected_summary")
     qualification = coverage.get("qualification")
-    wissensschema = coverage.get("wissensschema")
     if not isinstance(summary, dict):
-        fehler.append("Coverage-Zusammenfassung fehlt.")
-        return fehler
+        return ["Coverage-Zusammenfassung fehlt."]
+
+    fehler = pruefe_wissensschema(coverage)
     if not isinstance(qualification, dict) or qualification.get("status") != "PASS_REAL":
         fehler.append("Coverage-Qualification ist nicht PASS_REAL.")
-    if not isinstance(wissensschema, dict):
-        fehler.append("Coverage-Wissensschema fehlt.")
-    else:
-        if wissensschema.get("reifegrad") != "E2":
-            fehler.append("Coverage-Reifegrad ist nicht E2.")
-        if wissensschema.get("status") != "BESTAETIGT":
-            fehler.append("Coverage-Wissensstatus ist nicht BESTAETIGT.")
-        if wissensschema.get("goldene_regel") is not False:
-            fehler.append("Coverage wurde unerwartet als Goldene Regel markiert.")
-
-    if status.get("p04_fortschritt_prozent") != summary.get("fachfortschritt_prozent"):
-        fehler.append("P04-Fortschritt widerspricht MASTERPLAN-Coverage.")
-    if status.get("naechste_iteration") != summary.get("next_iteration"):
-        fehler.append("Nächste Iteration widerspricht MASTERPLAN-Coverage.")
-    if handover.get("next_iteration") != summary.get("next_iteration"):
-        fehler.append("ITERATIONSUEBERGABE widerspricht MASTERPLAN-Coverage.")
-    if summary.get("phase_close_allowed") is not False:
-        fehler.append("P04 darf im aktuellen 2/4-Stand nicht geschlossen sein.")
+    fehler.extend(pruefe_coverage_konsistenz(status, handover, summary))
     return fehler
 
 
@@ -125,17 +137,18 @@ def befehl_ausfuehren(name: str, befehl: list[str]) -> tuple[bool, str]:
         return False, f"{name}: Werkzeug nicht installiert ({befehl[0]})."
     print(f"\n--- {name} ---")
     prozess = subprocess.run(befehl, cwd=ROOT, check=False)
-    return prozess.returncode == 0, f"{name}: {'GRÜN' if prozess.returncode == 0 else 'ROT'}"
+    status = "GRÜN" if prozess.returncode == 0 else "ROT"
+    return prozess.returncode == 0, f"{name}: {status}"
 
 
 def vollpruefung() -> list[str]:
-    fehler: list[str] = []
     befehle = [
         ("Ruff", ["ruff", "check", "src", "tests", "WERKZEUGE", "tools"]),
         ("Ruff Format", ["ruff", "format", "--check", "src", "tests", "WERKZEUGE", "tools"]),
         ("mypy", ["mypy", "src/provoware"]),
         ("pytest", [sys.executable, "-m", "pytest", "-q"]),
     ]
+    fehler: list[str] = []
     for name, befehl in befehle:
         ok, meldung = befehl_ausfuehren(name, befehl)
         print(meldung)
@@ -149,6 +162,8 @@ def zeige_status() -> None:
     handover = lade_json("ITERATIONSUEBERGABE.json")
     coverage = lade_json("docs/MASTERPLAN_COVERAGE_P04.json")
     summary = coverage.get("expected_summary", {})
+    kernstand = f"{summary.get('qualifiziert')}/{summary.get('pflichtkerne_gesamt')} qualifiziert"
+    abschluss = "NEIN" if summary.get("phase_close_allowed") is False else "UNBEKANNT"
 
     print("\nPROVOWARE — Klick & Start")
     print("=" * 52)
@@ -157,47 +172,44 @@ def zeige_status() -> None:
     ausgabe("Letzte Iteration", status.get("letzte_abgeschlossene_iteration"))
     ausgabe("Nächste Iteration", status.get("naechste_iteration"))
     ausgabe("P04-Fortschritt", f"{status.get('p04_fortschritt_prozent')} %")
-    ausgabe("P04-Pflichtkerne", f"{summary.get('qualifiziert')}/{summary.get('pflichtkerne_gesamt')} qualifiziert")
-    ausgabe("P04-Abschluss erlaubt", "NEIN" if summary.get("phase_close_allowed") is False else "UNBEKANNT")
+    ausgabe("P04-Pflichtkerne", kernstand)
+    ausgabe("P04-Abschluss erlaubt", abschluss)
     ausgabe("Nächstes Ziel", handover.get("next_goal"))
     print("=" * 52)
 
 
+def fuehre_schnellpruefung(pruefungen: list[Pruefung]) -> list[str]:
+    fehler: list[str] = []
+    print("\nSchnellprüfung")
+    print("-" * 52)
+    for name, funktion in pruefungen:
+        ergebnis = funktion()
+        print(f"[{'ROT' if ergebnis else 'GRÜN'}]  {name}")
+        for eintrag in ergebnis:
+            print(f"        - {eintrag}")
+        fehler.extend(ergebnis)
+    return fehler
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="PROVOWARE Klick-&-Start-Prüfung")
-    parser.add_argument(
-        "--vollpruefung",
-        action="store_true",
-        help="Zusätzlich Ruff, mypy und pytest ausführen, sofern installiert.",
-    )
+    parser.add_argument("--vollpruefung", action="store_true")
     args = parser.parse_args()
 
     try:
         zeige_status()
-    except Exception as exc:  # noqa: BLE001 - Startdiagnose
+    except Exception as exc:
         print(f"STARTSTATUS: ROT — {exc}", file=sys.stderr)
         return 2
 
-    pruefungen = [
+    pruefungen: list[Pruefung] = [
         ("Python 3.13", pruefe_python),
         ("JSON-Struktur", pruefe_json_dateien),
         ("Baseline-Konsistenz", pruefe_baseline),
         ("P04-Coverage", pruefe_coverage),
         ("Historische Gates", pruefe_historische_gates),
     ]
-    fehler: list[str] = []
-    print("\nSchnellprüfung")
-    print("-" * 52)
-    for name, funktion in pruefungen:
-        ergebnis = funktion()
-        if ergebnis:
-            print(f"[ROT]   {name}")
-            for eintrag in ergebnis:
-                print(f"        - {eintrag}")
-            fehler.extend(ergebnis)
-        else:
-            print(f"[GRÜN]  {name}")
-
+    fehler = fuehre_schnellpruefung(pruefungen)
     if args.vollpruefung:
         fehler.extend(vollpruefung())
 
@@ -206,7 +218,7 @@ def main() -> int:
         return 1
     print("\nSTARTPRÜFUNG: GRÜN")
     if not args.vollpruefung:
-        print("Tipp: Für die komplette Entwicklerprüfung: ./PROVOWARE_STARTEN.sh --vollpruefung")
+        print("Tipp: Vollprüfung mit ./PROVOWARE_STARTEN.sh --vollpruefung")
     return 0
 
 
