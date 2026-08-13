@@ -1,0 +1,81 @@
+{
+  "schema": "1.0.0",
+  "phase": "P04",
+  "masterplan_version": "2.0.0",
+  "active_plan_delta": "PLAN-DELTA-P04-2026-08-12-001",
+  "status": "KANDIDAT",
+  "allowed_states": [
+    "QUALIFIZIERT",
+    "EXPLIZIT_WEITERGEFUEHRT",
+    "BLOCKIERT"
+  ],
+  "unknown_state_policy": "FAIL_CLOSED",
+  "phase_close_policy": "ALLE_PFLICHTKERNE_MUESSEN_QUALIFIZIERT_SEIN",
+  "pflichtkerne": [
+    {
+      "masterplan_origin": "P04/I015",
+      "ziel": "dauerhafte ID-Erzeugung und Validierung",
+      "project_iteration": "I017",
+      "status": "QUALIFIZIERT",
+      "evidence": "docs/I017_ABSCHLUSS.json"
+    },
+    {
+      "masterplan_origin": "P04/I016",
+      "ziel": "Versions- und Manifestregistry",
+      "project_iteration": "I018",
+      "status": "QUALIFIZIERT",
+      "evidence": "docs/I018_3H_METADATENVERSCHLUSS.json"
+    },
+    {
+      "masterplan_origin": "P04/I017",
+      "ziel": "Auditjournal mit sequence + hash chain",
+      "project_iteration": "I019",
+      "status": "EXPLIZIT_WEITERGEFUEHRT",
+      "abnahmekern": "Manipulation wird erkannt",
+      "evidence": "docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json"
+    },
+    {
+      "masterplan_origin": "P04/I018",
+      "ziel": "Audit/Debug/Evidence-Speichertrennung",
+      "project_iteration": "I020",
+      "status": "EXPLIZIT_WEITERGEFUEHRT",
+      "abnahmekern": "Retentionregeln greifen",
+      "evidence": "docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json"
+    }
+  ],
+  "expected_summary": {
+    "qualifiziert": 2,
+    "explizit_weitergefuehrt": 2,
+    "blockiert": 0,
+    "pflichtkerne_gesamt": 4,
+    "fachfortschritt_prozent": 50,
+    "phase_close_allowed": false,
+    "next_iteration": "I019"
+  },
+  "known_metadata_drift": {
+    "PROJEKTSTATUS.p04_fortschritt_prozent": "ALTSTAND_95_NICHT_COVERAGE_BASIERT",
+    "behandlung": "NICHT_ALS_PHASE_CLOSE_BELEG_VERWENDEN"
+  },
+  "wissensschema": {
+    "typ": "Nachweisentwurf",
+    "hauptkategorie": "Qualitaetssicherung",
+    "nebenkategorien": ["Masterplan", "Coverage", "Lifecycle", "Evidence", "Fail-Closed"],
+    "reifegrad": "E1",
+    "prioritaet": "P0",
+    "gueltigkeitsbereich": "PROVOWARE P04 Phasenabdeckung",
+    "projektbezug": ["PROVOWARE Wissensspeicher", "PROVOWARE Tool"],
+    "quelle_herkunft": ["PLAN-DELTA-P04-2026-08-12-001", "ITERATIONSUEBERGABE.json", "I017/I018 Qualification Evidence"],
+    "automatisierbarkeit": "JA",
+    "status": "KANDIDAT",
+    "historie": ["2026-08-13: P04-Coverage als fail-closed Kandidat mit vier Pflichtkernen angelegt."],
+    "goldene_regel": false
+  },
+  "qualification": {
+    "status": "AUSSTEHEND"
+  },
+  "mutation": {
+    "produktlogik": false,
+    "nutzdaten": false,
+    "bestehende_evidence": false
+  }
+}

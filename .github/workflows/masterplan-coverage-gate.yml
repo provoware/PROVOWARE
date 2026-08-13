@@ -1,0 +1,164 @@
+name: MASTERPLAN Coverage Gate P04
+
+on:
+  pull_request:
+    paths:
+      - 'docs/MASTERPLAN_COVERAGE_P04.json'
+      - 'docs/MASTERPLAN_COVERAGE_GATE.md'
+      - 'docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json'
+      - 'docs/I017_ABSCHLUSS.json'
+      - 'docs/I018_3H_METADATENVERSCHLUSS.json'
+      - 'ITERATIONSUEBERGABE.json'
+      - '.github/workflows/masterplan-coverage-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: P04 Pflichtkerne und Uebergabe fail-closed pruefen
+        run: |
+          python3 - <<'PY'
+          import copy
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+
+          coverage = load('docs/MASTERPLAN_COVERAGE_P04.json')
+          handover = load('ITERATIONSUEBERGABE.json')
+          delta = load('docs/PLAN_DELTA_P04_FORTSETZUNG_2026-08-12.json')
+          i017 = load('docs/I017_ABSCHLUSS.json')
+          i018 = load('docs/I018_3H_METADATENVERSCHLUSS.json')
+          project_status = load('PROJEKTSTATUS.json')
+
+          allowed = {'QUALIFIZIERT', 'EXPLIZIT_WEITERGEFUEHRT', 'BLOCKIERT'}
+          origins = ['P04/I015', 'P04/I016', 'P04/I017', 'P04/I018']
+          iterations = ['I017', 'I018', 'I019', 'I020']
+
+          def validate(cov, hand):
+              assert cov['schema'] == '1.0.0'
+              assert cov['phase'] == 'P04'
+              assert cov['masterplan_version'] == '2.0.0'
+              assert cov['active_plan_delta'] == 'PLAN-DELTA-P04-2026-08-12-001'
+              assert cov['unknown_state_policy'] == 'FAIL_CLOSED'
+              assert set(cov['allowed_states']) == allowed
+              cores = cov['pflichtkerne']
+              assert len(cores) == 4
+              assert [x['masterplan_origin'] for x in cores] == origins
+              assert [x['project_iteration'] for x in cores] == iterations
+              states = [x['status'] for x in cores]
+              assert all(state in allowed for state in states)
+
+              ident = hand['plan_identity']
+              assert hand['next_iteration'] == 'I019'
+              assert ident['active_delta_id'] == cov['active_plan_delta']
+              assert ident['fail_closed_on_ambiguity'] is True
+              mapping = {
+                  'I017': ident['project_mapping_p04_i017'],
+                  'I018': ident['project_mapping_p04_i018'],
+                  'I019': ident['project_mapping_p04_i019'],
+                  'I020': ident['project_mapping_p04_i020'],
+              }
+              for core in cores:
+                  assert mapping[core['project_iteration']] == core['ziel']
+
+              assert delta['delta_id'] == cov['active_plan_delta']
+              assert delta['status'] == 'BESTAETIGT'
+              assert delta['reifegrad'] == 'E2'
+              assert delta['qualification']['status'] == 'PASS_REAL'
+
+              assert cores[0]['status'] == 'QUALIFIZIERT'
+              assert all(x['status'] == 'PASS_REAL' for x in i017['qualifizierte_bausteine'])
+              assert i017['abnahmekern']['id_format_validierung'] == 'QUALIFIZIERT'
+              assert i017['abnahmekern']['restart_erhalt'] == 'QUALIFIZIERT'
+
+              assert cores[1]['status'] == 'QUALIFIZIERT'
+              assert i018['tool_evidence']['workflow_status'] == 'completed'
+              assert i018['tool_evidence']['workflow_conclusion'] == 'success'
+              assert i018['masterbuch_evidence']['reifegrad'] == 'E2'
+              assert i018['masterbuch_evidence']['status'] == 'BESTAETIGT'
+              assert i018['masterbuch_evidence']['evidence_binding'] == 'PASS_REAL'
+              assert i018['zielzustand']['binding_receipt'] == 'SHA256_KANONISCHE_GESAMTZUSTANDSBINDUNG_QUALIFIZIERT'
+
+              continuation = delta['kleinste_sichere_fortsetzung']
+              for core, key in ((cores[2], 'project_I019'), (cores[3], 'project_I020')):
+                  assert core['status'] == 'EXPLIZIT_WEITERGEFUEHRT'
+                  assert continuation[key]['masterplan_origin'] == core['masterplan_origin']
+                  assert continuation[key]['ziel'] == core['ziel']
+                  assert continuation[key]['abnahmekern'] == core['abnahmekern']
+
+              counts = Counter(states)
+              summary = {
+                  'qualifiziert': counts['QUALIFIZIERT'],
+                  'explizit_weitergefuehrt': counts['EXPLIZIT_WEITERGEFUEHRT'],
+                  'blockiert': counts['BLOCKIERT'],
+                  'pflichtkerne_gesamt': len(cores),
+                  'fachfortschritt_prozent': round(100 * counts['QUALIFIZIERT'] / len(cores)),
+                  'phase_close_allowed': counts['QUALIFIZIERT'] == len(cores),
+                  'next_iteration': hand['next_iteration'],
+              }
+              assert summary == cov['expected_summary']
+              assert summary['phase_close_allowed'] is False
+              return summary
+
+          summary = validate(coverage, handover)
+          print('MASTERPLAN_COVERAGE=PASS')
+          print(json.dumps(summary, sort_keys=True))
+
+          old_progress = project_status.get('p04_fortschritt_prozent')
+          if old_progress != summary['fachfortschritt_prozent']:
+              print(f'METADATA_DRIFT=PROJEKTSTATUS_P04_{old_progress}_VS_COVERAGE_{summary["fachfortschritt_prozent"]}')
+
+          bad_state = copy.deepcopy(coverage)
+          bad_state['pflichtkerne'][2]['status'] = 'UNBEKANNT'
+          try:
+              validate(bad_state, handover)
+          except (AssertionError, KeyError, TypeError):
+              print('NEGATIVE_UNKNOWN_STATE=BLOCKIERT')
+          else:
+              raise AssertionError('Unbekannter Zustand wurde nicht blockiert')
+
+          bad_handover = copy.deepcopy(handover)
+          bad_handover['next_iteration'] = 'I020'
+          try:
+              validate(coverage, bad_handover)
+          except (AssertionError, KeyError, TypeError):
+              print('NEGATIVE_HANDOVER_MISMATCH=BLOCKIERT')
+          else:
+              raise AssertionError('Uebergabe-Widerspruch wurde nicht blockiert')
+          PY
+
+      - name: Kandidaten-Scope ohne Produktmutation pruefen
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          number = event['pull_request']['number']
+          repo = os.environ['GITHUB_REPOSITORY']
+          req = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/pulls/{number}/files?per_page=100',
+              headers={
+                  'Authorization': f'Bearer {os.environ["GH_TOKEN"]}',
+                  'Accept': 'application/vnd.github+json',
+              },
+          )
+          with urllib.request.urlopen(req) as response:
+              changed = {x['filename'] for x in json.load(response)}
+          forbidden = [p for p in changed if p.startswith(('src/', 'tests/', 'data/', 'evidence/'))]
+          assert not forbidden, forbidden
+          print('PRODUKTMUTATION=NEIN')
+          PY
