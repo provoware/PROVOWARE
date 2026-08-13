@@ -1,0 +1,48 @@
+{
+  "schema": "1.0.0",
+  "status": "KANDIDAT",
+  "zweck": "Maschinenlesbare Quelle fuer bereits promovierte historische Qualifikations-Gates, die nach Promotion nicht automatisch durch spaetere Projektmetadaten reaktiviert werden duerfen.",
+  "regel": {
+    "erlaubte_trigger": ["workflow_dispatch"],
+    "verbotene_trigger": ["pull_request", "push"],
+    "fail_closed": true
+  },
+  "gates": [
+    {
+      "path": ".github/workflows/i017f-formaler-abschluss.yml",
+      "status": "PROMOTED_FROZEN",
+      "grund": "I017F ist historisch qualifiziert; spaetere ITERATIONSUEBERGABE-Aenderungen duerfen den historischen I018-Uebergabevertrag nicht erneut als aktuelle Invariante ausfuehren."
+    },
+    {
+      "path": ".github/workflows/i018-1h-metadatenverschluss.yml",
+      "status": "PROMOTED_FROZEN",
+      "grund": "I018.1H ist historischer Metadatenverschluss und darf nach Promotion nur manuell reproduziert werden."
+    },
+    {
+      "path": ".github/workflows/i018-2h-metadatenverschluss.yml",
+      "status": "PROMOTED_FROZEN",
+      "grund": "I018.2H ist historischer Metadatenverschluss und darf nach Promotion nur manuell reproduziert werden."
+    },
+    {
+      "path": ".github/workflows/plan-delta-p04-fortsetzung.yml",
+      "status": "PROMOTED_FROZEN",
+      "grund": "Das PLAN-DELTA-P04-Candidate-Gate wurde real qualifiziert und darf nach Promotion nicht automatisch requalifiziert werden."
+    }
+  ],
+  "wissensschema": {
+    "typ": "Praeventionsregel",
+    "hauptkategorie": "Qualitaetssicherung",
+    "nebenkategorien": ["CI", "Lifecycle", "Regression", "Evidence", "Fail-Closed"],
+    "reifegrad": "E1",
+    "prioritaet": "P0",
+    "gueltigkeitsbereich": "PROVOWARE Toolrepository; promovierte historische Candidate-/Closure-Gates",
+    "projektbezug": ["PROVOWARE Wissensspeicher", "PROVOWARE Tool"],
+    "quelle_herkunft": "Wiederholte reale Lifecycle-Konflikte bis einschliesslich PR #54; konsolidiert aus bestehenden Einzel-Freeze-Massnahmen.",
+    "automatisierbarkeit": "JA",
+    "status": "KANDIDAT",
+    "historie": [
+      "2026-08-13: initialer generischer Registry-Vertrag nach erneutem I017F-Lifecycle-Konflikt vorbereitet."
+    ],
+    "goldene_regel": false
+  }
+}
