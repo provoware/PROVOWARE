@@ -32,110 +32,120 @@ PROVOWARE ALL-IN 2026 bekommt eine feste, kleine Schnittstelle für spätere Too
 - [x] Eigener Feature-Branch für 0.2.0 anlegen.
 - [x] Hauptziel auf Modulvertrag, Registry und dafür notwendige Qualitätsabsicherung begrenzen.
 - [x] Keine fachlichen Beispieltools und keine Demo-Inhalte einbauen.
-- [ ] Vor dem Merge prüfen, dass der Branch nicht hinter `main` liegt.
+- [x] Vor dem Merge prüfen, dass der Branch nicht hinter `main` liegt.
 
 **Abnahmekriterium:** Jede geänderte Datei muss direkt dem Modulvertrag, dem Registry-Lebenszyklus, der reproduzierbaren Prüfung oder der zugehörigen Dokumentation dienen.
 
 ### 2. Entwicklungsregeln in `AGENTS.md` professionalisieren
 
-- [ ] Reihenfolge `Baseline -> Plan -> Precheck -> Patch -> Prüfung -> Dokumentation -> Diff-Kontrolle -> PR` verbindlich machen.
-- [ ] Kleine, codesparsame Änderungen als Standard festlegen.
-- [ ] Unbegründete Refactorings, neue Abhängigkeiten und Seiteneffekte ausdrücklich verbieten.
-- [ ] Für jeden Patch Zweck, Risiko, Prüfung und Rückweg verlangen.
-- [ ] Laienkommunikation festlegen: Fachbegriff zuerst erklären, Fachwort anschließend in Klammern nennen.
-- [ ] Statusausgabe mit erledigt, in Arbeit, blockiert und nächstem Schritt standardisieren.
-- [ ] Zwei Folgeschritte plus drei Auswahlantworten für die Abschlussfrage vorsehen.
+- [x] Reihenfolge `Baseline -> Plan -> Precheck -> Patch -> Prüfung -> Dokumentation -> Diff-Kontrolle -> PR` verbindlich machen.
+- [x] Kleine, codesparsame Änderungen als Standard festlegen.
+- [x] Unbegründete Refactorings, neue Abhängigkeiten und Seiteneffekte ausdrücklich verbieten.
+- [x] Für jeden Patch Zweck, Risiko, Prüfung und Rückweg verlangen.
+- [x] Laienkommunikation festlegen: Fachbegriff zuerst erklären, Fachwort anschließend in Klammern nennen.
+- [x] Statusausgabe mit erledigt, in Arbeit, blockiert und nächstem Schritt standardisieren.
+- [x] Zwei Folgeschritte plus drei Auswahlantworten für die Abschlussfrage vorsehen.
 
 **Abnahmekriterium:** Ein fremder Entwickler kann aus `AGENTS.md` allein erkennen, wie eine Änderung reproduzierbar vorbereitet, umgesetzt, geprüft und dokumentiert wird.
 
 ### 3. Minimalen Modulvertrag definieren
 
-- [ ] Pflichtfelder festlegen: `id`, `name`, `version`, `apiVersion`, `entry`, `enabledByDefault`.
-- [ ] Optionale Felder nur aufnehmen, wenn sie bereits einen klaren Zweck haben: `description`, `slots`, `capabilities`.
-- [ ] Modul-ID auf kleingeschriebene, stabile Bindestrichnamen begrenzen.
-- [ ] Version auf das Schema `MAJOR.MINOR.PATCH` begrenzen.
-- [ ] Einstiegspfad auf lokale Dateien innerhalb von `modules/` begrenzen.
-- [ ] Doppelte Modul-IDs ablehnen.
-- [ ] Keine Berechtigungen oder Funktionen automatisch voraussetzen.
+- [x] Pflichtfelder festlegen: `id`, `name`, `version`, `apiVersion`, `entry`, `enabledByDefault`.
+- [x] Optionale Felder nur aufnehmen, wenn sie bereits einen klaren Zweck haben: `description`, `slots`, `capabilities`.
+- [x] Modul-ID auf kleingeschriebene, stabile Bindestrichnamen begrenzen.
+- [x] Version auf das Schema `MAJOR.MINOR.PATCH` begrenzen.
+- [x] Einstiegspfad auf lokale Dateien innerhalb von `modules/` begrenzen.
+- [x] Doppelte Modul-IDs ablehnen.
+- [x] Keine Berechtigungen oder Funktionen automatisch voraussetzen.
 
 **Abnahmekriterium:** Ein ungültiger Moduleintrag wird mit klarer Fehlermeldung abgewiesen, bevor Code geladen wird.
 
 ### 4. Leere zentrale Registry anlegen
 
-- [ ] Registry als bewusst leeren Katalog starten.
-- [ ] Die Registry darf keine Beispielmodule vortäuschen.
-- [ ] Katalogdaten beim Start validieren.
-- [ ] Status jedes Moduls intern eindeutig führen: `registered`, `loading`, `loaded`, `active`, `inactive`, `error`.
+- [x] Registry als bewusst leeren Katalog starten.
+- [x] Die Registry darf keine Beispielmodule vortäuschen.
+- [x] Katalogdaten beim Start validieren.
+- [x] Status jedes Moduls intern eindeutig führen: `registered`, `loading`, `loaded`, `active`, `inactive`, `error`.
 
 **Abnahmekriterium:** Die Anwendung startet mit null Modulen fehlerfrei und meldet im Diagnosebereich, dass die Registry initialisiert wurde.
 
 ### 5. Reproduzierbaren Modul-Lebenszyklus implementieren
 
-- [ ] `load(id)` lädt genau den registrierten Einstiegspunkt.
-- [ ] Das Modul muss sich anschließend über `define(id, implementation)` eindeutig anmelden.
-- [ ] `activate(id)` lädt bei Bedarf und aktiviert nur einmal.
-- [ ] `deactivate(id)` beendet eine aktive Instanz sauber.
-- [ ] `remove(id)` deaktiviert zuerst, räumt Laufzeitdaten auf und entfernt den geladenen Script-Knoten.
-- [ ] Mehrfachaufrufe müssen sicher sein oder mit klarer Meldung abgewiesen werden.
-- [ ] Fehler dürfen die übrige Anwendung nicht stoppen.
+- [x] `load(id)` lädt genau den registrierten Einstiegspunkt.
+- [x] Das Modul muss sich anschließend über `define(id, implementation)` eindeutig anmelden.
+- [x] `activate(id)` lädt bei Bedarf und aktiviert nur einmal.
+- [x] `deactivate(id)` beendet eine aktive Instanz sauber.
+- [x] `remove(id)` deaktiviert zuerst, räumt Laufzeitdaten auf und entfernt den geladenen Script-Knoten.
+- [x] Mehrfachaufrufe müssen sicher sein oder mit klarer Meldung abgewiesen werden.
+- [x] Fehler dürfen die übrige Anwendung nicht stoppen.
 
 **Abnahmekriterium:** Der Lebenszyklus ist über eine kleine öffentliche API testbar, ohne Fachinhalte in die UI einzubauen.
 
 ### 6. Bestehendes Logging anbinden
 
-- [ ] Registry-Ereignisse über die vorhandenen drei Logging-Stufen melden.
-- [ ] Stufe 1 nur wichtige Zustandsänderungen und Fehler.
-- [ ] Stufe 2 Lade-/Aktivierungsdiagnose.
-- [ ] Stufe 3 technische Detaildaten ohne unnötige Nutzerdaten.
-- [ ] Fehlertext so formulieren, dass Ursache und nächster Prüfschritt erkennbar sind.
+- [x] Registry-Ereignisse über die vorhandene dreistufige Logging-Infrastruktur melden.
+- [x] Stufe 1 für wichtige Zustandsänderungen und Fehler verwenden.
+- [x] Stufe 2 für Lade- und Registry-Diagnose verwenden.
+- [x] Stufe 3 für tiefe Trace-Daten reservieren und in 0.2.0 keine künstlichen Daten erzeugen.
+- [x] Fehlertext so formulieren, dass Ursache oder betroffener Schritt erkennbar sind.
 
 **Abnahmekriterium:** Registry-Fehler erscheinen kontrolliert im Debugbereich und nicht als unlesbarer ungefangener Fehler.
 
 ### 7. Reproduzierbare Qualitätsprüfung ohne Laufzeitabhängigkeiten ergänzen
 
-- [ ] `package.json` nur als Befehlszentrale verwenden; keine npm-Pakete zur Laufzeit hinzufügen.
-- [ ] Node-20-Prüfscript anlegen.
-- [ ] JSON-Syntax und JSON-Format prüfen.
-- [ ] Pflichtdateien und lokale Asset-Verweise prüfen.
-- [ ] Modulvertrag und Registry automatisch validieren.
-- [ ] Doppelte IDs und unsichere Einstiegspfade erkennen.
-- [ ] Externe Laufzeit-URLs in `src`/`href` erkennen.
-- [ ] Sichere automatische Korrektur (`--fix`) nur für Formatierung, Zeilenenden und eindeutig reparierbare Textfehler erlauben.
-- [ ] Keine semantische Codeänderung automatisch durchführen.
+- [x] `package.json` nur als Befehlszentrale verwenden; keine npm-Pakete zur Laufzeit hinzufügen.
+- [x] Node-20-Prüfscript anlegen.
+- [x] JSON-Syntax und JSON-Format prüfen.
+- [x] Pflichtdateien und lokale Asset-Verweise prüfen.
+- [x] Modulvertrag und Registry automatisch validieren.
+- [x] Doppelte IDs und unsichere Einstiegspfade erkennen.
+- [x] Externe Laufzeit-URLs in `src`/`href` erkennen.
+- [x] Sichere automatische Korrektur (`--fix`) nur für Formatierung, Zeilenenden und eindeutig reparierbare Textfehler erlauben.
+- [x] Keine semantische Codeänderung automatisch durchführen.
+- [x] Automatischen Modul-Lebenszyklustest mit Node-Bordmitteln ergänzen.
 
-**Abnahmekriterium:** `npm run verify` benötigt keine installierten npm-Abhängigkeiten und liefert lokal wie in GitHub Actions dasselbe Ergebnis.
+**Abnahmekriterium:** `npm run verify` benötigt keine installierten npm-Abhängigkeiten und läuft im GitHub-Quality-Gate reproduzierbar durch.
 
 ### 8. Automatische GitHub-Prüfung einrichten
 
-- [ ] Workflow bei Pull Requests und Änderungen auf `main` ausführen.
-- [ ] Node 20 fest verwenden.
-- [ ] Nur Leserechte für Repository-Inhalte vergeben.
-- [ ] Zeitlimit setzen, damit defekte Prüfungen nicht endlos laufen.
-- [ ] `npm run verify` als einziges kanonisches Quality Gate verwenden.
+- [x] Workflow bei Pull Requests und Änderungen auf `main` ausführen.
+- [x] Node 20 fest verwenden.
+- [x] Nur Leserechte für Repository-Inhalte vergeben.
+- [x] Zeitlimit setzen, damit defekte Prüfungen nicht endlos laufen.
+- [x] `npm run verify` als kanonisches Quality Gate verwenden.
+- [x] Quality Gate auf PR #62 real erfolgreich durchlaufen lassen.
 
-**Abnahmekriterium:** Ein fehlerhafter Modulvertrag oder Formatfehler lässt den Workflow fehlschlagen.
+**Abnahmekriterium:** Der Pull-Request-Lauf für 0.2.0 wurde mit `success` abgeschlossen.
 
 ### 9. Dokumentation synchronisieren
 
-- [ ] `README.md`: Start, Modulprinzip, Qualitätsbefehle und aktueller Stand.
-- [ ] `TODO.md`: erledigte 0.2.0-Punkte abhaken und 0.3.0 als nächste Hauptiteration ankündigen.
-- [ ] `CHANGELOG.md`: ausschließlich tatsächlich umgesetzte Änderungen dokumentieren.
-- [ ] `MANIFEST.md`: neue technische Dateien aufnehmen.
-- [ ] `VERSION.json`: auf `0.2.0 – Module Contract & Registry` aktualisieren.
-- [ ] Eigene Modulvertragsdokumentation mit einem rein schematischen, nicht ausführbaren Beispiel ergänzen.
+- [x] `README.md`: Start, Modulprinzip, Qualitätsbefehle und aktueller Stand.
+- [x] `TODO.md`: erledigte 0.2.0-Punkte abhaken und 0.3.0 als nächste Hauptiteration ankündigen.
+- [x] `CHANGELOG.md`: ausschließlich tatsächlich umgesetzte Änderungen dokumentieren.
+- [x] `MANIFEST.md`: neue technische Dateien aufnehmen.
+- [x] `VERSION.json`: auf `0.2.0 – Module Contract & Registry` aktualisieren.
+- [x] Eigene Modulvertragsdokumentation mit einem rein schematischen, nicht ausführbaren Beispiel ergänzen.
 
 **Abnahmekriterium:** README, TODO, CHANGELOG, VERSION und reale Dateien widersprechen sich nicht.
 
 ### 10. Abschlussprüfung und Merge
 
-- [ ] Branch gegen `main` vergleichen.
-- [ ] Nur geplante Dateien akzeptieren.
-- [ ] Quality Gate prüfen.
-- [ ] Pull Request mit Ziel, Risiken, Tests und Rückweg dokumentieren.
-- [ ] Nur bei grünem Stand mergen.
-- [ ] Nach Merge die Dateien auf `main` stichprobenartig erneut lesen.
+- [x] Branch gegen `main` vergleichen.
+- [x] Nur geplante Dateien akzeptieren.
+- [x] Quality Gate prüfen.
+- [x] Pull Request mit Ziel, Risiken, Tests und Rückweg dokumentieren.
+- [x] Nur bei grünem Stand mergen.
+- [x] Nach Merge Version, `AGENTS.md`, TODO und Modul-Registry auf `main` stichprobenartig erneut lesen.
 
-**Rollback:** Der gesamte Release kann über den einzelnen Pull Request zurückgesetzt werden. Keine Migration verändert Nutzerdaten.
+**Rollback:** Der gesamte Release kann über PR #62 beziehungsweise dessen Merge zurückgesetzt werden. Keine Migration verändert Nutzerdaten.
+
+## Releaseabschluss
+
+- Pull Request: `#62`
+- Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
+- PR-Quality-Gate: `success`
+- Ausgangsbranch war beim Abschluss `0` Commits hinter `main`.
+- Version auf `main`: `0.2.0`
 
 ## Bewusst nicht Teil von 0.2.0
 
@@ -156,4 +166,4 @@ Diese Punkte bleiben getrennte spätere Iterationen, damit 0.2.0 klein und prüf
 
 ## Freigabedefinition
 
-0.2.0 gilt erst als fertig, wenn Modulvertrag, leere Registry, Lebenszyklus-API, automatische Qualitätsprüfung, GitHub-Quality-Gate und Dokumentation gemeinsam konsistent sind und der Pull Request ohne ungeklärte Abweichung gemergt wurde.
+0.2.0 ist abgeschlossen: Modulvertrag, leere Registry, Lebenszyklus-API, automatische Qualitätsprüfung, GitHub-Quality-Gate, Dokumentation und Merge sind gemeinsam konsistent abgeschlossen.
