@@ -46,6 +46,38 @@ Drag & Drop folgt erst nach Workspace-Vertrag, State Foundation, Autosave/Reset,
 
 ## D-007 – Produktversion
 
-**Entscheidung:** während der reinen Planungs- und Vertragsphase bleibt die reale Produktversion `0.2.0`.
+**Entscheidung:** Die freigegebene Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
 
-**Begründung:** Eine neue Produktversion wird erst vergeben, wenn die zugehörige Funktion implementiert und geprüft ist.
+**Begründung:** Interne Teilstufen wie 0.3.0-B werden transparent dokumentiert, aber nicht als vollständig freigegebene 0.3.0-Funktion ausgegeben.
+
+## D-008 – Vollständig ausgeblendeter Workspace
+
+**Entscheidung:** Option A.
+
+Alle Panels dürfen später vollständig ausgeblendet werden.
+
+**Schutzmaßnahme:** Ein permanenter `Layout`-Schalter bleibt außerhalb des veränderbaren Workspace jederzeit erreichbar. Darüber können einzelne Panels wieder eingeblendet oder das Standardlayout vollständig wiederhergestellt werden.
+
+**Begründung:** Maximale Flexibilität ohne Gefahr, sich aus der Oberfläche auszusperren.
+
+## D-009 – Kompakte Schnellstarter- und Menüleiste
+
+**Entscheidung:** Unter dem festen oberen Bereich wird ab 0.3.0-C eine moderne kompakte Schnellstarter-/Menüleiste vorgesehen.
+
+Die Leiste:
+
+- gehört nicht zum verschiebbaren Workspace
+- bleibt bei ausgeblendeten Panels erreichbar
+- enthält den permanenten `Layout`-Schalter
+- soll spätere häufige Aktionen aufnehmen, ohne die Hauptfläche zu überladen
+- wird erst mit real benötigten Funktionen erweitert
+
+**Begründung:** Wichtige Steuerfunktionen bleiben schnell erreichbar, während die Arbeitsfläche klar und modular bleibt.
+
+## D-010 – Wartbarkeit und Benennung
+
+**Entscheidung:** Neue Workspace-Logik wird in kleine, klar abgegrenzte Funktionen zerlegt. Daten, reine Logik, Browser-Speicherung und Logging werden getrennt behandelt.
+
+Neue Workspace-Funktionsnamen werden verständlich und konsistent deutsch benannt. Bestehende veröffentlichte Schnittstellen anderer Subsysteme werden nicht nur aus Stilgründen umbenannt.
+
+**Begründung:** Weniger doppelte Logik, reproduzierbare Tests und geringeres Risiko bei späteren Erweiterungen.
