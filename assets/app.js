@@ -147,6 +147,24 @@
     }
   };
 
+  const initializeWorkspace = () => {
+    const workspace = window.PROVOWARE_WORKSPACE;
+    if (!workspace) {
+      log(1, "WORKSPACE", "Workspace-Zustandsverwaltung ist nicht verfügbar.");
+      return;
+    }
+
+    try {
+      workspace.loggerSetzen(log);
+      const workspaceState = workspace.initialisieren();
+      log(2, "WORKSPACE", `Workspace-Zustand bereit (${workspaceState.order.length} Panels).`);
+    } catch (error) {
+      log(1, "WORKSPACE", "Workspace-Zustand konnte nicht initialisiert werden.", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+
   readPreference();
 
   elements.toggle.addEventListener("click", () => {
@@ -199,5 +217,6 @@
     viewport: `${window.innerWidth}x${window.innerHeight}`,
     language: document.documentElement.lang,
   });
+  initializeWorkspace();
   void initializeModules();
 })();
