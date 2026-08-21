@@ -35,11 +35,63 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 
 ### 0.3.0 – Flexible Workspace Engine
 
-- [ ] Panels verschiebbar machen.
-- [ ] Panels ein-/ausblendbar machen.
-- [ ] Panelgrößen veränderbar machen.
-- [ ] Layoutzustand lokal und rücksetzbar speichern.
-- [ ] Tastaturbedienung und responsive Rückfallregeln von Anfang an berücksichtigen.
+#### 0.3.0-A – Workspace-Vertrag
+
+- [x] Option A festlegen: Layout automatisch lokal speichern und vollständig rücksetzbar machen.
+- [x] Detaillierten Entwicklungsplan in `docs/PLAN_0.3.0.md` anlegen.
+- [x] Workspace-Vertrag Version 1 in `docs/WORKSPACE_CONTRACT.md` definieren.
+- [x] Stabile Panel-IDs, Reihenfolge, Sichtbarkeit, Breite, Höhe und erlaubten Bereich festlegen.
+- [x] Persistente Layoutdaten von temporären Drag-/Resize-Zuständen trennen.
+- [x] Responsive Regeln definieren, ohne gespeicherte Desktopwerte auf Mobilgeräten zu überschreiben.
+- [x] Versionierten lokalen Speicher-Schlüssel und sicheren Reset-Vertrag festlegen.
+- [x] Drag & Drop bis nach stabiler State-/Visibility-/Resize-Basis ausdrücklich zurückstellen.
+- [ ] Entscheidung treffen, wie alle ausgeblendeten Panels sicher wieder sichtbar gemacht werden.
+- [ ] Planungs-PR erfolgreich durch Quality Gate bringen und mergen.
+
+#### 0.3.0-B – State Foundation & Autosave/Reset
+
+- [ ] Workspace-Vertrag als kleine validierbare Laufzeitbasis implementieren.
+- [ ] Standardzustand und gespeicherten Zustand deterministisch normalisieren.
+- [ ] Automatische lokale Speicherung nach abgeschlossenen Änderungen implementieren.
+- [ ] `Standardlayout wiederherstellen` isoliert und sicher implementieren.
+- [ ] beschädigte oder gesperrte Browser-Speicherung robust behandeln.
+- [ ] automatische Tests für Zustand, Validierung und Reset ergänzen.
+
+#### 0.3.0-C – Visibility Controls
+
+- [ ] Panels zentral ein-/ausblendbar machen.
+- [ ] Wiederherstellung außerhalb der veränderbaren Panels bereitstellen.
+- [ ] Tastaturbedienung und Fokusführung sicherstellen.
+
+#### 0.3.0-D – Resize
+
+- [ ] Panelbreiten in 12 Rastereinheiten veränderbar machen.
+- [ ] Panelhöhen innerhalb sicherer Grenzen veränderbar machen.
+- [ ] Desktopwerte bei Tablet-/Mobil-Fallback erhalten.
+- [ ] Maus-, Touch- und Tastaturbedienung absichern.
+
+#### 0.3.0-E – Reorder & Drag and Drop
+
+- [ ] Panels erst jetzt verschiebbar machen.
+- [ ] Ziehen nur über dedizierten Griff erlauben.
+- [ ] Nur Reihenfolge, keine freien Pixelkoordinaten speichern.
+- [ ] Drag-Abbruch ohne Zustandsverlust ermöglichen.
+- [ ] vollständige Tastaturalternative anbieten.
+
+#### 0.3.0-F – Responsive & Accessibility Hardening
+
+- [ ] Desktop-, Tablet- und Mobilregeln vollständig prüfen.
+- [ ] Fokus, Live-Status und `prefers-reduced-motion` absichern.
+- [ ] Touch-Ziele und Tastaturnavigation prüfen.
+
+#### 0.3.0-G – Release Gate
+
+- [ ] `npm run verify` um Workspace-Vertrags- und Zustandsprüfungen erweitern.
+- [ ] manuelle Firefox-Abnahme durchführen.
+- [ ] Chrome-Kompatibilität stichprobenartig prüfen.
+- [ ] README, CHANGELOG, MANIFEST und VERSION erst nach realer Implementierung synchronisieren.
+- [ ] Version erst nach vollständiger Abnahme auf `0.3.0` setzen.
+- [ ] Release-PR nur bei grünem Quality Gate mergen.
 
 ## Danach
 
