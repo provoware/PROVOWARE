@@ -135,6 +135,9 @@
     if (record.state !== STATES.LOADING) {
       throw new Error(`Modul ${id} darf sich nur während des Ladens definieren.`);
     }
+    if (record.implementation) {
+      throw new Error(`Modul ${id} hat sich während desselben Ladevorgangs bereits definiert.`);
+    }
     if (!implementation || typeof implementation !== "object") {
       throw new TypeError(`Modul ${id}: Implementation muss ein Objekt sein.`);
     }
@@ -158,6 +161,9 @@
     if ([STATES.LOADED, STATES.ACTIVE, STATES.INACTIVE].includes(record.state)) {
       return snapshotRecord(record);
     }
+    if (record.state === STATES.ERROR && record.implementation) {
+      return snapshotRecord(record);
+    }
     if (record.state === STATES.LOADING && record.loadPromise) {
       return record.loadPromise;
     }
@@ -168,50 +174,54 @@
 
     record.loadPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      const timeout = window.setTimeout(() => {
+      let settled = false;
+      let timeout = 0;
+
+      const failLoad = (error, details) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
         script.remove();
         record.scriptNode = null;
         record.loadPromise = null;
         record.state = STATES.ERROR;
-        record.error = new Error(`Zeitüberschreitung beim Laden von ${id}.`);
-        log(1, `Modul ${id} konnte nicht geladen werden.`, { reason: "timeout" });
-        reject(record.error);
-      }, LOAD_TIMEOUT_MS);
+        record.error = error;
+        log(1, `Modul ${id} konnte nicht geladen werden.`, details);
+        reject(error);
+      };
+
+      const finishLoad = () => {
+        if (settled) return;
+        if (!record.implementation) {
+          failLoad(new Error(`Modul ${id} hat sich nach dem Laden nicht definiert.`), {
+            reason: "define fehlt",
+          });
+          return;
+        }
+
+        settled = true;
+        window.clearTimeout(timeout);
+        record.loadPromise = null;
+        record.state = STATES.LOADED;
+        log(1, `Modul ${id} geladen.`);
+        resolve(snapshotRecord(record));
+      };
 
       script.src = record.manifest.entry;
       script.async = false;
       script.dataset.provowareModule = id;
       record.scriptNode = script;
 
-      script.addEventListener("load", () => {
-        window.clearTimeout(timeout);
-        record.loadPromise = null;
-
-        if (!record.implementation) {
-          script.remove();
-          record.scriptNode = null;
-          record.state = STATES.ERROR;
-          record.error = new Error(`Modul ${id} hat sich nach dem Laden nicht definiert.`);
-          log(1, `Modul ${id} verletzt den Modulvertrag.`, { reason: "define fehlt" });
-          reject(record.error);
-          return;
-        }
-
-        record.state = STATES.LOADED;
-        log(1, `Modul ${id} geladen.`);
-        resolve(snapshotRecord(record));
-      });
-
+      script.addEventListener("load", finishLoad);
       script.addEventListener("error", () => {
-        window.clearTimeout(timeout);
-        script.remove();
-        record.scriptNode = null;
-        record.loadPromise = null;
-        record.state = STATES.ERROR;
-        record.error = new Error(`Einstiegspunkt von ${id} konnte nicht geladen werden.`);
-        log(1, `Modul ${id} konnte nicht geladen werden.`, { entry: record.manifest.entry });
-        reject(record.error);
+        failLoad(new Error(`Einstiegspunkt von ${id} konnte nicht geladen werden.`), {
+          entry: record.manifest.entry,
+        });
       });
+
+      timeout = window.setTimeout(() => {
+        failLoad(new Error(`Zeitüberschreitung beim Laden von ${id}.`), { reason: "timeout" });
+      }, LOAD_TIMEOUT_MS);
 
       document.head.append(script);
     });
@@ -316,7 +326,7 @@
     logger = nextLogger;
   };
 
-  window.PROVOWARE_MODULES = Object.freeze({
+  const api = Object.freeze({
     CONTRACT_VERSION,
     STATES,
     initialize,
@@ -328,5 +338,12 @@
     getSnapshot,
     setLogger,
     validateManifest,
+  });
+
+  Object.defineProperty(window, "PROVOWARE_MODULES", {
+    value: api,
+    writable: false,
+    configurable: false,
+    enumerable: true,
   });
 })();
