@@ -18,11 +18,18 @@
 
 ## Repository-Prüfung
 
-- [ ] Branch ist vor Merge nicht hinter `main`.
-- [ ] Diff enthält ausschließlich Planungs- und Statusdokumentation.
-- [ ] vorhandenes `npm run verify` läuft im Pull Request erfolgreich.
-- [ ] Pull Request ist mergebar.
+- [x] Branch war vor Merge 0 Commits hinter `main`.
+- [x] Diff enthielt ausschließlich Planungs- und Statusdokumentation.
+- [x] vorhandenes `npm run verify` lief im Pull Request erfolgreich.
+- [x] Pull Request #64 war mergebar.
+- [x] Pull Request #64 wurde erfolgreich gemergt.
 
 ## Freigabe
 
-0.3.0-A ist abgeschlossen, wenn alle Repository-Prüfungen grün sind und der Planungs-PR gemergt wurde.
+`0.3.0-A – Workspace-Vertrag` ist abgeschlossen.
+
+- PR: `#64`
+- Quality Gate: `success`
+- Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
+- Laufzeitänderungen: keine
+- Produktversion: weiterhin `0.2.0`
