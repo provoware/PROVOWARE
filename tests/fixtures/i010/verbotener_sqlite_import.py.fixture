@@ -1,3 +1,0 @@
-import sqlite3
-
-WERT = sqlite3.sqlite_version
