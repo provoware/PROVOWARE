@@ -1,6 +1,6 @@
 # PROVOWARE ALL-IN 2026
 
-Modulare, flexible und bewusst noch fachlich leere HTML-Oberfläche. Version `0.2.0` ergänzt einen festen Modulvertrag und eine zentrale Registry, damit spätere Tools nach denselben Regeln eingebunden werden können.
+Modulare, flexible und bewusst noch fachlich leere HTML-Oberfläche. Die freigegebene Produktversion ist `0.2.0`. Parallel wird die Flexible Workspace Engine schrittweise entwickelt; aktuell befindet sich `0.3.0-B – State Foundation & Autosave/Reset` in der technischen Abnahme.
 
 ## Start für normale Nutzung
 
@@ -35,6 +35,31 @@ Aktuell ist `modules/registry.js` absichtlich leer. Es werden noch keine Fachmod
 
 Die vollständigen Regeln stehen in [`docs/MODULE_CONTRACT.md`](docs/MODULE_CONTRACT.md).
 
+## Workspace-Grundlage 0.3.0-B
+
+Die sichtbare Arbeitsfläche ist noch nicht verschiebbar. Zuerst wurde die interne Zustandsgrundlage aufgebaut.
+
+Sie kann:
+
+- den Standardzustand der fünf Kernpanels reproduzierbar erzeugen
+- gespeicherte Layoutdaten prüfen und sicher bereinigen
+- unbekannte oder fehlende Panels kontrolliert behandeln
+- Layoutdaten lokal speichern und wieder laden
+- bei beschädigtem oder gesperrtem Browser-Speicher auf einen sicheren Zustand zurückfallen
+- ausschließlich den Workspace-Zustand zurücksetzen
+
+Lokaler Schlüssel:
+
+`provoware.allin.workspace.main.v1`
+
+Der Reset löscht keine Debug-Einstellungen und keine anderen PROVOWARE-Daten.
+
+Die Vertragsdetails stehen in [`docs/WORKSPACE_CONTRACT.md`](docs/WORKSPACE_CONTRACT.md). Der aktuelle Teilplan steht in [`docs/PLAN_0.3.0_B.md`](docs/PLAN_0.3.0_B.md).
+
+## Nächste sichtbare Workspace-Stufe
+
+In `0.3.0-C` ist unter dem festen oberen Bereich eine kompakte Schnellstarter-/Menüleiste vorgesehen. Ein permanenter `Layout`-Schalter bleibt dort außerhalb des veränderbaren Workspace erreichbar, damit auch nach dem Ausblenden aller Panels jederzeit eine Wiederherstellung möglich ist.
+
 ## Debugging & Logging
 
 Der Bereich ist über den Schalter `Debug & Logging` ein- und ausblendbar.
@@ -45,7 +70,7 @@ Der Bereich ist über den Schalter `Debug & Logging` ein- und ausblendbar.
 
 Die gewählte Stufe und Sichtbarkeit werden lokal im Browser gespeichert. Fehler und unbehandelte Promise-Ablehnungen werden in einem begrenzten Arbeitsspeicher-Puffer erfasst.
 
-Registry-Ereignisse erscheinen unter dem Bereich `MODULES` im selben Logger.
+Registry-Ereignisse erscheinen unter `MODULES`, Workspace-Ereignisse unter `WORKSPACE`.
 
 ## Entwicklung und automatische Prüfung
 
@@ -68,7 +93,11 @@ Dieser Befehl prüft unter anderem:
 - Versionskonsistenz
 - Modulvertrag und Registry
 - unsichere Modulpfade
-- automatischen Modul-Lebenszyklustest
+- Modul-Lebenszyklus
+- Workspace-Standardzustand
+- Workspace-Normalisierung
+- beschädigte oder gesperrte lokale Speicherung
+- Workspace-Reset
 
 ### Sichere automatische Korrektur
 
@@ -82,7 +111,12 @@ Bei Pull Requests und Änderungen an `main` führt GitHub Actions denselben Befe
 
 ## Entwicklungsworkflow
 
-Die verbindlichen Regeln stehen in [`AGENTS.md`](AGENTS.md). Der detaillierte Plan für diese Iteration steht in [`docs/PLAN_0.2.0.md`](docs/PLAN_0.2.0.md).
+Die verbindlichen Regeln stehen in [`AGENTS.md`](AGENTS.md).
+
+Aktuelle Pläne:
+
+- [`docs/PLAN_0.3.0.md`](docs/PLAN_0.3.0.md) – Gesamtplan Workspace Engine
+- [`docs/PLAN_0.3.0_B.md`](docs/PLAN_0.3.0_B.md) – aktuelle Teilstufe
 
 Kurzform:
 
@@ -92,14 +126,18 @@ Kurzform:
 
 - `index.html` – semantische UI-Hülle
 - `assets/styles.css` – responsives Dark-/Petrol-Layout
-- `assets/app.js` – UI-Zustand und dreistufiges Logging
+- `assets/app.js` – UI-Zustand, Logging und Start der Subsysteme
 - `assets/module-registry.js` – Modulvertrag und Laufzeit-Lebenszyklus
+- `assets/workspace-state.js` – Workspace-Zustand, Validierung, Speicherung und Reset
 - `modules/registry.js` – kanonischer, derzeit leerer Modulkatalog
 - `scripts/quality-check.mjs` – reproduzierbare Qualitätsprüfung und sicherer Auto-Fix
-- `tests/module-registry.test.mjs` – Lebenszyklus-Test mit Node-Bordmitteln
+- `tests/module-registry.test.mjs` – Modul-Lebenszyklus-Test
+- `tests/workspace-state.test.mjs` – Workspace-Zustands- und Speicherfehler-Test
 - `.github/workflows/quality.yml` – automatisches Quality Gate
-- `VERSION.json` – Versionsmetadaten
+- `VERSION.json` – Release- und Entwicklungsmetadaten
 
 ## Version
 
-Aktueller Entwicklungsstand: `0.2.0 – Module Contract & Registry`.
+Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`.
+
+Aktuelle Entwicklungsstufe: `0.3.0-B – State Foundation & Autosave/Reset`.
