@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#071b21">
+  <title>PROVOWARE ALL-IN 2026</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#arbeitsbereich">Zum Arbeitsbereich</a>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Seitennavigation">
+      <div class="brand" aria-label="PROVOWARE ALL-IN 2026">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span class="brand-text">PROVOWARE</span>
+      </div>
+
+      <nav class="side-nav" aria-label="Bereiche">
+        <a href="#uebersicht">Übersicht</a>
+        <a href="#module">Module</a>
+        <a href="#arbeitsbereich">Arbeitsbereich</a>
+        <a href="#details">Detailbereich</a>
+        <a href="#systemstatus">Systemstatus</a>
+      </nav>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PROVOWARE</p>
+          <h1>PROVOWARE ALL-IN 2026</h1>
+        </div>
+
+        <button
+          id="debug-toggle"
+          class="debug-toggle"
+          type="button"
+          aria-controls="debug-panel"
+          aria-expanded="false"
+        >
+          Debug &amp; Logging
+        </button>
+      </header>
+
+      <main class="main-grid" id="arbeitsbereich">
+        <section class="panel panel-wide" id="uebersicht" aria-labelledby="title-uebersicht">
+          <h2 id="title-uebersicht">Übersicht</h2>
+        </section>
+
+        <section class="panel" id="module" aria-labelledby="title-module">
+          <h2 id="title-module">Module</h2>
+        </section>
+
+        <section class="panel panel-feature" aria-labelledby="title-arbeitsbereich">
+          <h2 id="title-arbeitsbereich">Arbeitsbereich</h2>
+        </section>
+
+        <section class="panel" id="details" aria-labelledby="title-details">
+          <h2 id="title-details">Detailbereich</h2>
+        </section>
+
+        <section class="panel panel-wide" id="systemstatus" aria-labelledby="title-systemstatus">
+          <h2 id="title-systemstatus">Systemstatus</h2>
+        </section>
+      </main>
+
+      <aside id="debug-panel" class="debug-panel" aria-labelledby="debug-title" hidden>
+        <div class="debug-header">
+          <h2 id="debug-title">Debugging &amp; Logging</h2>
+          <button id="debug-clear" class="text-button" type="button">Leeren</button>
+        </div>
+
+        <div class="debug-levels" role="group" aria-label="Logging-Stufe">
+          <button type="button" data-log-level="1" aria-pressed="true">Stufe 1 · Ereignisse</button>
+          <button type="button" data-log-level="2" aria-pressed="false">Stufe 2 · Diagnose</button>
+          <button type="button" data-log-level="3" aria-pressed="false">Stufe 3 · Trace</button>
+        </div>
+
+        <pre id="debug-output" class="debug-output" aria-live="polite" aria-atomic="false"></pre>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

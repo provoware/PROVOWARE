@@ -1,0 +1,8 @@
+{
+  "product": "PROVOWARE ALL-IN 2026",
+  "version": "0.1.0",
+  "phase": "UI Foundation",
+  "status": "prototype",
+  "baseline_commit": "e15c45ca9a355ae564cd25cb15aa7e59fac90ffa",
+  "entrypoint": "index.html"
+}
