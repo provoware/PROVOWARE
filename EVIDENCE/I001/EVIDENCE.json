@@ -1,1 +1,0 @@
-{"schema":"1.0.0","iteration":"I001","ziel":"Technologie-Baseline fixieren","status":"VALIDIERT_LOKAL","baseline_id":"BASELINE-2026-08-09-I004","masterplan_sha256":"e0aa1afe47a9cde2333d651fbf662c923382be00bd3af17a35f63d867dba3f8c","tests":["WERKZEUGE/baseline_pruefen.py","pytest -q"],"hinweis":"GitHub-Promotion wird separat nachgewiesen."}

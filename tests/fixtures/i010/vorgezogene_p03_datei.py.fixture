@@ -1,3 +1,0 @@
-"""Diese Datei simuliert vorgezogenes P03-Produktverhalten."""
-
-PLATTFORM = "X11"

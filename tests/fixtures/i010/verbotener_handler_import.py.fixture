@@ -1,3 +1,0 @@
-from provoware.handler.basis import Handler
-
-WERT = Handler
