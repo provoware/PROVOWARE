@@ -90,7 +90,7 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 ## 4. Teilstufe 0.3.0-B – State Foundation & Autosave/Reset
 
-**Status: 🟡 implementiert, Abschlussvalidierung läuft**
+**Status: 🟢 abgeschlossen**
 
 Detaillierter Teilplan: `docs/PLAN_0.3.0_B.md`
 
@@ -142,18 +142,24 @@ Detaillierter Teilplan: `docs/PLAN_0.3.0_B.md`
 - [x] gesperrter Speicher
 - [x] isolierter Reset
 
-### 4.6 Abschlusskriterien
+### 4.6 Abschluss
 
-- [ ] vollständiger Diff gegen aktuellen `main`
-- [ ] Branch 0 Commits hinter `main`
-- [ ] `npm run verify` erfolgreich
-- [ ] PR mergebar
-- [ ] 0.3.0-B mergen
-- [ ] zentrale Dateien auf `main` stichprobenartig erneut lesen
+- [x] vollständiger Diff gegen `main` geprüft
+- [x] Branch beim Diff-Check 0 Commits hinter `main`
+- [x] `npm run verify` erfolgreich
+- [x] `35` Dateien statisch geprüft
+- [x] `11/11` automatische Tests erfolgreich
+- [x] PR #66 mergebar
+- [x] 0.3.0-B per Squash gemergt
+- [x] zentrale Dateien auf `main` stichprobenartig erneut gelesen
+
+0.3.0-B-Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
+
+**Nicht blockierender Hinweis:** GitHub Actions weist bei den aktuell verwendeten Actions der Generation `v4` auf eine auslaufende interne Node-20-Laufzeit hin. Das Projekt-Quality-Gate selbst lief erfolgreich mit Node `20.20.2`. Die Workflow-Hygiene wird getrennt und spätestens in 0.3.0-G geprüft.
 
 ## 5. Teilstufe 0.3.0-C – Visibility Controls + Schnellstarterleiste
 
-**Status: ⚪ geplant**
+**Status: 🟡 nächster geplanter Entwicklungsschritt**
 
 ### 5.1 Feste kompakte Menüleiste
 
@@ -165,6 +171,7 @@ Sie bleibt außerhalb des veränderbaren Workspace und enthält nur Funktionen m
 - [ ] responsive Darstellung definieren
 - [ ] Tastaturfokus sauber führen
 - [ ] keine zweite parallele Navigation erzeugen
+- [ ] Struktur so aufbauen, dass spätere Schnellaktionen ohne Umbau ergänzt werden können
 
 ### 5.2 Permanenter Layout-Schalter
 
@@ -186,6 +193,7 @@ Alle Panels dürfen ausgeblendet werden. Ein permanenter `Layout`-Schalter bleib
 - [ ] ausgeblendete Panels behalten Reihenfolge und Größe
 - [ ] Wiederanzeigen nutzt gespeicherten Zustand
 - [ ] Aktion kurz und verständlich bestätigen
+- [ ] Fehlerfeedback nennt Ursache, sicheren Zustand und nächsten sinnvollen Schritt
 
 **Abnahmekriterium:** Auch bei vollständig ausgeblendeter Arbeitsfläche kann der Nutzer jedes Panel ohne Konsole oder Neuinstallation wiederherstellen.
 
@@ -253,6 +261,7 @@ Erst nach A bis D.
 - [ ] Workspace-Vertrags- und Zustandstests grün
 - [ ] keine unbeabsichtigten externen Laufzeitverweise
 - [ ] Versionen und Manifeste konsistent
+- [ ] GitHub-Actions-Workflow ohne vermeidbare Runtime-Warnungen prüfen und bei Bedarf getrennt modernisieren
 
 ### Manuell
 
@@ -330,7 +339,7 @@ Workspace-Reset darf niemals `localStorage.clear()` verwenden.
 
 **0.3.0-C – Visibility Controls + kompakte Schnellstarter-/Menüleiste**
 
-Nach Abschluss von 0.3.0-B wird zuerst die sichere Sichtbarkeit umgesetzt: feste Leiste, permanenter `Layout`-Schalter, Panel-Liste, `Alle anzeigen`, Reset, Fokusführung und verständliches Nutzerfeedback.
+Zuerst wird die sichere Sichtbarkeit umgesetzt: feste Leiste, permanenter `Layout`-Schalter, Panel-Liste, `Alle anzeigen`, Reset, Fokusführung und verständliches Nutzerfeedback. Sichtbarkeitsänderungen laufen ausschließlich über die vorhandene Workspace-Zustandsverwaltung.
 
 ### Danach
 

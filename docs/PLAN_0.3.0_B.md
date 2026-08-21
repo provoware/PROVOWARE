@@ -2,9 +2,9 @@
 
 ## Ziel in einfacher Sprache
 
-Diese Teilstufe baut das stabile Gedächtnis der Arbeitsfläche. Die Anwendung soll einen Layoutzustand sicher prüfen, bereinigen, laden, lokal speichern und vollständig zurücksetzen können. Noch wird **kein Panel sichtbar verschoben, versteckt oder in der Größe verändert**.
+Diese Teilstufe baut das stabile Gedächtnis der Arbeitsfläche. Die Anwendung kann einen Layoutzustand sicher prüfen, bereinigen, laden, lokal speichern und vollständig zurücksetzen. Noch wird **kein Panel sichtbar verschoben, versteckt oder in der Größe verändert**.
 
-Damit entstehen zuerst belastbare Regeln für den Zustand. Erst spätere Bedienfunktionen greifen darauf zu.
+Damit sind belastbare Regeln für den Zustand vorhanden. Erst spätere Bedienfunktionen greifen darauf zu.
 
 ## Begriffe vorab
 
@@ -155,13 +155,13 @@ Die sichtbare Oberfläche bleibt in 0.3.0-B unverändert. Technische Meldungen e
 
 ## 8. Automatische Prüfung
 
-Kanonischer Befehl bleibt:
+Kanonischer Befehl:
 
 ```bash
 npm run verify
 ```
 
-Der Testlauf prüft zusätzlich:
+Der Testlauf prüft:
 
 - [x] reproduzierbaren Standardzustand
 - [x] Reihenfolge mit unbekannten und doppelten IDs
@@ -173,9 +173,18 @@ Der Testlauf prüft zusätzlich:
 - [x] gesperrten Speicher
 - [x] Reset ohne Löschen der Debug-Einstellungen
 
+Reales Ergebnis des PR-Laufs:
+
+- `QUALITY GATE: OK (35 Dateien geprüft)`
+- `11` Tests
+- `11` erfolgreich
+- `0` fehlgeschlagen
+
 ## 9. Änderungsvolumen
 
 **Einstufung:** mittel.
+
+PR #66 änderte `19` Dateien.
 
 ### Laufzeit
 
@@ -191,14 +200,14 @@ Der Testlauf prüft zusätzlich:
 
 ### Dokumentation
 
-- Entwicklungsplan, Entscheidungen, Status, TODO und Manifest werden synchronisiert
+- Entwicklungsplan, Entscheidungen, Status, TODO, README, Logging, Debugging und Manifeste synchronisiert
 - Produktversion bleibt `0.2.0`, bis die vollständige Workspace Engine abgenommen ist
 
 ## 10. Wer oder was ist betroffen?
 
 ### Nutzer
 
-Keine neue sichtbare Bedienfunktion. Der Start lädt künftig zusätzlich die interne Workspace-Zustandsverwaltung.
+Keine neue sichtbare Bedienfunktion. Der Start lädt zusätzlich die interne Workspace-Zustandsverwaltung.
 
 ### Nutzerdaten
 
@@ -218,7 +227,7 @@ Nicht betroffen; keine Übertragung.
 
 ## 11. Rückweg
 
-Der gesamte 0.3.0-B-Patch kann über seinen Pull Request zurückgenommen werden.
+Der gesamte 0.3.0-B-Patch kann über PR #66 zurückgenommen werden.
 
 Zusätzlich gilt:
 
@@ -229,20 +238,38 @@ Zusätzlich gilt:
 
 ## 12. Abnahmekriterien
 
-0.3.0-B ist erst abgeschlossen, wenn:
+0.3.0-B ist abgeschlossen:
 
-- [x] Laufzeitbasis implementiert ist
-- [x] Zustandslogik getrennt von Browser-Speicherung testbar ist
-- [x] Laden, Speichern und Reset robust sind
-- [x] Fehlerfälle automatisiert getestet sind
-- [x] keine neue Abhängigkeit entstanden ist
-- [x] sichtbare UI unverändert geblieben ist
-- [ ] vollständiger Branch-Diff gegen aktuellen `main` kontrolliert ist
-- [ ] GitHub Quality Gate erfolgreich ist
-- [ ] Pull Request mergebar ist
-- [ ] PR gemergt und `main` stichprobenartig nachgeprüft ist
+- [x] Laufzeitbasis implementiert
+- [x] Zustandslogik getrennt von Browser-Speicherung testbar
+- [x] Laden, Speichern und Reset robust
+- [x] Fehlerfälle automatisiert getestet
+- [x] keine neue Abhängigkeit entstanden
+- [x] sichtbare UI unverändert geblieben
+- [x] vollständiger Branch-Diff gegen `main` kontrolliert
+- [x] Branch beim Diff-Check 0 Commits hinter `main`
+- [x] GitHub Quality Gate erfolgreich
+- [x] Pull Request #66 mergebar
+- [x] PR #66 per Squash gemergt
+- [x] `assets/workspace-state.js` und `VERSION.json` auf `main` stichprobenartig nachgeprüft
 
-## 13. Nächste zwei Schritte
+## 13. Releaseabschluss der Teilstufe
+
+- PR: `#66`
+- Quality Gate: `success`
+- geprüfte Dateien: `35`
+- Tests: `11/11` erfolgreich
+- Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
+- freigegebene Produktversion bleibt: `0.2.0`
+- Workspace-Vertragsversion: `1`
+
+### Nicht blockierender Workflow-Hinweis
+
+GitHub meldet für die aktuell eingesetzten Actions der Generation `v4` eine Warnung zur auslaufenden internen Node-20-Laufzeit. Das eigentliche Projekt-Quality-Gate lief erfolgreich mit Node `20.20.2`.
+
+Die Workflow-Hygiene wird getrennt betrachtet und spätestens in 0.3.0-G erneut geprüft. Sie war kein Fehler von 0.3.0-B.
+
+## 14. Nächste zwei Schritte
 
 ### 0.3.0-C – Visibility Controls + kompakte Menüleiste
 
@@ -264,4 +291,4 @@ Zusätzlich gilt:
 
 ## Empfehlung
 
-Nach erfolgreichem Merge von 0.3.0-B direkt mit **0.3.0-C** fortfahren. Der permanente `Layout`-Schalter und die kompakte Schnellstarterleiste lösen dann zuerst die sichere Sichtbarkeit. Resize und Drag & Drop bleiben weiterhin getrennte spätere Patches.
+Direkt mit **0.3.0-C** fortfahren. Der permanente `Layout`-Schalter und die kompakte Schnellstarterleiste lösen zuerst die sichere Sichtbarkeit. Resize und Drag & Drop bleiben getrennte spätere Patches.

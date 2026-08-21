@@ -53,10 +53,15 @@ Die Workspace-Vertragsversion ist `1`.
 ## Dokumentation
 
 - `AGENTS.md`
+- `docs/PLAN_0.3.0.md`
 - `docs/PLAN_0.3.0_B.md`
 - `docs/DECISIONS_0.3.0.md`
 - `docs/STATUS_0.3.0.md`
 - `TODO.md`
+- `README.md`
+- `LOGGING.md`
+- `PRO_DEBUGGING.md`
+- `CHANGELOG.md`
 - `MANIFEST.md`
 - dieses Patchmanifest
 
@@ -85,7 +90,7 @@ Reset darf ausschließlich diesen Schlüssel entfernen.
 window.PROVOWARE_WORKSPACE
 ```
 
-Vorgesehene Funktionen in 0.3.0-B:
+Funktionen in 0.3.0-B:
 
 ```text
 initialisieren
@@ -102,19 +107,33 @@ loggerSetzen
 
 Einstufung: **mittel**.
 
-Betroffen sind interne Workspace-Zustandsverwaltung, App-Start, Tests und Entwicklungsdokumentation. Sichtbare Panelmechaniken bleiben unverändert.
+PR #66 änderte `19` Dateien. Betroffen sind interne Workspace-Zustandsverwaltung, App-Start, Tests, Quality Gate und Entwicklungsdokumentation. Sichtbare Panelmechaniken bleiben unverändert.
 
-## Validierung
+## Reale Validierung
 
-Vor Merge erforderlich:
+- vollständiger Diff gegen `main` geprüft
+- Branch beim Diff-Check `0` Commits hinter `main`
+- PR #66 mergebar
+- GitHub Quality Gate: `success`
+- `QUALITY GATE: OK (35 Dateien geprüft)`
+- automatische Tests: `11/11` erfolgreich, `0` fehlgeschlagen
+- PR #66 per Squash gemergt
+- `assets/workspace-state.js` und `VERSION.json` danach auf `main` stichprobenartig gelesen
 
-- `npm run verify` erfolgreich
-- vollständiger Diff gegen `main`
-- Branch nicht hinter `main`
-- PR mergebar
-- keine ungeplanten Dateien
-- nach Merge zentrale Dateien auf `main` stichprobenartig erneut lesen
+## Abschluss
+
+- Pull Request: `#66`
+- Merge-Commit: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
+- Workspace-Vertragsversion: `1`
+- freigegebene Produktversion: weiterhin `0.2.0`
+- nächster technischer Schritt: `0.3.0-C – Visibility Controls + kompakte Menüleiste`
+
+## Nicht blockierender Workflow-Hinweis
+
+GitHub Actions weist bei den derzeit verwendeten Actions der Generation `v4` auf die auslaufende interne Node-20-Laufzeit hin. Der Projektprüflauf selbst wurde erfolgreich mit Node `20.20.2` ausgeführt.
+
+Die Workflow-Aktualisierung wird getrennt geplant, damit dieser Patch nicht nachträglich mit einem unabhängigen Infrastrukturumbau vermischt wird.
 
 ## Rückweg
 
-Revert des 0.3.0-B-Pull-Requests. Es existiert keine serverseitige Migration und kein Eingriff in andere lokale PROVOWARE-Schlüssel.
+Revert von PR #66. Es existiert keine serverseitige Migration und kein Eingriff in andere lokale PROVOWARE-Schlüssel.

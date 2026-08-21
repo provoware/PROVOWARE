@@ -4,9 +4,9 @@
 
 `0.3.0-A – Workspace-Vertrag` ist abgeschlossen.
 
-`0.3.0-B – State Foundation & Autosave/Reset` ist implementiert und befindet sich in der Abschlussvalidierung.
+`0.3.0-B – State Foundation & Autosave/Reset` ist abgeschlossen, automatisch geprüft und über PR #66 gemergt.
 
-Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`.
+Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. Die interne Entwicklungsphase ist in `VERSION.json` transparent als `0.3.0-B` vermerkt.
 
 ## Erledigt
 
@@ -24,9 +24,9 @@ Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme 
 - gespeicherte Daten validiert und deterministisch normalisiert.
 - unbekannte, doppelte oder fehlende Panel-IDs kontrolliert behandelt.
 - Breiten und Höhen auf sichere Werte begrenzt.
-- beschädigtes JSON auf Standardzustand zurückgeführt.
+- beschädigtes JSON auf Standardzustand zurückgeführt und kontrolliert repariert.
 - Browser-Speicherfehler so behandelt, dass die Sitzung weiterläuft.
-- lokales Speichern und Wiederladen vorbereitet.
+- lokales Speichern und Wiederladen implementiert.
 - Reset auf `provoware.allin.workspace.main.v1` begrenzt.
 - Workspace-Logging an den vorhandenen dreistufigen Logger angebunden.
 - automatische Tests für Zustand, Speicherfehler und Reset ergänzt.
@@ -35,27 +35,38 @@ Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme 
 - Wartbarkeitsstandard in `AGENTS.md` geschärft.
 - detaillierter Teilplan und Patchmanifest ergänzt.
 
+## Validierung 0.3.0-B
+
+- Branch vor Merge: `0` Commits hinter `main`.
+- PR: `#66`.
+- PR war mergebar.
+- GitHub Quality Gate: `success`.
+- statische Projektprüfung: `35` Dateien erfolgreich geprüft.
+- automatische Tests: `11/11` erfolgreich, `0` fehlgeschlagen.
+- Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`.
+- Main-Stichprobe: `assets/workspace-state.js` und `VERSION.json` erfolgreich gelesen.
+
+## Technischer Hinweis
+
+GitHub Actions meldet bei den derzeit verwendeten Actions der Generation `v4` einen Hinweis zur veraltenden internen Node-20-Laufzeit. Das Projekt-Quality-Gate selbst lief erfolgreich mit bereitgestelltem Node `20.20.2`.
+
+Der Hinweis blockiert 0.3.0-B nicht. Die Workflow-Hygiene wird spätestens im Release-Hardening 0.3.0-G erneut geprüft, damit eine Umstellung getrennt und reproduzierbar erfolgt.
+
 ## Bestätigte Bedienentscheidung für 0.3.0-C
 
-Alle Workspace-Panels dürfen später vollständig ausgeblendet werden.
+Alle Workspace-Panels dürfen vollständig ausgeblendet werden.
 
 Unter dem festen oberen Bereich wird eine kompakte Schnellstarter-/Menüleiste vorgesehen. Darin bleibt ein permanenter `Layout`-Schalter außerhalb des verschiebbaren Workspace jederzeit erreichbar.
-
-## In Arbeit
-
-- vollständiger Diff-Check gegen den aktuellen `main`
-- GitHub Quality Gate für 0.3.0-B
-- Merge und Main-Stichprobe
 
 ## Blockiert
 
 Keine bekannte fachliche oder technische Blockade.
 
-## Änderungsvolumen
+## Änderungsvolumen 0.3.0-B
 
 Einstufung: **mittel**.
 
-Betroffen sind:
+PR #66 änderte 19 Dateien. Betroffen waren:
 
 - interne Workspace-Zustandsverwaltung
 - App-Start
@@ -64,9 +75,9 @@ Betroffen sind:
 - Quality Gate
 - Entwicklungsdokumentation
 
-Nicht betroffen sind:
+Nicht betroffen waren:
 
-- sichtbares Panel-Layout
+- sichtbare Panelbedienung
 - Fachmodule
 - Netzwerk
 - Debug-Einstellungen
@@ -74,9 +85,9 @@ Nicht betroffen sind:
 
 ## Nächste zwei Schritte
 
-1. `0.3.0-C – Visibility Controls + kompakte Menüleiste`: feste Schnellstarter-/Menüleiste mit permanentem `Layout`-Schalter anlegen, Panels sicher ein-/ausblendbar machen, `Alle anzeigen` und Reset jederzeit erreichbar halten sowie Tastatur/Fokus prüfen.
+1. `0.3.0-C – Visibility Controls + kompakte Menüleiste`: feste Schnellstarter-/Menüleiste mit permanentem `Layout`-Schalter anlegen, Panels sicher ein-/ausblendbar machen, `Alle anzeigen` und Reset jederzeit erreichbar halten sowie Tastatur/Fokus und verständliches Nutzerfeedback prüfen.
 2. `0.3.0-D – Resize`: Panelbreite und -höhe innerhalb des Vertrags veränderbar machen, Maus/Touch/Tastatur absichern und nur validierte Endwerte speichern.
 
 ## Empfehlung
 
-0.3.0-B erst nach grünem Quality Gate mergen. Danach direkt 0.3.0-C beginnen. Drag & Drop bleibt bis 0.3.0-E gesperrt.
+Als Nächstes ausschließlich 0.3.0-C umsetzen. Drag & Drop bleibt bis 0.3.0-E gesperrt, damit Sichtbarkeit und Größenlogik vorher unabhängig stabilisiert werden.

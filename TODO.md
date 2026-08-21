@@ -67,10 +67,12 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [x] Quality Gate um Workspace-Pflichtdateien und Script-Reihenfolge erweitern.
 - [x] `AGENTS.md` um Wartbarkeits-, Zustands- und Transparenzregeln schärfen.
 - [x] Hauptmanifest und Patchmanifest synchronisieren.
-- [ ] vollständigen Branch-Diff gegen aktuellen `main` prüfen.
-- [ ] GitHub Quality Gate erfolgreich durchlaufen lassen.
-- [ ] PR mergebar prüfen und 0.3.0-B mergen.
-- [ ] zentrale Dateien nach Merge auf `main` stichprobenartig nachprüfen.
+- [x] vollständigen Branch-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
+- [x] GitHub Quality Gate erfolgreich durchlaufen lassen: 35 Dateien geprüft, 11/11 Tests erfolgreich.
+- [x] PR #66 als mergebar prüfen und 0.3.0-B per Squash mergen.
+- [x] `assets/workspace-state.js` und `VERSION.json` nach Merge auf `main` stichprobenartig nachprüfen.
+
+0.3.0-B-Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
 
 #### 0.3.0-C – Visibility Controls + kompakte Menüleiste
 
