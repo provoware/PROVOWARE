@@ -2,37 +2,81 @@
 
 ## Aktueller Stand
 
-`0.3.0-A – Workspace-Vertrag` ist abgeschlossen und über PR #64 gemergt.
+`0.3.0-A – Workspace-Vertrag` ist abgeschlossen.
 
-Produktiv freigegebene Version bleibt korrekt `0.2.0`, weil noch keine Workspace-Laufzeitfunktion implementiert wurde.
+`0.3.0-B – State Foundation & Autosave/Reset` ist implementiert und befindet sich in der Abschlussvalidierung.
+
+Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`.
 
 ## Erledigt
 
-- Baseline `0a2240f89fa11dd0759af0b4cfa96c79e35714b4` festgehalten.
-- Option A bestätigt: automatische lokale Speicherung plus vollständiger Reset.
-- Bestehende HTML- und CSS-Grid-Struktur geprüft.
+### Vertragsphase 0.3.0-A
+
 - Workspace-Vertrag Version 1 definiert.
-- Stabile Panel-IDs und Standardreihenfolge festgelegt.
-- Speicherformat, Validierung, Reset und responsive Rückfallregeln festgelegt.
-- Drag & Drop bewusst bis nach State-, Visibility- und Resize-Grundlage zurückgestellt.
-- Planungs-PR #64 mit erfolgreichem Quality Gate geprüft.
-- Planungs-PR #64 gemergt: `3998373876f087f90ddbf248c316986b85c20fe9`.
+- Option A für automatische lokale Speicherung und vollständigen Reset bestätigt.
+- Planungs-PR #64 erfolgreich geprüft und gemergt.
+
+### Laufzeitgrundlage 0.3.0-B
+
+- `assets/workspace-state.js` als getrennte Zustandsverwaltung angelegt.
+- fünf Kernpanels zentral definiert.
+- Standardzustand reproduzierbar erzeugt.
+- gespeicherte Daten validiert und deterministisch normalisiert.
+- unbekannte, doppelte oder fehlende Panel-IDs kontrolliert behandelt.
+- Breiten und Höhen auf sichere Werte begrenzt.
+- beschädigtes JSON auf Standardzustand zurückgeführt.
+- Browser-Speicherfehler so behandelt, dass die Sitzung weiterläuft.
+- lokales Speichern und Wiederladen vorbereitet.
+- Reset auf `provoware.allin.workspace.main.v1` begrenzt.
+- Workspace-Logging an den vorhandenen dreistufigen Logger angebunden.
+- automatische Tests für Zustand, Speicherfehler und Reset ergänzt.
+- `npm run test` auf alle Testdateien erweitert.
+- Quality Gate um Workspace-Dateien und Script-Reihenfolge erweitert.
+- Wartbarkeitsstandard in `AGENTS.md` geschärft.
+- detaillierter Teilplan und Patchmanifest ergänzt.
+
+## Bestätigte Bedienentscheidung für 0.3.0-C
+
+Alle Workspace-Panels dürfen später vollständig ausgeblendet werden.
+
+Unter dem festen oberen Bereich wird eine kompakte Schnellstarter-/Menüleiste vorgesehen. Darin bleibt ein permanenter `Layout`-Schalter außerhalb des verschiebbaren Workspace jederzeit erreichbar.
 
 ## In Arbeit
 
-Noch keine Laufzeitänderung. Der nächste technische Patch ist `0.3.0-B – State Foundation & Autosave/Reset`.
+- vollständiger Diff-Check gegen den aktuellen `main`
+- GitHub Quality Gate für 0.3.0-B
+- Merge und Main-Stichprobe
 
 ## Blockiert
 
-Keine technische Blockade für 0.3.0-B.
+Keine bekannte fachliche oder technische Blockade.
 
-Vor `0.3.0-C – Visibility Controls` ist noch eine Bedienentscheidung offen: Wie wird ein vollständig ausgeblendeter Workspace sicher wiederhergestellt?
+## Änderungsvolumen
+
+Einstufung: **mittel**.
+
+Betroffen sind:
+
+- interne Workspace-Zustandsverwaltung
+- App-Start
+- lokale Workspace-Speicherung
+- automatische Tests
+- Quality Gate
+- Entwicklungsdokumentation
+
+Nicht betroffen sind:
+
+- sichtbares Panel-Layout
+- Fachmodule
+- Netzwerk
+- Debug-Einstellungen
+- Modulvertrag
 
 ## Nächste zwei Schritte
 
-1. `0.3.0-B – State Foundation & Autosave/Reset`: Vertrag als kleine validierbare Laufzeitbasis implementieren, inklusive sicherer lokaler Speicherung und Reset, weiterhin ohne Drag & Drop.
-2. `0.3.0-C – Visibility Controls`: Panels kontrolliert ein-/ausblendbar machen und eine dauerhaft erreichbare Wiederherstellung anbieten.
+1. `0.3.0-C – Visibility Controls + kompakte Menüleiste`: feste Schnellstarter-/Menüleiste mit permanentem `Layout`-Schalter anlegen, Panels sicher ein-/ausblendbar machen, `Alle anzeigen` und Reset jederzeit erreichbar halten sowie Tastatur/Fokus prüfen.
+2. `0.3.0-D – Resize`: Panelbreite und -höhe innerhalb des Vertrags veränderbar machen, Maus/Touch/Tastatur absichern und nur validierte Endwerte speichern.
 
 ## Empfehlung
 
-Als Nächstes ausschließlich `0.3.0-B` umsetzen und automatisiert testen. Drag & Drop beginnt erst in `0.3.0-E`, wenn Datenmodell, Speicherung, Reset, Sichtbarkeit und Größenregeln stabil sind.
+0.3.0-B erst nach grünem Quality Gate mergen. Danach direkt 0.3.0-C beginnen. Drag & Drop bleibt bis 0.3.0-E gesperrt.
