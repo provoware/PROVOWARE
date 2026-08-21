@@ -46,7 +46,9 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 - [x] Versionierten lokalen Speicher-Schlüssel und sicheren Reset-Vertrag festlegen.
 - [x] Drag & Drop bis nach stabiler State-/Visibility-/Resize-Basis ausdrücklich zurückstellen.
 - [ ] Entscheidung treffen, wie alle ausgeblendeten Panels sicher wieder sichtbar gemacht werden.
-- [ ] Planungs-PR erfolgreich durch Quality Gate bringen und mergen.
+- [x] Planungs-PR #64 erfolgreich durch Quality Gate bringen und mergen.
+
+Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 #### 0.3.0-B – State Foundation & Autosave/Reset
 
