@@ -129,6 +129,24 @@
     render();
   };
 
+  const initializeModules = async () => {
+    const registry = window.PROVOWARE_MODULES;
+    if (!registry) {
+      log(1, "MODULES", "Modul-Registry ist nicht verfügbar.");
+      return;
+    }
+
+    try {
+      registry.setLogger(log);
+      const modules = await registry.initialize();
+      log(2, "MODULES", `Registry-Start abgeschlossen (${modules.length} Module).`);
+    } catch (error) {
+      log(1, "MODULES", "Modul-Registry konnte nicht initialisiert werden.", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+
   readPreference();
 
   elements.toggle.addEventListener("click", () => {
@@ -181,4 +199,5 @@
     viewport: `${window.innerWidth}x${window.innerHeight}`,
     language: document.documentElement.lang,
   });
+  void initializeModules();
 })();

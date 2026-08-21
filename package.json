@@ -1,0 +1,16 @@
+{
+  "name": "provoware-all-in-2026",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Modulare Offline-First HTML-Oberfläche für PROVOWARE ALL-IN 2026",
+  "type": "module",
+  "scripts": {
+    "format": "node scripts/quality-check.mjs --fix",
+    "fix": "node scripts/quality-check.mjs --fix",
+    "test": "node --test tests/module-registry.test.mjs",
+    "verify": "node scripts/quality-check.mjs && npm run test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
