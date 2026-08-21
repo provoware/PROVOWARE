@@ -2,269 +2,342 @@
 
 ## Ziel in einfacher Sprache
 
-Die bisher feste Arbeitsfläche von **PROVOWARE ALL-IN 2026** soll schrittweise zu einer flexiblen Arbeitsfläche werden. Panels sollen später verschoben, ein- und ausgeblendet sowie in ihrer Größe verändert werden können. Die gewählte Anordnung wird automatisch nur im lokalen Browser gespeichert und kann jederzeit vollständig auf das Standardlayout zurückgesetzt werden.
+Die bisher feste Arbeitsfläche von **PROVOWARE ALL-IN 2026** wird schrittweise flexibel. Panels sollen später ein- und ausgeblendet, in der Größe verändert und neu angeordnet werden können. Layoutänderungen werden automatisch nur im lokalen Browser gespeichert und können jederzeit vollständig auf das Standardlayout zurückgesetzt werden.
 
-Wichtig: In der ersten Teilstufe wird **noch kein Drag & Drop programmiert**. Zuerst wird der Workspace-Vertrag festgelegt und geprüft. Dadurch werden spätere Sonderfälle bei Position, Größe, Sichtbarkeit und Speicherung vermieden.
+Die Entwicklung bleibt bewusst in kleine Teilstufen getrennt. Jede Teilstufe muss für sich prüfbar und rückgängig zu machen sein.
 
 ## Begriffe vorab
 
-- **Workspace (Arbeitsfläche):** der Bereich, in dem die einzelnen Panels angeordnet werden.
-- **Panel:** eine einzelne Arbeitskarte wie `Übersicht`, `Module` oder `Systemstatus`.
-- **Workspace-Vertrag (Contract):** feste Regeln, welche Eigenschaften ein Panel besitzen darf und wie Layoutzustände gespeichert werden.
-- **Schema:** festgelegte Datenstruktur für gespeicherte Einstellungen.
-- **Validierung:** automatische Prüfung, ob gespeicherte oder neue Daten den Regeln entsprechen.
-- **Fallback (Rückfallregel):** sichere Standardlösung, wenn gespeicherte Daten fehlen oder ungültig sind.
-- **Responsive:** die Oberfläche passt sich an unterschiedliche Fenster- und Bildschirmgrößen an.
-- **Grid (Raster):** unsichtbares Spaltenraster, auf dem Panelbreiten ausgerichtet werden.
-- **Clamp (Begrenzung):** ein Wert wird automatisch innerhalb erlaubter Mindest- und Höchstgrenzen gehalten.
-- **Debounce (Verzögerte Sammelspeicherung):** viele schnelle Änderungen werden gebündelt statt bei jeder Mausbewegung sofort gespeichert.
-- **Quality Gate (Qualitätsschranke):** automatische Prüfung, die fehlerhafte Änderungen vor dem Merge stoppt.
-- **Rollback (Rückweg):** dokumentierte Möglichkeit, eine Änderung vollständig zurückzunehmen.
+- **Workspace (Arbeitsfläche):** Bereich mit den veränderbaren Panels.
+- **Panel:** einzelne Arbeitskarte wie `Übersicht` oder `Systemstatus`.
+- **Vertrag (Contract):** feste Regeln für Daten und erlaubte Zustände.
+- **Zustand (State):** aktuell gültige Layoutdaten.
+- **Persistenz:** dauerhaftes lokales Speichern.
+- **Normalisierung:** fehlerhafte oder fehlende Werte werden kontrolliert auf sichere Werte gebracht.
+- **Responsive:** Darstellung passt sich an Bildschirm- und Fenstergröße an.
+- **Quality Gate (Qualitätsschranke):** automatische Prüfung vor dem Merge.
+- **Rollback (Rückweg):** komplette Änderung kann gezielt zurückgenommen werden.
 
-## Ausgangsstand
+## 1. Ausgangsstand und feste Grenzen
 
 - Produkt: `PROVOWARE ALL-IN 2026`
-- aktuelle freigegebene Version: `0.2.0 – Module Contract & Registry`
-- Baseline-Commit für 0.3.0: `0a2240f89fa11dd0759af0b4cfa96c79e35714b4`
-- vorhandenes Layout: 12-Spalten-CSS-Grid mit fünf Kernpanels
-- vorhandene Breakpoints: Desktop, Tablet und Mobil
-- bestehendes Debugging/Logging bleibt getrennt vom Workspace
-- Modulvertrag Version `1` bleibt unverändert
-- Entscheidung des Projekts: Layoutänderungen werden automatisch lokal gespeichert und können über `Standardlayout wiederherstellen` vollständig zurückgesetzt werden
-
-## Änderungsgrenze für 0.3.0
-
-### Enthalten
-
-- stabiler Workspace-Vertrag
-- validierbarer Layoutzustand
-- lokale automatische Speicherung
-- vollständiger Reset auf Standardlayout
-- Panels ein-/ausblendbar
-- Panels größenveränderbar
-- Panels neu anordenbar
-- Tastaturbedienung für alle wesentlichen Layoutaktionen
-- responsive Rückfallregeln
-- automatisierte Prüfungen und reproduzierbare Tests
-
-### Nicht enthalten
-
-- keine fachlichen Toolmodule
-- keine Remote-Plugins
+- freigegebene Produktversion: `0.2.0`
+- Modulvertragsversion: `1`
+- Workspace-Vertragsversion: `1`
+- aktuelles Layout: 12-Spalten-Raster
+- fünf Kernpanels: `overview`, `modules`, `work`, `details`, `system-status`
+- Debugging & Logging bleibt außerhalb des Workspace
 - keine Cloud-Synchronisation
-- keine serverseitige Speicherung
-- keine freie Pixelpositionierung außerhalb des Rasters
-- keine Speicherung von Debug- oder Modulinhalten im Workspace-Zustand
-- keine automatische Änderung von Fachinhalten
-- keine Veränderung des Modulvertrags ohne eigenen begründeten Patch
+- keine Remote-Plugins
+- keine freie Pixelpositionierung
+- keine neue Laufzeitbibliothek ohne nachgewiesenen Bedarf
 
----
+**Abnahmeregel:** Jede Änderung von 0.3.0 muss direkt der flexiblen Arbeitsfläche, ihrer Sicherheit, Bedienbarkeit, Prüfung oder Dokumentation dienen.
 
-# Nummerierte Schrittfolge und Checklisten
+## 2. Verbindliche Architekturregeln
 
-## 1. Baseline und Grenzen sichern
+### 2.1 Wartbarkeit
 
-- [x] aktuellen `main`-Commit als Baseline festhalten
-- [x] eigenen Feature-Branch für den Workspace-Vertrag anlegen
-- [x] aktuelle HTML-Struktur und vorhandenes 12-Spalten-Raster prüfen
-- [x] Debugbereich ausdrücklich aus dem Workspace-Vertrag ausschließen
-- [x] automatische lokale Speicherung plus vollständigen Reset als feste Produktentscheidung dokumentieren
-- [ ] vor jedem späteren Teilpatch prüfen, ob `main` neue relevante Änderungen enthält
+- [x] kleine Funktionen mit klarer Aufgabe als Standard
+- [x] doppelte Logik vermeiden
+- [x] wiederverwendbare Regeln zentral halten
+- [x] Kommentare nur für Gründe und ungewöhnliche Entscheidungen verwenden
+- [x] bestehende öffentliche Schnittstellen nicht aus reinem Stilgrund umbauen
 
-**Abnahmekriterium:** Jede Änderung von 0.3.0 muss nachweisbar der flexiblen Arbeitsfläche, ihrer Absicherung oder ihrer Dokumentation dienen.
+### 2.2 Trennung der Verantwortungen
 
-## 2. Workspace-Vertrag festlegen – aktuelle Teilstufe 0.3.0-A
+- [x] feste Daten und Verträge getrennt von veränderlichem Zustand behandeln
+- [x] reine Validierung/Normalisierung von Browser-Speicherung und DOM trennen
+- [x] Logging darf keine Geschäftslogik steuern
+- [x] Browser-Speicherfehler dürfen die Oberfläche nicht blockieren
+- [x] pro Subsystem genau eine verbindliche Zustandsquelle verwenden
 
-- [x] stabile Panel-IDs definieren
-- [x] unveränderliche Panel-Metadaten von veränderlichem Nutzerzustand trennen
-- [x] Reihenfolge als eigene geordnete Liste definieren
-- [x] Sichtbarkeit pro Panel definieren
-- [x] Breite in Rastereinheiten statt freien Pixelkoordinaten definieren
-- [x] optionale Höhe mit Mindest- und Höchstgrenzen definieren
-- [x] erlaubten Arbeitsbereich pro Panel festlegen
-- [x] responsive Regeln festlegen
+### 2.3 Benennung
+
+- [x] sichtbare UI-Texte und Projektdokumentation verständlich auf Deutsch
+- [x] neue Workspace-Funktionen konsistent deutsch benennen
+- [x] stabile technische IDs nicht aus sichtbaren Überschriften ableiten
+
+### 2.4 Nutzerfeedback
+
+Spätere sichtbare Aktionen folgen möglichst dem Muster:
+
+`Aktion -> Ergebnis -> nächster sinnvoller Schritt`
+
+Fehlertexte sollen kurz erklären:
+
+1. was passiert ist
+2. welcher Bereich betroffen ist
+3. welche sichere Reaktion bereits erfolgt ist
+
+## 3. Teilstufe 0.3.0-A – Workspace-Vertrag
+
+**Status: 🟢 abgeschlossen**
+
+- [x] stabile Panel-IDs festlegen
+- [x] Standardreihenfolge festlegen
+- [x] Sichtbarkeit, Breite und Höhe definieren
+- [x] 12-Spalten-Raster als Positionsmodell festlegen
+- [x] keine freien x/y-Pixelkoordinaten speichern
 - [x] Speicherformat versionieren
-- [x] Reset- und Fehlerverhalten festlegen
-- [x] unbekannte, fehlende oder beschädigte Layoutdaten eindeutig behandeln
-- [x] Zustände festlegen, die ausdrücklich **nicht** gespeichert werden
+- [x] responsive Rückfallregeln definieren
+- [x] Reset-Vertrag definieren
+- [x] unbekannte, fehlende und beschädigte Daten behandeln
+- [x] persistente und temporäre Zustände trennen
+- [x] Planungs-PR #64 erfolgreich prüfen und mergen
 
-**Abnahmekriterium:** Ein Entwickler kann allein anhand von `docs/WORKSPACE_CONTRACT.md` die spätere Engine implementieren, ohne neue Grundentscheidungen zu Position, Größe, Sichtbarkeit, Speicherung oder Reset treffen zu müssen.
+Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
-## 3. Vertrag als kleine Laufzeitbasis implementieren – Teilstufe 0.3.0-B
+## 4. Teilstufe 0.3.0-B – State Foundation & Autosave/Reset
 
-Noch nicht umgesetzt.
+**Status: 🟡 implementiert, Abschlussvalidierung läuft**
 
-- [ ] eine kleine Workspace-Laufzeitdatei anlegen
-- [ ] Standarddefinition der fünf Kernpanels im Code abbilden
-- [ ] Vertragsversion `1` festlegen
-- [ ] gespeicherten Zustand strikt validieren
-- [ ] fehlende Panels mit Standardwerten ergänzen
-- [ ] unbekannte Panel-IDs ignorieren und protokollieren
-- [ ] ungültige Werte auf sichere Grenzen zurücksetzen
-- [ ] öffentliche Nur-Lese-Statusabfrage bereitstellen
-- [ ] Workspace-Fehler an das vorhandene dreistufige Logging anbinden
+Detaillierter Teilplan: `docs/PLAN_0.3.0_B.md`
 
-**Abnahmekriterium:** Die Anwendung kann Standardlayout und gespeicherten Layoutzustand laden, validieren und als bereinigten Zustand ausgeben, ohne bereits Drag & Drop zu verwenden.
+### 4.1 Zustandsbasis
 
-## 4. Automatische lokale Speicherung und Reset – Teilstufe 0.3.0-B
+- [x] eigene kleine Workspace-Laufzeitdatei anlegen
+- [x] fünf Paneldefinitionen zentral abbilden
+- [x] reproduzierbaren Standardzustand erzeugen
+- [x] öffentliche Nur-Lese-Statusabfrage bereitstellen
 
-Noch nicht umgesetzt.
+### 4.2 Validierung und Normalisierung
 
-- [ ] versionierten `localStorage`-Schlüssel verwenden
-- [ ] nur den notwendigen Layoutzustand speichern
-- [ ] Speicherung nach abgeschlossenen Benutzeraktionen ausführen
-- [ ] bei schnellen Größenänderungen Schreibvorgänge bündeln
-- [ ] Speichern darf die Oberfläche bei Browserfehlern oder gesperrtem Speicher niemals blockieren
-- [ ] `Standardlayout wiederherstellen` löscht ausschließlich den Workspace-Schlüssel
-- [ ] Reset stellt Standardreihenfolge, Standardsichtbarkeit und Standardgrößen ohne Neuinstallation wieder her
-- [ ] nach Reset den gültigen Zustand sofort neu anwenden
+- [x] Schema-Version prüfen
+- [x] Workspace-ID prüfen
+- [x] unbekannte Panel-IDs entfernen
+- [x] doppelte Panel-IDs entfernen
+- [x] fehlende Panels ergänzen
+- [x] Sichtbarkeit validieren
+- [x] Breiten auf Panelgrenzen begrenzen
+- [x] Höhen auf Panelgrenzen begrenzen
+- [x] Eingabedaten nicht direkt verändern
 
-**Abnahmekriterium:** Layoutänderungen bleiben nach Neuladen erhalten; ein Reset stellt reproduzierbar exakt den definierten Standard wieder her.
+### 4.3 Lokale Speicherung
 
-## 5. Panel-Sichtbarkeit – Teilstufe 0.3.0-C
+- [x] Schlüssel `provoware.allin.workspace.main.v1` verwenden
+- [x] Speichern über eine zentrale Funktion führen
+- [x] Zustand vor dem Speichern normalisieren
+- [x] beschädigtes JSON sicher auf Standard zurückführen
+- [x] gesperrten Browser-Speicher kontrolliert behandeln
+- [x] keine Netzwerkübertragung
 
-Noch nicht umgesetzt.
+### 4.4 Reset
 
-- [ ] Panels über einen zentralen Layoutbereich ein-/ausblendbar machen
-- [ ] ausgeblendete Panels bleiben im Vertrag registriert
-- [ ] ausgeblendete Panels behalten ihre gespeicherte Größe und Position
-- [ ] Wiederanzeigen setzt das Panel an seine gespeicherte Position zurück
-- [ ] Bedienung vollständig per Tastatur ermöglichen
-- [ ] eine sichere Wiederherstellungsmöglichkeit außerhalb der veränderbaren Panels vorsehen
+- [x] nur Workspace-Schlüssel entfernen
+- [x] In-Memory-Zustand auf Standard setzen
+- [x] Debug-Einstellungen nicht verändern
+- [x] andere Browserdaten nicht verändern
+- [x] Reset verständlich loggen
 
-**Abnahmekriterium:** Kein Nutzer kann sich durch Ausblenden dauerhaft aus der Arbeitsfläche aussperren.
+### 4.5 Automatische Tests
 
-## 6. Größenänderung – Teilstufe 0.3.0-D
+- [x] Standardzustand
+- [x] unbekannte und doppelte IDs
+- [x] fehlende Panels
+- [x] Größenbegrenzung
+- [x] falsche Schema-Version
+- [x] beschädigtes JSON
+- [x] Speichern und Wiederladen
+- [x] gesperrter Speicher
+- [x] isolierter Reset
 
-Noch nicht umgesetzt.
+### 4.6 Abschlusskriterien
 
-- [ ] Breite nur in erlaubten Rastereinheiten verändern
-- [ ] Mindestbreite und Höchstbreite erzwingen
-- [ ] Höhe nur innerhalb definierter Pixelgrenzen verändern
-- [ ] Größenänderung über Maus/Zeiger und Tastatur anbieten
-- [ ] gespeicherte Desktopgröße auf kleinen Viewports nur temporär begrenzen, nicht überschreiben
-- [ ] Mobilansicht verwendet sichere Vollbreite und inhaltsgerechte Höhe
-- [ ] keine negativen, `NaN`- oder extremen Größenwerte akzeptieren
+- [ ] vollständiger Diff gegen aktuellen `main`
+- [ ] Branch 0 Commits hinter `main`
+- [ ] `npm run verify` erfolgreich
+- [ ] PR mergebar
+- [ ] 0.3.0-B mergen
+- [ ] zentrale Dateien auf `main` stichprobenartig erneut lesen
 
-**Abnahmekriterium:** Kein Panel kann außerhalb sinnvoller Layoutgrenzen verkleinert oder vergrößert werden.
+## 5. Teilstufe 0.3.0-C – Visibility Controls + Schnellstarterleiste
 
-## 7. Neuordnung und Drag & Drop – Teilstufe 0.3.0-E
+**Status: ⚪ geplant**
 
-Erst nach erfolgreichem Abschluss der Schritte 2 bis 6 programmieren.
+### 5.1 Feste kompakte Menüleiste
 
-- [ ] Bewegung nur über einen klaren Panel-Griff starten
-- [ ] Klicks und Interaktionen innerhalb eines Panels dürfen kein Ziehen auslösen
-- [ ] Zielposition ausschließlich aus der geordneten Panelliste ableiten
-- [ ] keine freien `x/y`-Pixelpositionen speichern
-- [ ] visuelle Zielmarkierung während des Verschiebens anzeigen
-- [ ] nach Loslassen genau eine stabile neue Reihenfolge speichern
-- [ ] Neuordnung alternativ vollständig per Tastatur ermöglichen
-- [ ] Drag-Abbruch stellt den vorherigen Zustand wieder her
+Direkt unter dem festen oberen Bereich wird eine kompakte Schnellstarter-/Menüleiste angelegt.
 
-**Abnahmekriterium:** Nach identischer Panelreihenfolge entsteht bei jedem Laden dasselbe Layout.
+Sie bleibt außerhalb des veränderbaren Workspace und enthält nur Funktionen mit klarem Nutzen.
 
-## 8. Responsive Rückfallregeln – Teilstufe 0.3.0-F
+- [ ] kompakte feste Leiste anlegen
+- [ ] responsive Darstellung definieren
+- [ ] Tastaturfokus sauber führen
+- [ ] keine zweite parallele Navigation erzeugen
 
-Noch nicht umgesetzt.
+### 5.2 Permanenter Layout-Schalter
 
-- [ ] Desktop ab `981 px`: gespeicherte Rasterbreite anwenden
-- [ ] Tablet `681–980 px`: Breiten auf sichere 6- oder 12-Spalten-Darstellung begrenzen
-- [ ] Mobil bis `680 px`: sichtbare Panels immer auf volle Breite setzen
-- [ ] gespeicherte Desktopbreite bei Tablet/Mobil nicht überschreiben
-- [ ] gespeicherte Reihenfolge auf allen Größen beibehalten
-- [ ] Höhe auf Mobilgeräten primär vom Inhalt bestimmen lassen
-- [ ] Fenstergrößenwechsel darf keine gespeicherten Desktopwerte zerstören
+Bestätigte Option A:
 
-**Abnahmekriterium:** Ein auf Desktop angepasstes Layout bleibt nach zwischenzeitlicher Mobilnutzung unverändert erhalten.
+Alle Panels dürfen ausgeblendet werden. Ein permanenter `Layout`-Schalter bleibt trotzdem jederzeit erreichbar.
 
-## 9. Barrierefreiheit und Fehlervermeidung – Teilstufe 0.3.0-F
+- [ ] `Layout`-Schalter in der festen Leiste integrieren
+- [ ] Panel-Liste öffnen/schließen
+- [ ] jedes Panel einzeln ein-/ausblendbar machen
+- [ ] `Alle anzeigen` anbieten
+- [ ] `Standardlayout wiederherstellen` anbieten
+- [ ] keine Möglichkeit schaffen, den Layout-Schalter selbst auszublenden
 
-Noch nicht umgesetzt.
+### 5.3 Zustand und Nutzerfeedback
 
-- [ ] jede Mausaktion besitzt eine Tastaturalternative
-- [ ] Fokus bleibt nach Verschieben, Größenänderung und Ausblenden nachvollziehbar
-- [ ] Statusänderungen kurz über eine Live-Region ankündigen
-- [ ] `prefers-reduced-motion` respektieren
-- [ ] Touch-Bedienung berücksichtigen
-- [ ] Drag- und Resize-Griffe ausreichend groß gestalten
-- [ ] versteckte Panels aus der Tastaturreihenfolge entfernen
-- [ ] Reset klar benennen und nicht mit Datenlöschung anderer Bereiche vermischen
+- [ ] Sichtbarkeitsänderung über die zentrale Workspace-API führen
+- [ ] nach abgeschlossener Änderung automatisch speichern
+- [ ] ausgeblendete Panels behalten Reihenfolge und Größe
+- [ ] Wiederanzeigen nutzt gespeicherten Zustand
+- [ ] Aktion kurz und verständlich bestätigen
 
-**Abnahmekriterium:** Die flexible Arbeitsfläche bleibt ohne Maus vollständig bedienbar.
+**Abnahmekriterium:** Auch bei vollständig ausgeblendeter Arbeitsfläche kann der Nutzer jedes Panel ohne Konsole oder Neuinstallation wiederherstellen.
 
-## 10. Automatisierte Prüfungen erweitern – Teilstufe 0.3.0-G
+## 6. Teilstufe 0.3.0-D – Resize
 
-Noch nicht umgesetzt.
+**Status: ⚪ geplant**
 
-- [ ] Workspace-Vertrag automatisch gegen ungültige Panel-IDs prüfen
-- [ ] doppelte Panel-IDs verhindern
-- [ ] Standardreihenfolge auf Vollständigkeit und Eindeutigkeit prüfen
-- [ ] Mindest-/Höchstgrößen logisch prüfen
-- [ ] gespeicherten Beispielzustand gegen Schema testen
-- [ ] beschädigte Speicherung testen
-- [ ] unbekannte alte Panels testen
-- [ ] fehlende neue Panels testen
-- [ ] Reset testen
-- [ ] responsive Berechnung als reine Funktionen testen, wo möglich
-- [ ] vorhandenes `npm run verify` als einzigen kanonischen Prüfaufruf beibehalten
+- [ ] Breite nur in ganzen Rastereinheiten ändern
+- [ ] Mindest- und Höchstbreite erzwingen
+- [ ] Höhe nur in gültigen Grenzen ändern
+- [ ] Vorschauzustand nicht persistent speichern
+- [ ] erst validierten Endwert speichern
+- [ ] Maus unterstützen
+- [ ] Touch unterstützen
+- [ ] Tastaturalternative anbieten
+- [ ] Desktopwerte auf Tablet/Mobil nur temporär begrenzen
 
-**Abnahmekriterium:** Typische Workspace-Datenfehler werden automatisch erkannt, bevor der Pull Request gemergt werden kann.
+**Abnahmekriterium:** Kein Panel kann einen ungültigen oder unbrauchbaren Größenwert speichern.
 
-## 11. Dokumentation und Status synchronisieren
+## 7. Teilstufe 0.3.0-E – Reorder & Drag and Drop
 
-- [x] detaillierten 0.3.0-Plan anlegen
-- [x] separaten Workspace-Vertrag anlegen
-- [ ] README nach tatsächlicher Implementierung ergänzen
-- [ ] TODO nach jeder abgeschlossenen Teilstufe aktualisieren
-- [ ] CHANGELOG nur mit real implementierten Funktionen ergänzen
-- [ ] MANIFEST erst bei neuen Laufzeitdateien erweitern
-- [ ] VERSION erst auf `0.3.0` erhöhen, wenn die funktionsfähige Workspace Engine geprüft ist
+**Status: ⚪ geplant**
 
-**Abnahmekriterium:** Planungsstand und Releaseversion werden nicht miteinander verwechselt. Während der Vertragsphase bleibt die reale Produktversion `0.2.0`.
+Erst nach A bis D.
 
-## 12. Abschlussprüfung und Release
+- [ ] Ziehen nur über dedizierten Griff starten
+- [ ] Buttons/Formulare dürfen kein Drag auslösen
+- [ ] nur Reihenfolge speichern
+- [ ] keine freien Zeigerkoordinaten speichern
+- [ ] Zielposition klar anzeigen
+- [ ] Drag-Abbruch ohne Zustandsverlust
+- [ ] Tastaturalternative vollständig anbieten
+- [ ] nach Abschluss einmal speichern
 
-Noch nicht umgesetzt.
+**Abnahmekriterium:** Gleiche gespeicherte Reihenfolge erzeugt reproduzierbar dasselbe Layout.
 
-- [ ] vollständigen Branch-Diff gegen aktuellen `main` prüfen
-- [ ] nur begründete Dateien akzeptieren
-- [ ] alle automatischen Quality Gates grün
-- [ ] manuelle Firefox-Prüfung durchführen
-- [ ] Chrome-Kompatibilität stichprobenartig prüfen
+## 8. Teilstufe 0.3.0-F – Responsive & Accessibility Hardening
+
+**Status: ⚪ geplant**
+
+### Responsive
+
+- [ ] Desktop ab 981 px: gespeicherte Rasterbreite anwenden
+- [ ] Tablet 681–980 px: sichere 6-/12-Spalten-Darstellung
+- [ ] Mobil bis 680 px: sichtbare Panels Vollbreite
+- [ ] Desktopwerte nicht durch kleinere Viewports überschreiben
+- [ ] gespeicherte Reihenfolge beibehalten
+
+### Bedienbarkeit
+
+- [ ] vollständige Tastaturnavigation
+- [ ] klare Fokusführung
+- [ ] Live-Status für Layoutaktionen
+- [ ] `prefers-reduced-motion` beachten
+- [ ] ausreichende Touch-Ziele
+- [ ] versteckte Panels aus Fokusreihenfolge entfernen
+
+## 9. Teilstufe 0.3.0-G – Release Gate
+
+**Status: ⚪ geplant**
+
+### Automatisch
+
+- [ ] `npm run verify` vollständig grün
+- [ ] Workspace-Vertrags- und Zustandstests grün
+- [ ] keine unbeabsichtigten externen Laufzeitverweise
+- [ ] Versionen und Manifeste konsistent
+
+### Manuell
+
+- [ ] Firefox: kompletter Workspace-Ablauf
+- [ ] Chrome: Kompatibilitätsstichprobe
+- [ ] Desktop, Tablet, Mobil
+- [ ] Alle Panels ausblenden und wiederherstellen
+- [ ] Resize testen
+- [ ] Reorder/Drag testen
+- [ ] Tastaturablauf testen
 - [ ] Reset aus verändertem Layout testen
-- [ ] Mobil-/Tablet-Fallback testen
-- [ ] PR mit Risiken, Prüfungen und Rückweg dokumentieren
-- [ ] erst danach `0.3.0` mergen
-- [ ] `main` nach Merge stichprobenartig nachprüfen
 
-**Rollback:** Die gesamte 0.3.0-Engine muss über ihren Release-PR zurücknehmbar bleiben. Gespeicherte Layoutdaten sind lokal, versionsgebunden und dürfen keine anderen Tooldaten verändern.
+### Dokumentation
 
----
+- [ ] README auf finalen Funktionsstand bringen
+- [ ] TODO abschließen
+- [ ] CHANGELOG finalisieren
+- [ ] MANIFEST finalisieren
+- [ ] VERSION erst jetzt auf `0.3.0` erhöhen
 
-# Status der Iteration
+### Merge
 
-## Erledigt
+- [ ] vollständiger Diff geprüft
+- [ ] Branch aktuell
+- [ ] keine ungeklärten Release-TODOs
+- [ ] Rückweg dokumentiert
+- [ ] Release-PR mergen
+- [ ] `main` stichprobenartig nachprüfen
 
-- Baseline festgelegt
-- Option A bestätigt: automatische lokale Speicherung plus vollständiger Reset
-- HTML- und Grid-Ausgangsstruktur geprüft
-- Workspace-Vertrag fachlich definiert
-- 0.3.0 in reproduzierbare Teilstufen zerlegt
+## 10. Änderungsvolumen nach Teilstufe
 
-## In Arbeit
+| Teilstufe | erwartetes Volumen | Hauptbetroffene Bereiche |
+| --- | --- | --- |
+| A | klein, Dokumentation | Vertrag, Planung |
+| B | mittel | Zustand, lokaler Speicher, Tests |
+| C | mittel | UI-Leiste, Sichtbarkeit, Fokus |
+| D | mittel | Größenlogik, Eingabegeräte |
+| E | mittel bis groß | Neuordnung, Drag, Tastatur |
+| F | mittel | Responsive, Barrierefreiheit |
+| G | klein bis mittel | Releaseprüfung, Dokumentation |
 
-- Vertragsprüfung und Freigabe der letzten offenen Bedienentscheidung vor Laufzeitcode
+Große Misch-Patches sind zu vermeiden. Wenn eine Teilstufe deutlich größer wird, wird sie vor der Implementierung weiter aufgeteilt.
 
-## Blockiert
+## 11. Wer ist betroffen?
 
-- nichts technisch blockiert
-- vor der Sichtbarkeitsimplementierung ist nur noch festzulegen, wie ein vollständig leer ausgeblendeter Workspace sicher wiederhergestellt wird
+### Normale Nutzer
 
-## Nächste zwei Schritte
+Ab 0.3.0-C sichtbar betroffen. 0.3.0-B verändert nur die interne Zustandsgrundlage.
 
-1. **0.3.0-B – State Foundation:** Workspace-Vertrag als kleine validierbare Laufzeitbasis plus Autosave/Reset implementieren, weiterhin ohne Drag & Drop.
-2. **0.3.0-C – Visibility Controls:** zentrale Panel-Sichtbarkeit und sichere Wiederherstellung umsetzen.
+### Lokale Daten
+
+Nur Layoutdaten im versionsgebundenen Workspace-Schlüssel.
+
+### Fachmodule
+
+Nicht betroffen, solange keine eigene Integrationsstufe beschlossen wird.
+
+### Netzwerk
+
+Nicht betroffen.
+
+### Entwickler
+
+Betroffen durch neue Workspace-API, Tests, Dokumentation und strengere Wartbarkeitsregeln.
+
+## 12. Rückweg
+
+Jede Teilstufe erhält einen eigenen PR. Dadurch kann eine problematische Stufe einzeln zurückgenommen werden.
+
+Workspace-Reset darf niemals `localStorage.clear()` verwenden.
+
+## 13. Nächste zwei Schritte
+
+### Nächster Schritt
+
+**0.3.0-C – Visibility Controls + kompakte Schnellstarter-/Menüleiste**
+
+Nach Abschluss von 0.3.0-B wird zuerst die sichere Sichtbarkeit umgesetzt: feste Leiste, permanenter `Layout`-Schalter, Panel-Liste, `Alle anzeigen`, Reset, Fokusführung und verständliches Nutzerfeedback.
+
+### Danach
+
+**0.3.0-D – Resize**
+
+Erst danach werden Panelbreite und -höhe veränderbar. Drag & Drop bleibt weiterhin bis 0.3.0-E gesperrt.
 
 ## Empfehlung
 
-Zuerst 0.3.0-B vollständig mit Tests abschließen. Drag & Drop bleibt bewusst bis 0.3.0-E gesperrt. Dadurch sind Datenmodell, Speicherung, Reset und Größenregeln bereits stabil, bevor Zeigerbewegungen den Zustand verändern können.
+Die Reihenfolge `State -> Sichtbarkeit -> Größe -> Neuordnung` beibehalten. Sie reduziert Fehler, hält Patches klein und macht jede Mechanik unabhängig testbar.

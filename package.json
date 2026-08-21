@@ -7,7 +7,7 @@
   "scripts": {
     "format": "node scripts/quality-check.mjs --fix",
     "fix": "node scripts/quality-check.mjs --fix",
-    "test": "node --test tests/module-registry.test.mjs",
+    "test": "node --test tests/*.test.mjs",
     "verify": "node scripts/quality-check.mjs && npm run test"
   },
   "engines": {

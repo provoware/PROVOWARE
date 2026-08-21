@@ -15,6 +15,8 @@ Diese Datei ist die verbindliche Arbeitsanweisung für Änderungen an **PROVOWAR
 - **Deterministisch:** dieselbe Prüfung liefert bei demselben Stand dasselbe Ergebnis.
 - **Quality Gate (Qualitätsschranke):** automatische Prüfung, die einen fehlerhaften Stand vor dem Merge stoppt.
 - **Rollback (Rückweg):** dokumentierte Möglichkeit, eine Änderung vollständig zurückzunehmen.
+- **Single Source of Truth (eine verbindliche Quelle):** ein Zustand oder eine Regel wird nur an einer Stelle festgelegt und nicht mehrfach kopiert.
+- **Kopplung:** beschreibt, wie stark zwei Systemteile voneinander abhängen. Weniger Kopplung erleichtert Tests und spätere Änderungen.
 
 ## 1. Verbindliche Grundregeln
 
@@ -30,6 +32,9 @@ Diese Datei ist die verbindliche Arbeitsanweisung für Änderungen an **PROVOWAR
 10. Dokumentation, TODO, Changelog und Version müssen den realen Codezustand widerspiegeln.
 11. Ein Pull Request darf erst gemergt werden, wenn der geplante Diff geprüft und alle verfügbaren Quality Gates grün sind.
 12. Bei unklarer Baseline, Datenintegrität, Sicherheitswirkung oder fehlendem Rückweg nicht automatisch weiterarbeiten.
+13. Neue Datenformate, lokale Speicherstrukturen und öffentliche Schnittstellen müssen versioniert werden.
+14. Benutzertexte und Projektdokumentation werden klar und konsistent auf Deutsch benannt. Neue technische Bezeichner eines Subsystems sollen innerhalb dieses Subsystems ebenfalls konsistent und verständlich benannt werden; bestehende veröffentlichte Schnittstellen werden nicht nur aus Stilgründen massenhaft umbenannt.
+15. Jede Mechanik braucht einen konkreten Nutzen. Ohne Nutzer-, Qualitäts- oder Wartbarkeitsgewinn wird sie nicht eingebaut.
 
 ## 2. Verbindlicher Iterationsablauf
 
@@ -55,6 +60,8 @@ Vor dem Patch schriftlich festhalten:
 - mögliche Risiken
 - Abnahmekriterien
 - Rückweg
+- erwartetes Änderungsvolumen: klein, mittel oder groß
+- betroffene Nutzergruppen oder Systemteile
 
 ### 2.3 PLAN – nummerierte Checkliste zuerst
 
@@ -69,7 +76,9 @@ Vor Codeänderungen einen detaillierten Plan erstellen. Der Plan enthält mindes
 7. manuelle Stichproben
 8. Dokumentationsänderungen
 9. Rückweg
-10. nächste zwei logische Entwicklungsstufen
+10. Änderungsvolumen und betroffene Bereiche
+11. Nutzerfeedback und Fehlermeldungen
+12. nächste zwei logische Entwicklungsstufen
 
 Jeder Punkt wird als Checkliste geführt und erst nach realer Umsetzung abgehakt.
 
@@ -80,6 +89,7 @@ Jeder Punkt wird als Checkliste geführt und erst nach realer Umsetzung abgehakt
 - Abhängigkeiten und Aufrufreihenfolge prüfen
 - nach doppelten Lösungen suchen
 - prüfen, ob die geplante Änderung mit weniger Code möglich ist
+- prüfen, ob Daten, Logik und Darstellung sauber getrennt werden können
 
 **Abbruchbedingung:** Wenn die reale Codebasis dem Plan widerspricht, zuerst den Plan korrigieren.
 
@@ -94,6 +104,8 @@ Für jeden Patch gilt:
 - neue Abstraktionen erst einführen, wenn mindestens ein realer Wiederverwendungsfall besteht
 - keine Platzhalterfunktionen vortäuschen
 - keine toten Optionen oder ungenutzten Konfigurationen anlegen
+- doppelte Validierungs- oder Zustandslogik vermeiden
+- reine Daten und Regeln von Seiteneffekten wie DOM, Speicherung und Logging trennen
 
 Jeder Patch muss vier Fragen beantworten:
 
@@ -144,6 +156,7 @@ Die Prüfung soll ohne installierte npm-Laufzeitpakete funktionieren und mindest
 - doppelte IDs
 - sichere lokale Modulpfade
 - Versionskonsistenz, soweit deterministisch prüfbar
+- neue Zustands- oder Speicherverträge mit gezielten Unit-Tests
 
 Wenn ein Test fehlschlägt: Ursache beheben, nicht den Test abschwächen, außer der Test ist nachweislich falsch.
 
@@ -157,6 +170,7 @@ Nach dem Patch:
 - neue Abhängigkeiten erneut begründen
 - Fehlerszenarien prüfen
 - sicherstellen, dass vorhandenes Verhalten erhalten bleibt
+- Änderungsvolumen tatsächlich erfassen und gegen die Planung halten
 
 ### 2.9 DOKUMENTATION – Realität nachziehen
 
@@ -181,6 +195,7 @@ Ein PR ist nur bereit, wenn:
 - keine ungeklärten TODOs innerhalb des Release-Ziels offen sind
 - Rückweg dokumentiert ist
 - Version und Changelog stimmen
+- keine identische Geschäfts-, Validierungs- oder Zustandslogik mehrfach entstanden ist
 
 ### 2.11 PR / MERGE / MAIN-CHECK
 
@@ -192,6 +207,7 @@ Pull Request enthält:
 - Tests und deren Ergebnis
 - bekannte Risiken
 - Rückweg
+- Änderungsvolumen und betroffene Bereiche
 - nächste zwei Entwicklungsstufen
 
 Nach dem Merge mindestens Version, Einstiegspunkt und zentrale neue Datei auf `main` erneut lesen.
@@ -206,16 +222,24 @@ Fachbegriffe werden **zuerst in Alltagssprache erklärt** und erst anschließend
 
 Keine bloßen Statusfloskeln. Jede Statusmeldung nennt konkret, was geprüft oder geändert wurde.
 
+Nutzerfeedback in der Oberfläche folgt, soweit passend, dem Muster:
+
+`Aktion -> Ergebnis -> nächster sinnvoller Schritt`
+
+Fehlertexte sollen Ursache, betroffenen Bereich und eine konkrete nächste Prüfmöglichkeit enthalten, ohne technische Datenfluten anzuzeigen.
+
 ### Pflichtformat am Ende jeder Entwicklungsiteration
 
 1. **Entwicklungsstand:** Version, Branch/PR, Fortschritt, Merge-Status.
 2. **Umgesetzt:** konkrete Änderungen.
-3. **Validierung:** ausgeführte automatische und manuelle Prüfungen.
-4. **Offen/Risiken:** nur reale offene Punkte.
-5. **Nächster Schritt:** genau der logisch beste Folgeschritt.
-6. **Danach:** zweiter angekündigter Folgeschritt.
-7. **Drei sinnvolle Optionen:** A/B/C mit klarer farblicher Empfehlung.
-8. **Klärungsfrage:** eine Frage, die Verständnis erhöht oder einen typischen Fehler verhindert.
+3. **Änderungsvolumen:** Anzahl/Art geänderter Dateien und betroffene Systemteile.
+4. **Betroffen:** Nutzer, Daten, Laufzeit oder nur Entwicklung/Dokumentation.
+5. **Validierung:** ausgeführte automatische und manuelle Prüfungen.
+6. **Offen/Risiken:** nur reale offene Punkte.
+7. **Nächster Schritt:** genau der logisch beste Folgeschritt, detailliert angekündigt.
+8. **Danach:** zweiter angekündigter Folgeschritt.
+9. **Drei sinnvolle Optionen:** A/B/C mit klarer farblicher Empfehlung.
+10. **Klärungsfrage:** eine Frage, die Verständnis erhöht oder einen typischen Fehler verhindert.
 
 ## 4. Statuskennzeichnung
 
@@ -226,14 +250,54 @@ Keine bloßen Statusfloskeln. Jede Statusmeldung nennt konkret, was geprüft ode
 
 Fortschrittsprozente nur aus realen Abnahmekriterien ableiten, nicht schätzen.
 
-## 5. Codequalitätsregeln
+## 5. Codequalitäts- und Wartbarkeitsregeln
 
-- kleine Funktionen mit klarer Aufgabe
+### 5.1 Kleine, eindeutige Einheiten
+
+- Funktionen haben genau eine klar erkennbare Aufgabe.
+- Kurze Funktionen sind Standard; deutlich längere Funktionen werden nur akzeptiert, wenn Aufteilung mehr Kopplung oder schlechtere Lesbarkeit erzeugen würde.
+- Wiederverwendbare Regeln werden zentral definiert und nicht kopiert.
+- Kommentare erklären **warum** eine ungewöhnliche Entscheidung nötig ist, nicht Zeile für Zeile **was** offensichtlicher Code tut.
+
+### 5.2 Daten, Logik und Seiteneffekte trennen
+
+- feste Daten und Verträge in unveränderlichen Konstanten halten
+- reine Validierungs- und Normalisierungslogik ohne DOM oder Speicherung schreiben, wenn möglich
+- Browser-Speicherung, DOM und Logging über kleine klar abgegrenzte Funktionen anbinden
+- keine UI-Komponente als versteckten Datenspeicher benutzen
+- keine Logik aus HTML-Texten oder sichtbaren Beschriftungen ableiten
+
+### 5.3 Zustand sauber verwalten
+
+- pro Subsystem genau eine verbindliche Zustandsquelle verwenden
+- Zustandswechsel über wenige zentrale Funktionen führen
+- gespeicherten Zustand vor Nutzung immer validieren
+- temporäre Zustände nicht versehentlich persistent speichern
+- Version von gespeicherten Daten und öffentlichen Verträgen ausdrücklich mitführen
+- Reset löscht nur den fachlich zugehörigen Schlüssel, niemals pauschal alle Browserdaten
+
+### 5.4 Systeme entkoppeln
+
+- Module kommunizieren über kleine dokumentierte Schnittstellen
+- Logging darf keine Geschäftslogik steuern
+- Speicherung darf die UI nicht blockieren
+- Diagnosefehler dürfen die Kernfunktion nicht lahmlegen
+- neue Subsysteme dürfen bestehende globale APIs nicht ungeplant verändern
+
+### 5.5 Reproduzierbare Fehler und verständliche Logs
+
+- Fehlerpfade genauso testen wie Erfolgswege
+- Logs nennen Bereich, Ereignis und relevante Ursache
+- gleiche Fehlerklasse möglichst mit gleicher Meldungsstruktur ausgeben
+- keine unnötigen Nutzerdaten in Logs aufnehmen
+- bei reparierten Eingaben die Art der Korrektur nachvollziehbar machen
+- Fehler sollen mit demselben Eingabefall reproduzierbar sein
+
+### 5.6 Bestehende technische Grundregeln
+
 - frühe Validierung an Systemgrenzen
 - unveränderliche Konstanten für Verträge und Zustandsnamen
 - keine globalen Variablen außer ausdrücklich dokumentierten öffentlichen Browser-Schnittstellen
-- Zustandswechsel zentral statt an vielen Stellen verteilen
-- Fehlerpfade genauso behandeln wie Erfolgswege
 - Nutzer- und Diagnosedaten sparsam halten
 - keine Remote-Abhängigkeit, wenn dieselbe Aufgabe zuverlässig lokal lösbar ist
 - Browser-Kompatibilität für Firefox und Chrome erhalten

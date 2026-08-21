@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## In Entwicklung – 0.3.0 Flexible Workspace Engine
+
+### 0.3.0-B – State Foundation & Autosave/Reset
+
+#### Hinzugefügt
+
+- `assets/workspace-state.js` als versionierte Workspace-Zustandsverwaltung.
+- reproduzierbarer Standardzustand für fünf Kernpanels.
+- Validierung und Normalisierung für Reihenfolge, Sichtbarkeit, Breite und Höhe.
+- robuste lokale Speicherung über `provoware.allin.workspace.main.v1`.
+- isolierter Reset auf das Standardlayout.
+- Workspace-Logging im Bereich `WORKSPACE`.
+- automatische Tests für Normalisierung, beschädigte Daten, Speicherfehler und Reset.
+- detaillierter Teilplan und Patchmanifest für 0.3.0-B.
+
+#### Geändert
+
+- `index.html` lädt die Workspace-Zustandsverwaltung vor `assets/app.js`.
+- `assets/app.js` initialisiert den Workspace-Zustand und bindet ihn an das vorhandene Logging an.
+- `npm run test` führt alle Testdateien aus.
+- das Quality Gate prüft die neuen Workspace-Pflichtdateien und die Script-Reihenfolge.
+- `AGENTS.md` stärkt Wartbarkeit, Zustandsverwaltung, Entkopplung und Patchtransparenz.
+
+#### Bewusst noch nicht enthalten
+
+- keine sichtbare Schnellstarter-/Menüleiste
+- kein sichtbarer `Layout`-Schalter
+- kein Ein-/Ausblenden
+- kein Resize
+- kein Drag & Drop
+
+Die freigegebene Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
+
 ## 0.2.0 – Module Contract & Registry
 
 ### Hinzugefügt

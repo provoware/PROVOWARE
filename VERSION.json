@@ -5,5 +5,8 @@
   "status": "prototype",
   "baseline_commit": "cda1c4092d2a041cbacf4a72308ed9b08406317f",
   "entrypoint": "index.html",
-  "module_contract_version": "1"
+  "module_contract_version": "1",
+  "workspace_contract_version": "1",
+  "development_phase": "0.3.0-B State Foundation & Autosave/Reset",
+  "development_baseline_commit": "59491ad1d5fa199402ddf4d72d71eddb525d43a8"
 }

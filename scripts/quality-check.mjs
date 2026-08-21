@@ -104,8 +104,11 @@ const checkRequiredFiles = async () => {
     "index.html",
     "assets/app.js",
     "assets/module-registry.js",
+    "assets/workspace-state.js",
     "assets/styles.css",
     "modules/registry.js",
+    "tests/module-registry.test.mjs",
+    "tests/workspace-state.test.mjs",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -183,11 +186,18 @@ const checkHtml = async () => {
     if (!(await exists(resolved))) fail(`index.html: lokale Datei fehlt (${ref}).`);
   }
 
-  const order = ["modules/registry.js", "assets/module-registry.js", "assets/app.js"].map((item) =>
-    html.indexOf(item),
-  );
-  if (order.some((position) => position < 0) || !(order[0] < order[1] && order[1] < order[2])) {
-    fail("index.html: Script-Reihenfolge muss registry.js -> module-registry.js -> app.js sein.");
+  const scriptOrder = [
+    "modules/registry.js",
+    "assets/module-registry.js",
+    "assets/workspace-state.js",
+    "assets/app.js",
+  ].map((item) => html.indexOf(item));
+
+  const ordered = scriptOrder.every((position, index) => index === 0 || scriptOrder[index - 1] < position);
+  if (scriptOrder.some((position) => position < 0) || !ordered) {
+    fail(
+      "index.html: Script-Reihenfolge muss registry.js -> module-registry.js -> workspace-state.js -> app.js sein.",
+    );
   }
 };
 
