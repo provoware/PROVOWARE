@@ -45,25 +45,43 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 - [x] Responsive Regeln definieren, ohne gespeicherte Desktopwerte auf Mobilgeräten zu überschreiben.
 - [x] Versionierten lokalen Speicher-Schlüssel und sicheren Reset-Vertrag festlegen.
 - [x] Drag & Drop bis nach stabiler State-/Visibility-/Resize-Basis ausdrücklich zurückstellen.
-- [ ] Entscheidung treffen, wie alle ausgeblendeten Panels sicher wieder sichtbar gemacht werden.
+- [x] Option A für vollständig ausgeblendeten Workspace festlegen: permanenter `Layout`-Schalter außerhalb des Workspace.
+- [x] Kompakte Schnellstarter-/Menüleiste unter dem festen oberen Bereich für 0.3.0-C festlegen.
 - [x] Planungs-PR #64 erfolgreich durch Quality Gate bringen und mergen.
 
 Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 #### 0.3.0-B – State Foundation & Autosave/Reset
 
-- [ ] Workspace-Vertrag als kleine validierbare Laufzeitbasis implementieren.
-- [ ] Standardzustand und gespeicherten Zustand deterministisch normalisieren.
-- [ ] Automatische lokale Speicherung nach abgeschlossenen Änderungen implementieren.
-- [ ] `Standardlayout wiederherstellen` isoliert und sicher implementieren.
-- [ ] beschädigte oder gesperrte Browser-Speicherung robust behandeln.
-- [ ] automatische Tests für Zustand, Validierung und Reset ergänzen.
+- [x] Detaillierten Teilplan `docs/PLAN_0.3.0_B.md` mit Änderungsvolumen und Abnahmekriterien anlegen.
+- [x] Workspace-Vertrag als kleine validierbare Laufzeitbasis implementieren.
+- [x] Standarddefinition und Standardzustand zentral abbilden.
+- [x] Standardzustand und gespeicherten Zustand deterministisch normalisieren.
+- [x] Daten, reine Logik, Browser-Speicherung und Logging klar trennen.
+- [x] Automatische lokale Speicherung über `zustandSetzen`/`zustandSpeichern` vorbereiten.
+- [x] `zuruecksetzen` isoliert auf den Workspace-Schlüssel begrenzen.
+- [x] beschädigte oder gesperrte Browser-Speicherung robust behandeln.
+- [x] Workspace-Fehler verständlich im Bereich `WORKSPACE` loggen.
+- [x] automatische Tests für Zustand, Validierung, Speicherung und Reset ergänzen.
+- [x] `npm run test` auf alle Testdateien erweitern.
+- [x] Quality Gate um Workspace-Pflichtdateien und Script-Reihenfolge erweitern.
+- [x] `AGENTS.md` um Wartbarkeits-, Zustands- und Transparenzregeln schärfen.
+- [x] Hauptmanifest und Patchmanifest synchronisieren.
+- [ ] vollständigen Branch-Diff gegen aktuellen `main` prüfen.
+- [ ] GitHub Quality Gate erfolgreich durchlaufen lassen.
+- [ ] PR mergebar prüfen und 0.3.0-B mergen.
+- [ ] zentrale Dateien nach Merge auf `main` stichprobenartig nachprüfen.
 
-#### 0.3.0-C – Visibility Controls
+#### 0.3.0-C – Visibility Controls + kompakte Menüleiste
 
+- [ ] feste kompakte Schnellstarter-/Menüleiste direkt unter dem oberen Bereich anlegen.
+- [ ] permanenten `Layout`-Schalter außerhalb des veränderbaren Workspace integrieren.
 - [ ] Panels zentral ein-/ausblendbar machen.
-- [ ] Wiederherstellung außerhalb der veränderbaren Panels bereitstellen.
+- [ ] `Alle anzeigen` und `Standardlayout wiederherstellen` jederzeit erreichbar halten.
+- [ ] ausgeblendete Panels mit gespeicherter Position und Größe wiederherstellen.
 - [ ] Tastaturbedienung und Fokusführung sicherstellen.
+- [ ] Nutzerfeedback nach `Aktion -> Ergebnis -> nächster Schritt` ausgeben.
+- [ ] Leiste kompakt halten und nur Funktionen mit realem Nutzen aufnehmen.
 
 #### 0.3.0-D – Resize
 
@@ -71,6 +89,7 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [ ] Panelhöhen innerhalb sicherer Grenzen veränderbar machen.
 - [ ] Desktopwerte bei Tablet-/Mobil-Fallback erhalten.
 - [ ] Maus-, Touch- und Tastaturbedienung absichern.
+- [ ] erst validierte Endwerte persistent speichern.
 
 #### 0.3.0-E – Reorder & Drag and Drop
 
@@ -88,10 +107,10 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 #### 0.3.0-G – Release Gate
 
-- [ ] `npm run verify` um Workspace-Vertrags- und Zustandsprüfungen erweitern.
+- [ ] `npm run verify` mit allen Workspace-Prüfungen grün abschließen.
 - [ ] manuelle Firefox-Abnahme durchführen.
 - [ ] Chrome-Kompatibilität stichprobenartig prüfen.
-- [ ] README, CHANGELOG, MANIFEST und VERSION erst nach realer Implementierung synchronisieren.
+- [ ] README, CHANGELOG, MANIFEST und VERSION auf den realen Releasezustand synchronisieren.
 - [ ] Version erst nach vollständiger Abnahme auf `0.3.0` setzen.
 - [ ] Release-PR nur bei grünem Quality Gate mergen.
 
