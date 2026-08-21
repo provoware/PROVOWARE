@@ -25,9 +25,11 @@
 - [x] Sicheren Auto-Fix für Format-/Textnormalisierung ergänzen.
 - [x] Automatischen Modul-Lebenszyklustest mit Node-Bordmitteln ergänzen.
 - [x] GitHub-Actions-Prüfung für Pull Requests und `main` einrichten.
-- [ ] Pull-Request-Quality-Gate real erfolgreich durchlaufen lassen.
-- [ ] Branch-Diff gegen aktuellen `main` abschließend kontrollieren.
-- [ ] 0.2.0 mergen und `main` stichprobenartig nachprüfen.
+- [x] Pull-Request-Quality-Gate erfolgreich durchlaufen lassen (PR #62).
+- [x] Branch-Diff gegen aktuellen `main` abschließend kontrollieren; Branch war 0 Commits hinter `main`.
+- [x] 0.2.0 über PR #62 mergen und `main` stichprobenartig nachprüfen.
+
+Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 
 ## Nächste Iteration
 
