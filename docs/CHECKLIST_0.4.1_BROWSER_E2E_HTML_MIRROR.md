@@ -43,11 +43,13 @@
 - [x] automatischen Chromium-Workflow für PR und `main` definieren.
 - [x] Firefox nur über optionalen Workflow-Dispatch definieren.
 - [x] Screenshot-/Export-/Report-Artefakte hochladen.
-- [ ] Core Quality Gate Node 20 grün.
-- [ ] Core Quality Gate Node 24 grün.
-- [ ] Chromium-Browser-E2E grün.
-- [ ] Browser-Evidenzartefakt vorhanden.
-- [ ] tatsächliche Screenshotdateien im Artefakt prüfen.
+- [x] Core Quality Gate Node 20 grün.
+- [x] Core Quality Gate Node 24 grün.
+- [x] Chromium-Browser-E2E grün: 2/2 echte Browserprüfungen bestanden.
+- [x] Browser-Evidenzartefakt `9474583341` vorhanden; SHA-256 `f2009e5b8c1ae992a8894fcb1d3d4d5bc41bd5aaa4e24fad0dd4747a6c8eff27`.
+- [x] sechs Screenshotdateien und JSON-Export aus dem Erfolgsartefakt entpackt und geprüft.
+- [x] Mirror-Evidenz bestätigt 1366 × 900 intern, Faktor 0,5, 683 × 450 visuell und identische Schlüsselgeometrie.
+- [x] erster echter Browserlauf deckte einen UI-Überlagerungsfehler auf; Container-Responsive-Reparatur anschließend im unveränderten E2E-Test grün validiert.
 
 ## E – Dokumentation / Abschluss
 
@@ -58,7 +60,7 @@
 - [ ] TODO aktualisieren.
 - [ ] CHANGELOG aktualisieren.
 - [ ] MANIFEST aktualisieren.
-- [ ] VERSION-Entwicklungsphase aktualisieren.
+- [x] VERSION-Entwicklungsphase aktualisieren; Produktversion bleibt 0.2.0 und Datenschema v1.
 - [ ] finalen Diff gegen `main` prüfen.
 - [ ] PR auf ready for review setzen.
 - [ ] Squash-Merge durchführen.
