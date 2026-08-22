@@ -10,10 +10,9 @@ Alle Panels dürfen ausgeblendet werden. Trotzdem muss der Nutzer jederzeit ohne
 
 - **Sichtbarkeit:** Ein Panel wird angezeigt oder ausgeblendet, ohne seine gespeicherte Reihenfolge oder Größe zu verlieren.
 - **Schnellstarterleiste:** kompakte feste Leiste mit häufig benötigten Layoutfunktionen.
-- **Menüleiste:** Bereich, aus dem der Nutzer weitere Layoutaktionen öffnet.
 - **Fokus:** markiert das aktuell per Tastatur bedienbare Element.
 - **Live-Status:** kurze Textmeldung, die eine ausgeführte Aktion bestätigt.
-- **ARIA:** zusätzliche HTML-Informationen, damit Bedienhilfen Zustand und Bedeutung einer Steuerung erkennen.
+- **ARIA:** zusätzliche HTML-Informationen für Bedienhilfen.
 - **Regression:** eine neue Änderung beschädigt bereits funktionierendes Verhalten.
 
 ## 1. Baseline
@@ -24,7 +23,7 @@ Alle Panels dürfen ausgeblendet werden. Trotzdem muss der Nutzer jederzeit ohne
 - Baseline: `247b584e87f4e041e6f405932328659e895bfbb7`
 - Workspace-Vertrag: Version `1`
 - bestehende Zustandsbasis: `0.3.0-B`
-- lokale Speicherung: `provoware.allin.workspace.main.v1`
+- lokaler Schlüssel: `provoware.allin.workspace.main.v1`
 - keine neue externe Laufzeitabhängigkeit
 
 ## 2. Bestätigte Entscheidungen
@@ -33,7 +32,7 @@ Alle Panels dürfen ausgeblendet werden. Trotzdem muss der Nutzer jederzeit ohne
 - [x] Ein permanenter `Layout`-Schalter liegt außerhalb des veränderbaren Workspace.
 - [x] Die Schnellstarterleiste liegt direkt unter dem festen oberen Bereich.
 - [x] Mobile Option A: Leiste bleibt einzeilig und kompakt; `Layout` bleibt fest sichtbar.
-- [x] Weitere Leisteninhalte dürfen bei Bedarf horizontal scrollen.
+- [x] Nur sekundäre Leisteninhalte dürfen horizontal scrollen.
 - [x] Keine zweite unnötige Navigation erzeugen.
 - [x] Resize bleibt in 0.3.0-D.
 - [x] Drag & Drop bleibt in 0.3.0-E.
@@ -42,19 +41,19 @@ Alle Panels dürfen ausgeblendet werden. Trotzdem muss der Nutzer jederzeit ohne
 
 ### Enthalten
 
-- [ ] feste kompakte Schnellstarterleiste
-- [ ] permanenter `Layout`-Schalter
-- [ ] Layout-Menü mit den fünf Kernpanels
-- [ ] jedes Panel einzeln ein-/ausblendbar
-- [ ] `Alle anzeigen`
-- [ ] `Standardlayout wiederherstellen`
-- [ ] Sichtbarkeit über die zentrale Workspace-Zustandsverwaltung
-- [ ] automatische lokale Speicherung nach Sichtbarkeitsänderung
-- [ ] ausgeblendete Panels behalten Reihenfolge und Größe
-- [ ] verständliches Nutzerfeedback
-- [ ] Tastaturbedienung und Fokusführung
-- [ ] automatische Tests und Quality-Gate-Prüfungen
-- [ ] Dokumentation, TODO und Manifeste synchronisieren
+- [x] feste kompakte Schnellstarterleiste
+- [x] permanenter `Layout`-Schalter
+- [x] Layout-Menü mit den fünf Kernpanels
+- [x] jedes Panel einzeln ein-/ausblendbar
+- [x] `Alle anzeigen`
+- [x] `Standardlayout wiederherstellen`
+- [x] Sichtbarkeit über die zentrale Workspace-Zustandsverwaltung
+- [x] automatische lokale Speicherung nach Sichtbarkeitsänderung
+- [x] ausgeblendete Panels behalten Reihenfolge und Größe
+- [x] verständliches Nutzerfeedback
+- [x] Tastaturbedienung und Fokusführung für die neue Menüfunktion
+- [x] automatische Tests und Quality-Gate-Prüfungen
+- [x] Dokumentation, TODO und Manifeste synchronisieren
 
 ### Nicht enthalten
 
@@ -71,26 +70,26 @@ Alle Panels dürfen ausgeblendet werden. Trotzdem muss der Nutzer jederzeit ohne
 
 ### 4.1 Zustandslogik bleibt zentral
 
-Die Datei `assets/workspace-state.js` bleibt die einzige verbindliche Quelle für Workspace-Zustand und Speicherung.
+`assets/workspace-state.js` bleibt die einzige verbindliche Quelle für Workspace-Zustand und Speicherung.
 
-Neue sichtbare Bedienlogik darf nicht selbst `localStorage` schreiben.
+Die sichtbare Bedienlogik schreibt nicht selbst in `localStorage`.
 
-### 4.2 UI-Logik wird getrennt
+### 4.2 UI-Logik ist getrennt
 
-Eine kleine Datei `assets/workspace-ui.js` übernimmt ausschließlich:
+`assets/workspace-ui.js` übernimmt ausschließlich:
 
 - DOM-Zuordnung der Panels
 - Anzeigen/Ausblenden
 - Layout-Menü öffnen/schließen
 - Fokusführung
 - Nutzerfeedback
-- Verbindung zwischen Klick/Tastatur und Workspace-API
+- Verbindung zwischen Bedienaktion und Workspace-API
 
-Sie erhält keinen eigenen persistenten Zustand.
+Die Datei besitzt keinen eigenen persistenten Layoutzustand.
 
 ### 4.3 Stabile Panel-Zuordnung
 
-Die fünf sichtbaren Panels erhalten `data-workspace-panel` mit den stabilen Vertrags-IDs:
+Die fünf sichtbaren Panels verwenden `data-workspace-panel` mit den Vertrags-IDs:
 
 1. `overview`
 2. `modules`
@@ -98,100 +97,100 @@ Die fünf sichtbaren Panels erhalten `data-workspace-panel` mit den stabilen Ver
 4. `details`
 5. `system-status`
 
-Sichtbare deutsche Überschriften bleiben davon getrennt.
+Die Schalter im Layout-Menü verwenden dieselben IDs über `data-layout-panel`.
 
 ### 4.4 Kurze Funktionen
 
-Bevorzugte kleine Aufgaben:
+Die Bedienlogik ist in kleine Aufgaben getrennt, unter anderem:
 
 - `zustandAnwenden()`
 - `menueSetzen()`
-- `panelSichtbarkeitSetzen()`
+- `panelSichtbarkeitAendern()`
 - `alleAnzeigen()`
 - `standardWiederherstellen()`
 - `statusMelden()`
-- `fokusNachAktionSetzen()`
+- `aktionAusfuehren()`
 
-Keine Funktion soll gleichzeitig Zustand berechnen, Browserdaten schreiben und UI rendern.
+Browser-Speicherung bleibt vollständig in der State-Schicht.
 
-## 5. Schrittfolge
+## 5. Schrittfolge und Checkliste
 
 ### 5.1 Vorprüfung
 
-- [ ] aktuellen `main`-Stand bestätigen
-- [ ] bestehende IDs, Raster und Breakpoints prüfen
-- [ ] vorhandene Workspace-API vollständig lesen
-- [ ] keine bestehende Funktion doppelt implementieren
-- [ ] Diff-Grenze festlegen
+- [x] aktuellen `main`-Stand `247b584e87f4e041e6f405932328659e895bfbb7` bestätigt
+- [x] bestehende IDs, Raster und Breakpoints geprüft
+- [x] vorhandene Workspace-API gelesen
+- [x] keine parallele Speicherung eingeführt
+- [x] Diff-Grenze auf Sichtbarkeit und feste Layoutsteuerung begrenzt
 
 ### 5.2 Workspace-State minimal erweitern
 
-- [ ] zentrale Methode für einzelne Panel-Sichtbarkeit ergänzen
-- [ ] zentrale Methode `allePanelsAnzeigen` ergänzen
-- [ ] unbekannte Panel-ID kontrolliert ablehnen
-- [ ] Änderungen immer über bestehende Normalisierung und Speicherung führen
-- [ ] Reset unverändert isoliert halten
+- [x] zentrale Methode `panelSichtbarkeitSetzen` ergänzt
+- [x] zentrale Methode `allePanelsAnzeigen` ergänzt
+- [x] unbekannte Panel-ID wird vor Zustandsänderung abgelehnt
+- [x] Änderungen laufen über vorhandene Normalisierung und Speicherung
+- [x] Reset bleibt isoliert auf dem Workspace-Schlüssel
+- [x] unveränderte Sichtbarkeit erzeugt keinen unnötigen neuen Zustand
 
 ### 5.3 HTML-Struktur
 
-- [ ] Schnellstarterleiste nach `topbar` und vor `main` einfügen
-- [ ] `Layout`-Schalter permanent sichtbar platzieren
-- [ ] Layout-Menü außerhalb von `main` anlegen
-- [ ] fünf Checkbox-/Schalterzeilen für Panels anlegen
-- [ ] `Alle anzeigen` und `Standardlayout wiederherstellen` integrieren
-- [ ] Live-Statusbereich für kurze Rückmeldungen ergänzen
-- [ ] `data-workspace-panel` an allen Kernpanels setzen
+- [x] Schnellstarterleiste nach `topbar` und vor `main` eingefügt
+- [x] `Layout`-Schalter permanent sichtbar platziert
+- [x] Layout-Menü außerhalb von `main` angelegt
+- [x] fünf Kontrollfelder für Panels angelegt
+- [x] `Alle anzeigen` integriert
+- [x] `Standardlayout wiederherstellen` integriert
+- [x] Live-Statusbereich ergänzt
+- [x] `data-workspace-panel` an allen Kernpanels gesetzt
 
 ### 5.4 CSS
 
-- [ ] Leiste kompakt und visuell klar gestalten
-- [ ] `Layout` als primäre feste Aktion behandeln
-- [ ] Menü optisch vom Workspace trennen
-- [ ] horizontales Überlaufen der sekundären Leistenfläche erlauben
-- [ ] auf Mobilgeräten `Layout` sichtbar halten
-- [ ] versteckte Panels zuverlässig aus dem Grid entfernen
-- [ ] Fokuszustände deutlich halten
-- [ ] `prefers-reduced-motion` respektieren
+- [x] Leiste kompakt und visuell klar gestaltet
+- [x] `Layout` als feste primäre Aktion behandelt
+- [x] Menü optisch vom Workspace getrennt
+- [x] sekundäre Leistenfläche kann horizontal überlaufen
+- [x] `Layout` bleibt auf Mobilgeräten im nicht scrollenden Primärbereich
+- [x] versteckte Panels werden zuverlässig aus dem Grid entfernt
+- [x] Fokuszustände für Buttons, Links und Kontrollfelder sichtbar
+- [x] bestehendes `prefers-reduced-motion` bleibt erhalten
 
 ### 5.5 Workspace-UI-Controller
 
-- [ ] Workspace-API beim Start anbinden
-- [ ] gespeicherten Zustand auf DOM anwenden
-- [ ] Menüschalter synchron halten
-- [ ] einzelne Sichtbarkeit setzen
-- [ ] alle Panels anzeigen
-- [ ] Standardlayout wiederherstellen
-- [ ] Menü per `Escape` schließen
-- [ ] Klick außerhalb schließt Menü kontrolliert
-- [ ] Fokus nach Aktionen nachvollziehbar setzen
-- [ ] keine Endlosschleife zwischen Rendern und Speichern erzeugen
+- [x] Workspace-API beim Start angebunden
+- [x] gespeicherten Zustand auf DOM angewendet
+- [x] Kontrollfelder mit Zustand synchronisiert
+- [x] einzelne Sichtbarkeit angebunden
+- [x] alle Panels anzeigen angebunden
+- [x] Standardlayout wiederherstellen angebunden
+- [x] Menü per `Escape` schließen
+- [x] Klick außerhalb schließt Menü kontrolliert
+- [x] Fokus nach `Escape` zum Layout-Schalter zurückführen
+- [x] keine Render-/Speicher-Endlosschleife erzeugt
+- [x] fehlerhafte UI-Aktion fällt auf letzten gültigen Zustand zurück
 
 ### 5.6 Nutzerfeedback
 
-Nach jeder Layoutaktion gilt:
-
-`Aktion -> Ergebnis -> sicherer nächster Zustand`
-
-Beispiele:
-
-- `Module ausgeblendet.`
-- `Alle Bereiche sind wieder sichtbar.`
-- `Standardlayout wiederhergestellt.`
-
-Fehler werden kurz und verständlich gemeldet und zusätzlich im Bereich `WORKSPACE` geloggt.
+- [x] `Module ausgeblendet.` bzw. entsprechender Bereichsname
+- [x] `Alle Bereiche sind wieder sichtbar.`
+- [x] `Standardlayout wiederhergestellt.`
+- [x] Fehler meldet, dass der bisherige Zustand erhalten bleibt
+- [x] technische Fehler zusätzlich im Bereich `WORKSPACE` geloggt
 
 ### 5.7 Automatische Tests
 
-- [ ] einzelnes Panel ausblenden und speichern
-- [ ] Panel wieder anzeigen und gespeicherte Größe/Reihenfolge erhalten
-- [ ] alle fünf Panels ausblenden dürfen
-- [ ] `allePanelsAnzeigen` stellt nur Sichtbarkeit auf `true`
-- [ ] Reset stellt vollständigen Standardzustand wieder her
-- [ ] unbekannte Panel-ID verändert keinen Zustand
-- [ ] UI wendet gespeicherten Zustand auf alle fünf DOM-Panels an
-- [ ] `Layout`-Schalter liegt statisch außerhalb des Workspace
-- [ ] alle fünf `data-workspace-panel`-IDs stimmen mit dem Vertrag überein
-- [ ] Script-Reihenfolge bleibt deterministisch
+- [x] einzelnes Panel ausblenden
+- [x] Panel wieder anzeigen und gespeicherte Größe/Reihenfolge erhalten
+- [x] alle fünf Panels ausblenden dürfen
+- [x] `allePanelsAnzeigen` stellt Sichtbarkeit wieder her
+- [x] Reset stellt Standardzustand wieder her
+- [x] unbekannte Panel-ID verändert keinen Zustand
+- [x] UI wendet gespeicherte Sichtbarkeit auf DOM und Kontrollfelder an
+- [x] sichtbare Aktion aktualisiert Nutzerfeedback
+- [x] `Alle anzeigen` in UI geprüft
+- [x] Reset in UI geprüft
+- [x] Layout-Menü per `Escape` schließen und Fokus zurückführen
+- [x] statische Zuordnung der fünf Vertrags-IDs im Quality Gate geprüft
+- [x] Script-Reihenfolge deterministisch geprüft
 
 ### 5.8 Quality Gate
 
@@ -201,29 +200,33 @@ Kanonischer Befehl:
 npm run verify
 ```
 
-Er muss zusätzlich prüfen:
+Implementierte Prüfungen:
 
-- neue UI-Datei vorhanden
-- Script-Reihenfolge korrekt
-- Layout-Schalter vorhanden
-- Panel-Zuordnung vollständig und eindeutig
-- keine externen Laufzeitabhängigkeiten
-- alle automatischen Tests grün
+- [x] neue UI-Datei als Pflichtdatei
+- [x] UI-Test als Pflichtdatei
+- [x] Script-Reihenfolge korrekt
+- [x] Layout-Schalter vorhanden
+- [x] Panel-Zuordnung vollständig und eindeutig
+- [x] Vertrags-IDs werden direkt aus `assets/workspace-state.js` abgeleitet
+- [x] keine externen Laufzeitabhängigkeiten
+- [ ] GitHub-Quality-Gate dieses PRs erfolgreich abschließen
 
 ### 5.9 Dokumentation
 
-- [ ] `README.md`
-- [ ] `TODO.md`
-- [ ] `CHANGELOG.md`
-- [ ] `MANIFEST.md`
-- [ ] `VERSION.json` nur als Entwicklungsphase aktualisieren
-- [ ] `docs/STATUS_0.3.0.md`
-- [ ] `docs/DECISIONS_0.3.0.md`
-- [ ] `docs/MANIFEST_0.3.0_C.md`
+- [x] `README.md`
+- [x] `TODO.md`
+- [x] `CHANGELOG.md`
+- [x] `MANIFEST.md`
+- [x] `LOGGING.md`
+- [x] `PRO_DEBUGGING.md`
+- [x] `VERSION.json` nur als Entwicklungsphase aktualisiert
+- [x] `docs/STATUS_0.3.0.md`
+- [x] `docs/DECISIONS_0.3.0.md`
+- [x] `docs/MANIFEST_0.3.0_C.md`
 
 ## 6. Änderungsvolumen
 
-**Erwartete Einstufung: mittel.**
+**Einstufung: mittel.**
 
 Hauptbetroffen:
 
@@ -247,19 +250,19 @@ Nicht betroffen:
 
 ### Risiko: Nutzer blendet alles aus
 
-Schutz: `Layout` bleibt außerhalb des Workspace permanent sichtbar.
+Schutz: `Layout` liegt außerhalb des Workspace und wird vom Quality Gate statisch abgesichert.
 
 ### Risiko: UI und gespeicherter Zustand laufen auseinander
 
-Schutz: Rendern liest ausschließlich aus der zentralen Workspace-API.
+Schutz: Rendern liest aus der zentralen Workspace-API. Die UI besitzt keinen eigenen persistenten Zustand.
 
 ### Risiko: doppelte Speicherung
 
-Schutz: nur Workspace-State schreibt persistent; UI ruft nur dessen Methoden auf.
+Schutz: nur Workspace-State schreibt persistent.
 
 ### Risiko: Mobile Leiste wird unbedienbar
 
-Schutz: `Layout` liegt im festen, nicht scrollenden Primärbereich. Nur sekundärer Inhalt darf horizontal überlaufen.
+Schutz: `Layout` liegt im festen, nicht scrollenden Primärbereich. Nur der sekundäre Statusbereich darf horizontal überlaufen.
 
 ### Risiko: Reset löscht andere Daten
 
@@ -269,18 +272,18 @@ Schutz: bestehender isolierter Reset-Vertrag bleibt unverändert.
 
 0.3.0-C ist erst abgeschlossen, wenn:
 
-- [ ] alle fünf Panels einzeln steuerbar sind
-- [ ] alle fünf gleichzeitig ausgeblendet werden können
-- [ ] `Layout` trotzdem erreichbar bleibt
-- [ ] `Alle anzeigen` funktioniert
-- [ ] Standardlayout reproduzierbar wiederhergestellt wird
-- [ ] Reihenfolge und Größe beim Aus-/Einblenden erhalten bleiben
-- [ ] Maus und Tastatur funktionieren
-- [ ] sichtbares Feedback verständlich ist
-- [ ] keine neue externe Abhängigkeit existiert
+- [x] alle fünf Panels einzeln steuerbar sind
+- [x] alle fünf gleichzeitig ausgeblendet werden können
+- [x] `Layout` trotzdem außerhalb des Workspace vorhanden ist
+- [x] `Alle anzeigen` funktioniert
+- [x] Standardlayout reproduzierbar wiederhergestellt wird
+- [x] Reihenfolge und Größe beim Aus-/Einblenden erhalten bleiben
+- [x] neue Bedienung per Maus und Tastatur bedienbar ist
+- [x] sichtbares Feedback verständlich ist
+- [x] keine neue externe Abhängigkeit existiert
 - [ ] Branch-Diff geprüft ist
 - [ ] Branch nicht hinter `main` liegt
-- [ ] `npm run verify` erfolgreich ist
+- [ ] `npm run verify` im Pull Request erfolgreich ist
 - [ ] PR mergebar ist
 - [ ] Merge und Main-Stichprobe erfolgt sind
 
@@ -292,7 +295,7 @@ Workspace-Layoutdaten bleiben versionsgebunden. Es gibt keine serverseitige Migr
 
 ## 10. Nächste zwei Schritte
 
-### Danach 0.3.0-D – Resize
+### 0.3.0-D – Resize
 
 1. Breite in ganzen Rastereinheiten ändern
 2. Höhe innerhalb gültiger Grenzen ändern
@@ -300,7 +303,7 @@ Workspace-Layoutdaten bleiben versionsgebunden. Es gibt keine serverseitige Migr
 4. nur validierte Endwerte speichern
 5. Desktopwerte bei kleineren Viewports erhalten
 
-### Danach 0.3.0-E – Reorder & Drag and Drop
+### 0.3.0-E – Reorder & Drag and Drop
 
 1. dedizierten Drag-Griff ergänzen
 2. nur Reihenfolge verändern
@@ -310,4 +313,4 @@ Workspace-Layoutdaten bleiben versionsgebunden. Es gibt keine serverseitige Migr
 
 ## Empfehlung
 
-0.3.0-C ausschließlich auf Sichtbarkeit, feste Schnellstarterleiste und sicheren Wiederherstellungsweg begrenzen. Resize und Drag & Drop nicht vorziehen. Dadurch bleibt die neue Bedienmechanik klein, testbar und bei Fehlern leicht rückgängig zu machen.
+0.3.0-C nur nach erfolgreichem Diff-Check und grünem Quality Gate mergen. Danach ausschließlich `0.3.0-D – Resize` beginnen. Drag & Drop bleibt bis `0.3.0-E` gesperrt.
