@@ -57,23 +57,9 @@ Kernpanels:
 4. `details`
 5. `system-status`
 
-Gespeichert werden nur:
+Gespeichert werden nur Reihenfolge, Sichtbarkeit, Rasterbreite und optionale Höhe.
 
-- Reihenfolge
-- Sichtbarkeit
-- Rasterbreite
-- optionale Höhe
-
-Nicht gespeichert werden:
-
-- Fachinhalte
-- Debuglogs
-- Modul-Laufzeitstatus
-- Fokus
-- Scrollposition
-- Zeigerposition
-- Resize-/Drag-Vorschau
-- Browserfenstergröße
+Nicht gespeichert werden Fachinhalte, Debuglogs, Modul-Laufzeitstatus, Fokus, Scrollposition, Zeigerposition, Resize-/Drag-Vorschau oder Browserfenstergröße.
 
 ---
 
@@ -83,14 +69,6 @@ Nicht gespeichert werden:
 
 **Status: 🟢 abgeschlossen**
 
-Ergebnis:
-
-- stabile Panel-IDs
-- 12-Spalten-Raster
-- Sichtbarkeits-, Größen- und Resetregeln
-- persistente und temporäre Zustände getrennt
-- responsive Rückfallregeln
-
 Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 ## 0.3.0-B – State Foundation & Autosave/Reset
@@ -98,16 +76,6 @@ Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 **Status: 🟢 abgeschlossen**
 
 Detailplan: `docs/PLAN_0.3.0_B.md`
-
-Ergebnis:
-
-- zentrale Zustandsverwaltung
-- Standardzustand
-- Validierung und Normalisierung
-- lokale Speicherung
-- isolierter Reset
-- kontrollierte Speicherfehler
-- automatische Tests
 
 Abnahme:
 
@@ -123,20 +91,6 @@ Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
 
 Detailplan: `docs/PLAN_0.3.0_C.md`
 
-Ergebnis:
-
-- kompakte feste Schnellstarter-/Menüleiste
-- permanenter `Layout`-Schalter außerhalb des Workspace
-- Mobile Option A: `Layout` bleibt fest sichtbar
-- fünf Panels einzeln ein-/ausblendbar
-- alle fünf gleichzeitig ausblendbar
-- `Alle anzeigen`
-- `Standardlayout wiederherstellen`
-- Größenwerte beim Aus-/Einblenden erhalten
-- entkoppelte `assets/workspace-ui.js`
-- Live-Nutzerfeedback
-- Tastatur-/Fokus-Grundlage
-
 Abnahme:
 
 - technischer PR #68
@@ -150,37 +104,53 @@ Merge: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
 
 ## 0.3.0-D – Resize
 
-**Status: 🟡 Vertrag und Implementierungsplan werden festgelegt**
+**Status: 🟡 Planungs-/Vertragsphase abgeschlossen; technische Implementierung ist nächster Schritt**
 
 Detailplan: `docs/PLAN_0.3.0_D.md`
 
 Resize-Vertrag: `docs/RESIZE_CONTRACT_0.3.0.md`
 
-Bestätigte Option A:
+Planungsabnahme:
 
-- [x] ein klarer Resize-Griff pro sichtbarem Panel
-- [x] Maus/Touch/Stift über gemeinsame Pointer Events
-- [x] derselbe Griff per Tastatur bedienbar
-- [x] Breite in Schritten von 1 Rastereinheit
-- [x] Höhe in Schritten von 24 px
-- [x] Pointer-/Tastaturbewegungen erzeugen nur Vorschau
-- [x] Persistenz erst nach validiertem Abschluss
-- [x] `Home` stellt einzelne Panelgröße auf Standard zurück
-- [x] Resize in 0.3.0-D nur ab 981 px aktiv
-- [x] gespeicherte Desktopwerte bleiben auf Tablet/Mobil unverändert
-- [x] keine zweite vollständige Größensteuerung im Layout-Menü
+- Planungs-PR #70
+- 9 geänderte Dokumentations-/Metadatendateien
+- Branch 0 Commits hinter `main`
+- Quality Gate `success`
+- 42 Dateien statisch geprüft
+- bestehende Tests 18/18 erfolgreich
+- 0 fehlgeschlagen
+- Main-Stichprobe erfolgt
 
-Technische Reihenfolge nach Planungsmerge:
+Planungs-Merge:
 
-1. State-API für Größenänderung
+`c41b958b6a1aa426cd427be4f633742b21e404d0`
+
+Verbindliche Resize-Regeln:
+
+- ein klarer Resize-Griff pro sichtbarem Panel
+- Maus/Touch/Stift über gemeinsame Pointer Events
+- derselbe Griff per Tastatur bedienbar
+- Breite: Schritt 1 Rastereinheit
+- Höhe: Schritt 24 px
+- Pointer-/Tastaturbewegungen erzeugen nur Vorschau
+- Persistenz erst nach validiertem Abschluss
+- `Home` stellt die einzelne Panelgröße auf Standard zurück
+- Resize in 0.3.0-D aktiv ab 981 px
+- gespeicherte Desktopwerte bleiben auf Tablet/Mobil unverändert
+- keine zweite vollständige Größensteuerung im Layout-Menü
+- Drag & Drop bleibt bis 0.3.0-E gesperrt
+
+Technische Reihenfolge:
+
+1. State-API `panelGroesseSetzen` und `panelGroesseZuruecksetzen`
 2. reine Raster-/Höhenberechnung
 3. automatische Tests
-4. DOM-Anwendung gespeicherter Größen
+4. gespeicherte Größen zentral auf DOM anwenden
 5. Resize-Griffe
 6. Pointer-Controller
 7. Tastatursteuerung
 8. Responsive-/Abbruchhärtung
-9. Quality Gate und Release-Dokumentation der Teilstufe
+9. Quality Gate und Dokumentationsabschluss
 
 Abnahmekriterium:
 
@@ -188,7 +158,7 @@ Kein Panel darf einen ungültigen Größenwert persistieren. Eine laufende Grö�
 
 ## 0.3.0-E – Reorder & Drag and Drop
 
-**Status: ⚪ geplant und bis D-Abnahme gesperrt**
+**Status: ⚪ geplant und bis vollständiger D-Abnahme gesperrt**
 
 - [ ] Ziehen nur über dedizierten Drag-Griff.
 - [ ] Resize-Griff darf keinen Drag starten.
@@ -213,27 +183,18 @@ Kein Panel darf einen ungültigen Größenwert persistieren. Eine laufende Grö�
 
 **Status: ⚪ geplant**
 
-Automatisch:
-
 - [ ] `npm run verify` vollständig grün.
 - [ ] alle Workspace-Tests grün.
 - [ ] keine unbeabsichtigten externen Laufzeitverweise.
 - [ ] Versionen und Manifeste konsistent.
 - [ ] GitHub-Actions-Workflow-Hygiene prüfen.
-
-Manuell:
-
-- [ ] Firefox komplett.
-- [ ] Chrome stichprobenartig.
-- [ ] Desktop, Tablet, Mobil.
+- [ ] Firefox komplett prüfen.
+- [ ] Chrome stichprobenartig prüfen.
+- [ ] Desktop, Tablet, Mobil prüfen.
 - [ ] Sichtbarkeit, Resize, Neuordnung, Tastatur und Reset komplett prüfen.
-
-Release:
-
 - [ ] README, TODO, CHANGELOG und MANIFEST finalisieren.
 - [ ] VERSION erst nach vollständiger Abnahme auf `0.3.0` erhöhen.
-- [ ] Release-PR mergen.
-- [ ] `main` erneut stichproartig prüfen.
+- [ ] Release-PR mergen und `main` erneut stichproartig prüfen.
 
 ---
 
@@ -260,7 +221,7 @@ Sichtbare Layoutaktionen folgen dem Muster:
 
 `Aktion -> Ergebnis -> sicherer Zustand`
 
-Resize ergänzt zusätzlich eine kompakte Vorschau der aktuellen Zielgröße, ohne pro Bewegung technische Logmeldungen zu erzeugen.
+Resize ergänzt eine kompakte Vorschau der aktuellen Zielgröße, ohne pro Bewegung technische Logmeldungen zu erzeugen.
 
 Technisches Logging und sichtbares Nutzerfeedback bleiben getrennt.
 
@@ -268,9 +229,7 @@ Technisches Logging und sichtbares Nutzerfeedback bleiben getrennt.
 
 # 6. Rückweg
 
-Jede Teilstufe erhält einen eigenen Pull Request.
-
-Der Resize-Planungs-Patch und der spätere technische Resize-Patch bleiben getrennt. Dadurch kann fehlerhafte Laufzeitlogik zurückgenommen werden, ohne den freigegebenen Stand 0.3.0-C zu beschädigen.
+Jede Teilstufe erhält einen eigenen Pull Request. Resize-Planung und Resize-Laufzeit bleiben getrennte PRs. Dadurch kann fehlerhafte Laufzeitlogik zurückgenommen werden, ohne den stabilen Stand 0.3.0-C oder den freigegebenen Resize-Vertrag zu beschädigen.
 
 Workspace-Reset darf niemals `localStorage.clear()` verwenden.
 
@@ -278,7 +237,7 @@ Workspace-Reset darf niemals `localStorage.clear()` verwenden.
 
 # 7. Infrastrukturhinweis
 
-GitHub Actions meldet bei den derzeit verwendeten Actions `v4` weiterhin einen Hinweis zur auslaufenden internen Node-20-Laufzeit. Das Projekt-Quality-Gate von 0.3.0-C lief erfolgreich mit Node `20.20.2`.
+GitHub Actions meldet bei den derzeit verwendeten Actions `v4` weiterhin einen Hinweis zur auslaufenden internen Node-20-Laufzeit. Das Projekt-Quality-Gate läuft erfolgreich mit Node `20.20.2`.
 
 Die Workflow-Hygiene bleibt getrennt und wird spätestens in 0.3.0-G geprüft.
 
@@ -286,9 +245,11 @@ Die Workflow-Hygiene bleibt getrennt und wird spätestens in 0.3.0-G geprüft.
 
 # 8. Nächste zwei Schritte
 
-1. **0.3.0-D Implementierung:** zuerst State-API und reine Größenberechnung, danach Resize-Griff und Eingabesteuerung.
-2. **0.3.0-E – Reorder & Drag and Drop:** erst nach vollständig grünem Resize-Merge.
+1. **0.3.0-D State-API + Größenberechnung:** zuerst die persistenten Größenmethoden und reine Berechnung implementieren und testen.
+2. **0.3.0-D Resize-Griffe + Eingabe:** danach Pointer-/Tastaturbedienung auf die geprüfte Logik setzen.
+
+Anschließend erst `0.3.0-E – Reorder & Drag and Drop`.
 
 ## Empfehlung
 
-Den technischen Resize-Patch **nicht** mit sichtbarem Ziehen beginnen. Zuerst `panelGroesseSetzen`, `panelGroesseZuruecksetzen` und die reine Raster-/Höhenberechnung implementieren und testen. Dadurch arbeitet die spätere Bedienung nur noch gegen bereits validierte Größenfunktionen.
+Den technischen Resize-Patch jetzt ausschließlich mit State-API, Rasterberechnung und Tests beginnen. Sichtbare Ziehlogik erst anschließen, wenn diese Basis grün ist.
