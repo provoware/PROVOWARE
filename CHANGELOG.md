@@ -2,6 +2,13 @@
 
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
+### Entwicklungsqualität
+
+#### Geändert
+
+- Unerwartete interne Fehler der Qualitätsschranke enden kontrolliert mit Ursache und nächstem Prüfschritt statt mit einem technischen Stapelabdruck.
+- Ein automatischer Fehlerfall sichert verständliche Diagnoseausgabe und den Fehler-Exitcode ab.
+
 ### Erscheinungsbild nach Referenz
 
 #### Geändert

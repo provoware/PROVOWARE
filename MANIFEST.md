@@ -155,6 +155,7 @@ Bestehend:
 - `.editorconfig`
 - `package.json`
 - `scripts/quality-check.mjs`
+- `tests/quality-check.test.mjs`
 - `tests/module-registry.test.mjs`
 - `tests/workspace-state.test.mjs`
 - `tests/workspace-ui.test.mjs`
@@ -185,15 +186,14 @@ npm run verify
 
 ## Aktueller Patchtyp
 
-**Nur Dokumentation und Entwicklungsmetadaten.**
+**Kleine Härtung der Entwicklungsprüfung mit gezieltem Regressionstest.**
 
 Keine Änderung an:
 
 - HTML
 - CSS
 - JavaScript-Laufzeit
-- Testcode
-- Quality-Gate-Code
+- Produktdaten und öffentlichen Browser-Schnittstellen
 - Browser-Speicherung
 
 ## Nächste zwei technischen Schritte
