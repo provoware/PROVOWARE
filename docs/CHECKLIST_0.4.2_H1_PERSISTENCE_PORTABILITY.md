@@ -39,7 +39,7 @@
 
 - [x] H1-Pflichtdateien und Architekturregeln im zentralen Quality Gate verankern.
 - [x] VERSION auf H1-Vertrag aktualisieren; Produktversion und Datenschemata unverändert lassen.
-- [ ] TODO/README/MANIFEST/CHANGELOG synchronisieren.
+- [x] TODO/README/MANIFEST/CHANGELOG synchronisieren und historische Detailduplikation verdichten.
 - [x] erster H1-Core-Gate: Node 20 grün.
 - [x] erster H1-Core-Gate: Node 24 grün.
 - [x] erster H1-Core-Gate: 44 JavaScript-Dateien, 109 Projektdateien, 112/112 Node-Tests.
