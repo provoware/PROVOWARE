@@ -1,0 +1,52 @@
+name: Persistence Portability Gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/persistence-portability.yml"
+      - "scripts/atomic-file.mjs"
+      - "scripts/project-data-service.mjs"
+      - "scripts/project-data-recovery.mjs"
+      - "scripts/data-studio-pro-service.mjs"
+      - "tests/atomic-file.test.mjs"
+      - "tests/project-data-recovery.test.mjs"
+      - "tests/data-studio-pro-service.test.mjs"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/persistence-portability.yml"
+      - "scripts/atomic-file.mjs"
+      - "scripts/project-data-service.mjs"
+      - "scripts/project-data-recovery.mjs"
+      - "scripts/data-studio-pro-service.mjs"
+      - "tests/atomic-file.test.mjs"
+      - "tests/project-data-recovery.test.mjs"
+      - "tests/data-studio-pro-service.test.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  portability:
+    name: Persistenz · ${{ matrix.os }} · Node 20
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v7
+
+      - name: Node 20 bereitstellen
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Portability-Vertrag prüfen
+        run: node --test tests/atomic-file.test.mjs tests/project-data-recovery.test.mjs tests/data-studio-pro-service.test.mjs

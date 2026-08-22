@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { atomicReplaceFile } from "./atomic-file.mjs";
 import {
   ProjectDataError,
   readProjectDatabase,
@@ -179,16 +180,16 @@ export const writeDataStudioProAtomic = async (
   validateStoredDataStudioPro(stored);
   const filePath = path.join(root, DATA_STUDIO_PRO_RELATIVE_PATH);
   await mkdir(path.dirname(filePath), { recursive: true });
-  const tempPath = `${filePath}.tmp-${process.pid}-${randomUUID()}`;
   const source = `${JSON.stringify(stored, null, 2)}\n`;
-  try {
-    await writeFile(tempPath, source, { encoding: "utf8", flag: "wx" });
-    if (beforeRename) await beforeRename({ tempPath, filePath, stored });
-    await rename(tempPath, filePath);
-  } catch (error) {
-    await unlink(tempPath).catch(() => {});
-    throw error;
-  }
+  await atomicReplaceFile(filePath, source, {
+    beforeRename: beforeRename
+      ? ({ tempPath, filePath: targetPath }) => beforeRename({
+        tempPath,
+        filePath: targetPath,
+        stored,
+      })
+      : null,
+  });
 };
 
 const ensureTemplateExists = async (root, templateId) => {
