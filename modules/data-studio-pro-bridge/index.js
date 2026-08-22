@@ -3,6 +3,7 @@
 
   const MODULE_ID = "data-studio-pro-bridge";
   let listenersAbort = null;
+  let revisionObserver = null;
 
   const log = (level, message, data) => {
     window.PROVOWARE_DEBUG?.log(level, "DATA-STUDIO-PRO", message, data);
@@ -35,6 +36,25 @@
     });
   };
 
+  const dispatchRevision = (revisionNode) => {
+    const text = revisionNode?.textContent || "";
+    const revision = Number(text.match(/\d+/)?.[0]);
+    window.dispatchEvent(new CustomEvent("provoware:data-studio-refreshed", {
+      detail: { revision: Number.isInteger(revision) ? revision : null },
+    }));
+  };
+
+  const bindRevisionBridge = () => {
+    const revisionNode = baseStudio()?.querySelector("[data-data-studio-revision]");
+    if (!revisionNode || typeof MutationObserver !== "function") return;
+    revisionObserver = new MutationObserver(() => dispatchRevision(revisionNode));
+    revisionObserver.observe(revisionNode, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  };
+
   const bind = () => {
     listenersAbort = new AbortController();
     const signal = listenersAbort.signal;
@@ -54,21 +74,25 @@
         log(1, "PRO-Datensatznavigation fehlgeschlagen.", { message: error.message });
       }
     }, { signal });
+
+    bindRevisionBridge();
   };
 
   const unbind = () => {
     listenersAbort?.abort();
     listenersAbort = null;
+    revisionObserver?.disconnect();
+    revisionObserver = null;
   };
 
   window.PROVOWARE_MODULES.define(MODULE_ID, {
     async activate() {
       if (!listenersAbort) bind();
-      log(2, "Data-Studio-PRO-Navigationsbrücke aktiviert.");
+      log(2, "Data-Studio-PRO-Navigations- und Revisionsbrücke aktiviert.");
     },
     async deactivate() {
       unbind();
-      log(2, "Data-Studio-PRO-Navigationsbrücke deaktiviert.");
+      log(2, "Data-Studio-PRO-Navigations- und Revisionsbrücke deaktiviert.");
     },
     async dispose() {
       unbind();
