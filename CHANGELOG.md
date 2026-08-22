@@ -2,6 +2,42 @@
 
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
+### 0.3.0-D3a – Keyboard Resize Preview
+
+#### Hinzugefügt
+
+- `assets/workspace-resize.js` als entkoppelte Eingabeschicht für sichtbaren Resize-Griff und Tastaturbedienung.
+- genau ein dynamisch erzeugter Resize-Griff pro Workspace-Panel mit ungefähr 44 × 44 px Trefferfläche.
+- zugängliche deutsche Griffbeschriftung und `aria-keyshortcuts` für Pfeile, `Home` und `Escape`.
+- flüchtiger Tastatur-Vorschauzustand ohne Zwischen-Speicherung.
+- gebündelter Größen-Commit erst nach Freigabe der letzten aktiven Resize-Pfeiltaste.
+- `Escape` zum Verwerfen der laufenden Vorschau ohne Persistenz.
+- `Home` zum Zurücksetzen ausschließlich der aktuellen Panelgröße.
+- logische Responsive-Sperre bis einschließlich 980 px zusätzlich zur visuellen CSS-Sperre.
+- neue Tests `tests/workspace-resize.test.mjs` und `tests/workspace-resize-load.test.mjs`.
+
+#### Geändert
+
+- `assets/workspace-ui.js` stellt mit `panelGroesseVorschauAnwenden` dieselbe CSS-Variablen-Darstellung nun auch für nicht persistente Vorschauwerte bereit.
+- `assets/workspace-layout.css` ergänzt Griff-, Aktiv- und Vorschau-Darstellung ausschließlich ab 981 px.
+- `assets/app.js` initialisiert die Resize-Eingabeschicht erst nach Workspace-State und Workspace-UI.
+- `index.html` lädt `workspace-size.js` und `workspace-resize.js` in deterministischer Reihenfolge vor `app.js`.
+- interne Entwicklungsphase auf `0.3.0-D3a Keyboard Resize Preview` fortgeschrieben; Produktversion und Workspace-Vertragsversion bleiben unverändert.
+
+#### Validiert
+
+- technischer PR #78 war beim finalen Diff-Check 0 Commits hinter `main` und mergebar.
+- GitHub Quality Gate erfolgreich: 56 Dateien geprüft, 48/48 Tests erfolgreich, 0 fehlgeschlagen.
+- Squash-Merge: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`.
+
+#### Bewusst noch nicht enthalten
+
+- keine Pointer-/Maus-/Touch-/Stift-Ziehbedienung
+- kein Pointer Capture
+- kein Drag & Drop
+- keine neue persistente State-Struktur
+- keine neue Bibliothek
+
 ### Entwicklungsqualität
 
 #### Geändert
