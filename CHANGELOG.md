@@ -1,5 +1,57 @@
 # CHANGELOG
 
+## In Entwicklung – 0.4.1-E2E Chromium Gate & HTML UI Mirror
+
+### Hinzugefügt
+
+- Chromium als primäres echtes Browser-E2E-Projekt über Playwright `1.62.1`.
+- Firefox als separater optionaler Kompatibilitätslauf statt als automatischer Hauptblocker.
+- isolierter Browser-Testserver `scripts/browser-e2e-server.mjs`, der jede E2E-Ausführung in einer temporären Projektkopie startet.
+- vollständige Browserkette `Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import`.
+- automatische Screenshot-Evidenz für Start, Datensatzerstellung, Restore, Import und HTML-Mirror.
+- proportionale HTML-Mirror-Pipeline, die zweimal dieselbe echte `index.html` mit identischem internem Viewport lädt.
+- Geometrieprüfung zentraler UI-Rechtecke zwischen Referenz und Spiegel.
+- separater GitHub-Actions-Workflow `Browser E2E Gate` mit automatischem Chromium-Lauf bei Pull Requests und `main`-Pushes.
+- Artefakt-Upload für Screenshots, Exportdatei, Playwright-Report sowie Fehler-Trace/Video.
+- statische Browser-E2E-Vertragstests im bestehenden paketfreien Node-Gate.
+- Plan, Checkpoint und Abnahmecheckliste für Browser-E2E und HTML-Mirror.
+
+### Geändert
+
+- `assets/project-data.css` reagiert auf die tatsächliche Containerbreite statt nur auf die Browserbreite.
+- Project-Data-Karten sind im schmalen Detailpanel einspaltig und wechseln erst bei ausreichender Fachmodulbreite in mehrspaltige Darstellung.
+- Feldzeilen und Datensatzaktionen werden ebenfalls containerabhängig angeordnet.
+- interaktive Project-Data-Controls besitzen Scroll-Abstand zur sticky Schnellstarterleiste.
+- `package.json` enthält getrennte Chromium-/Firefox-Browserbefehle; normale Runtime-Abhängigkeiten bleiben unverändert leer.
+- `scripts/quality-check.mjs` verankert Browserworkflow, Mirror-Dateien, Chromium-Priorität und Firefox-Alternativstatus als Pflichtvertrag.
+- Browserartefakte, Reports, Testresultate und `node_modules` sind im Root-`.gitignore` ausgeschlossen.
+
+### Durch echten Browserlauf gefunden und repariert
+
+- der erste vollständig gestartete Chromium-Test zeigte, dass sich im schmalen Detailpanel die viewport-basierte Zwei-Spalten-Darstellung von Data Studio/Recovery überlagerte.
+- der sichtbare Button `Neue Vorlage` konnte dadurch von `Neuer Datensatz` oder nach Scrollbewegung von der sticky Schnellleiste abgefangen werden.
+- der Test wurde nicht mit erzwungenen Klicks abgeschwächt; stattdessen wurde die reale Layoutgeometrie container-responsiv repariert.
+- derselbe unveränderte Browserpfad lief nach der Reparatur vollständig grün.
+
+### Validiert
+
+- Core Quality Gate auf Node 20: PASS.
+- Core Quality Gate auf Node 24: PASS.
+- Core-Stand: `35` JavaScript-Dateien gelintet, `94` Projektdateien geprüft, `85/85` Node-Tests erfolgreich.
+- Chromium: `2/2` echte Browserprüfungen erfolgreich.
+- HTML-Mirror: PASS mit intern `1366 × 900`, Skalierungsfaktor `0,5`, sichtbarer Spiegelgröße `683 × 450` und identischer Schlüsselgeometrie.
+- Erfolgsartefakt enthält tatsächlich sechs PNG-Screenshots und einen validierten Project-Data-JSON-Export.
+- Firefox wurde im automatischen Lauf wie vorgesehen übersprungen.
+
+### Bewusst nicht enthalten
+
+- Firefox bleibt alternativ/manuell und ist kein automatischer Chromium-Ersatz.
+- keine OS-abhängigen Pixel-Diff-Screenshot-Baselines.
+- noch keine Windows-/macOS-CI-Matrix.
+- keine Änderungen am Project-Data-Produktionsschema v1.
+- keine Änderungen an Produktversion `0.2.0`.
+- keine 0.4.2-Suche/Filter/Vorlagenbibliothek in diesem Strang.
+
 ## In Entwicklung – 0.4.1 Recovery & Migration
 
 ### Hinzugefügt
