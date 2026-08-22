@@ -101,6 +101,32 @@ test("Vorlage und Datensatz werden versioniert persistiert und editierbar gehalt
   });
 });
 
+test("parallele Datensatzmutationen verlieren keine Schreibvorgänge", async () => {
+  await withTempRoot(async (root) => {
+    let nextId = 0;
+    const uuid = () => `parallel-${++nextId}`;
+    const template = await createTemplate(templateInput(), { root, uuid });
+
+    await Promise.all(Array.from({ length: 12 }, (_, index) => createRecord({
+      templateId: template.id,
+      values: {
+        titel: `Eintrag ${index + 1}`,
+        status: index % 2 ? "Erledigt" : "Offen",
+        fortschritt: index,
+      },
+    }, { root, uuid })));
+
+    const database = await readProjectDatabase(root);
+    assert.equal(database.records.length, 12);
+    assert.equal(database.revision, 13);
+    assert.equal(new Set(database.records.map((record) => record.id)).size, 12);
+    assert.deepEqual(
+      database.records.map((record) => record.values.titel).sort(),
+      Array.from({ length: 12 }, (_, index) => `Eintrag ${index + 1}`).sort(),
+    );
+  });
+});
+
 test("beschädigte Datenbank wird nicht still überschrieben", async () => {
   await withTempRoot(async (root) => {
     const filePath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
