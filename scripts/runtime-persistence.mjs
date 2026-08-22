@@ -109,18 +109,7 @@ export const atomicReplaceFile = async ({
       throw asPersistenceError(error, { phase, targetPath, tempPath, attempts: 0 });
     }
 
-    if (beforeReplace) {
-      try {
-        await beforeReplace({ tempPath, targetPath });
-      } catch (error) {
-        throw asPersistenceError(error, {
-          phase: "before-replace",
-          targetPath,
-          tempPath,
-          attempts: 0,
-        });
-      }
-    }
+    if (beforeReplace) await beforeReplace({ tempPath, targetPath });
 
     let lastError = null;
     for (let attempt = 1; attempt <= replaceAttempts; attempt += 1) {
