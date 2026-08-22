@@ -56,11 +56,14 @@
 - [x] Plan anlegen.
 - [x] Checkpoint anlegen.
 - [x] Checkliste anlegen.
-- [ ] README aktualisieren.
-- [ ] TODO aktualisieren.
-- [ ] CHANGELOG aktualisieren.
-- [ ] MANIFEST aktualisieren.
+- [x] README auf Chromium-first, Mirror, E2E-Befehle und reale Evidenz aktualisieren.
+- [x] TODO auf aktuellen Qualitätsstrang und Cross-OS-Folgeschritt aktualisieren.
+- [x] CHANGELOG mit E2E-Strang ergänzen und bestehende Historie erhalten.
+- [x] MANIFEST um Browser-, Mirror-, Isolierungs- und Evidenzvertrag erweitern.
 - [x] VERSION-Entwicklungsphase aktualisieren; Produktversion bleibt 0.2.0 und Datenschema v1.
+- [x] E2E-Metadaten und Container-Responsive-Reparatur zusätzlich mit paketfreien Node-Vertragstests absichern.
+- [ ] finalen Dokumentationsstand auf Node 20 und Node 24 grün prüfen.
+- [ ] finalen Dokumentationsstand im Chromium-Browser-Gate grün prüfen.
 - [ ] finalen Diff gegen `main` prüfen.
 - [ ] PR auf ready for review setzen.
 - [ ] Squash-Merge durchführen.
