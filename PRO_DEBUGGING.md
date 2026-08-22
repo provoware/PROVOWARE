@@ -2,15 +2,15 @@
 
 ## Ziel
 
-Fehler der HTML-Oberfläche, Modul-Registry und Workspace-Zustandsverwaltung reproduzierbar sichtbar machen, ohne den normalen Arbeitsbereich dauerhaft mit Diagnoseinformationen zu belasten.
+Fehler der HTML-Oberfläche, Modul-Registry und Workspace-Funktionen reproduzierbar sichtbar machen, ohne den normalen Arbeitsbereich dauerhaft mit Diagnoseinformationen zu belasten.
 
 ## Begriffe in einfacher Sprache
 
 - **Quality Gate (Qualitätsschranke):** automatische Prüfung, die fehlerhafte Projektstände erkennt.
 - **Registry (Modulverzeichnis):** kennt und verwaltet die späteren Tools.
-- **Lifecycle (Lebenszyklus):** Zustandsfolge eines Moduls vom Bekanntmachen bis zum Entfernen.
 - **Workspace-Zustand:** gespeicherte Layoutdaten der Arbeitsfläche.
 - **Normalisierung:** fehlerhafte Einzelwerte werden kontrolliert auf sichere Werte gebracht.
+- **UI-Controller:** kleine Bedienlogik, die den gültigen Workspace-Zustand auf HTML-Elemente anwendet.
 
 ## Prüfbereich
 
@@ -19,14 +19,19 @@ Fehler der HTML-Oberfläche, Modul-Registry und Workspace-Zustandsverwaltung rep
 - Wechsel zwischen Logging-Stufe 1, 2 und 3
 - JavaScript-Laufzeitfehler
 - unbehandelte Promise-Ablehnungen
-- Initialisierung der leeren Modul-Registry
-- Modulvertrag und Modulpfade
-- Laden, Aktivieren, Deaktivieren und Entfernen eines Testmoduls
+- Modul-Registry und Modul-Lebenszyklus
 - Workspace-Standardzustand
 - Workspace-Normalisierung
 - beschädigte Workspace-Daten
 - gesperrter lokaler Speicher
+- einzelne Panel-Sichtbarkeit
+- alle Panels gleichzeitig ausgeblendet
+- `Alle anzeigen`
 - Workspace-Reset
+- Layout-Menü öffnen/schließen
+- `Escape` und Fokus-Rückkehr
+- vollständige HTML-Zuordnung der fünf Panel-IDs
+- permanenter `Layout`-Schalter außerhalb des Workspace
 - responsive Darstellung
 
 ## Schnelle Entwicklerprüfung
@@ -37,7 +42,7 @@ Node.js 20 oder neuer verwenden. Es sind keine installierten npm-Pakete erforder
 npm run verify
 ```
 
-Die Prüfung kombiniert statische Projektprüfung, Registry-Lebenszyklustest und Workspace-Zustandstests.
+Die Prüfung kombiniert statische Projektprüfung, Registry-Lebenszyklustest, Workspace-Zustandstests und Workspace-UI-Tests.
 
 ## Sichere automatische Korrektur
 
@@ -49,12 +54,16 @@ Dieser Befehl repariert nur sichere Formatabweichungen. Fachliche Programmlogik 
 
 ## Reproduktion im Browser
 
-1. `index.html` im Browser öffnen.
-2. `Debug & Logging` einschalten.
-3. Geeignete Logging-Stufe wählen.
-4. Fehlerzustand reproduzieren.
-5. Zeit, Stufe, Bereich und Meldung vergleichen.
-6. Bei Modulproblemen auf `MODULES`, bei Layoutzustandsproblemen auf `WORKSPACE` achten.
+1. `index.html` in Firefox öffnen.
+2. `Layout` öffnen.
+3. einen Bereich ausblenden.
+4. Seite neu laden und prüfen, ob die Sichtbarkeit erhalten bleibt.
+5. alle Bereiche ausblenden und prüfen, ob `Layout` weiterhin sichtbar bleibt.
+6. `Alle anzeigen` verwenden.
+7. erneut einen Bereich ausblenden und `Standardlayout wiederherstellen` verwenden.
+8. `Debug & Logging` einschalten.
+9. bei Problemen den Bereich `WORKSPACE` prüfen.
+10. denselben Ablauf stichprobenartig in Chrome wiederholen.
 
 ## Diagnose-Schnittstellen
 
@@ -71,23 +80,14 @@ Unter `window.PROVOWARE_DEBUG`:
 
 ### Modul-Registry
 
-Unter `window.PROVOWARE_MODULES`:
+Unter `window.PROVOWARE_MODULES` unter anderem:
 
 - `initialize`
-- `define`
 - `load`
 - `activate`
 - `deactivate`
 - `remove`
 - `getSnapshot`
-- `setLogger`
-- `validateManifest`
-
-Reine Statusabfrage:
-
-```js
-window.PROVOWARE_MODULES.getSnapshot();
-```
 
 ### Workspace-Zustand
 
@@ -98,6 +98,8 @@ Unter `window.PROVOWARE_WORKSPACE`:
 - `standardzustandErstellen`
 - `zustandSetzen`
 - `zustandSpeichern`
+- `panelSichtbarkeitSetzen`
+- `allePanelsAnzeigen`
 - `zuruecksetzen`
 - `statusLesen`
 - `loggerSetzen`
@@ -108,7 +110,13 @@ Reine Statusabfrage:
 window.PROVOWARE_WORKSPACE.statusLesen();
 ```
 
-Technischer Reset für die Entwicklungsprüfung:
+Beispiel für eine gezielte Sichtbarkeitsprüfung:
+
+```js
+window.PROVOWARE_WORKSPACE.panelSichtbarkeitSetzen("modules", false);
+```
+
+Technischer Reset:
 
 ```js
 window.PROVOWARE_WORKSPACE.zuruecksetzen();
@@ -118,23 +126,35 @@ Der Reset betrifft ausschließlich:
 
 `provoware.allin.workspace.main.v1`
 
+### Workspace-UI
+
+Unter `window.PROVOWARE_WORKSPACE_UI`:
+
+- `initialisieren`
+- `zustandAnwenden`
+- `menueSetzen`
+- `statusMelden`
+- `istInitialisiert`
+
+Die UI besitzt keinen eigenen persistenten Layoutzustand. Die verbindliche Quelle bleibt `window.PROVOWARE_WORKSPACE`.
+
 ## Typische reproduzierbare Fehlerfälle
 
-### Beschädigtes JSON
+### Alle Panels ausgeblendet
 
-Erwartung: Anwendung startet mit Standardlayout weiter und protokolliert die Reparatur im Bereich `WORKSPACE`.
+Erwartung: Arbeitsfläche ist leer, `Layout` bleibt sichtbar und kann `Alle anzeigen` oder den Reset ausführen.
 
 ### Unbekannte Panel-ID
 
-Erwartung: unbekannter Eintrag wird ignoriert, bekannte Panels bleiben erhalten.
-
-### Fehlendes Panel
-
-Erwartung: Panel wird anhand der Standardreihenfolge ergänzt.
+Erwartung: die Zustands-API lehnt die Änderung ab; der bisherige Zustand bleibt erhalten.
 
 ### Gesperrter Browser-Speicher
 
 Erwartung: aktuelle Sitzung bleibt funktionsfähig; Speicherung schlägt kontrolliert fehl und wird geloggt.
+
+### UI und Zustand stimmen nicht überein
+
+Erwartung: erneutes Anwenden von `statusLesen()` über die UI stellt die Darstellung aus der zentralen Zustandsquelle wieder her.
 
 ### Reset
 
@@ -144,9 +164,9 @@ Erwartung: Workspace-Schlüssel wird entfernt; Debug-Einstellungen und andere Br
 
 - Logs verbleiben lokal im Arbeitsspeicher.
 - Logpuffer ist auf 500 Einträge begrenzt.
-- Registry- und Workspace-Fehler werden kontrolliert geloggt.
+- Registry-, Workspace-State- und Workspace-UI-Fehler werden kontrolliert geloggt.
 - GitHub Actions führt `npm run verify` bei Pull Requests und Änderungen auf `main` automatisch aus.
 
 ## Rückweg
 
-Die freigegebene Produktversion bleibt `0.2.0`. Die Teilstufe `0.3.0-B` wird als eigener Pull Request umgesetzt und kann dadurch als Einheit zurückgenommen werden. Workspace-Daten sind auf einen eigenen versionierten lokalen Schlüssel begrenzt.
+Die freigegebene Produktversion bleibt `0.2.0`. `0.3.0-C` wird als eigener Pull Request umgesetzt und kann als Einheit zurückgenommen werden. Workspace-Daten bleiben auf den eigenen versionierten lokalen Schlüssel begrenzt.
