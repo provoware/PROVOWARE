@@ -199,3 +199,94 @@ test("Unbekannte Panel-ID verändert den gültigen Zustand nicht", () => {
   assert.throws(() => api.panelSichtbarkeitSetzen("unbekannt", false), /Unbekannte Panel-ID/);
   assert.deepEqual(alsStandardObjekt(api.statusLesen()), vorher);
 });
+
+test("Panelgröße wird gesetzt, gespeichert und erhält Sichtbarkeit sowie Reihenfolge", () => {
+  const speicher = speicherErstellen();
+  const api = laufzeitErstellen(speicher);
+  api.initialisieren({ speicher });
+
+  const vorbereitet = api.standardzustandErstellen();
+  vorbereitet.order = ["details", "overview", "modules", "work", "system-status"];
+  vorbereitet.panels.details.visible = false;
+  api.zustandSetzen(vorbereitet);
+
+  const geaendert = alsStandardObjekt(
+    api.panelGroesseSetzen("details", { widthUnits: 9, heightPx: 460 }),
+  );
+  const gespeichert = JSON.parse(speicher.getItem(WORKSPACE_KEY));
+
+  assert.equal(geaendert.panels.details.widthUnits, 9);
+  assert.equal(geaendert.panels.details.heightPx, 460);
+  assert.equal(geaendert.panels.details.visible, false);
+  assert.equal(geaendert.order[0], "details");
+  assert.equal(gespeichert.panels.details.widthUnits, 9);
+  assert.equal(gespeichert.panels.details.heightPx, 460);
+});
+
+test("Panelgröße wird an individuelle Mindest- und Höchstgrenzen angepasst", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+
+  const minimum = alsStandardObjekt(
+    api.panelGroesseSetzen("work", { widthUnits: 1, heightPx: 1 }),
+  );
+  assert.equal(minimum.panels.work.widthUnits, 6);
+  assert.equal(minimum.panels.work.heightPx, 360);
+
+  const maximum = alsStandardObjekt(
+    api.panelGroesseSetzen("work", { widthUnits: 99, heightPx: 9999 }),
+  );
+  assert.equal(maximum.panels.work.widthUnits, 12);
+  assert.equal(maximum.panels.work.heightPx, 1200);
+});
+
+test("Automatische Höhe bleibt über heightPx null ausdrücklich erhalten", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+
+  api.panelGroesseSetzen("modules", { heightPx: 400 });
+  const automatisch = alsStandardObjekt(api.panelGroesseSetzen("modules", { heightPx: null }));
+
+  assert.equal(automatisch.panels.modules.heightPx, null);
+  assert.equal(automatisch.panels.modules.widthUnits, 4);
+});
+
+test("Teilweise Größenänderung lässt den jeweils anderen Größenwert unverändert", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+
+  api.panelGroesseSetzen("details", { widthUnits: 8, heightPx: 500 });
+  const nurBreite = alsStandardObjekt(api.panelGroesseSetzen("details", { widthUnits: 10 }));
+  const nurHoehe = alsStandardObjekt(api.panelGroesseSetzen("details", { heightPx: 620 }));
+
+  assert.equal(nurBreite.panels.details.widthUnits, 10);
+  assert.equal(nurBreite.panels.details.heightPx, 500);
+  assert.equal(nurHoehe.panels.details.widthUnits, 10);
+  assert.equal(nurHoehe.panels.details.heightPx, 620);
+});
+
+test("Panelgröße zurücksetzen betrifft nur das gewählte Panel", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+
+  api.panelGroesseSetzen("modules", { widthUnits: 8, heightPx: 500 });
+  api.panelGroesseSetzen("details", { widthUnits: 9, heightPx: 600 });
+  const zurueckgesetzt = alsStandardObjekt(api.panelGroesseZuruecksetzen("modules"));
+
+  assert.equal(zurueckgesetzt.panels.modules.widthUnits, 4);
+  assert.equal(zurueckgesetzt.panels.modules.heightPx, null);
+  assert.equal(zurueckgesetzt.panels.details.widthUnits, 9);
+  assert.equal(zurueckgesetzt.panels.details.heightPx, 600);
+});
+
+test("Unbekannte Panel-ID kann keine Größe verändern", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+  const vorher = alsStandardObjekt(api.statusLesen());
+
+  assert.throws(
+    () => api.panelGroesseSetzen("unbekannt", { widthUnits: 8, heightPx: 400 }),
+    /Unbekannte Panel-ID/,
+  );
+  assert.deepEqual(alsStandardObjekt(api.statusLesen()), vorher);
+});

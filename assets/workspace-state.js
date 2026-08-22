@@ -353,8 +353,14 @@
 
   const statusLesen = () => klonen(zustand || standardzustandErstellen());
 
+  const panelDefinitionLesen = (id) => {
+    const definition = DEFINITION_NACH_ID.get(id);
+    if (!definition) throw new RangeError(`Unbekannte Panel-ID: ${String(id)}.`);
+    return definition;
+  };
+
   const panelSichtbarkeitSetzen = (id, sichtbar) => {
-    if (!DEFINITION_NACH_ID.has(id)) throw new RangeError(`Unbekannte Panel-ID: ${String(id)}.`);
+    panelDefinitionLesen(id);
     if (typeof sichtbar !== "boolean") throw new TypeError("Sichtbarkeit muss true oder false sein.");
 
     const naechsterZustand = statusLesen();
@@ -364,6 +370,42 @@
     const gespeichert = zustandSetzen(naechsterZustand);
     log(2, `Panel ${id} ${sichtbar ? "eingeblendet" : "ausgeblendet"}.`);
     return gespeichert;
+  };
+
+  const panelGroesseSetzen = (id, groesse) => {
+    const definition = panelDefinitionLesen(id);
+    if (!istObjekt(groesse)) throw new TypeError("Panelgröße muss als Objekt übergeben werden.");
+
+    const hatBreite = Object.hasOwn(groesse, "widthUnits");
+    const hatHoehe = Object.hasOwn(groesse, "heightPx");
+    const naechsterZustand = statusLesen();
+    if (!hatBreite && !hatHoehe) return naechsterZustand;
+
+    const panel = naechsterZustand.panels[id];
+    const korrekturen = [];
+    const breite = hatBreite
+      ? breiteNormalisieren(definition, groesse.widthUnits, korrekturen)
+      : panel.widthUnits;
+    const hoehe = hatHoehe
+      ? hoeheNormalisieren(definition, groesse.heightPx, korrekturen)
+      : panel.heightPx;
+
+    korrekturenProtokollieren(korrekturen);
+    if (panel.widthUnits === breite && panel.heightPx === hoehe) return naechsterZustand;
+
+    panel.widthUnits = breite;
+    panel.heightPx = hoehe;
+    const gespeichert = zustandSetzen(naechsterZustand);
+    log(2, `Panel ${id} auf ${breite} Rastereinheit(en) und ${hoehe ?? "automatische Höhe"} gesetzt.`);
+    return gespeichert;
+  };
+
+  const panelGroesseZuruecksetzen = (id) => {
+    const definition = panelDefinitionLesen(id);
+    return panelGroesseSetzen(id, {
+      widthUnits: definition.standardBreite,
+      heightPx: definition.standardHoehe,
+    });
   };
 
   const allePanelsAnzeigen = () => {
@@ -406,6 +448,8 @@
     zustandSetzen,
     zustandSpeichern,
     panelSichtbarkeitSetzen,
+    panelGroesseSetzen,
+    panelGroesseZuruecksetzen,
     allePanelsAnzeigen,
     zuruecksetzen,
     statusLesen,

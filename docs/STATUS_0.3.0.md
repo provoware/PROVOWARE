@@ -4,9 +4,9 @@
 
 `0.3.0-A – Workspace-Vertrag`, `0.3.0-B – State Foundation & Autosave/Reset` und `0.3.0-C – Visibility Controls + kompakte Menüleiste` sind abgeschlossen.
 
-Für `0.3.0-D – Resize` ist die **Planungs- und Vertragsphase abgeschlossen**. Die technische Resize-Laufzeit ist noch nicht implementiert; sie ist jetzt der nächste Entwicklungsschritt.
+Für `0.3.0-D – Resize` sind Planungs- und Vertragsphase ebenfalls abgeschlossen. Der erste bewusst kleine technische Folgepatch **State-API + reine Größenberechnung** ist implementiert und befindet sich jetzt in der Abschlussvalidierung. Es gibt weiterhin **keine sichtbare Resize-Bedienung**.
 
-Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. `VERSION.json` weist die interne Entwicklungsphase transparent als `0.3.0-D Resize Planning & Contract` aus.
+Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. `VERSION.json` weist die interne Entwicklungsphase transparent als `0.3.0-D Resize State & Calculation` aus.
 
 ## Erledigt bis 0.3.0-C
 
@@ -77,59 +77,87 @@ Die Resize-Testmatrix enthält **40 klar benannte Prüfziele** für State, Berec
 - Squash-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`.
 - Main-Stichprobe: `docs/RESIZE_CONTRACT_0.3.0.md`, `docs/PLAN_0.3.0_D.md` und `VERSION.json` erfolgreich gelesen.
 
-## Änderungsvolumen des Planungs-Patches
+## 0.3.0-D – State & Calculation Foundation
+
+Aktuelle technische Baseline:
+
+`a9b23b8d16e96142f35904a08315ca3f2f4495a0`
+
+Diese Baseline enthält bereits den separat gemergten Erscheinungsbild-Patch PR #72. Der Resize-Patch baut deshalb bewusst auf dem **aktuellen** `main` auf und überschreibt keine Designänderungen.
+
+Implementiert:
+
+- `panelGroesseSetzen(id, groesse)` in `assets/workspace-state.js`
+- `panelGroesseZuruecksetzen(id)` in `assets/workspace-state.js`
+- gemeinsame Panel-ID-Prüfung für Sichtbarkeits- und Größenaktionen
+- Erhalt von Reihenfolge und Sichtbarkeit bei Größenänderungen
+- Größenbegrenzung über die bereits kanonischen `PANEL_DEFINITIONEN`
+- `heightPx: null` bleibt als automatische Höhe gültig
+- neue reine Datei `assets/workspace-size.js`
+- Rastermetrik aus Containerbreite, 12 Spalten und realem Spaltenabstand
+- symmetrische Rundung der Horizontalbewegung auf Rastereinheiten
+- Höhenberechnung in 24-px-Schritten
+- reine kombinierte Größenberechnung ohne DOM, Speicherung oder Logging
+- neue Tests `tests/workspace-size.test.mjs`
+- erweiterte `tests/workspace-state.test.mjs` für Größen-State und Einzel-Reset
+
+Bewusst nicht enthalten:
+
+- keine Änderung an `index.html`
+- keine Änderung an `assets/styles.css`
+- keine sichtbaren Resize-Griffe
+- keine DOM-Anwendung der gespeicherten Größen
+- keine Pointer-/Touch-/Stiftsteuerung
+- keine Resize-Tastatursteuerung
+- keine Änderung am Browser-Speicherschlüssel
+- keine neue Workspace-Vertragsversion
+- kein Drag & Drop
+
+## Aktuelle Abschlussvalidierung
+
+Noch offen:
+
+- vollständiger Diff gegen aktuellen `main`
+- Branch muss 0 Commits hinter `main` bleiben
+- GitHub Quality Gate erfolgreich
+- alle neuen und bestehenden Tests erfolgreich
+- PR mergebar
+- technischer Merge
+- Main-Stichprobe der zentralen Dateien
+
+## Änderungsvolumen des aktuellen technischen Patches
 
 Einstufung: **klein bis mittel**.
 
-Betroffen waren ausschließlich:
+Direkt betroffen:
 
-- Entwicklungsplan
-- Resize-Vertrag
-- Testmatrix
-- Entscheidungen
-- TODO
-- Status
-- Manifest
-- Entwicklungsmetadaten
+- Workspace-State-API
+- reine Größenberechnung
+- automatische Tests
+- Entwicklungsmetadaten und Dokumentation
 
-Nicht betroffen waren:
+Nicht betroffen:
 
-- HTML
+- sichtbare Oberfläche
 - CSS
-- JavaScript-Laufzeit
-- Tests
-- Browser-Speicherung
 - Fachmodule
 - Netzwerk
-
-## Erwartetes Volumen der technischen Resize-Implementierung
-
-Einstufung: **mittel**.
-
-Voraussichtlich betroffen:
-
-- `assets/workspace-state.js`
-- `assets/workspace-ui.js`
-- neue `assets/workspace-resize.js`
-- `assets/styles.css`
-- `index.html`
-- automatische Tests
-- Quality Gate
-- Entwicklungsdokumentation
+- Modulvertrag
+- persistentes Workspace-Schema
 
 ## Technischer Hinweis
 
-GitHub Actions meldet weiterhin einen nicht blockierenden Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions `v4`. Das Projekt-Quality-Gate selbst war erfolgreich mit Node `20.20.2`.
+GitHub Actions meldet weiterhin einen nicht blockierenden Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions `v4`. Das Projekt-Quality-Gate selbst wurde in den bisherigen Stufen erfolgreich mit Node `20.20.2` ausgeführt.
 
 Diese Workflow-Hygiene bleibt von Funktionspatches getrennt und wird spätestens in `0.3.0-G` behandelt.
 
 ## Nächste zwei Schritte
 
-1. **0.3.0-D State-API + reine Größenberechnung:** `panelGroesseSetzen`, `panelGroesseZuruecksetzen`, Rasterberechnung und 24-px-Höhenraster implementieren und automatisiert testen.
-2. **0.3.0-D Resize-Griffe + Pointer/Tastatur:** erst danach sichtbare Griffe und Eingabesteuerung auf die geprüfte Größenlogik setzen.
+1. **0.3.0-D DOM-Anwendung:** gespeicherte `widthUnits` und `heightPx` zentral auf die Panels anwenden; `heightPx: null` muss sauber automatische Höhe bedeuten. Noch ohne Ziehen.
+2. **0.3.0-D Resize-Griff + Eingabe:** erst danach einen Griff pro Panel und den entkoppelten Pointer-/Tastatur-Controller auf die geprüfte State-/Berechnungsbasis setzen.
 
 Anschließend folgt erst `0.3.0-E – Reorder & Drag and Drop`.
 
 ## Empfehlung
 
-Den technischen Resize-Patch jetzt mit der State-API und reinen Berechnungsfunktionen beginnen. Sichtbare Ziehlogik erst anschließen, wenn Größenwerte, Rasterung, Grenzen und Abbruchfälle bereits automatisiert grün sind.
+Die aktuelle Trennung beibehalten. Dieser Patch darf erst nach grünem Quality Gate gemergt werden. Die sichtbare Resize-Bedienung beginnt erst im nächsten Patch auf der bereits geprüften Größenbasis.

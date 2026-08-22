@@ -9,6 +9,31 @@
 - Unerwartete interne Fehler der Qualitätsschranke enden kontrolliert mit Ursache und nächstem Prüfschritt statt mit einem technischen Stapelabdruck.
 - Ein automatischer Fehlerfall sichert verständliche Diagnoseausgabe und den Fehler-Exitcode ab.
 
+### 0.3.0-D – Resize State & Calculation Foundation
+
+#### Hinzugefügt
+
+- `assets/workspace-size.js` als reine, DOM-freie Größenberechnung für Rasterbreite und Höhe.
+- deterministische Rastermetrik mit Berücksichtigung des tatsächlichen Spaltenabstands (`column-gap`).
+- symmetrische Rundung horizontaler Bewegungen auf ganze Rastereinheiten.
+- Höhenberechnung in festen 24-px-Schritten.
+- automatische Tests für Rastermetrik, Grenzen, Rundung und reproduzierbare Ergebnisse.
+- zusätzliche State-Tests für Größenänderung, Einzel-Reset und Erhalt von Sichtbarkeit/Reihenfolge.
+
+#### Geändert
+
+- Workspace-State-API um `panelGroesseSetzen` und `panelGroesseZuruecksetzen` erweitert.
+- Panel-ID-Prüfung zentralisiert und von Sichtbarkeits- sowie Größenaktionen gemeinsam verwendet.
+- Entwicklungsmetadaten auf `0.3.0-D Resize State & Calculation` fortgeschrieben.
+
+#### Bewusst noch nicht enthalten
+
+- keine sichtbare Größenänderung
+- kein Resize-Griff
+- keine DOM-Anwendung gespeicherter Größen
+- keine Pointer-/Touch-/Tastatursteuerung für Resize
+- kein Drag & Drop
+
 ### Erscheinungsbild nach Referenz
 
 #### Geändert
