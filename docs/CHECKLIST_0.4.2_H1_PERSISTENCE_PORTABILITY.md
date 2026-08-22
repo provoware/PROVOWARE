@@ -4,43 +4,49 @@
 
 - [x] isolierten Feature-Branch anlegen.
 - [x] Plan und Baseline-Checkpoint anlegen.
-- [ ] `scripts/runtime-persistence.mjs` anlegen.
-- [ ] Temp-Datei im Zielverzeichnis erzwingen.
-- [ ] exklusives Temp-Erzeugen verwenden.
-- [ ] begrenzten Retry nur für transiente Replace-Fehler implementieren.
-- [ ] fail-closed ohne `unlink(target) -> rename(temp)` sicherstellen.
-- [ ] Temp-Cleanup bei Fehlern durchführen.
-- [ ] stabile Fehlerklassifikation bereitstellen.
+- [x] `scripts/runtime-persistence.mjs` anlegen.
+- [x] Temp-Datei im Zielverzeichnis erzwingen.
+- [x] exklusives Temp-Erzeugen verwenden.
+- [x] begrenzten Retry nur für transiente Replace-Fehler implementieren.
+- [x] fail-closed ohne `unlink(target) -> rename(temp)` sicherstellen.
+- [x] Temp-Cleanup bei Fehlern durchführen.
+- [x] teilweise erzeugte Temp-Datei nach Schreibfehler sicher bereinigen, ohne `EEXIST`-Fremdtemp zu löschen.
+- [x] stabile Fehlerklassifikation bereitstellen.
 
 ## B – Writer migrieren
 
-- [ ] Project-Data-Writer auf gemeinsamen Vertrag umstellen.
-- [ ] Data-Studio-PRO-Writer auf gemeinsamen Vertrag umstellen.
-- [ ] Fachvalidierung unverändert in den Fachservices belassen.
-- [ ] bestehende `beforeRename`-Failure-Injection kompatibel halten.
-- [ ] Dateiformate byte-/semantikgleich halten.
+- [x] Project-Data-Writer auf gemeinsamen Vertrag umstellen.
+- [x] Data-Studio-PRO-Writer auf gemeinsamen Vertrag umstellen.
+- [x] Fachvalidierung unverändert in den Fachservices belassen.
+- [x] bestehende `beforeRename`-Failure-Injection kompatibel halten.
+- [x] Dateiformate byte-/semantikgleich halten.
 
 ## C – Tests
 
-- [ ] Erfolgsfall des gemeinsamen Writers testen.
-- [ ] Failure-Injection vor Replace testen.
-- [ ] bytegenauen Erhalt der Live-Datei nach Fehler testen.
-- [ ] Temp-Cleanup testen.
-- [ ] transiente Retry-Grenze testen.
-- [ ] permanente Fehler ohne destruktiven Fallback testen.
-- [ ] Fehlerklassifikation testen.
-- [ ] statisch nachweisen, dass beide Fachwriter denselben Vertrag verwenden.
-- [ ] statisch verbieten, dass die Fachwriter wieder eigene `rename`-/Temp-Logik einführen.
+- [x] Erfolgsfall des gemeinsamen Writers testen.
+- [x] Failure-Injection vor Replace testen.
+- [x] bytegenauen Erhalt der Live-Datei nach Fehler testen.
+- [x] Temp-Cleanup testen.
+- [x] teilweisen Temp-Schreibfehler `ENOSPC` testen.
+- [x] Verzeichnis-/Rechtefehler vor Schreibversuch testen.
+- [x] transiente Retry-Grenze testen.
+- [x] permanente Fehler ohne destruktiven Fallback testen.
+- [x] Fehlerklassifikation testen.
+- [x] statisch nachweisen, dass beide Fachwriter denselben Vertrag verwenden.
+- [x] statisch verbieten, dass die Fachwriter wieder eigene `rename`-/Temp-Logik einführen.
 
 ## D – Quality / Regression
 
-- [ ] H1-Pflichtdateien im zentralen Quality Gate verankern.
-- [ ] VERSION/TODO/README/MANIFEST/CHANGELOG synchronisieren.
-- [ ] Node 20 grün.
-- [ ] Node 24 grün.
-- [ ] Chromium-E2E unverändert grün.
+- [x] H1-Pflichtdateien und Architekturregeln im zentralen Quality Gate verankern.
+- [x] VERSION auf H1-Vertrag aktualisieren; Produktversion und Datenschemata unverändert lassen.
+- [ ] TODO/README/MANIFEST/CHANGELOG synchronisieren.
+- [x] erster H1-Core-Gate: Node 20 grün.
+- [x] erster H1-Core-Gate: Node 24 grün.
+- [x] erster H1-Core-Gate: 44 JavaScript-Dateien, 109 Projektdateien, 112/112 Node-Tests.
+- [x] erster Chromium-E2E nach Writer-Migration unverändert grün; Firefox wie vorgesehen übersprungen.
+- [ ] finalen Dokumentationsstand erneut durch Node 20/24 und Chromium prüfen.
 - [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR kontrolliert mergen.
+- [ ] PR #86 auf ready for review setzen und kontrolliert squash-mergen.
 - [ ] `main` nach Merge prüfen.
 
 ## Bewusst nicht H1
