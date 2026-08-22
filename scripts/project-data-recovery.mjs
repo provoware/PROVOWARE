@@ -20,7 +20,7 @@ export const PROJECT_DATA_BACKUP_LIMIT = 10;
 export const PROJECT_DATA_RECOVERY_API_ROOT = "/api/provoware/project-data/recovery";
 
 const MAX_RECOVERY_REQUEST_BYTES = 4 * 1024 * 1024;
-const BACKUP_ID_PATTERN = /^project-data-\d{8}T\d{6}Z-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/;
+const BACKUP_ID_PATTERN = /^project-data-\d{8}T\d{6}Z-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pwbak$/;
 const PRODUCTION_MIGRATORS = new Map();
 
 const jsonSource = (database) => `${JSON.stringify(database, null, 2)}\n`;
@@ -189,7 +189,7 @@ const createBackupUnlocked = async (
   { root = ROOT, now = () => new Date(), uuid = randomUUID, limit = PROJECT_DATA_BACKUP_LIMIT } = {},
 ) => {
   const timestamp = now();
-  const id = `project-data-${compactUtcTimestamp(timestamp)}-${uuid()}.json`;
+  const id = `project-data-${compactUtcTimestamp(timestamp)}-${uuid()}.pwbak`;
   const directory = backupDirectory(root);
   const filePath = backupPath(root, id);
   const source = await readLiveRaw(root);
