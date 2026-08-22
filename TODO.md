@@ -61,13 +61,15 @@ Wichtige Merges:
 - [ ] Firefox-Endabnahme und Chrome-Kompatibilitätsprobe durchführen.
 - [ ] Workspace-Release-Gate vollständig grün abschließen.
 
-## Aktuelle Iteration – 0.4.0 Project Data Studio
+## Abgeschlossen – 0.4.0 Project Data Studio
 
 Baseline: `6fd1123122cca0c69fd50bdbf69ef2186cc930d0`
 
 Arbeitsbranch: `feat/0.4.0-project-data-studio`
 
 Pull Request: `#81`
+
+Squash-Merge: `20546306a0db98c25a003f4cf96f142aac851d6f`
 
 ### A – Entwicklungsnotizen
 
@@ -127,8 +129,8 @@ Pull Request: `#81`
 - [x] lokale Laufzeitdatenbank explizit vom Auto-Fix ausschließen.
 - [x] GitHub Actions von v4 auf aktuelle v7-Actions aktualisieren.
 - [x] CI-Matrix auf Node 20 und Node 24 erweitern.
-- [ ] finalen CI-Lauf auf beiden Node-Versionen vollständig grün bestätigen.
-- [ ] finalen PR-Diff gegen `main` auf ausschließlich begründete Änderungen prüfen.
+- [x] finalen CI-Lauf auf beiden Node-Versionen vollständig grün bestätigen.
+- [x] finalen PR-Diff gegen `main` auf ausschließlich begründete Änderungen prüfen.
 
 ### F – Dokumentation und Abschluss
 
@@ -137,12 +139,12 @@ Pull Request: `#81`
 - [x] `docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
 - [x] README auf 0.4.0-Funktion und Grenzen aktualisieren.
 - [x] TODO auf die reale Roadmap aktualisieren und Versionskonflikt mit der früher geplanten Diagnose-Stufe beseitigen.
-- [ ] CHANGELOG aktualisieren.
-- [ ] MANIFEST aktualisieren.
+- [x] CHANGELOG aktualisieren.
+- [x] MANIFEST aktualisieren.
 - [x] VERSION-Entwicklungsmetadaten aktualisieren; Produktversion bleibt `0.2.0`.
-- [ ] PR #81 nach grünem Gate auf „ready for review“ setzen.
-- [ ] PR #81 kontrolliert mergen.
-- [ ] `main` nach Merge erneut prüfen.
+- [x] PR #81 nach grünem Gate auf „ready for review“ setzen.
+- [x] PR #81 kontrolliert mergen.
+- [x] `main` nach Merge erneut prüfen.
 
 ## Nächste Project-Data-Stufe – 0.4.1 Recovery & Migration
 
