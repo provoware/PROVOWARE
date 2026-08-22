@@ -72,90 +72,20 @@ PR `#83` · Squash-Merge `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
 
 ## Abgeschlossen – 0.4.2 Data Studio PRO
 
-Baseline: `acf36db29460b2ce25922aeaf065745c04c59176`
-
-Arbeitsbranch: `feat/0.4.2-data-studio-pro`
-
 PR `#84` · Squash-Merge `d22a4ba51a970966b8f0242186094fb894e14356`
 
-### A – Architektur / Persistenz
-
 - [x] PRO als Companion-Modul statt CRUD-Monolith aufgebaut.
-- [x] `data-studio` unverändert als stabilen CRUD-Editor auf 0.4.0 belassen.
-- [x] `data-studio-pro` 0.4.2 für Recherche und Organisation ergänzt.
-- [x] kleine `data-studio-pro-bridge` für Navigation und Revisionssynchronisierung ergänzt.
-- [x] Project-Data-Produktionsschema ausdrücklich bei Version 1 belassen.
-- [x] eigenen PRO-Metadatenvertrag Version 1 definiert.
-- [x] feste Runtime-Datei `data/data-studio-pro.json` implementiert.
-- [x] atomare PRO-Persistenz über Temp-Datei und Rename implementiert.
-- [x] dieselbe zentrale Mutationssperre wie Project Data/Recovery wiederverwendet.
-- [x] PRO-Datei und Temp-Dateien aus Git, Auto-Fix und statischer Auslieferung ausgeschlossen.
-- [x] Same-Origin-geschützte PRO-API integriert.
-- [x] beschädigte PRO-Datei wird nicht still überschrieben.
-
-### B – Suche / Filter / Sortierung
-
-- [x] Datensatz-Volltextsuche über Feldbezeichnungen und sichtbare Werte ergänzt.
-- [x] Filter nach Vorlage ergänzt.
-- [x] Filter nach Kategorie ergänzt.
-- [x] Trefferzahl und Nulltrefferanzeige ergänzt.
-- [x] Sortierung nach Aktualisierung neu→alt / alt→neu ergänzt.
-- [x] Sortierung nach Erstellung neu→alt / alt→neu ergänzt.
-
-### C – Kategorien / Vorlagenbibliothek
-
-- [x] frei benennbare Kategorien ergänzt.
-- [x] case-insensitive doppelte Kategorienamen serverseitig verhindert.
-- [x] Vorlagen einer Kategorie zuweisbar und wieder lösbar gemacht.
-- [x] Kategorie löschen ohne Vorlagenverlust implementiert.
-- [x] Bibliothek mit Name, Kategorie, Feldanzahl und Datensatzanzahl ergänzt.
-- [x] Bibliothek nach Text und Kategorie filterbar gemacht.
-- [x] Vorlagen über die PRO-Brücke im bestehenden Editor öffnbar gemacht.
-
-### D – Gespeicherte Ansichten
-
-- [x] benannte Ansicht serverseitig speichern.
-- [x] Vorlage, Kategorie, Suchtext und Sortierung speichern.
-- [x] gespeicherte Ansicht anwenden.
-- [x] gespeicherte Ansicht löschen.
-- [x] doppelte Namen case-insensitiv verhindern.
-- [x] Ansicht über Reload hinweg erhalten.
-- [x] keine Datensatzkopien in Ansichten speichern.
-
-### E – Vorlagenexport
-
-- [x] gewählte Vorlage als JSON exportieren.
-- [x] Formatkennung `provoware-data-studio-template` und Formatversion 1 verwenden.
-- [x] Kategorie optional mitgeben.
-- [x] Datensätze bewusst nicht in Vorlagenexport aufnehmen.
-- [x] sicheren Dateinamen aus Vorlagenname ableiten.
-
-### F – Regression / Browser
-
-- [x] PRO-Service-Tests für Kategorien, Zuweisungen, Views und atomare Persistenz ergänzt.
-- [x] Failure-Injection direkt vor PRO-Rename ergänzt und bytegenauen Erhalt nachgewiesen.
-- [x] API-Tests für Routing, Same-Origin, Referenzen und Validierung ergänzt.
-- [x] UI-/Registry-/Bridge-Vertragstests ergänzt.
-- [x] Browser-Zweitpersistenz-Verbot explizit auf PRO erweitert und getestet.
-- [x] PRO im zentralen Quality Gate als Pflichtbestandteil verankert.
-- [x] Chromium-E2E um Kategorie, Bibliothek, Suche, View, Export und Reload erweitert.
-- [x] HTML-Mirror wartet auf PRO und vergleicht dessen Geometrie mit.
+- [x] Project-Data-Produktionsschema bei Version 1 belassen.
+- [x] getrennten PRO-Metadatenvertrag Version 1 unter `data/data-studio-pro.json` eingeführt.
+- [x] Volltextsuche, Vorlagen-/Kategorienfilter und vier Sortierungen ergänzt.
+- [x] Kategorien und Vorlagenbibliothek ergänzt.
+- [x] gespeicherte Ansichten mit Reload-Persistenz ergänzt.
+- [x] Vorlagenexport als versioniertes JSON ohne Datensätze ergänzt.
+- [x] PRO-Bridge für Navigation und Revisionssynchronisierung ergänzt.
+- [x] Same-Origin, atomare Persistenz, Failure-Injection und Zweitpersistenz-Verbot getestet.
 - [x] finaler Core-Gate: Node 20 + Node 24 PASS, 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Node-Tests.
-- [x] finaler Browser-Gate: Chromium 3/3 PASS, Firefox wie vorgesehen übersprungen.
+- [x] finaler Browser-Gate: Chromium 3/3 PASS.
 - [x] finales Browserartefakt `9476846607`, SHA-256 `afb421a42d6e5a0d83a36940297a7598b49e9f35445ec56096604163a986a4e4`.
-- [x] finales Artefakt tatsächlich entpackt und geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
-- [x] Vorlagenexport geprüft: Format v1, Kategorie und Felddefinitionen vorhanden, keine Datensätze.
-
-### G – Dokumentation / Abschluss
-
-- [x] Plan, Baseline-Checkpoint und Checkliste angelegt.
-- [x] VERSION auf 0.4.2-Entwicklungsstufe aktualisiert; Produktversion bleibt 0.2.0.
-- [x] README auf Funktionen, Verträge, E2E und Recovery-Grenze synchronisiert.
-- [x] TODO, CHANGELOG, MANIFEST und Checkliste synchronisiert.
-- [x] finalen Dokumentationsstand erneut durch Node 20/24 und Chromium geprüft.
-- [x] finalen Diff gegen `main` geprüft: 27 Commits voraus, 0 hinter, 24 begründete Dateien.
-- [x] PR #84 auf ready for review gesetzt und kontrolliert squash-gemergt.
-- [x] `main` nach Merge auf VERSION, Registry und PRO-Service geprüft.
 
 ### Bewusst nicht Teil von 0.4.2
 
@@ -164,30 +94,96 @@ PR `#84` · Squash-Merge `d22a4ba51a970966b8f0242186094fb894e14356`
 - [ ] SQLite-Adapter – nur bei nachgewiesenem Bedarf.
 - [ ] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – eigener versionierter Folgeschritt.
 
-## Nächster Qualitätsstrang – 0.4.2-H1 Persistence Portability Foundation
+## Abgeschlossen – 0.4.2-H1 Persistence Portability Foundation
 
-Ziel: **eine** belastbare, plattformneutrale Persistenzbasis schaffen, bevor der gemeinsame Recovery Envelope mehrere Live-Dateien transaktional ersetzen muss.
+PR `#85` · Squash-Merge `b25b9e424b7445e1a8444aefde456744fcf42587`
 
-- [ ] zentrale `atomicReplace`-/Temp-/Cleanup-Abstraktion für alle Runtime-Datendateien definieren.
-- [ ] bestehende Project-Data- und Data-Studio-PRO-Writer schrittweise hinter denselben Vertrag legen, ohne Dateiformate zu ändern.
-- [ ] Linux: Rechtefehler, schreibgeschütztes Verzeichnis, Temp-Erstellung, Rename-Fehler und Cleanup per Failure-Injection prüfen.
-- [ ] Windows-CI: Pfadseparatoren, offene Dateihandles/Locks, Rename-/Replace-Verhalten und Temp-Cleanup prüfen.
-- [ ] niemals Datenverlust durch Fallback `unlink -> rename` zulassen; Ersatz muss fail-closed arbeiten.
-- [ ] reproduzierbaren Portability-Report pro Plattform erzeugen.
-- [ ] bestehenden Node-20/24-Core-Gate und Chromium-E2E unverändert grün halten.
-- [ ] Windows-Browser-E2E erst aktivieren, wenn das Dateisystem-Gate stabil ist.
+Synchronisierte Baseline vor Merge: `9794828aa4dbe95d3a97bf6541fca008956c2056`
 
-## Danach – 0.4.3 Recovery Envelope
+### Gemeinsamer Atomic-Replace-Vertrag
 
-Ziel: Project Data und PRO-Metadaten gemeinsam sichern, ohne das bestehende `.pwbak`-Format still umzudeuten.
+- [x] zentrale Schicht `scripts/atomic-file.mjs` eingeführt.
+- [x] Temp-Datei immer im selben Verzeichnis wie das Ziel erzeugen.
+- [x] Temp-Datei exklusiv mit `wx` anlegen.
+- [x] Inhalt vor Rename über `FileHandle.sync()` synchronisieren.
+- [x] keinen Datenverlust-Fallback `unlink(ziel) -> rename(temp,ziel)` verwenden.
+- [x] Ersatz bei permanentem Fehler fail-closed abbrechen und Live-Datei erhalten.
+- [x] Cleanup-Fehler dürfen den Primärfehler nicht verdecken.
+- [x] fremde Temp-Dateien bei `EEXIST` nicht löschen.
 
-- [ ] neues explizites Envelope-Format mit eigener Formatversion definieren.
-- [ ] Project Data und PRO-Metadaten als getrennte Komponenten mit SHA-256 und Byte-Länge erfassen.
+### Windows-/Linux-Portabilität
+
+- [x] begrenzte Windows-Retries ausschließlich für `EPERM`, `EACCES` und `EBUSY` implementieren.
+- [x] Retry-Limit und nicht-transiente Fehler testen.
+- [x] `Persistence Portability Gate` auf Ubuntu + Windows mit Node 20 einführen.
+- [x] Ubuntu-Portability real: PASS.
+- [x] Windows-Portability real: PASS.
+
+### Integration
+
+- [x] `writeProjectDatabaseAtomic()` auf dieselbe zentrale Schicht umstellen.
+- [x] `writeDataStudioProAtomic()` auf dieselbe zentrale Schicht umstellen.
+- [x] bestehende `beforeRename`-Failure-Hooks kompatibel halten.
+- [x] Recovery-Service, APIs, Browser-UI und Workspace unverändert lassen.
+- [x] Project-Data-Schema v1 unverändert lassen.
+- [x] Data-Studio-PRO-Schema v1 unverändert lassen.
+- [x] bestehendes `.pwbak`-Format unverändert lassen.
+
+### Finale Evidenz
+
+- [x] Node 20: PASS.
+- [x] Node 24: PASS.
+- [x] Project Lint: 44 JavaScript-Dateien.
+- [x] Quality Gate: 110 Projektdateien.
+- [x] Node Tests: 114/114 PASS, 0 Fehler.
+- [x] Ubuntu Portability: PASS.
+- [x] Windows Portability: PASS.
+- [x] Chromium: 3/3 PASS.
+- [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
+- [x] Browser-Evidenzartefakt `9477830587`.
+- [x] Artefakt-SHA-256 `fed02b407da6e9916d4423aed94da8d03e581f3d8e99f5db7e049355f6c84d52`.
+- [x] finaler Diff vor Merge: 1 Commit voraus, 0 hinter `main`, 10 begründete Dateien.
+
+## Nächster aktiver Datenstrang – 0.4.3 Recovery Envelope
+
+Ziel: Project Data und PRO-Metadaten gemeinsam sichern und wiederherstellen, **ohne** das bestehende `.pwbak`-Format still umzudeuten.
+
+### A – Neues Envelope-Format
+
+- [ ] neue explizite Formatkennung und `formatVersion: 1` definieren.
+- [ ] Project Data und PRO-Metadaten als getrennte Komponenten aufnehmen.
+- [ ] pro Komponente Rohbytes, SHA-256, Byte-Länge, Gültigkeitsstatus und Schema-Metadaten erfassen.
 - [ ] fehlende oder beschädigte Komponenten als Zustand dokumentieren statt still zu normalisieren.
-- [ ] bestehende `.pwbak`-Backups weiterhin lesbar halten.
+- [ ] Gesamt-Envelope mit eigener SHA-256-Prüfsumme binden.
+
+### B – Rückwärtskompatibilität
+
+- [ ] bestehende `.pwbak`-Backups weiterhin vollständig lesbar halten.
+- [ ] Legacy-`.pwbak` ausdrücklich als Ein-Komponenten-Recovery behandeln.
+- [ ] bestehende 0.4.1-Backups niemals automatisch umschreiben.
+
+### C – Restore-Vorschau / Journal
+
 - [ ] Restore-Vorschau auf Envelope-Ebene mit Komponentenstatus und Prüfsummen aufbauen.
-- [ ] Multi-Datei-Restore mit Journal/Rollback auf der 0.4.2-H1-Persistenzbasis implementieren.
-- [ ] Crash-/Failure-Injection zwischen den Komponenten ausführen und vollständige Wiederanlaufstrategie nachweisen.
+- [ ] Vorschau kryptografisch an die spätere Ausführung binden.
+- [ ] Restore-Journal mit eindeutigen Stufen und Wiederanlaufzuständen definieren.
+- [ ] Multi-Datei-Restore ausschließlich über die 0.4.2-H1-Atomic-Schicht ausführen.
+
+### D – Rollback / Failure Injection
+
+- [ ] Fehler vor erster Komponente simulieren.
+- [ ] Fehler zwischen Project Data und PRO simulieren.
+- [ ] Fehler nach zweiter Komponente, aber vor Journal-Abschluss simulieren.
+- [ ] Rollback-Fehler separat simulieren.
+- [ ] nach jedem Fehlerzustand einen deterministischen Wiederanlauf nachweisen.
+- [ ] niemals einen gemischten, unjournalisierten Live-Zustand still akzeptieren.
+
+### E – Abnahme
+
+- [ ] Node 20 + Node 24 vollständig grün halten.
+- [ ] Ubuntu + Windows Portability Gate grün halten.
+- [ ] Chromium 3/3 mindestens unverändert grün halten.
+- [ ] neue Recovery-Envelope-E2E-Kette ergänzen, sobald Service-/Failure-Gates grün sind.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
 
