@@ -27,6 +27,7 @@ const recordItem = (page, text) => page.locator("[data-record-list] .data-studio
 const waitForModules = async (page) => {
   await expect(page.locator("#development-note-input")).toBeVisible();
   await expect(page.locator("[data-data-studio-status]")).toContainText("bereit", { ignoreCase: true });
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("bereit", { ignoreCase: true });
   await expect(page.locator("[data-recovery-status]")).toContainText("bereit", { ignoreCase: true });
 };
 
@@ -128,6 +129,96 @@ test("Chromium-first Kernkette: Notiz, CRUD, Reload, Backup, Restore, Export und
   await selectTemplate(page, templateName);
   await expect(recordItem(page, beta)).toHaveCount(1);
   await screenshot(page, suffix, "04-import-restored.png");
+});
+
+test("Data Studio PRO: Kategorie, Bibliothek, Suche, gespeicherte Ansicht, Reload und Vorlagenexport", async ({ page }, testInfo) => {
+  const suffix = testInfo.project.name;
+  const categoryName = `PRO Kategorie ${suffix}`;
+  const templateName = `PRO Vorlage ${suffix}`;
+  const fieldLabel = `PRO Titel ${suffix}`;
+  const alpha = `Alpha PRO ${suffix}`;
+  const beta = `Beta PRO ${suffix}`;
+  const viewName = `PRO Ansicht ${suffix}`;
+
+  await page.goto("/");
+  await waitForModules(page);
+
+  await page.locator("[data-action='new-template']").click();
+  await page.locator("[data-template-name]").fill(templateName);
+  await page.locator(".data-studio-field-label").first().fill(fieldLabel);
+  await page.locator("[data-action='save-template']").click();
+  await expect(page.locator("[data-data-studio-status]")).toContainText("Vorlage gespeichert", { ignoreCase: true });
+
+  await currentRecordInput(page).fill(alpha);
+  await page.locator("[data-record-form]").getByRole("button", { name: "Datensatz speichern" }).click();
+  await expect(recordItem(page, alpha)).toHaveCount(1);
+  await page.locator("[data-action='new-record']").click();
+  await currentRecordInput(page).fill(beta);
+  await page.locator("[data-record-form]").getByRole("button", { name: "Datensatz speichern" }).click();
+  await expect(recordItem(page, beta)).toHaveCount(1);
+
+  await page.locator("[data-pro-category-name]").fill(categoryName);
+  await page.locator("[data-action='create-category']").click();
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("angelegt", { ignoreCase: true });
+
+  await page.locator("[data-action='refresh-pro']").click();
+  const libraryItem = page.locator("[data-pro-template-library] [data-pro-template-id]", { hasText: templateName });
+  await expect(libraryItem).toHaveCount(1);
+  await libraryItem.locator("[data-pro-template-category]").selectOption({ label: categoryName });
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("zugewiesen", { ignoreCase: true });
+
+  await page.locator("[data-pro-library-category]").selectOption({ label: categoryName });
+  await expect(page.locator("[data-pro-template-library] [data-pro-template-id]", { hasText: templateName })).toHaveCount(1);
+  await page.locator("[data-pro-library-search]").fill("unauffindbar");
+  await expect(page.locator("[data-pro-template-count]")).toContainText("0 Vorlagen");
+  await page.locator("[data-pro-library-search]").fill("PRO Vorlage");
+  await expect(page.locator("[data-pro-template-count]")).toContainText("1 Vorlagen");
+
+  await page.locator("[data-pro-record-template]").selectOption({ label: templateName });
+  await page.locator("[data-pro-record-category]").selectOption({ label: categoryName });
+  await page.locator("[data-pro-record-search]").fill("Alpha PRO");
+  await expect(page.locator("[data-pro-record-count]")).toContainText("1 Treffer");
+  await expect(page.locator("[data-pro-record-results] .data-studio-record-item", { hasText: alpha })).toHaveCount(1);
+  await page.locator("[data-pro-record-search]").fill("kein-treffer-xyz");
+  await expect(page.locator("[data-pro-record-count]")).toContainText("0 Treffer");
+  await page.locator("[data-pro-record-search]").fill("Alpha PRO");
+
+  await page.locator("[data-pro-view-name]").fill(viewName);
+  await page.locator("[data-action='save-view']").click();
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("gespeichert", { ignoreCase: true });
+  await expect(page.locator("[data-pro-saved-view]")).toHaveValue(/.+/);
+
+  await page.locator("[data-pro-record-search]").fill("Beta PRO");
+  await expect(page.locator("[data-pro-record-results] .data-studio-record-item", { hasText: beta })).toHaveCount(1);
+  await page.locator("[data-action='apply-view']").click();
+  await expect(page.locator("[data-pro-record-search]")).toHaveValue("Alpha PRO");
+  await expect(page.locator("[data-pro-record-results] .data-studio-record-item", { hasText: alpha })).toHaveCount(1);
+
+  const templateDownloadPromise = page.waitForEvent("download");
+  await page.locator("[data-pro-template-library] [data-pro-template-id]", { hasText: templateName })
+    .getByRole("button", { name: "Exportieren" }).click();
+  const templateDownload = await templateDownloadPromise;
+  const directory = artifactRoot(suffix);
+  await mkdir(directory, { recursive: true });
+  const templateExportPath = path.join(directory, "data-studio-template-export.json");
+  await templateDownload.saveAs(templateExportPath);
+  const templateExport = JSON.parse(await readFile(templateExportPath, "utf8"));
+  expect(templateExport.format).toBe("provoware-data-studio-template");
+  expect(templateExport.formatVersion).toBe(1);
+  expect(templateExport.category).toBe(categoryName);
+  expect(templateExport.template.name).toBe(templateName);
+  expect(templateExport.records).toBeUndefined();
+
+  await screenshot(page, suffix, "07-data-studio-pro.png");
+
+  await page.reload();
+  await waitForModules(page);
+  await expect(page.locator("[data-pro-saved-view]").getByRole("option", { name: viewName })).toHaveCount(1);
+  await expect(page.locator("[data-pro-category-list]", { hasText: categoryName })).toHaveCount(1);
+  await page.locator("[data-pro-saved-view]").selectOption({ label: viewName });
+  await page.locator("[data-action='apply-view']").click();
+  await expect(page.locator("[data-pro-record-search]")).toHaveValue("Alpha PRO");
+  await expect(page.locator("[data-pro-record-count]")).toContainText("1 Treffer");
 });
 
 test("HTML-Mirror bildet die echte UI geometrisch proportional ab und erzeugt Screenshot-Evidenz", async ({ page }, testInfo) => {

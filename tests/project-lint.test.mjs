@@ -9,6 +9,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROBE = path.join(ROOT, "modules", ".lint-probe.js");
 const RECOVERY_PROBE_DIR = path.join(ROOT, "modules", "data-recovery", ".lint-probe");
 const RECOVERY_PROBE = path.join(RECOVERY_PROBE_DIR, "index.js");
+const PRO_PROBE_DIR = path.join(ROOT, "modules", "data-studio-pro", ".lint-probe");
+const PRO_PROBE = path.join(PRO_PROBE_DIR, "index.js");
 
 test("Projekt-Linter erkennt verbotene dynamische Codeausführung", async () => {
   const forbiddenCall = ["ev", "al('1 + 1')"].join("");
@@ -40,5 +42,22 @@ test("Project-Data-Linter verbietet zweite Browser-Persistenz auch im Recovery-M
     assert.match(result.stderr, /modules\/data-recovery\/\.lint-probe\/index\.js/);
   } finally {
     await rm(RECOVERY_PROBE_DIR, { recursive: true, force: true });
+  }
+});
+
+test("Project-Data-Linter verbietet zweite Browser-Persistenz auch in Data Studio PRO", async () => {
+  await mkdir(PRO_PROBE_DIR, { recursive: true });
+  const storageAccess = ["session", "Storage.setItem('view', '1')"].join("");
+  await writeFile(PRO_PROBE, `(() => { 'use strict'; ${storageAccess}; })();\n`, "utf8");
+  try {
+    const result = spawnSync(process.execPath, ["scripts/project-lint.mjs"], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Project-Data-Module dürfen keine zweite Browser-Datenquelle anlegen/);
+    assert.match(result.stderr, /modules\/data-studio-pro\/\.lint-probe\/index\.js/);
+  } finally {
+    await rm(PRO_PROBE_DIR, { recursive: true, force: true });
   }
 });

@@ -27,7 +27,10 @@ const IGNORED_DIRECTORIES = new Set([
   "playwright-report",
   "test-results",
 ]);
-const IGNORED_RUNTIME_FILES = new Set(["data/project-data.json"]);
+const IGNORED_RUNTIME_FILES = new Set([
+  "data/project-data.json",
+  "data/data-studio-pro.json",
+]);
 const IGNORED_RUNTIME_PREFIXES = ["data/backups/project-data/"];
 const errors = [];
 const fixes = [];
@@ -48,6 +51,7 @@ const ignoredRuntimeFile = (filePath) => {
   const item = relative(filePath);
   return IGNORED_RUNTIME_FILES.has(item)
     || item.startsWith("data/project-data.json.tmp-")
+    || item.startsWith("data/data-studio-pro.json.tmp-")
     || IGNORED_RUNTIME_PREFIXES.some((prefix) => item.startsWith(prefix));
 };
 
@@ -129,11 +133,14 @@ const checkRequiredFiles = async () => {
     "modules/registry.js",
     "modules/development-notes/index.js",
     "modules/data-studio/index.js",
+    "modules/data-studio-pro/index.js",
+    "modules/data-studio-pro-bridge/index.js",
     "modules/data-recovery/index.js",
     "scripts/start.mjs",
     "scripts/browser-e2e-server.mjs",
     "scripts/project-data-service.mjs",
     "scripts/project-data-recovery.mjs",
+    "scripts/data-studio-pro-service.mjs",
     "scripts/project-lint.mjs",
     "start.cmd",
     "start.sh",
@@ -146,6 +153,9 @@ const checkRequiredFiles = async () => {
     "tests/project-data-recovery.test.mjs",
     "tests/project-data-recovery-api.test.mjs",
     "tests/project-data-recovery-ui.test.mjs",
+    "tests/data-studio-pro-service.test.mjs",
+    "tests/data-studio-pro-api.test.mjs",
+    "tests/data-studio-pro-ui.test.mjs",
     "tests/project-lint.test.mjs",
     "tests/browser-e2e-contract.test.mjs",
     "tests/browser/playwright.config.mjs",
@@ -161,6 +171,12 @@ const checkRequiredFiles = async () => {
     "docs/PLAN_0.4.1_RECOVERY_MIGRATION.md",
     "docs/CHECKPOINT_0.4.1_RECOVERY_MIGRATION.md",
     "docs/CHECKLIST_0.4.1_RECOVERY_MIGRATION.md",
+    "docs/PLAN_0.4.1_BROWSER_E2E_HTML_MIRROR.md",
+    "docs/CHECKPOINT_0.4.1_BROWSER_E2E_HTML_MIRROR.md",
+    "docs/CHECKLIST_0.4.1_BROWSER_E2E_HTML_MIRROR.md",
+    "docs/PLAN_0.4.2_DATA_STUDIO_PRO.md",
+    "docs/CHECKPOINT_0.4.2_DATA_STUDIO_PRO.md",
+    "docs/CHECKLIST_0.4.2_DATA_STUDIO_PRO.md",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -207,13 +223,19 @@ const checkVersion = async () => {
     fail(`VERSION.json: Einstiegspunkt fehlt oder existiert nicht (${version.entrypoint || "leer"}).`);
   }
   if (version.project_data_schema_version !== "1") {
-    fail("VERSION.json: Project-Data-Produktionsschema muss in 0.4.1 weiterhin '1' sein.");
+    fail("VERSION.json: Project-Data-Produktionsschema muss in 0.4.x weiterhin '1' sein.");
   }
   if (version.project_data_backup_store !== "data/backups/project-data/*.pwbak") {
     fail("VERSION.json: Recovery-Backup-Pfad muss auf *.pwbak zeigen.");
   }
   if (version.project_data_backup_limit !== 10) {
     fail("VERSION.json: Recovery-Backup-Limit muss 10 sein.");
+  }
+  if (version.data_studio_pro_schema_version !== "1") {
+    fail("VERSION.json: Data-Studio-PRO-Metadatenvertrag muss Version '1' sein.");
+  }
+  if (version.data_studio_pro_store !== "data/data-studio-pro.json") {
+    fail("VERSION.json: Data-Studio-PRO-Store muss data/data-studio-pro.json sein.");
   }
 };
 
@@ -409,6 +431,8 @@ const checkProjectDataContract = async () => {
   const requiredModules = new Map([
     ["development-notes", "0.4.0"],
     ["data-studio", "0.4.0"],
+    ["data-studio-pro", "0.4.2"],
+    ["data-studio-pro-bridge", "0.4.2"],
     ["data-recovery", "0.4.1"],
   ]);
 
@@ -439,8 +463,19 @@ const checkProjectDataContract = async () => {
   if (!ignoreLines.includes("project-data.json.tmp-*")) {
     fail("data/.gitignore: temporäre atomare Datenbankdateien müssen aus Git ausgeschlossen bleiben.");
   }
+  if (!ignoreLines.includes("data-studio-pro.json")) {
+    fail("data/.gitignore: lokale Data-Studio-PRO-Metadaten müssen aus Git ausgeschlossen bleiben.");
+  }
+  if (!ignoreLines.includes("data-studio-pro.json.tmp-*")) {
+    fail("data/.gitignore: temporäre PRO-Dateien müssen aus Git ausgeschlossen bleiben.");
+  }
   if (!ignoreLines.includes("backups/")) {
     fail("data/.gitignore: Recovery-Backups müssen vollständig aus Git ausgeschlossen bleiben.");
+  }
+
+  const start = await readFile(path.join(ROOT, "scripts/start.mjs"), "utf8");
+  if (!start.includes("handleDataStudioProApi") || !start.includes("isProtectedDataStudioProPath")) {
+    fail("scripts/start.mjs: PRO-API und Schutz der PRO-Runtime-Datei müssen aktiv sein.");
   }
 
   const packageJson = await readJson("package.json");

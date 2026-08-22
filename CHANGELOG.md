@@ -1,5 +1,64 @@
 # CHANGELOG
 
+## In Entwicklung – 0.4.2 Data Studio PRO
+
+### Hinzugefügt
+
+- neues Companion-Modul `data-studio-pro` Version `0.4.2` für Suche, Filter, Kategorien, Vorlagenbibliothek, Vorlagenexport und gespeicherte Ansichten.
+- kleine getrennte `data-studio-pro-bridge` für Navigation in den bestehenden CRUD-Editor und automatische Revisionssynchronisierung.
+- eigener PRO-Metadatenvertrag Version 1 in `data/data-studio-pro.json` mit `categories[]`, `templateCategories[]` und `savedViews[]`.
+- Datensatz-Volltextsuche über Feldbezeichnungen und sichtbare Werte.
+- Filter nach Vorlage und Kategorie sowie vier reproduzierbare Sortiermodi nach Erstellung/Aktualisierung.
+- Vorlagenbibliothek mit Name, Kategorie, Feldanzahl, Datensatzanzahl, Suche und Kategorie-Filter.
+- serverseitig persistierte Kategorien mit case-insensitiver Eindeutigkeit.
+- benannte gespeicherte Ansichten für Vorlage, Kategorie, Suchtext und Sortierung.
+- portabler Vorlagenexport mit Kennung `provoware-data-studio-template`, Formatversion 1 und optionaler Kategorie; Datensätze werden bewusst nicht exportiert.
+- PRO-Service-, API-, UI-, Bridge-, Failure-Injection- und Browser-Regressionen.
+- Plan, Baseline-Checkpoint und Abnahmecheckliste für 0.4.2.
+
+### Architektur und Sicherheit
+
+- Project-Data-Produktionsschema bleibt unverändert Version 1.
+- der stabile CRUD-Editor `data-studio` bleibt Version 0.4.0 und wird nicht mit Recherche-/Organisationslogik aufgebläht.
+- PRO-Metadaten verwenden dieselbe zentrale Mutationssperre wie Project Data und Recovery.
+- PRO-Persistenz verwendet vollständiges Temp-Schreiben und atomaren Rename.
+- ein injizierter Fehler direkt vor Rename lässt die vorhandene PRO-Datei bytegenau unverändert.
+- beschädigtes bestehendes PRO-JSON wird nicht still ersetzt.
+- `data/data-studio-pro.json` und Temp-Dateien bleiben aus Git, statischer Auslieferung und semantikneutralem Auto-Fix ausgeschlossen.
+- PRO-Schreibzugriffe sind Same-Origin-gebunden.
+- `localStorage` und `sessionStorage` bleiben auch für PRO durch den Projekt-Linter verboten.
+- die Revisionsbrücke beobachtet ausschließlich die gerenderte Data-Studio-Revision und löst einen erneuten PRO-Lesezugriff aus; CRUD wird nicht dupliziert.
+
+### Chromium-E2E und Evidenz
+
+- Chromium führt jetzt drei echte Browserprüfungen aus: bestehende CRUD-/Recovery-Kette, neue Data-Studio-PRO-Kette und HTML-Mirror.
+- PRO-Browserpfad: `Vorlage -> Datensätze -> Kategorie -> Zuweisung -> Bibliotheksfilter -> Volltextsuche -> gespeicherte Ansicht -> Anwenden -> Vorlagenexport -> Reload -> Ansicht erneut anwenden`.
+- HTML-Mirror wartet auf vollständig aktiviertes Data Studio PRO und vergleicht `.data-studio-pro` zusätzlich geometrisch.
+- neue Screenshot-Evidenz `07-data-studio-pro.png`.
+- neuer Evidenzexport `data-studio-template-export.json`.
+
+### Erster vollständig grüner 0.4.2-Stand
+
+- Core Quality Gate auf Node 20: PASS.
+- Core Quality Gate auf Node 24: PASS.
+- Project Lint: `41` JavaScript-Dateien.
+- Quality Gate: `103` Projektdateien.
+- Node-Test-Suite: `101/101` PASS, `0` Fehler.
+- Chromium: `3/3` echte Browserprüfungen PASS.
+- Firefox im automatischen Lauf: wie vorgesehen übersprungen.
+- Browserartefakt: `9476750307`.
+- Artefakt-SHA-256: `f2eee6beb9baec81126885ce23c8543070afec0fae088045d104cd68a8628f99`.
+- Artefakt tatsächlich geprüft: sieben PNG-Screenshots, Project-Data-Export, Vorlagenexport und Playwright-Report.
+
+### Bewusst nicht enthalten
+
+- keine Änderung des Project-Data-Schemas v1.
+- keine relationalen Feldtypen.
+- kein Template-Import ohne eigenen Konflikt-/ID-Vertrag.
+- kein SQLite-Adapter ohne nachgewiesenen Bedarf.
+- das bestehende 0.4.1-`.pwbak`-Format sichert weiterhin nur `data/project-data.json`; eine gemeinsame Recovery-Hülle für PRO-Metadaten benötigt einen eigenen versionierten Vertrag.
+- Cross-OS-/Windows-Dateisperren und Rename-Unterschiede folgen als eigener Qualitätsstrang.
+
 ## In Entwicklung – 0.4.1-E2E Chromium Gate & HTML UI Mirror
 
 ### Hinzugefügt
@@ -37,9 +96,10 @@
 
 - Core Quality Gate auf Node 20: PASS.
 - Core Quality Gate auf Node 24: PASS.
-- Core-Stand: `35` JavaScript-Dateien gelintet, `94` Projektdateien geprüft, `85/85` Node-Tests erfolgreich.
+- finaler Core-Stand: `35` JavaScript-Dateien gelintet, `94` Projektdateien geprüft, `87/87` Node-Tests erfolgreich.
 - Chromium: `2/2` echte Browserprüfungen erfolgreich.
 - HTML-Mirror: PASS mit intern `1366 × 900`, Skalierungsfaktor `0,5`, sichtbarer Spiegelgröße `683 × 450` und identischer Schlüsselgeometrie.
+- finales Browserartefakt `9474686971`, SHA-256 `0ed384715c715ec78c9bfbabfc283e26f490fc7c83fa66f0355a60340118a8fe`.
 - Erfolgsartefakt enthält tatsächlich sechs PNG-Screenshots und einen validierten Project-Data-JSON-Export.
 - Firefox wurde im automatischen Lauf wie vorgesehen übersprungen.
 
@@ -96,14 +156,14 @@
 - erster vollständiger GitHub-Actions-Lauf auf Node 20 und Node 24 erfolgreich.
 - Projekt-Linter: `30` JavaScript-Dateien geprüft.
 - Quality Gate: `82` Projektdateien geprüft.
-- Testsuite: `81/81` Tests erfolgreich, `0` fehlgeschlagen.
+- finale Testsuite: `82/82` Tests erfolgreich, `0` fehlgeschlagen.
 - bestehende Workspace-, Registry-, Start- und 0.4.0-Regressionen bleiben Bestandteil derselben Testsuite.
 
 ### Bewusst noch nicht enthalten
 
 - keine reale Produktionsmigration auf Schema v2; diese wird erst bei einem tatsächlich benötigten neuen Datenvertrag entwickelt.
 - keine relationale Datenbank oder SQLite-Umschaltung.
-- keine echten Firefox-/Chrome-E2E-Tests.
+- Browser-E2E wurde im nachfolgenden 0.4.1-E2E-Strang ergänzt.
 - keine Cross-OS-CI-Matrix für Windows/macOS.
 - keine Änderungen am parallelen Pointer-/Drag-and-Drop-Workspace-Strang.
 
@@ -149,7 +209,7 @@
 
 - Backup/Restore, Export/Import und Schemamigrationen; vorgesehen für 0.4.1.
 - relationale Feldtypen, Suche/Filter und optionaler SQLite-Adapter.
-- echte Firefox-/Chrome-E2E-Tests.
+- echte Browser-E2E-Tests wurden in 0.4.1-E2E ergänzt.
 - Cross-OS-CI für Windows/macOS.
 - Pointer-/Touch-Resize und Drag & Drop aus dem separaten Workspace-Strang.
 

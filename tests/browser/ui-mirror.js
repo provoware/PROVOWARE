@@ -13,6 +13,7 @@
     "#quickbar",
     "#arbeitsbereich",
     "#details",
+    ".data-studio-pro",
   ];
 
   const source = document.querySelector("#mirror-source");
@@ -25,7 +26,12 @@
   const frameReady = (frame) => {
     const doc = frame.contentDocument;
     if (!doc?.body) return false;
-    return Boolean(doc.querySelector("#development-note-input") && doc.querySelector(".data-recovery"));
+    return Boolean(
+      doc.querySelector("#development-note-input")
+      && doc.querySelector(".data-recovery")
+      && doc.querySelector(".data-studio-pro")
+      && doc.querySelector("[data-data-studio-pro-status]"),
+    );
   };
 
   const waitForFrame = async (frame) => {
