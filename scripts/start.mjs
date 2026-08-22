@@ -13,6 +13,11 @@ import {
   DATA_STUDIO_PRO_RELATIVE_PATH,
   handleDataStudioProApi,
 } from "./data-studio-pro-service.mjs";
+import {
+  handleRecoveryEnvelopeApi,
+  isProtectedRecoveryEnvelopePath,
+  recoverInterruptedEnvelopeTransaction,
+} from "./recovery-envelope.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HOST = "127.0.0.1";
@@ -21,6 +26,7 @@ const MAX_PORTVERSUCHE = 10;
 
 const MELDUNGEN = Object.freeze({
   start: "Startprüfung -> lokale Voraussetzungen werden geprüft.",
+  recovery: "Recovery -> liegengebliebene Multi-Datei-Transaktionen werden geprüft.",
   bereit: "Start abgeschlossen -> PROVOWARE ist lokal erreichbar.",
 });
 
@@ -95,6 +101,7 @@ const abhaengigkeitenAufloesen = async () => {
 
 const antworten = async (anfrage, antwort) => {
   if (await handleDataStudioProApi(anfrage, antwort, { root: ROOT })) return;
+  if (await handleRecoveryEnvelopeApi(anfrage, antwort, { root: ROOT })) return;
   if (await handleProjectDataApi(anfrage, antwort, { root: ROOT })) return;
 
   const datei = anfragepfadAufloesen(anfrage.url);
@@ -102,7 +109,11 @@ const antworten = async (anfrage, antwort) => {
     antwort.writeHead(403).end("Zugriff außerhalb des Projektordners ist nicht erlaubt.");
     return;
   }
-  if (isProtectedProjectDataPath(datei, ROOT) || isProtectedDataStudioProPath(datei, ROOT)) {
+  if (
+    isProtectedProjectDataPath(datei, ROOT)
+    || isProtectedDataStudioProPath(datei, ROOT)
+    || isProtectedRecoveryEnvelopePath(datei, ROOT)
+  ) {
     antwort.writeHead(403).end("Direkter Zugriff auf lokale Projekt-Laufzeitdaten ist nicht erlaubt.");
     return;
   }
@@ -141,6 +152,15 @@ export const starten = async (argumente = process.argv.slice(2)) => {
   console.log(MELDUNGEN.start);
   nodeVersionPruefen(process.versions.node);
   await abhaengigkeitenAufloesen();
+
+  console.log(MELDUNGEN.recovery);
+  const recovery = await recoverInterruptedEnvelopeTransaction({ root: ROOT });
+  if (recovery.recovered) {
+    console.log(`Recovery -> unterbrochene Transaktion sicher behandelt (${recovery.action}).`);
+  } else {
+    console.log("Recovery -> kein offenes Multi-Datei-Journal gefunden.");
+  }
+
   const { port } = await serverStarten(optionen.port);
   const url = `http://${HOST}:${port}/`;
   console.log(`${MELDUNGEN.bereit} ${url}`);
