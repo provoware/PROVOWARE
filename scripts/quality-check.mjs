@@ -141,6 +141,7 @@ const checkRequiredFiles = async () => {
     "scripts/project-data-service.mjs",
     "scripts/project-data-recovery.mjs",
     "scripts/data-studio-pro-service.mjs",
+    "scripts/runtime-persistence.mjs",
     "scripts/project-lint.mjs",
     "start.cmd",
     "start.sh",
@@ -156,6 +157,8 @@ const checkRequiredFiles = async () => {
     "tests/data-studio-pro-service.test.mjs",
     "tests/data-studio-pro-api.test.mjs",
     "tests/data-studio-pro-ui.test.mjs",
+    "tests/runtime-persistence.test.mjs",
+    "tests/runtime-persistence-integration.test.mjs",
     "tests/project-lint.test.mjs",
     "tests/browser-e2e-contract.test.mjs",
     "tests/browser/playwright.config.mjs",
@@ -177,6 +180,9 @@ const checkRequiredFiles = async () => {
     "docs/PLAN_0.4.2_DATA_STUDIO_PRO.md",
     "docs/CHECKPOINT_0.4.2_DATA_STUDIO_PRO.md",
     "docs/CHECKLIST_0.4.2_DATA_STUDIO_PRO.md",
+    "docs/PLAN_0.4.2_H1_PERSISTENCE_PORTABILITY.md",
+    "docs/CHECKPOINT_0.4.2_H1_PERSISTENCE_PORTABILITY.md",
+    "docs/CHECKLIST_0.4.2_H1_PERSISTENCE_PORTABILITY.md",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -236,6 +242,12 @@ const checkVersion = async () => {
   }
   if (version.data_studio_pro_store !== "data/data-studio-pro.json") {
     fail("VERSION.json: Data-Studio-PRO-Store muss data/data-studio-pro.json sein.");
+  }
+  if (version.runtime_persistence_contract_version !== "1") {
+    fail("VERSION.json: Runtime-Persistence-Vertrag muss Version '1' sein.");
+  }
+  if (version.runtime_persistence_writer !== "scripts/runtime-persistence.mjs") {
+    fail("VERSION.json: kanonischer Runtime-Persistence-Writer muss scripts/runtime-persistence.mjs sein.");
   }
 };
 
@@ -487,6 +499,34 @@ const checkProjectDataContract = async () => {
   }
 };
 
+const checkRuntimePersistenceContract = async () => {
+  const runtime = await readFile(path.join(ROOT, "scripts/runtime-persistence.mjs"), "utf8");
+  const projectData = await readFile(path.join(ROOT, "scripts/project-data-service.mjs"), "utf8");
+  const pro = await readFile(path.join(ROOT, "scripts/data-studio-pro-service.mjs"), "utf8");
+
+  if (!runtime.includes('flag: "wx"')) {
+    fail("Runtime Persistence: Temp-Dateien müssen exklusiv mit flag 'wx' erzeugt werden.");
+  }
+  if (!runtime.includes('new Set(["EBUSY", "EPERM"])')) {
+    fail("Runtime Persistence: Retry darf nur den kanonischen transienten Replace-Fehlern gelten.");
+  }
+  if (/\bunlink\s*\(\s*targetPath\s*\)|\bremoveTemp\s*\(\s*targetPath\s*\)/.test(runtime)) {
+    fail("Runtime Persistence: destruktiver Target-Unlink-Fallback ist verboten.");
+  }
+
+  for (const [name, source] of [["Project Data", projectData], ["Data Studio PRO", pro]]) {
+    if (!source.includes('import { atomicReplaceFile } from "./runtime-persistence.mjs";')) {
+      fail(`Runtime Persistence: ${name} muss den gemeinsamen atomicReplaceFile-Vertrag importieren.`);
+    }
+    if (!source.includes("await atomicReplaceFile({")) {
+      fail(`Runtime Persistence: ${name} muss Schreibvorgänge an atomicReplaceFile delegieren.`);
+    }
+    if (/\brename\s*\(/.test(source)) {
+      fail(`Runtime Persistence: ${name} darf keinen eigenen rename-Pfad besitzen.`);
+    }
+  }
+};
+
 const checkBrowserE2EContract = async () => {
   const packageJson = await readJson("package.json");
   if (!packageJson) return;
@@ -541,6 +581,7 @@ const main = async () => {
   await checkWorkspaceLayout();
   await checkRegistry();
   await checkProjectDataContract();
+  await checkRuntimePersistenceContract();
   await checkBrowserE2EContract();
 
   if (fixes.length) {
