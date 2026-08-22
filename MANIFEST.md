@@ -6,7 +6,7 @@
 
 Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
 
-Aktuelle interne Entwicklungsstufe: `0.3.0-D – Resize State & Calculation`
+Aktuelle interne Entwicklungsstufe: `0.3.0-D – Resize DOM Application`
 
 Modulvertragsversion: `1`
 
@@ -16,16 +16,17 @@ Workspace-Vertragsversion: `1`
 
 ### Einstieg
 
-- `index.html` – lokale HTML-Einstiegsdatei
+- `index.html` – lokale HTML-Einstiegsdatei und deterministische Asset-Reihenfolge
 
 ### Oberfläche und Kernlogik
 
-- `assets/styles.css` – Dark-/Petrol-Layout, responsive Darstellung, Schnellstarterleiste und Layout-Menü
+- `assets/styles.css` – unveränderte Dark-/Petrol-Basisdarstellung inklusive bestehender Tablet-/Mobilregeln
+- `assets/workspace-layout.css` – isolierter Desktop-Darstellungsvertrag für gespeicherte Panelbreite und -höhe ab 981 px
 - `assets/app.js` – App-Start, Debug-UI und Initialisierung der Subsysteme
 - `assets/module-registry.js` – Modulvertrag und Modul-Lebenszyklus
 - `assets/workspace-state.js` – Workspace-Zustand, Normalisierung, Sichtbarkeits- und Größenaktionen, lokale Speicherung und Reset
 - `assets/workspace-size.js` – reine, DOM-freie Raster-/Höhenberechnung für die spätere Resize-Bedienung
-- `assets/workspace-ui.js` – DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus und Nutzerfeedback
+- `assets/workspace-ui.js` – DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus, Nutzerfeedback und Übertragung gültiger Größenwerte auf CSS-Variablen
 - `modules/registry.js` – zentraler Modulkatalog, aktuell bewusst leer
 
 ### Versionsmetadaten
@@ -76,8 +77,9 @@ Nicht gespeichert werden:
 - Scrollposition
 - Zeigerbewegungen
 - Resize-/Drag-Vorschau
+- CSS-Variablen oder Darstellungsmarker
 
-0.3.0-D führt keine neuen persistenten Felder ein. Workspace-Vertragsversion `1` bleibt deshalb unverändert.
+0.3.0-D2 führt keine neuen persistenten Felder ein. Workspace-Vertragsversion `1` bleibt unverändert.
 
 ## 0.3.0-C – vorhandene Funktionsbasis
 
@@ -93,7 +95,7 @@ Vorhanden:
 - Live-Nutzerfeedback
 - Tastatur-/Fokus-Grundlage
 
-## 0.3.0-D – aktueller technischer Stand
+## 0.3.0-D1 – State & Calculation
 
 Bereits implementiert:
 
@@ -107,26 +109,39 @@ Bereits implementiert:
 - symmetrische Rundung horizontaler Bewegungen auf ganze Rastereinheiten
 - Höhe wird in 24-px-Schritten berechnet
 - deterministische Berechnung ohne DOM-, Speicher- oder Logging-Seiteneffekt
-- automatische State- und Größenberechnungstests
+
+## 0.3.0-D2 – aktueller technischer Stand
+
+Implementiert:
+
+- `workspace-ui.js` setzt gültige `widthUnits` ausschließlich als CSS-Variable `--panel-spalten`
+- konkrete `heightPx` wird ausschließlich als `--panel-hoehe` mit `px` übertragen
+- `heightPx: null` entfernt die Inline-Höhenvariable und erhält automatische Höhe
+- ungültige Darstellungsbreite entfernt die Breitenvariable und deaktiviert den nicht persistenten Bereitschaftsmarker
+- `assets/workspace-layout.css` verwendet die Größenvariablen ausschließlich ab 981 px
+- das Overlay setzt `grid-column` und `height`; JavaScript setzt diese Eigenschaften nicht direkt
+- `assets/styles.css` bleibt unverändert und damit alleinige Tablet-/Mobilbasis
+- `index.html` lädt das Overlay lokal direkt nach der Basis-CSS
+- automatische DOM-, CSS-Vertrags- und Ladereihenfolge-Tests sind ergänzt
 
 Bewusst noch nicht implementiert:
 
-- gespeicherte Größen auf DOM anwenden
 - sichtbare Resize-Griffe
 - Pointer-/Touch-/Stiftsteuerung
 - Tastatursteuerung für Resize
-- transiente Vorschau im Browser
+- transiente Resize-Vorschau
 - Resize-Nutzerfeedback
 - Drag & Drop
 
 ## Verantwortungstrennung für Resize
 
 - `assets/workspace-state.js` – einzige persistente Größenquelle
-- `assets/workspace-size.js` – reine Berechnung ohne Seiteneffekt
-- `assets/workspace-ui.js` – später gültige gespeicherte Größe auf DOM anwenden
+- `assets/workspace-size.js` – reine Größenberechnung ohne Seiteneffekt
+- `assets/workspace-ui.js` – gültige Größenwerte auf CSS-Variablen übertragen, keine eigene Persistenz
+- `assets/workspace-layout.css` – ausschließlich Desktopdarstellung der übergebenen Größenwerte
 - geplante `assets/workspace-resize.js` – Pointer/Tastatur, transiente Vorschau, Commit/Abbruch
 
-Weder Größenberechnung noch spätere Resize-Eingabeschicht dürfen direkt in `localStorage` schreiben.
+Weder Größenberechnung, UI-Darstellung noch spätere Resize-Eingabeschicht dürfen direkt eine zweite Größenquelle in `localStorage` anlegen.
 
 ## Hauptdokumente
 
@@ -151,7 +166,8 @@ Weder Größenberechnung noch spätere Resize-Eingabeschicht dürfen direkt in `
 - `docs/PLAN_0.3.0_B.md` – State Foundation
 - `docs/PLAN_0.3.0_C.md` – Visibility Controls
 - `docs/PLAN_0.3.0_D.md` – detaillierter Resize-Implementierungsplan
-- `docs/PLAN_0.3.0_D_STATE.md` – kleiner Teilplan für State-API und reine Größenberechnung
+- `docs/PLAN_0.3.0_D_STATE.md` – D1 State-API und reine Größenberechnung
+- `docs/PLAN_0.3.0_D_DOM.md` – D2 DOM-/CSS-Größenanwendung
 - `docs/WORKSPACE_CONTRACT.md` – allgemeiner Workspace-Vertrag Version 1
 - `docs/RESIZE_CONTRACT_0.3.0.md` – detaillierter Resize-Vertrag und 40-teilige Testmatrix
 - `docs/DECISIONS_0.3.0.md`
@@ -159,7 +175,8 @@ Weder Größenberechnung noch spätere Resize-Eingabeschicht dürfen direkt in `
 - `docs/MANIFEST_0.3.0_B.md`
 - `docs/MANIFEST_0.3.0_C.md`
 - `docs/MANIFEST_0.3.0_D_PLAN.md` – Planungs- und Vertrags-Patch
-- `docs/MANIFEST_0.3.0_D_STATE.md` – State- und Berechnungs-Patch
+- `docs/MANIFEST_0.3.0_D_STATE.md` – D1 State- und Berechnungs-Patch
+- `docs/MANIFEST_0.3.0_D_DOM.md` – D2 DOM-/CSS-Patch
 
 ## Entwicklungs- und Qualitätssicherung
 
@@ -185,12 +202,17 @@ Bereits abgedeckt:
 - Rastermetrik inklusive Spaltenabstand
 - Breiten- und Höhenbegrenzung
 - reproduzierbare Größenberechnung
+- DOM-Übertragung von Breite und Höhe über CSS-Variablen
+- Rückkehr von fester zu automatischer Höhe
+- sicherer Fallback bei ungültiger Darstellungsbreite
+- Desktop-Begrenzung des Workspace-Größenoverlays
+- lokale Stylesheet-Ladereihenfolge
 
-Noch für die sichtbare Resize-Stufe geplant:
+Noch für D3 geplant:
 
 - Pointer-Abbruch-/Commit-Tests
 - Tastaturtests
-- Responsive-Tests
+- Responsive-Interaktionstests
 - statische Resize-Griff-/Controller-Prüfungen im Quality Gate
 
 ## Kanonische Befehle
@@ -209,26 +231,24 @@ npm run verify
 
 ## Aktueller Patchtyp
 
-**State-API + reine Größenberechnung + automatische Tests.**
-
-Die bereits auf `main` vorhandene Quality-Gate-Härtung bleibt unverändert erhalten.
+**D2 – Darstellung bereits gespeicherter Größen über CSS-Variablen.**
 
 Keine Änderung an:
 
-- HTML
-- CSS
-- sichtbarer Bedienung
+- persistentem Workspace-Schema
+- Workspace-State-API
+- reiner Größenberechnung
+- Basis-CSS `assets/styles.css`
 - Modulvertrag
 - Browser-Speicherschlüssel
 - Workspace-Vertragsversion
+- Resize-Eingabemechanik
 
 ## Nächste zwei technischen Schritte
 
-1. Gespeicherte Breite/Höhe zentral auf das DOM anwenden und `heightPx: null` als automatische Höhe erhalten.
-2. Danach genau einen Resize-Griff pro Panel plus entkoppelten Pointer-/Tastatur-Controller ergänzen.
-
-Danach erst `0.3.0-E – Reorder & Drag and Drop`.
+1. D3: genau einen Resize-Griff pro sichtbarem Panel und entkoppelten Pointer-/Tastatur-Controller auf D1/D2 aufsetzen.
+2. Danach erst 0.3.0-E: Reorder & Drag and Drop mit eigener Tastaturalternative.
 
 ## Status
 
-Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`. Die interne Entwicklungsphase ist transparent als `0.3.0-D Resize State & Calculation` dokumentiert.
+Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`. Die interne Entwicklungsphase ist transparent als `0.3.0-D Resize DOM Application` dokumentiert.
