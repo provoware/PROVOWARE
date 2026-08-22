@@ -1,6 +1,6 @@
 # TODO
 
-Kanonische Entwicklungsroadmap. Abgeschlossene Detailhistorie bleibt über Git, CHANGELOG und die versionsbezogenen Checklisten nachvollziehbar; diese Datei zeigt den aktuellen Arbeitsstand und die nächsten realen Gates.
+Kanonische Entwicklungsroadmap. Detailhistorie bleibt über Git, CHANGELOG und die versionsbezogenen Checklisten nachvollziehbar. Diese Datei zeigt den aktuellen Stand und die nächsten realen Gates.
 
 ## Freigegebene Basis
 
@@ -31,7 +31,7 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 - [ ] Pointer Capture, Preview, Commit und Abbruch automatisiert testen.
 - [ ] Reorder & Drag and Drop erst nach grünem D3b beginnen.
 - [ ] Responsive/Accessibility-Hardening durchführen.
-- [ ] Firefox-Endabnahme und Chrome-Kompatibilitätsprobe durchführen.
+- [ ] Chromium-first Browserprüfung des Workspace-Pfads ergänzen; Firefox optional gegenprüfen.
 
 ## Abgeschlossen – 0.4.0 Project Data Studio
 
@@ -41,91 +41,72 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 - [x] Datensätze erstellen, bearbeiten und löschen.
 - [x] serverseitige Typ-/Schema-/Same-Origin-Prüfung.
 - [x] projektspezifischer Linter und Node-20/24-CI.
-- [x] 66/66 Tests im finalen 0.4.0-Branch-Gate.
 
-PR: `#81`
-
-Squash-Merge: `20546306a0db98c25a003f4cf96f142aac851d6f`
+PR `#81` · Squash-Merge `20546306a0db98c25a003f4cf96f142aac851d6f`
 
 ## Abgeschlossen – 0.4.1 Recovery & Migration
 
-Baseline: `a3f6f17d3e9c50bb83392588b6eec17ba8fb9d8f`
+- [x] lokale `.pwbak`-Backups und Rotation auf maximal 10 Sicherungen.
+- [x] automatisches Sicherheitsbackup vor Restore und Import.
+- [x] SHA-256-gebundene Restore-/Import-Vorschau.
+- [x] atomarer Ersatz und Failure-Injection direkt vor Rename.
+- [x] Recovery aus beschädigter Live-Datei mit Erhalt der Rohbytes.
+- [x] validierter JSON-Export/-Import.
+- [x] deterministische Migrationsengine `n -> n+1`; Produktionsschema bleibt v1.
+- [x] `v1 -> v2` ausschließlich als isolierte Testfixture.
+- [x] Recovery im Lint- und zentralen Quality Gate verankert.
 
-Arbeitsbranch: `feat/0.4.1-recovery-migration`
+PR `#82` · Squash-Merge `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
-Pull Request: `#82`
+## Aktueller Qualitätsstrang – 0.4.1-E2E Chromium Gate & HTML UI Mirror
 
-Squash-Merge: `babdc49367a4fe6b07ce64599fedf23c552ab173`
+Baseline: `7f59c727bcef6b959e3fcc49d7c796b088bc197a`
 
-### A – Backup & Rotation
+Arbeitsbranch: `feat/0.4.1-browser-e2e-html-mirror`
 
-- [x] feste Backup-Ablage `data/backups/project-data/` definieren.
-- [x] Recovery-Artefakte mit `.pwbak` vom Quellcode-/JSON-Auto-Fix entkoppeln.
-- [x] manuelles Backup implementieren.
-- [x] automatisches Sicherheitsbackup vor Restore implementieren.
-- [x] automatisches Sicherheitsbackup vor Import implementieren.
-- [x] Backup-IDs mit festem Muster statt frei wählbaren Pfaden absichern.
-- [x] SHA-256, Größe, Schema, Revision sowie Vorlagen-/Datensatzanzahl erfassen.
-- [x] Rotation auf maximal 10 Backups begrenzen und testen.
-- [x] Backup-Verzeichnis gegen statische Auslieferung schützen und aus Git ausschließen.
+Pull Request: `#83`
 
-### B – Restore / Failure Injection
+### A – Chromium-first Browser-E2E
 
-- [x] Restore-Vorschau und SHA-256-Bindung implementieren.
-- [x] Restore unter derselben Mutationssperre wie CRUD ausführen.
-- [x] aktuellen Zustand vor Restore automatisch sichern.
-- [x] atomaren Temp-Datei-zu-Rename-Pfad wiederverwenden.
-- [x] Failpoint direkt vor Rename ergänzen.
-- [x] simulierten Schreibabbruch testen.
-- [x] bei Abbruch bytegenau unveränderte Live-Daten nachweisen.
-- [x] Sicherheitsbackup trotz fehlgeschlagenem Restore nachweisen.
+- [x] Playwright als exakt gepinnte Dev-Abhängigkeit einführen.
+- [x] Chromium als primäres automatisches Browserprojekt festlegen.
+- [x] Firefox ausschließlich als optionalen manuellen Alternativlauf behalten.
+- [x] Testserver aus temporärer Projektkopie starten, damit echte Nutzdaten unangetastet bleiben.
+- [x] Browserpfad `Start -> Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import` automatisieren.
+- [x] Browserartefakte, Reports und Fehler-Traces aus Git ausschließen.
+- [x] Chromium-Gate bei Pull Requests und `main`-Pushes automatisch ausführen.
 
-### C – Export / Import
+### B – HTML-Mirror & Screenshot-Evidenz
 
-- [x] validierten JSON-Export implementieren.
-- [x] Importdatei auswählen und serverseitig prüfen.
-- [x] Schemastand, Inhaltszusammenfassung und SHA-256 vor Import anzeigen.
-- [x] Import an die Vorschau-Prüfsumme binden.
-- [x] aktuellen Rohzustand vor Import automatisch sichern.
-- [x] beschädigte Live-Datei als Rohbytes sichern und danach Recovery-Import erlauben.
-- [x] beschädigtes Import-JSON, unbekannte Schemaversion und veraltete Prüfsumme ablehnen.
+- [x] reale `index.html` zweimal laden statt eine Testattrappe nachzubauen.
+- [x] Referenz und Spiegel intern exakt auf 1366 × 900 festlegen.
+- [x] Spiegel ausschließlich visuell auf Faktor 0,5 skalieren.
+- [x] zentrale DOM-Rechtecke zwischen Referenz und Spiegel vergleichen.
+- [x] gemessenen Skalierungsfaktor validieren.
+- [x] vollständigen Mirror-Screenshot und separaten 683 × 450-Spiegel erzeugen.
+- [x] Start-, Datensatz-, Restore- und Import-Screenshots erzeugen.
+- [x] Erfolgsartefakt mit sechs PNGs und JSON-Export tatsächlich entpacken und prüfen.
 
-### D – Migration
+### C – real gefundener UI-Fehler
 
-- [x] deterministische Migrationskette `n -> n+1` implementieren.
-- [x] fehlende Migrationsschritte und Rückwärtsmigration ablehnen.
-- [x] Migrationsplan ohne Mutation beschreibbar machen.
-- [x] isolierte `v1 -> v2`-Testfixture implementieren und Determinismus nachweisen.
-- [x] Produktionsschema ausdrücklich bei Version 1 belassen.
+- [x] erster echter Chromium-Lauf deckte überlappende Data-Studio-/Recovery-Bedienelemente im schmalen Detailpanel auf.
+- [x] Project-Data-UI von viewport-basiertem Zwei-Spalten-Verhalten auf container-responsive Darstellung umstellen.
+- [x] schmale Modulbreite auf eine Spalte begrenzen; Zwei-Spalten-Modus erst bei ausreichend echter Containerbreite aktivieren.
+- [x] Bedienelemente mit Scroll-Abstand zur sticky Schnellleiste härten.
+- [x] denselben unveränderten Chromium-E2E-Pfad danach vollständig grün ausführen.
 
-### E – Recovery-UI
+### D – aktuelle Evidenz
 
-- [x] Modul `data-recovery` Version `0.4.1` registrieren.
-- [x] Backup-Liste, Backup-Erstellung und Restore-Vorschau integrieren.
-- [x] Restore erst nach expliziter Bestätigung ausführen.
-- [x] JSON-Export, Dateiauswahl und Import-Vorschau integrieren.
-- [x] Import erst nach expliziter Bestätigung ausführen.
-- [x] `file://` kontrolliert in nicht schreibfähigen Modus degradieren.
-
-### F – Regression / Qualität
-
-- [x] Recovery-Service-, API- und UI-Tests ergänzen.
-- [x] Failure-Injection direkt im atomaren Schreibpfad testen.
-- [x] bestehende 0.4.0-, Workspace-, Registry- und Starttests unverändert weiter ausführen.
-- [x] Recovery als Pflichtbestandteil im zentralen Quality Gate verankern.
-- [x] Runtime-Backups aus Quellcode-/Auto-Fix-Walk ausschließen.
-- [x] `data-recovery` in das Verbot einer zweiten Browser-Persistenz aufnehmen und testen.
-- [x] finaler GitHub-Actions-Lauf auf Node 20 und Node 24 vollständig grün.
-- [x] finaler Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 82/82 Tests erfolgreich, 0 fehlgeschlagen.
-- [x] finaler Diff: 21 Commits voraus, 0 hinter `main`, 19 begründete Dateien.
-
-### G – Dokumentation / Abschluss
-
-- [x] Plan, Checkpoint und Checkliste angelegt.
-- [x] README, TODO, CHANGELOG, MANIFEST und VERSION synchronisiert.
-- [x] PR #82 auf `ready for review` gesetzt.
-- [x] PR #82 kontrolliert per Squash gemergt.
-- [x] `main` nach Merge auf Registry, VERSION und Recovery-Service geprüft.
+- [x] Node 20 Core Quality Gate grün.
+- [x] Node 24 Core Quality Gate grün.
+- [x] paketfreier Core-Stand: 35 JavaScript-Dateien gelintet, 94 Projektdateien geprüft, 85/85 Node-Tests erfolgreich.
+- [x] Chromium: 2/2 echte Browserprüfungen erfolgreich.
+- [x] HTML-Mirror: PASS, 1366 × 900 intern, Faktor 0,5, Schlüsselgeometrie identisch.
+- [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
+- [ ] finalen Dokumentationsstand erneut durch Core- und Chromium-Gate prüfen.
+- [ ] finalen Diff gegen `main` prüfen.
+- [ ] PR #83 auf ready for review setzen und kontrolliert squash-mergen.
+- [ ] `main` nach Merge erneut prüfen.
 
 ## Nächste Funktionsstufe – 0.4.2 Data Studio PRO
 
@@ -136,11 +117,12 @@ Squash-Merge: `babdc49367a4fe6b07ce64599fedf23c552ab173`
 - [ ] optionalen Storage-Adapter-Vertrag vorbereiten.
 - [ ] SQLite nur bei nachgewiesenem Bedarf hinter demselben Datenservice einführen.
 
-## Parallel nächstes Qualitätsgate – Browser E2E
+## Danach – Cross-OS-/Release-Hardening
 
-- [ ] Firefox-first: Start -> Notiz -> Vorlage -> Datensatz -> Reload -> Edit -> Delete -> Backup -> Restore -> Import automatisieren.
-- [ ] danach Chrome-Kompatibilitätslauf.
-- [ ] Cross-OS-CI für Windows/macOS nach Stabilisierung der Datenpfade ergänzen.
+- [ ] Linux-Pfade zusätzlich mit expliziten Rechte-/Temp-/Rename-Fällen härten.
+- [ ] Windows-CI für Pfadseparatoren, Dateisperren, Rename und Recovery ergänzen.
+- [ ] Browser-E2E auf Windows erst nach stabilem Dateisystem-Gate aktivieren.
+- [ ] Firefox bei Bedarf als manuellen Kompatibilitätslauf verwenden, nicht als primären Blocker.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
 
