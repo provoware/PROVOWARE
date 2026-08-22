@@ -10,7 +10,7 @@ Dieses Manifest beschreibt ausschließlich `0.3.0-C`.
 
 ## Produktversion
 
-Freigegebene Produktversion bleibt während dieser Teilstufe `0.2.0`.
+Freigegebene Produktversion bleibt `0.2.0`.
 
 Workspace-Vertragsversion: `1`.
 
@@ -23,19 +23,18 @@ Workspace-Vertragsversion: `1`.
 - Layout-Menü mit fünf Kernpanels
 - `Alle anzeigen`
 - `Standardlayout wiederherstellen`
-- sichtbarer Live-Status
+- Live-Status
 - stabile `data-workspace-panel`-Zuordnung
-- Layout-Schalter verwenden dieselben IDs über `data-layout-panel`
+- Layout-Schalter mit denselben IDs über `data-layout-panel`
 - `assets/workspace-ui.js` wird zwischen Workspace-State und App geladen
 
 ### `assets/styles.css`
 
-- kompakte, sticky Schnellstarterleiste
+- kompakte sticky Schnellstarterleiste
 - fester Primärbereich für `Layout`
 - horizontal scrollbarer sekundärer Statusbereich
-- modernes Layout-Menü
-- Fokusdarstellung für Kontrollfelder
-- versteckte Panels werden sicher aus dem Grid entfernt
+- Layout-Menü und Fokusdarstellung
+- versteckte Panels verlassen das Grid
 - mobile Option A ohne separate Zweitnavigation
 
 ### `assets/workspace-state.js`
@@ -48,99 +47,83 @@ Neue zentrale Methoden:
 Eigenschaften:
 
 - unbekannte Panel-ID wird vor Zustandsänderung abgelehnt
-- keine Änderung, wenn der Zielwert bereits gilt
+- unveränderter Zielwert erzeugt keinen unnötigen neuen Zustand
 - Reihenfolge, Breite und Höhe bleiben erhalten
-- Speicherung läuft weiterhin ausschließlich über `zustandSetzen()`/`zustandSpeichern()`
+- Speicherung bleibt zentral über `zustandSetzen()`/`zustandSpeichern()`
 
 ### `assets/workspace-ui.js`
 
-Neue entkoppelte Bedienlogik ohne eigene Persistenz:
+Entkoppelte Bedienlogik ohne eigene Persistenz:
 
 - Workspace-Zustand auf DOM anwenden
 - Kontrollfelder synchron halten
 - Layout-Menü öffnen/schließen
-- einzelne Panel-Sichtbarkeit ausführen
+- Panel-Sichtbarkeit ausführen
 - `Alle anzeigen`
 - Standardlayout wiederherstellen
-- verständliches Nutzerfeedback
-- `Escape` schließt Menü und setzt Fokus auf `Layout`
-- Klick außerhalb schließt das Menü kontrolliert
-- Fehler führen auf den letzten gültigen Workspace-Zustand zurück
+- Nutzerfeedback
+- `Escape` und Fokus-Rückkehr
+- Klick außerhalb schließt Menü
+- Fehler fallen auf letzten gültigen Workspace-Zustand zurück
 
 ### `assets/app.js`
 
-- initialisiert zuerst Workspace-State
-- verbindet danach Workspace-UI mit derselben Workspace-API und demselben Logger
+- initialisiert Workspace-State
+- bindet danach Workspace-UI an dieselbe API und denselben Logger
 - keine zweite Zustands- oder Log-Infrastruktur
 
 ## Qualitätssicherung
 
-### `tests/workspace-state.test.mjs`
+### Tests
 
-Zusätzlich geprüft:
+`tests/workspace-state.test.mjs` prüft zusätzlich:
 
 - Aus-/Einblenden erhält Reihenfolge und Größenwerte
 - alle fünf Panels dürfen gleichzeitig ausgeblendet werden
-- `allePanelsAnzeigen()` stellt alle wieder sichtbar
+- `allePanelsAnzeigen()`
 - unbekannte Panel-ID verändert keinen gültigen Zustand
 
-### `tests/workspace-ui.test.mjs`
+`tests/workspace-ui.test.mjs` prüft:
 
-Neu geprüft:
-
-- gespeicherte Sichtbarkeit wird auf DOM und Kontrollfelder angewendet
+- gespeicherte Sichtbarkeit auf DOM und Kontrollfelder
 - Sichtbarkeitsschalter aktualisiert Zustand, DOM und Nutzerfeedback
 - `Alle anzeigen`
 - Standardlayout wiederherstellen
 - Layout-Menü öffnen
 - `Escape` schließen und Fokus zurückführen
 
-### `scripts/quality-check.mjs`
+### Quality Gate
 
-Zusätzlich geprüft:
+`scripts/quality-check.mjs` prüft zusätzlich:
 
-- `assets/workspace-ui.js` ist Pflichtdatei
-- `tests/workspace-ui.test.mjs` ist Pflichtdatei
-- Script-Reihenfolge ist deterministisch
-- `data-workspace-panel` enthält exakt die Vertrags-IDs
-- `data-layout-panel` enthält exakt die Vertrags-IDs
-- Layout-Pflichtelemente sind vorhanden
-- `Layout` liegt statisch vor dem veränderbaren Workspace
+- `assets/workspace-ui.js` als Pflichtdatei
+- `tests/workspace-ui.test.mjs` als Pflichtdatei
+- deterministische Script-Reihenfolge
+- `data-workspace-panel` entspricht exakt den realen Vertrags-IDs
+- `data-layout-panel` entspricht exakt denselben IDs
+- Layout-Pflichtelemente vorhanden
+- `Layout` liegt statisch vor und außerhalb des veränderbaren Workspace
 
-`npm run verify` bleibt der einzige kanonische Prüfaufruf.
+Kanonischer Prüfaufruf bleibt:
+
+```bash
+npm run verify
+```
 
 ## Datenhaltung
 
-Persistenter Schlüssel bleibt unverändert:
+Persistenter Schlüssel:
 
 `provoware.allin.workspace.main.v1`
 
 Die UI schreibt niemals direkt in `localStorage`.
 
-## Bestätigte Bedienentscheidung
-
-Mobile Option A:
+## Bestätigte mobile Option A
 
 - Schnellstarterleiste bleibt kompakt und einzeilig
 - `Layout` bleibt immer sichtbar
 - nur sekundäre Inhalte dürfen horizontal gescrollt werden
 - keine zweite unnötige Navigation
-
-## Dokumentation
-
-Betroffen:
-
-- `README.md`
-- `TODO.md`
-- `CHANGELOG.md`
-- `MANIFEST.md`
-- `LOGGING.md`
-- `PRO_DEBUGGING.md`
-- `VERSION.json`
-- `docs/PLAN_0.3.0_C.md`
-- `docs/DECISIONS_0.3.0.md`
-- `docs/STATUS_0.3.0.md`
-- dieses Patchmanifest
 
 ## Nicht Bestandteil
 
@@ -155,20 +138,38 @@ Betroffen:
 
 Einstufung: **mittel**.
 
-Betroffen sind feste Bedienzone, Panel-Sichtbarkeit, Workspace-State-API, Workspace-UI-Anbindung, Tests, Quality Gate und Dokumentation.
+Technischer PR #68:
 
-## Validierung vor Merge
+- `20` geänderte Dateien
+- `1823` Hinzufügungen
+- `408` Löschungen
 
-Noch ausstehend:
+Der hohe Textanteil stammt wesentlich aus Plan-, Manifest-, README-, Debug- und Statusdokumentation sowie neuen Tests. Der eigentliche Laufzeitpatch bleibt auf Sichtbarkeit, feste Bedienzone und ihre Absicherung begrenzt.
 
-- vollständiger Diff gegen `main`
-- Branch 0 Commits hinter `main`
-- `npm run verify` erfolgreich
-- alle Sichtbarkeits- und UI-Tests erfolgreich
-- PR mergebar
-- keine ungeplanten Dateien
-- zentrale Dateien nach Merge auf `main` erneut lesen
+## Reale Validierung
+
+- Branch vor Merge: `0` Commits hinter `main`
+- technischer PR: `#68`
+- PR mergebar: ja
+- Quality Gate: `success`
+- statisch geprüft: `39` Dateien
+- automatische Tests: `18/18` erfolgreich
+- fehlgeschlagen: `0`
+- Projekt-Node: `20.20.2`
+- Squash-Merge: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
+- Main-Stichprobe erfolgreich:
+  - `index.html`
+  - `assets/workspace-ui.js`
+  - `VERSION.json`
+
+## Nicht blockierender Infrastrukturhinweis
+
+GitHub Actions meldet weiterhin einen Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions `v4`. Das Projekt-Quality-Gate selbst war erfolgreich. Die Workflow-Hygiene wird getrennt und spätestens in 0.3.0-G geprüft.
 
 ## Rückweg
 
-Revert des 0.3.0-C-Pull-Requests. Es existiert keine serverseitige Migration und kein Eingriff in andere lokale PROVOWARE-Schlüssel.
+Revert des Squash-Merges `dce166770cf589a8fb9720cb3c0a650c19151cd9`. Es existiert keine serverseitige Migration und kein Eingriff in andere lokale PROVOWARE-Schlüssel.
+
+## Abschluss
+
+`0.3.0-C – Visibility Controls & Compact Menu` ist technisch abgeschlossen und validiert. Nächster Funktionspatch ist `0.3.0-D – Resize`.
