@@ -1,183 +1,173 @@
 # TODO
 
-Kanonische Entwicklungsroadmap. Abgeschlossene Detailhistorie bleibt über Git/CHANGELOG nachvollziehbar; diese Datei zeigt den aktuellen Arbeitsstand und die nächsten realen Gates.
+Kanonische Entwicklungsroadmap. Abgeschlossene Detailhistorie bleibt über Git, CHANGELOG und die versionsbezogenen Checklisten nachvollziehbar; diese Datei zeigt den aktuellen Arbeitsstand und die nächsten realen Gates.
 
 ## Freigegebene Basis
 
 ### 0.1.0 – UI Foundation
 
-- [x] modulare HTML-Oberfläche, responsives Dark-/Petrol-Layout und Debugging/Logging aufbauen.
-- [x] Versionsmetadaten und stabile UI-Basis anlegen.
+- [x] modulare HTML-Oberfläche, responsives Dark-/Petrol-Layout und Debugging/Logging.
 
 ### 0.2.0 – Module Contract & Registry
 
-- [x] Modulvertrag Version 1 definieren.
-- [x] Registry-Lifecycle implementieren.
-- [x] reproduzierbares Quality Gate und GitHub Actions einführen.
-- [x] semantikneutralen Auto-Fix einführen.
-- [x] PR #62 mergen und `main` prüfen.
+- [x] Modulvertrag Version 1, Registry-Lifecycle, Quality Gate, GitHub Actions und semantikneutraler Auto-Fix.
 
 Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 
 ## Paralleler Workspace-Strang – 0.3.0 Flexible Workspace Engine
 
-Die Workspace-Basis bleibt aktiv. 0.4.0 Project Data Studio verändert deren persistente Verträge nicht.
-
 ### Abgeschlossen
 
 - [x] 0.3.0-A – Workspace-Vertrag.
 - [x] 0.3.0-B – State Foundation & Autosave/Reset.
-- [x] 0.3.0-C – Visibility Controls und kompakte Layoutsteuerung.
-- [x] 0.3.0-D1 – State-API und reine Größenberechnung.
+- [x] 0.3.0-C – Visibility Controls.
+- [x] 0.3.0-D1 – State-API und Größenberechnung.
 - [x] 0.3.0-D2 – DOM-Anwendung über CSS-Variablen.
 - [x] 0.3.0-D3a – Resize-Griff und Tastatur-Vorschau.
 
-Wichtige Merges:
+### Offen – 0.3.0-D3b / E / F / G
 
-- 0.3.0-B: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
-- 0.3.0-C: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
-- 0.3.0-D1: `1de0999cd570c612a80649cfe4975d8531947935`
-- 0.3.0-D2: `249df54ec13fa632f74400897dd3d83da3332bcb`
-- 0.3.0-D3a: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
-
-### Offen – 0.3.0-D3b Pointer/Maus/Touch/Stift
-
-- [ ] vorhandenen Resize-Griff für Pointer Events wiederverwenden.
-- [ ] `pointerdown` kontrolliert starten und Pointer Capture robust verwalten.
-- [ ] `pointermove` ausschließlich als transiente Vorschau verarbeiten.
-- [ ] Rastermetrik und bestehende D1-Größenberechnung wiederverwenden.
-- [ ] während der Bewegung weder speichern noch pro Bewegung loggen.
-- [ ] `pointerup` auf höchstens einen validierten Commit begrenzen.
-- [ ] `pointercancel` und `Escape` ohne Persistenz behandeln.
-- [ ] Maus, Touch und Stift über dieselbe Pointer-Logik abdecken.
-- [ ] Resize bis 980 px weiter deaktiviert halten.
-- [ ] Pointer-/Capture-/Commit-/Abbruchtests ergänzen.
-
-### Danach – 0.3.0-E/F/G
-
+- [ ] Pointer/Maus/Touch/Stift über denselben Resize-Griff ergänzen.
+- [ ] Pointer Capture, Preview, Commit und Abbruch automatisiert testen.
 - [ ] Reorder & Drag and Drop erst nach grünem D3b beginnen.
-- [ ] Tastaturalternative und Drag-Abbruch ohne Zustandsverlust sicherstellen.
 - [ ] Responsive/Accessibility-Hardening durchführen.
 - [ ] Firefox-Endabnahme und Chrome-Kompatibilitätsprobe durchführen.
-- [ ] Workspace-Release-Gate vollständig grün abschließen.
 
 ## Abgeschlossen – 0.4.0 Project Data Studio
 
-Baseline: `6fd1123122cca0c69fd50bdbf69ef2186cc930d0`
+- [x] Entwicklungsnotiz-Schnelleingabe mit Zeitstempel und fester Projekttextdatei.
+- [x] zentrale lokale JSON-Datenbank mit atomarer Persistenz und serialisierten Mutationen.
+- [x] Eingabemasken-Baukasten und wiederverwendbare Vorlagen.
+- [x] Datensätze erstellen, bearbeiten und löschen.
+- [x] serverseitige Typ-/Schema-/Same-Origin-Prüfung.
+- [x] projektspezifischer Linter und Node-20/24-CI.
+- [x] 66/66 Tests im finalen 0.4.0-Branch-Gate.
 
-Arbeitsbranch: `feat/0.4.0-project-data-studio`
-
-Pull Request: `#81`
+PR: `#81`
 
 Squash-Merge: `20546306a0db98c25a003f4cf96f142aac851d6f`
 
-### A – Entwicklungsnotizen
+## Aktuelle Iteration – 0.4.1 Recovery & Migration
 
-- [x] feste Projektdatei `data/ENTWICKLUNGSNOTIZEN.txt` anlegen.
-- [x] einzeiliges Eingabefeld in die Dashboard-Schnellstarterleiste integrieren.
-- [x] Speichern über `Enter` und Button auf denselben Submit-Pfad legen.
-- [x] lokalen Zeitstempel `YYYY-MM-DD HH:mm:ss` serverseitig erzeugen.
-- [x] Eingabe trimmen, Zeilenumbrüche normalisieren und Länge begrenzen.
-- [x] Link `Datei öffnen` integrieren.
-- [x] `file://`-Start erhalten und Schreibfunktion dort kontrolliert deaktivieren.
+Baseline: `a3f6f17d3e9c50bb83392588b6eec17ba8fb9d8f`
 
-### B – Zentrale Projektdatenbank
+Arbeitsbranch: `feat/0.4.1-recovery-migration`
 
-- [x] versionierten JSON-Vertrag mit `schemaVersion`, `revision`, `templates[]` und `records[]` implementieren.
-- [x] feste Laufzeitdatei `data/project-data.json` definieren.
-- [x] Laufzeitdatenbank und temporäre Austauschdateien aus Git ausschließen.
-- [x] direkte statische Auslieferung der Datenbank blockieren.
-- [x] atomaren Dateiaustausch implementieren.
-- [x] Mutationen innerhalb des lokalen Servers serialisieren.
-- [x] beschädigtes JSON erkennen und nicht still überschreiben.
-- [x] serverseitige Payload-, Typ- und Schema-Prüfung implementieren.
-- [x] Same-Origin-Schutz für Browser-API-Aufrufe implementieren.
+Pull Request: `#82`
 
-### C – Eingabemasken-Baukasten
+### A – Backup & Rotation
 
-- [x] Vorlagen erstellen.
-- [x] Vorlagen erneut laden und bearbeiten.
-- [x] Felder hinzufügen und entfernen.
-- [x] Feldtyp `Text` unterstützen.
-- [x] Feldtyp `Mehrzeiliger Text` unterstützen.
-- [x] Feldtyp `Zahl` unterstützen.
-- [x] Feldtyp `Datum` unterstützen.
-- [x] Feldtyp `Checkbox` unterstützen.
-- [x] Feldtyp `Auswahlliste` mit frei definierbaren Optionen unterstützen.
-- [x] Pflichtfelder unterstützen.
-- [x] inkompatible Vorlagenänderungen bei bestehenden Datensätzen blockieren.
+- [x] feste Backup-Ablage `data/backups/project-data/` definieren.
+- [x] Recovery-Artefakte mit `.pwbak` vom Quellcode-/JSON-Auto-Fix entkoppeln.
+- [x] manuelles Backup implementieren.
+- [x] automatisches Sicherheitsbackup vor Restore implementieren.
+- [x] automatisches Sicherheitsbackup vor Import implementieren.
+- [x] Backup-IDs mit festem Muster statt frei wählbaren Pfaden absichern.
+- [x] SHA-256, Größe, Schema, Revision sowie Vorlagen-/Datensatzanzahl erfassen.
+- [x] Rotation auf maximal 10 Backups begrenzen.
+- [x] Rotation automatisiert testen.
+- [x] Backup-Verzeichnis gegen statische Auslieferung schützen.
+- [x] Backup-Verzeichnis aus Git ausschließen.
 
-### D – Datensatzverwaltung
+### B – Restore
 
-- [x] Datensätze erstellen.
-- [x] Datensätze anzeigen.
-- [x] Datensätze bearbeiten.
-- [x] Datensätze löschen.
-- [x] Werte bei jedem Schreibvorgang serverseitig gegen die Vorlage validieren.
-- [x] parallele Mutationen automatisiert auf verlorene Schreibvorgänge testen.
+- [x] Restore-Vorschau implementieren.
+- [x] Restore an die SHA-256-Prüfsumme der Vorschau binden.
+- [x] Backup vor Wiederherstellung erneut serverseitig validieren.
+- [x] Restore unter derselben Mutationssperre wie CRUD ausführen.
+- [x] aktuellen Zustand vor Restore automatisch sichern.
+- [x] atomaren Temp-Datei-zu-Rename-Pfad wiederverwenden.
+- [x] Failpoint direkt vor Rename ergänzen.
+- [x] simulierten Schreibabbruch testen.
+- [x] bei Abbruch unveränderte Live-Daten nachweisen.
+- [x] Sicherheitsbackup trotz fehlgeschlagenem Restore nachweisen.
 
-### E – Lint, Format und Regression
+### C – Export / Import
 
-- [x] `npm run lint` als eigenen projektspezifischen Lint-Gate ergänzen.
-- [x] dynamische Codeausführung, externe absolute `fetch`-Ziele und unsichere Serverbindung prüfen.
-- [x] zweite Browser-Persistenz in Project-Data-Modulen verbieten.
-- [x] `npm run verify` auf `Lint -> Quality Gate -> Tests` erweitern.
-- [x] bestehende Workspace-Regressionstests unverändert weiter ausführen.
-- [x] API-, Daten-, UI- und Linter-Tests ergänzen.
-- [x] beschädigte Datenbank als Failure-Probe testen.
-- [x] parallele Datensatzmutationen als Failure-/Concurrency-Probe testen.
-- [x] lokale Laufzeitdatenbank explizit vom Auto-Fix ausschließen.
-- [x] GitHub Actions von v4 auf aktuelle v7-Actions aktualisieren.
-- [x] CI-Matrix auf Node 20 und Node 24 erweitern.
-- [x] finalen CI-Lauf auf beiden Node-Versionen vollständig grün bestätigen.
-- [x] finalen PR-Diff gegen `main` auf ausschließlich begründete Änderungen prüfen.
+- [x] validierten JSON-Export implementieren.
+- [x] Importdatei im Browser auswählen und als JSON einlesen.
+- [x] Import-Vorschau serverseitig validieren.
+- [x] Schemastand, Inhaltszusammenfassung und SHA-256 vor Import anzeigen.
+- [x] Import an die Vorschau-Prüfsumme binden.
+- [x] aktuellen Rohzustand vor Import automatisch sichern.
+- [x] beschädigte Live-Datei als Rohbytes sichern und danach Recovery-Import erlauben.
+- [x] beschädigtes Import-JSON ablehnen.
+- [x] unbekannte/höhere Schemaversion ablehnen.
+- [x] veraltete Vorschau-Prüfsumme ablehnen.
 
-### F – Dokumentation und Abschluss
+### D – Migration
 
-- [x] `docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
-- [x] `docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
-- [x] `docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
-- [x] README auf 0.4.0-Funktion und Grenzen aktualisieren.
-- [x] TODO auf die reale Roadmap aktualisieren und Versionskonflikt mit der früher geplanten Diagnose-Stufe beseitigen.
-- [x] CHANGELOG aktualisieren.
-- [x] MANIFEST aktualisieren.
-- [x] VERSION-Entwicklungsmetadaten aktualisieren; Produktversion bleibt `0.2.0`.
-- [x] PR #81 nach grünem Gate auf „ready for review“ setzen.
-- [x] PR #81 kontrolliert mergen.
-- [x] `main` nach Merge erneut prüfen.
+- [x] deterministische Migrationskette `n -> n+1` implementieren.
+- [x] fehlende Migrationsschritte ablehnen.
+- [x] Rückwärtsmigration ablehnen.
+- [x] Migrationsplan ohne Mutation beschreibbar machen.
+- [x] isolierte `v1 -> v2`-Testfixture implementieren.
+- [x] deterministisches Migrationsergebnis testen.
+- [x] Produktionsschema ausdrücklich bei Version 1 belassen.
 
-## Nächste Project-Data-Stufe – 0.4.1 Recovery & Migration
+### E – Recovery-UI
 
-- [ ] Backup vor Datenbankersatz definieren und implementieren.
-- [ ] Backup-Rotation mit klarer Obergrenze festlegen.
-- [ ] Restore-Vorschau und kontrollierte Wiederherstellung implementieren.
-- [ ] Export/Import mit Schema-Prüfung ergänzen.
-- [ ] beschädigte Datei, Schreibabbruch und Recovery als Failure-Injection automatisieren.
-- [ ] Schema-Migrationsvertrag für zukünftige Versionen definieren.
-- [ ] Migration `v1 -> v2` zuerst als Testfixture entwickeln, bevor ein echtes v2-Schema eingeführt wird.
+- [x] Modul `data-recovery` Version `0.4.1` registrieren.
+- [x] Backup-Liste und `Backup jetzt` integrieren.
+- [x] Restore-Vorschau und explizite Bestätigung integrieren.
+- [x] JSON-Export integrieren.
+- [x] JSON-Dateiauswahl und Import-Vorschau integrieren.
+- [x] Import erst nach expliziter Bestätigung ausführen.
+- [x] `file://` kontrolliert in nicht schreibfähigen Modus degradieren.
+- [x] bestehende Project-Data-Stile wiederverwenden statt zweiten UI-Stack aufzubauen.
+
+### F – Regression / Qualität
+
+- [x] Recovery-Service-Tests ergänzen.
+- [x] Recovery-API-Tests ergänzen.
+- [x] Recovery-UI-/Pflichtdateivertrag testen.
+- [x] Failure-Injection direkt im atomaren Schreibpfad testen.
+- [x] bestehende 0.4.0-, Workspace-, Registry- und Starttests unverändert weiter ausführen.
+- [x] erster GitHub-Actions-Lauf auf Node 20 grün.
+- [x] erster GitHub-Actions-Lauf auf Node 24 grün.
+- [x] erster 0.4.1-Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 81/81 Tests erfolgreich.
+- [ ] finalen CI-Lauf nach vollständiger Dokumentationssynchronisierung grün bestätigen.
+
+### G – Dokumentation / Abschluss
+
+- [x] `docs/PLAN_0.4.1_RECOVERY_MIGRATION.md` anlegen.
+- [x] `docs/CHECKPOINT_0.4.1_RECOVERY_MIGRATION.md` anlegen.
+- [x] `docs/CHECKLIST_0.4.1_RECOVERY_MIGRATION.md` anlegen.
+- [x] README auf 0.4.1 aktualisieren.
+- [x] VERSION-Entwicklungsmetadaten auf 0.4.1 aktualisieren; Produktversion bleibt `0.2.0`.
+- [x] TODO auf den realen 0.4.1-Stand synchronisieren.
+- [ ] CHANGELOG aktualisieren.
+- [ ] MANIFEST aktualisieren.
+- [ ] finalen PR-Diff gegen `main` prüfen.
+- [ ] PR #82 auf `ready for review` setzen.
+- [ ] PR #82 kontrolliert per Squash mergen.
+- [ ] `main` nach Merge erneut prüfen.
 
 ## Danach – 0.4.2 Data Studio PRO
 
 - [ ] Filter- und Suchansicht ergänzen.
+- [ ] Vorlagenbibliothek und Vorlagenexport verbessern.
+- [ ] bessere Maskenorganisation und Kategorien ergänzen.
 - [ ] relationale Feldtypen fachlich definieren.
 - [ ] optionalen Storage-Adapter-Vertrag vorbereiten.
 - [ ] SQLite nur bei nachgewiesenem Bedarf hinter demselben Datenservice einführen.
-- [ ] Vorlagenexport und Vorlagenbibliothek ergänzen.
+
+## Danach – Browser-E2E-Hardening
+
+- [ ] Firefox-first: Start -> Notiz -> Vorlage -> Datensatz -> Reload -> Edit -> Delete -> Backup -> Restore -> Import automatisieren.
+- [ ] danach Chrome-Kompatibilitätslauf.
+- [ ] Cross-OS-CI für Windows/macOS nach Stabilisierung der Datenpfade ergänzen.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
-
-Die früher als `0.4.0` geplante Diagnose-Stufe wird wegen des jetzt belegten Project-Data-Releases sauber auf `0.5.0` verschoben.
 
 - [ ] Logging nach Bereichen und Stufen filterbar machen.
 - [ ] Zeitmessung und Laufzeitkontext ergänzen.
 - [ ] kontrollierten Fehlerkontext strukturieren.
 - [ ] datensparsamen Diagnosebericht exportierbar machen.
-- [ ] Export vor Speicherung auf sensible oder unnötige Daten begrenzen.
 
 ## Langfristig
 
+- [ ] reale Schema-v2-Migration erst entwickeln, wenn ein tatsächlicher v2-Datenvertrag benötigt wird.
 - [ ] Modulzustände nur bei realem Bedarf lokal speichern.
 - [ ] Berechtigungsmodell erst mit einem echten privilegierten Modul entwerfen.
 - [ ] keine Remote-Plugin-Installation ohne eigenes Sicherheitskonzept einführen.
-- [ ] Browser-E2E-Tests für Firefox und Chrome als Release-Gate etablieren.
-- [ ] Cross-OS-CI erst nach Stabilisierung der lokalen Datenpfade auf Windows/macOS erweitern.
