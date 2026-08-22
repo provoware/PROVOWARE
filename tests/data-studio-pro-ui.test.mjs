@@ -44,14 +44,18 @@ test("PRO-Oberfläche enthält Suche, Filter, Kategorien, Bibliothek, Export und
   }
   assert.match(source, /provoware-data-studio-template/);
   assert.match(source, /formatVersion: 1/);
+  assert.match(source, /provoware:data-studio-refreshed/);
   assert.match(source, /window\.location\.protocol === "file:"/);
   assert.doesNotMatch(source, /localStorage|sessionStorage/);
 });
 
-test("PRO-Navigationsbrücke öffnet Vorlagen und vorhandene Record-Edit-Aktion ohne CRUD zu duplizieren", async () => {
+test("PRO-Brücke navigiert ohne CRUD-Duplikation und koppelt PRO an die Data-Studio-Revision", async () => {
   const source = await read("modules/data-studio-pro-bridge/index.js");
   assert.match(source, /provoware:data-studio-open-template/);
   assert.match(source, /provoware:data-studio-open-record/);
+  assert.match(source, /provoware:data-studio-refreshed/);
+  assert.match(source, /data-data-studio-revision/);
+  assert.match(source, /new MutationObserver/);
   assert.match(source, /data-template-select/);
   assert.match(source, /button\[data-action='edit-record'\]/);
   assert.match(source, /button\.click\(\)/);
