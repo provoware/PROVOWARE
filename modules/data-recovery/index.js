@@ -3,6 +3,7 @@
 
   const MODULE_ID = "data-recovery";
   const API_ROOT = "/api/provoware/project-data/recovery";
+  const LEGACY_BACKUP_FORMAT = ".pwbak";
   const LEGACY_BACKUP_LABEL = "Legacy `.pwbak` · 0.4.1";
 
   let root = null;
@@ -423,7 +424,7 @@
           <h4>Import-Vorschau</h4>
           <p class="data-studio-empty" data-import-preview>Noch keine Importdatei geprüft.</p>
           <button type="button" data-action="confirm-import" disabled>Geprüften Import ausführen</button>
-          <p class="data-studio-empty">Legacy-Import und `.pwbak` bleiben Project-Data-only. Das alte Format wird nicht umgedeutet.</p>
+          <p class="data-studio-empty">Legacy-Import und ${LEGACY_BACKUP_FORMAT} bleiben Project-Data-only. Das alte Format wird nicht umgedeutet.</p>
         </section>
       </div>
     `;
