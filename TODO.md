@@ -27,7 +27,7 @@
 - [x] GitHub-Actions-Prüfung für Pull Requests und `main` einrichten.
 - [x] Pull-Request-Quality-Gate erfolgreich durchlaufen lassen (PR #62).
 - [x] Branch-Diff gegen aktuellen `main` abschließend kontrollieren; Branch war 0 Commits hinter `main`.
-- [x] 0.2.0 über PR #62 mergen und `main` stichprobenartig nachprüfen.
+- [x] 0.2.0 über PR #62 mergen und `main` stichproartig nachprüfen.
 
 Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 
@@ -70,7 +70,7 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [x] vollständigen Branch-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
 - [x] GitHub Quality Gate erfolgreich durchlaufen lassen: 35 Dateien geprüft, 11/11 Tests erfolgreich.
 - [x] PR #66 als mergebar prüfen und 0.3.0-B per Squash mergen.
-- [x] `assets/workspace-state.js` und `VERSION.json` nach Merge auf `main` stichprobenartig nachprüfen.
+- [x] `assets/workspace-state.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
 
 0.3.0-B-Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
 
@@ -92,10 +92,12 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [x] automatische Zustands- und UI-Tests ergänzen.
 - [x] Quality Gate um UI-Pflichtdatei, Panel-Zuordnung und sicheren Layout-Schalter erweitern.
 - [x] Patchmanifest `docs/MANIFEST_0.3.0_C.md` anlegen.
-- [ ] vollständigen Branch-Diff gegen aktuellen `main` prüfen.
-- [ ] GitHub Quality Gate erfolgreich durchlaufen lassen.
-- [ ] PR als mergebar prüfen und 0.3.0-C mergen.
-- [ ] zentrale Dateien nach Merge auf `main` stichproartig nachprüfen.
+- [x] vollständigen Branch-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
+- [x] GitHub Quality Gate erfolgreich: 39 Dateien geprüft, 18/18 Tests erfolgreich, 0 fehlgeschlagen.
+- [x] PR #68 als mergebar prüfen und 0.3.0-C per Squash mergen.
+- [x] `index.html`, `assets/workspace-ui.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
+
+0.3.0-C-Merge: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
 
 #### 0.3.0-D – Resize
 
