@@ -125,15 +125,31 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 0.3.0-D-Planungs-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`
 
-##### Technische Implementierung nach Planungsmerge
+##### D1 – State-API + reine Größenberechnung
 
 - [x] State-API `panelGroesseSetzen` ergänzen.
 - [x] State-API `panelGroesseZuruecksetzen` ergänzen.
 - [x] reine Raster-/Höhenberechnung in `assets/workspace-size.js` implementieren.
 - [x] Größenberechnung inklusive realem CSS-`column-gap` automatisiert testen.
 - [x] automatische State- und Berechnungstests ergänzen.
+- [x] Branch nach parallelem PR #73 kontrolliert mit aktuellem `main` synchronisieren.
+- [x] D1-Diff gegen `main` prüfen; 11 geplante Dateien, 0 Commits hinter `main`.
+- [x] GitHub Quality Gate erfolgreich: 48 Dateien geprüft, 31/31 Tests erfolgreich, 0 fehlgeschlagen.
+- [x] PR #74 als mergebar prüfen und D1 per Squash mergen.
+- [x] `assets/workspace-state.js`, `assets/workspace-size.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
+
+0.3.0-D1-Merge: `1de0999cd570c612a80649cfe4975d8531947935`
+
+##### D2 – DOM-Anwendung gespeicherter Größen
+
 - [ ] gespeicherte Breite/Höhe zentral auf DOM anwenden.
 - [ ] `heightPx: null` als automatische Höhe in der DOM-Anwendung erhalten.
+- [ ] Desktopwerte auf Tablet/Mobil nur visuell begrenzen und nicht überschreiben.
+- [ ] automatische DOM-/Responsive-Tests ergänzen.
+- [ ] noch keinen Resize-Griff und keine Pointerlogik einführen.
+
+##### D3 – Resize-Griff + Eingabesteuerung
+
 - [ ] genau einen Resize-Griff pro sichtbarem Panel integrieren.
 - [ ] ungefähr 44 × 44 px sichere Trefferfläche gewährleisten.
 - [ ] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
@@ -145,7 +161,7 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [ ] Nutzerfeedback und WORKSPACE-Logging für die sichtbare Resize-Bedienung ergänzen.
 - [ ] automatische Pointer-, Tastatur- und Responsive-Tests ergänzen.
 - [ ] Quality Gate um Resize-Vertragsprüfungen für die sichtbare Bedienung erweitern.
-- [ ] vollständigen technischen Diff gegen `main` prüfen.
+- [ ] vollständigen D3-Diff gegen `main` prüfen.
 - [ ] technisches Quality Gate erfolgreich abschließen.
 - [ ] technischen PR mergebar prüfen und mergen.
 - [ ] zentrale Laufzeitdateien nach Merge auf `main` stichproartig prüfen.
