@@ -7,6 +7,6 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.3.0-D Resize DOM Application",
-  "development_baseline_commit": "5542f90edb6b2079ef4e55f5e217f3b0e05422c4"
+  "development_phase": "0.3.0-D3a Keyboard Resize Preview",
+  "development_baseline_commit": "d5d7022816e3c164f641a39ccd9b05a5722d0db2"
 }
