@@ -92,7 +92,7 @@ PR `#84` · Squash-Merge `d22a4ba51a970966b8f0242186094fb894e14356`
 - [ ] relationale Feldtypen – eigener späterer Datenmodellvertrag.
 - [ ] Template-Import – erst nach eigenem Konflikt-/ID-Vertrag.
 - [ ] SQLite-Adapter – nur bei nachgewiesenem Bedarf.
-- [ ] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – eigener versionierter Folgeschritt.
+- [x] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – in 0.4.3 als eigener versionierter Vertrag umgesetzt.
 
 ## Abgeschlossen – 0.4.2-H1 Persistence Portability Foundation
 
@@ -144,46 +144,58 @@ Synchronisierte Baseline vor Merge: `9794828aa4dbe95d3a97bf6541fca008956c2056`
 - [x] Artefakt-SHA-256 `fed02b407da6e9916d4423aed94da8d03e581f3d8e99f5db7e049355f6c84d52`.
 - [x] finaler Diff vor Merge: 1 Commit voraus, 0 hinter `main`, 10 begründete Dateien.
 
-## Nächster aktiver Datenstrang – 0.4.3 Recovery Envelope
+## Abgeschlossen – 0.4.3 Recovery Envelope
+
+PR `#87` · Merge `b1bf3a24b30cb18df693b46a26953de8bc9aef18`
 
 Ziel: Project Data und PRO-Metadaten gemeinsam sichern und wiederherstellen, **ohne** das bestehende `.pwbak`-Format still umzudeuten.
 
 ### A – Neues Envelope-Format
 
-- [ ] neue explizite Formatkennung und `formatVersion: 1` definieren.
-- [ ] Project Data und PRO-Metadaten als getrennte Komponenten aufnehmen.
-- [ ] pro Komponente Rohbytes, SHA-256, Byte-Länge, Gültigkeitsstatus und Schema-Metadaten erfassen.
-- [ ] fehlende oder beschädigte Komponenten als Zustand dokumentieren statt still zu normalisieren.
-- [ ] Gesamt-Envelope mit eigener SHA-256-Prüfsumme binden.
+- [x] explizite Formatkennung `provoware-recovery-envelope` und `formatVersion: 1` definiert.
+- [x] Project Data und PRO-Metadaten als getrennte Komponenten aufgenommen.
+- [x] pro Komponente Rohbytes/Base64, SHA-256, Byte-Länge, Gültigkeitsstatus und Schema-Metadaten erfasst.
+- [x] fehlende oder beschädigte Komponenten als Zustand dokumentiert statt still normalisiert.
+- [x] Gesamt-Envelope mit eigener SHA-256-Prüfsumme gebunden.
+- [x] Rotation auf maximal zehn `.pwenvelope`-Sicherungen umgesetzt.
 
 ### B – Rückwärtskompatibilität
 
-- [ ] bestehende `.pwbak`-Backups weiterhin vollständig lesbar halten.
-- [ ] Legacy-`.pwbak` ausdrücklich als Ein-Komponenten-Recovery behandeln.
-- [ ] bestehende 0.4.1-Backups niemals automatisch umschreiben.
+- [x] bestehende `.pwbak`-Backups vollständig lesbar gehalten.
+- [x] Legacy-`.pwbak` bleibt Ein-Komponenten-Recovery für Project Data.
+- [x] bestehende 0.4.1-Backups werden niemals automatisch umgeschrieben.
 
 ### C – Restore-Vorschau / Journal
 
-- [ ] Restore-Vorschau auf Envelope-Ebene mit Komponentenstatus und Prüfsummen aufbauen.
-- [ ] Vorschau kryptografisch an die spätere Ausführung binden.
-- [ ] Restore-Journal mit eindeutigen Stufen und Wiederanlaufzuständen definieren.
-- [ ] Multi-Datei-Restore ausschließlich über die 0.4.2-H1-Atomic-Schicht ausführen.
+- [x] Restore-Vorschau auf Envelope-Ebene mit Komponentenstatus und Prüfsummen aufgebaut.
+- [x] Vorschau per SHA-256 an die spätere Ausführung gebunden.
+- [x] Restore-Journal mit eindeutigen Stufen und Wiederanlaufzuständen eingeführt.
+- [x] Multi-Datei-Restore ausschließlich über die 0.4.2-H1-Atomic-Schicht ausgeführt.
+- [x] Safety-Envelope vor jedem gemeinsamen Restore erzeugt.
+- [x] beide Live-Komponenten nach Restore erneut verifiziert.
 
 ### D – Rollback / Failure Injection
 
-- [ ] Fehler vor erster Komponente simulieren.
-- [ ] Fehler zwischen Project Data und PRO simulieren.
-- [ ] Fehler nach zweiter Komponente, aber vor Journal-Abschluss simulieren.
-- [ ] Rollback-Fehler separat simulieren.
-- [ ] nach jedem Fehlerzustand einen deterministischen Wiederanlauf nachweisen.
-- [ ] niemals einen gemischten, unjournalisierten Live-Zustand still akzeptieren.
+- [x] Fehler vor erster Komponente simuliert.
+- [x] Fehler zwischen Project Data und PRO simuliert.
+- [x] Fehler nach zweiter Komponente vor Verifikation simuliert.
+- [x] Rollback-Fehler separat simuliert.
+- [x] deterministischen Wiederanlauf aus liegengebliebenem Journal nachgewiesen.
+- [x] gemischten, unjournalisierten Live-Zustand ausgeschlossen.
 
 ### E – Abnahme
 
-- [ ] Node 20 + Node 24 vollständig grün halten.
-- [ ] Ubuntu + Windows Portability Gate grün halten.
-- [ ] Chromium 3/3 mindestens unverändert grün halten.
-- [ ] neue Recovery-Envelope-E2E-Kette ergänzen, sobald Service-/Failure-Gates grün sind.
+- [x] Node 20 + Node 24: PASS.
+- [x] Project Lint: 49 JavaScript-Dateien.
+- [x] Quality Gate: 118 Projektdateien.
+- [x] Node Tests: 131/131 PASS, 0 Fehler.
+- [x] Ubuntu Persistence Portability: PASS.
+- [x] Windows Persistence Portability: PASS.
+- [x] Chromium auf 4/4 erweitert: PASS.
+- [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
+- [x] Browser-Evidenzartefakt `9481363211`.
+- [x] Artefakt-SHA-256 `a4e897f6a594fd126d9c19f5a72bb2416a5b0f7de14ec1ab285afbb231839566`.
+- [x] HTML-Mirror nach asynchroner Stabilisierung: PASS, intern 1366 × 900, Skalierung 0,5, keine Geometrieabweichungen.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
 

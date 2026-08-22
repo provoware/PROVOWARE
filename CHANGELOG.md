@@ -1,5 +1,66 @@
 # CHANGELOG
 
+## 0.4.3 – Recovery Envelope · abgeschlossen
+
+### Hinzugefügt
+
+- neuer versionierter Recovery-Envelope mit Kennung `provoware-recovery-envelope` und `formatVersion: 1`.
+- gemeinsame Sicherung von `data/project-data.json` und `data/data-studio-pro.json` als getrennte Komponenten mit Rohbytes/Base64, SHA-256, Byte-Länge, Zustand und Validierungsmetadaten.
+- eigene Gesamt-SHA-256-Bindung des kanonischen Envelope-Payloads.
+- feste `.pwenvelope`-Ablage unter `data/backups/project-envelope/` mit Rotation auf maximal zehn Sicherungen.
+- Safety-Envelope vor jedem gemeinsamen Restore.
+- versioniertes Restore-Journal unter `data/recovery/recovery-envelope-journal.json`.
+- deterministischer Multi-Datei-Restore mit verifizierter Zielprüfung und Rollback.
+- automatischer Wiederanlauf aus liegengebliebenem Journal vor dem Öffnen des lokalen Serverports.
+- Envelope-API unter dem bestehenden Recovery-Prefix und getrennte Envelope-Sektion im bestehenden Recovery-Modul.
+- echter vierter Chromium-E2E-Pfad für gemeinsamen Project-Data-/PRO-Restore.
+- Failure-Injection vor der ersten Komponente, zwischen den Komponenten, nach der zweiten Komponente, vor Abschlussverifikation sowie für einen separaten Rollbackfehler.
+
+### Architektur und Rückwärtskompatibilität
+
+- Legacy-`.pwbak` bleibt unverändert ein Project-Data-only-Format aus 0.4.1.
+- alte `.pwbak`-Dateien werden weder umgedeutet noch automatisch umgeschrieben.
+- Project-Data-Produktionsschema bleibt Version 1.
+- Data-Studio-PRO-Metadatenvertrag bleibt Version 1.
+- Multi-Datei-Restore verwendet ausschließlich die gemeinsame 0.4.2-H1-Schicht `scripts/atomic-file.mjs`.
+- Envelope-Routen werden vor dem Legacy-Recovery-Router behandelt, damit Unterrouten nicht vom älteren Router abgefangen werden.
+- Envelope-/Journalpfade sind aus Git, statischer Auslieferung und semantikneutralem Auto-Fix ausgeschlossen.
+- ein gemischter, unjournalisierter Live-Zustand wird nach Fehlern nicht still akzeptiert.
+
+### Durch echte Browserläufe gefunden und repariert
+
+- zwei syntaktisch gültige, aber zur Laufzeit fehlerhafte Backtick-Verwendungen im großen Recovery-`innerHTML`-Template wurden durch Chromium gefunden und durch Regressionstests gegen rohe `.pwbak`-Backticks abgesichert.
+- der bestehende HTML-Mirror konnte Recovery-/PRO-Frames zu früh als bereit werten und dadurch unterschiedliche asynchrone Zwischenzustände vergleichen.
+- der Mirror wartet jetzt auf fertige Data-Studio-, PRO- und Recovery-Statuswerte, verlangt mehrere stabile Geometriemessungen und nimmt `.data-recovery` selbst in den Geometrievertrag auf.
+- Fehlerberichte enthalten die konkret abweichenden Selektoren über `geometryDifferences`.
+
+### Finale Evidenz
+
+- Funktions-Head vor Merge: `5710a068dba7758b95aa8391c3abed7342e6eaee`.
+- PR #87: gemergt.
+- Merge-Commit: `b1bf3a24b30cb18df693b46a26953de8bc9aef18`.
+- Node 20: PASS.
+- Node 24: PASS.
+- Project Lint: `49` JavaScript-Dateien.
+- Quality Gate: `118` Projektdateien.
+- Node-Test-Suite: `131/131` PASS, `0` Fehler.
+- Ubuntu Persistence Portability: PASS.
+- Windows Persistence Portability: PASS.
+- Chromium: `4/4` PASS.
+- Firefox im automatischen Lauf: wie vorgesehen SKIPPED.
+- Browserartefakt: `9481363211`.
+- Artefakt-SHA-256: `a4e897f6a594fd126d9c19f5a72bb2416a5b0f7de14ec1ab285afbb231839566`.
+- Erfolgsartefakt tatsächlich geprüft: `11` Dateien inklusive `08-recovery-envelope-restored.png` und grünem HTML-Mirror.
+- HTML-Mirror: beide internen Frames `1366 × 900`, Skalierung `0,5`, `keyGeometryIdentical: true`, keine Geometrieabweichungen.
+
+### Bewusst nicht enthalten
+
+- kein portabler Envelope-Import/Export ohne eigenen Vorschau-, Konflikt- und Identitätsvertrag.
+- kein verpflichtender Windows-Chromium-Browserlauf; Windows-Dateisystem-Persistenz ist bereits separat grün.
+- keine Änderung der Produktversion `0.2.0`.
+- keine Änderung des Project-Data- oder PRO-Produktionsschemas.
+- kein SQLite-Adapter ohne nachgewiesenen Bedarf.
+
 ## In Entwicklung – 0.4.2 Data Studio PRO
 
 ### Hinzugefügt
