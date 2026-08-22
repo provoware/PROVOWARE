@@ -351,14 +351,42 @@
     return klonen(zustand);
   };
 
+  const statusLesen = () => klonen(zustand || standardzustandErstellen());
+
+  const panelSichtbarkeitSetzen = (id, sichtbar) => {
+    if (!DEFINITION_NACH_ID.has(id)) throw new RangeError(`Unbekannte Panel-ID: ${String(id)}.`);
+    if (typeof sichtbar !== "boolean") throw new TypeError("Sichtbarkeit muss true oder false sein.");
+
+    const naechsterZustand = statusLesen();
+    if (naechsterZustand.panels[id].visible === sichtbar) return naechsterZustand;
+
+    naechsterZustand.panels[id].visible = sichtbar;
+    const gespeichert = zustandSetzen(naechsterZustand);
+    log(2, `Panel ${id} ${sichtbar ? "eingeblendet" : "ausgeblendet"}.`);
+    return gespeichert;
+  };
+
+  const allePanelsAnzeigen = () => {
+    const naechsterZustand = statusLesen();
+    const bereitsSichtbar = PANEL_DEFINITIONEN.every(
+      (definition) => naechsterZustand.panels[definition.id].visible,
+    );
+    if (bereitsSichtbar) return naechsterZustand;
+
+    PANEL_DEFINITIONEN.forEach((definition) => {
+      naechsterZustand.panels[definition.id].visible = true;
+    });
+    const gespeichert = zustandSetzen(naechsterZustand);
+    log(2, "Alle Workspace-Panels eingeblendet.");
+    return gespeichert;
+  };
+
   const zuruecksetzen = () => {
     zustandLoeschen(aktiverSpeicher);
     zustand = standardzustandErstellen();
     log(1, "Standardlayout wiederhergestellt.");
     return klonen(zustand);
   };
-
-  const statusLesen = () => klonen(zustand || standardzustandErstellen());
 
   const loggerSetzen = (naechsterLogger) => {
     if (typeof naechsterLogger !== "function") {
@@ -377,6 +405,8 @@
     standardzustandErstellen,
     zustandSetzen,
     zustandSpeichern,
+    panelSichtbarkeitSetzen,
+    allePanelsAnzeigen,
     zuruecksetzen,
     statusLesen,
     loggerSetzen,
