@@ -33,7 +33,7 @@ test("Schnellnotizvertrag enthält feste Datei, API und Form-Submit für Button 
 test("Data Studio bietet alle vorgesehenen Feldtypen und keine Browser-Zweitpersistenz", async () => {
   const source = await read("modules/data-studio/index.js");
   for (const type of ["text", "textarea", "number", "date", "checkbox", "select"]) {
-    assert.match(source, new RegExp(`\\[\\"${type}\\"|\\[\"${type}\"|\"${type}\"`));
+    assert.ok(source.includes(`["${type}",`), `Feldtyp ${type} fehlt.`);
   }
   assert.doesNotMatch(source, /localStorage|sessionStorage/);
   assert.match(source, /data-action=\"save-template\"/);
