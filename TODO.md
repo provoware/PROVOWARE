@@ -70,13 +70,13 @@ PR `#82` · Squash-Merge `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
 PR `#83` · Squash-Merge `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
 
-## Aktueller Funktionsstrang – 0.4.2 Data Studio PRO
+## Abgeschlossen – 0.4.2 Data Studio PRO
 
 Baseline: `acf36db29460b2ce25922aeaf065745c04c59176`
 
 Arbeitsbranch: `feat/0.4.2-data-studio-pro`
 
-Pull Request: `#84`
+PR `#84` · Squash-Merge `d22a4ba51a970966b8f0242186094fb894e14356`
 
 ### A – Architektur / Persistenz
 
@@ -140,21 +140,22 @@ Pull Request: `#84`
 - [x] PRO im zentralen Quality Gate als Pflichtbestandteil verankert.
 - [x] Chromium-E2E um Kategorie, Bibliothek, Suche, View, Export und Reload erweitert.
 - [x] HTML-Mirror wartet auf PRO und vergleicht dessen Geometrie mit.
-- [x] erster kompletter Core-Gate: Node 20 + Node 24 PASS, 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Node-Tests.
-- [x] erster kompletter Browser-Gate: Chromium 3/3 PASS, Firefox wie vorgesehen übersprungen.
-- [x] Browserartefakt `9476750307`, SHA-256 `f2eee6beb9baec81126885ce23c8543070afec0fae088045d104cd68a8628f99`.
-- [x] Artefakt tatsächlich geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
+- [x] finaler Core-Gate: Node 20 + Node 24 PASS, 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Node-Tests.
+- [x] finaler Browser-Gate: Chromium 3/3 PASS, Firefox wie vorgesehen übersprungen.
+- [x] finales Browserartefakt `9476846607`, SHA-256 `afb421a42d6e5a0d83a36940297a7598b49e9f35445ec56096604163a986a4e4`.
+- [x] finales Artefakt tatsächlich entpackt und geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
+- [x] Vorlagenexport geprüft: Format v1, Kategorie und Felddefinitionen vorhanden, keine Datensätze.
 
 ### G – Dokumentation / Abschluss
 
 - [x] Plan, Baseline-Checkpoint und Checkliste angelegt.
 - [x] VERSION auf 0.4.2-Entwicklungsstufe aktualisiert; Produktversion bleibt 0.2.0.
 - [x] README auf Funktionen, Verträge, E2E und Recovery-Grenze synchronisiert.
-- [ ] TODO, CHANGELOG, MANIFEST und Checkliste abschließend synchronisieren.
-- [ ] finalen Dokumentationsstand erneut durch Node 20/24 und Chromium prüfen.
-- [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR #84 auf ready for review setzen und kontrolliert squash-mergen.
-- [ ] `main` nach Merge prüfen.
+- [x] TODO, CHANGELOG, MANIFEST und Checkliste synchronisiert.
+- [x] finalen Dokumentationsstand erneut durch Node 20/24 und Chromium geprüft.
+- [x] finalen Diff gegen `main` geprüft: 27 Commits voraus, 0 hinter, 24 begründete Dateien.
+- [x] PR #84 auf ready for review gesetzt und kontrolliert squash-gemergt.
+- [x] `main` nach Merge auf VERSION, Registry und PRO-Service geprüft.
 
 ### Bewusst nicht Teil von 0.4.2
 
@@ -163,18 +164,30 @@ Pull Request: `#84`
 - [ ] SQLite-Adapter – nur bei nachgewiesenem Bedarf.
 - [ ] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – eigener versionierter Folgeschritt.
 
-## Nächster Qualitätsstrang – Cross-OS-/Release-Hardening
+## Nächster Qualitätsstrang – 0.4.3 Persistence Portability Foundation
 
-- [ ] Linux-Rechte, Temp-Verzeichnisse und Rename-/Lock-Fehler systematisch injizieren.
-- [ ] Windows-CI für Pfadseparatoren, Dateisperren, atomaren Ersatz und Recovery ergänzen.
-- [ ] Verhalten von Temp-Dateien und Cleanup auf realen Plattformen vergleichen.
-- [ ] Chromium-E2E auf Windows erst nach stabilem Dateisystem-Gate aktivieren.
-- [ ] Firefox bei Bedarf als manuellen Kompatibilitätslauf verwenden, nicht als primären Blocker.
+Ziel: **eine** belastbare, plattformneutrale Persistenzbasis schaffen, bevor der gemeinsame Recovery Envelope mehrere Live-Dateien transaktional ersetzen muss.
 
-## Optional danach – 0.4.3 Recovery Envelope
+- [ ] zentrale `atomicReplace`-/Temp-/Cleanup-Abstraktion für alle Runtime-Datendateien definieren.
+- [ ] bestehende Project-Data- und Data-Studio-PRO-Writer schrittweise hinter denselben Vertrag legen, ohne Dateiformate zu ändern.
+- [ ] Linux: Rechtefehler, schreibgeschütztes Verzeichnis, Temp-Erstellung, Rename-Fehler und Cleanup per Failure-Injection prüfen.
+- [ ] Windows-CI: Pfadseparatoren, offene Dateihandles/Locks, Rename-/Replace-Verhalten und Temp-Cleanup prüfen.
+- [ ] niemals Datenverlust durch Fallback `unlink -> rename` zulassen; Ersatz muss fail-closed arbeiten.
+- [ ] reproduzierbaren Portability-Report pro Plattform erzeugen.
+- [ ] bestehenden Node-20/24-Core-Gate und Chromium-E2E unverändert grün halten.
+- [ ] Windows-Browser-E2E erst aktivieren, wenn das Dateisystem-Gate stabil ist.
 
-- [ ] gemeinsamen, versionierten Backup-/Restore-Vertrag für Project Data und PRO-Metadaten fachlich definieren.
-- [ ] keine stillschweigende Änderung des bestehenden `.pwbak`-Formats vornehmen.
+## Danach – 0.4.4 Recovery Envelope
+
+Ziel: Project Data und PRO-Metadaten gemeinsam sichern, ohne das bestehende `.pwbak`-Format still umzudeuten.
+
+- [ ] neues explizites Envelope-Format mit eigener Formatversion definieren.
+- [ ] Project Data und PRO-Metadaten als getrennte Komponenten mit SHA-256 und Byte-Länge erfassen.
+- [ ] fehlende oder beschädigte Komponenten als Zustand dokumentieren statt still zu normalisieren.
+- [ ] bestehende `.pwbak`-Backups weiterhin lesbar halten.
+- [ ] Restore-Vorschau auf Envelope-Ebene mit Komponentenstatus und Prüfsummen aufbauen.
+- [ ] Multi-Datei-Restore mit Journal/Rollback auf der 0.4.3-Persistenzbasis implementieren.
+- [ ] Crash-/Failure-Injection zwischen den Komponenten ausführen und vollständige Wiederanlaufstrategie nachweisen.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
 
