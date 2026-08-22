@@ -205,7 +205,7 @@ Screenshots sind Evidenz und Diagnose, aber kein OS-abhängiger Pixel-Diff-Block
 
 ## Browser-Evidenz
 
-Erfolgreicher Chromium-Run erzeugt:
+Erfolgreicher Chromium-Lauf erzeugt:
 
 - `01-start.png`
 - `02-record-created.png`
@@ -218,16 +218,17 @@ Erfolgreicher Chromium-Run erzeugt:
 
 Bei Fehlern werden zusätzlich Trace, Fehler-Screenshot und Video aufbewahrt.
 
-Geprüfter Erfolgsrun #6:
+Finaler dokumentierter Browser-Abnahmelauf auf Head `3b2fc8f5b90d79fe895b82d1357960b025bd781b`:
 
 - Chromium: `2/2` Browsertests PASS
+- Firefox im automatischen Lauf: wie vorgesehen `skipped`
 - Mirror: PASS
 - internes Mirror-Layout: `1366 × 900`
 - Skalierung: `0.5`
 - sichtbarer Spiegel: `683 × 450`
 - Schlüsselgeometrie: identisch
-- Browser-Evidenzartefakt: `9474583341`
-- Artefakt-SHA-256: `f2009e5b8c1ae992a8894fcb1d3d4d5bc41bd5aaa4e24fad0dd4747a6c8eff27`
+- Browser-Evidenzartefakt: `9474652501`
+- Artefakt-SHA-256: `5006875f74dfe91d2fb1c752bc70f540b1573a2170446e260aaba70d124e945c`
 
 ## Core-Qualitätskette
 
@@ -247,13 +248,14 @@ PROJECT LINT
 -> NODE TEST RUNNER
 ```
 
-Aktuell geprüfter E2E-Strang vor finaler Doku-Synchronisierung:
+Finaler dokumentierter Core-Abnahmelauf auf demselben Head:
 
 - Node 20: PASS
 - Node 24: PASS
 - 35 JavaScript-Dateien gelintet
 - 94 Projektdateien geprüft
-- 85/85 Node-Tests PASS
+- 87/87 Node-Tests PASS
+- 0 fehlgeschlagen
 
 Der zentrale Quality Gate prüft zusätzlich den Browser-E2E-Vertrag, Pflichtdateien, Chromium-Priorität, Firefox-Alternativstatus, Artifact-Workflow und echten Zwei-Frame-Mirror.
 
