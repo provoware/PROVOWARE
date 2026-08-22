@@ -211,6 +211,25 @@ test("gespeicherte Panelgröße wird ausschließlich als CSS-Variablen auf das D
   assert.deepEqual(workspace.statusLesen(), unveraendert);
 });
 
+test("transiente Größenvorschau nutzt dieselben CSS-Variablen und verändert den State nicht", () => {
+  const { api, workspace, panels } = umgebungErstellen();
+  api.initialisieren({ workspace });
+  const vorher = workspace.statusLesen();
+
+  api.panelGroesseVorschauAnwenden("work", { widthUnits: 10, heightPx: 456 });
+
+  const panel = panels.get("work");
+  assert.equal(panel.style.getPropertyValue("--panel-spalten"), "10");
+  assert.equal(panel.style.getPropertyValue("--panel-hoehe"), "456px");
+  assert.equal(panel.dataset.workspaceResizePreview, "true");
+  assert.deepEqual(workspace.statusLesen(), vorher);
+
+  api.zustandAnwenden(workspace.statusLesen());
+  assert.equal(panel.style.getPropertyValue("--panel-spalten"), "8");
+  assert.equal(panel.style.getPropertyValue("--panel-hoehe"), "");
+  assert.equal(panel.dataset.workspaceResizePreview, undefined);
+});
+
 test("automatische Höhe entfernt einen alten Inline-Höhenwert reproduzierbar", () => {
   const start = standardzustand();
   start.panels.work.heightPx = 408;
@@ -288,12 +307,12 @@ test("Layout-Menü lässt sich per Schalter öffnen und per Escape schließen", 
   assert.equal(ids.get("layout-toggle").focused, true);
 });
 
-test("Workspace-Größenstylesheet ist ausschließlich auf Desktop aktiv und nutzt nur CSS-Variablen", () => {
+test("Workspace-Größenstylesheet bleibt auf Desktop begrenzt und nutzt den D2-Variablenvertrag", () => {
   assert.match(WORKSPACE_LAYOUT_CSS, /@media \(min-width: 981px\)/);
   assert.match(WORKSPACE_LAYOUT_CSS, /data-workspace-size-ready="true"/);
   assert.match(WORKSPACE_LAYOUT_CSS, /grid-column: span var\(--panel-spalten\)/);
   assert.match(WORKSPACE_LAYOUT_CSS, /height: var\(--panel-hoehe, auto\)/);
-  assert.doesNotMatch(WORKSPACE_LAYOUT_CSS, /pointer|resize|drag|localStorage/i);
+  assert.doesNotMatch(WORKSPACE_LAYOUT_CSS, /localStorage/i);
 });
 
 test("Basis-CSS wird vor dem isolierten Workspace-Größenstylesheet geladen", () => {
