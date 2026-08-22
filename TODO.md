@@ -101,16 +101,57 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 #### 0.3.0-D – Resize
 
-- [ ] Panelbreiten in 12 Rastereinheiten veränderbar machen.
-- [ ] Panelhöhen innerhalb sicherer Grenzen veränderbar machen.
-- [ ] Desktopwerte bei Tablet-/Mobil-Fallback erhalten.
-- [ ] Maus-, Touch- und Tastaturbedienung absichern.
-- [ ] erst validierte Endwerte persistent speichern.
+##### Planung & Vertrag
+
+- [x] Option A bestätigen: ein Resize-Griff für Maus, Touch/Stift und Tastatur.
+- [x] detaillierten Resize-Vertrag `docs/RESIZE_CONTRACT_0.3.0.md` anlegen.
+- [x] detaillierten Teilplan `docs/PLAN_0.3.0_D.md` anlegen.
+- [x] Planungsmanifest `docs/MANIFEST_0.3.0_D_PLAN.md` anlegen.
+- [x] Breite auf Schritte von 1 Rastereinheit festlegen.
+- [x] Höhe auf Schritte von 24 px festlegen.
+- [x] individuelle Min-/Max-Grenzen aus `PANEL_DEFINITIONEN` als einzige Größenquelle bestätigen.
+- [x] Pointerbewegungen ausschließlich als transiente Vorschau definieren.
+- [x] Persistenz erst nach validiertem Abschluss definieren.
+- [x] Tastaturmodell festlegen: Pfeile, `Home`, `Escape`.
+- [x] Tastenwiederholung auf Vorschau + einen Commit bei `keyup` begrenzen.
+- [x] Resize in 0.3.0-D nur ab 981 px aktiv festlegen.
+- [x] Tablet-/Mobilansichten dürfen gespeicherte Desktopwerte nicht überschreiben.
+- [x] 40-teilige Testmatrix definieren.
+- [x] Drag & Drop weiterhin bis 0.3.0-E sperren.
+- [ ] Planungs-Diff gegen `main` prüfen.
+- [ ] Planungs-Quality-Gate erfolgreich abschließen.
+- [ ] Planungs-PR mergebar prüfen und mergen.
+- [ ] Planungsdokumente auf `main` stichproartig nachprüfen.
+
+##### Technische Implementierung nach Planungsmerge
+
+- [ ] State-API `panelGroesseSetzen` ergänzen.
+- [ ] State-API `panelGroesseZuruecksetzen` ergänzen.
+- [ ] reine Raster-/Höhenberechnung implementieren.
+- [ ] Größenberechnung inklusive realem CSS-`column-gap` testen.
+- [ ] gespeicherte Breite/Höhe zentral auf DOM anwenden.
+- [ ] `heightPx: null` als automatische Höhe erhalten.
+- [ ] genau einen Resize-Griff pro sichtbarem Panel integrieren.
+- [ ] ungefähr 44 × 44 px sichere Trefferfläche gewährleisten.
+- [ ] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
+- [ ] Pointer Capture und Pointer-Abbruch robust behandeln.
+- [ ] während Pointerbewegung niemals persistent speichern.
+- [ ] `pointerup` auf genau einen Commit begrenzen.
+- [ ] Tastatur-Pfeile, `Home`, `Escape` implementieren.
+- [ ] Resize bis 980 px kontrolliert deaktivieren.
+- [ ] Nutzerfeedback und WORKSPACE-Logging ergänzen.
+- [ ] automatische State-, Berechnungs-, Pointer-, Tastatur- und Responsive-Tests ergänzen.
+- [ ] Quality Gate um Resize-Vertragsprüfungen erweitern.
+- [ ] vollständigen technischen Diff gegen `main` prüfen.
+- [ ] technisches Quality Gate erfolgreich abschließen.
+- [ ] technischen PR mergebar prüfen und mergen.
+- [ ] zentrale Laufzeitdateien nach Merge auf `main` stichproartig prüfen.
 
 #### 0.3.0-E – Reorder & Drag and Drop
 
-- [ ] Panels erst jetzt verschiebbar machen.
-- [ ] Ziehen nur über dedizierten Griff erlauben.
+- [ ] Erst nach vollständig grünem 0.3.0-D beginnen.
+- [ ] Ziehen nur über dedizierten Drag-Griff erlauben.
+- [ ] Resize-Griff darf niemals Drag auslösen.
 - [ ] Nur Reihenfolge, keine freien Pixelkoordinaten speichern.
 - [ ] Drag-Abbruch ohne Zustandsverlust ermöglichen.
 - [ ] vollständige Tastaturalternative anbieten.
