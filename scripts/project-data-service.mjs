@@ -1,7 +1,8 @@
-import { appendFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { atomicReplaceFile } from "./runtime-persistence.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -185,17 +186,14 @@ export const writeProjectDatabaseAtomic = async (
 ) => {
   validateStoredDatabase(database);
   const filePath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
-  await mkdir(path.dirname(filePath), { recursive: true });
-  const tempPath = `${filePath}.tmp-${process.pid}-${randomUUID()}`;
   const source = `${JSON.stringify(database, null, 2)}\n`;
-  try {
-    await writeFile(tempPath, source, { encoding: "utf8", flag: "wx" });
-    if (beforeRename) await beforeRename({ tempPath, filePath, database });
-    await rename(tempPath, filePath);
-  } catch (error) {
-    await unlink(tempPath).catch(() => {});
-    throw error;
-  }
+  await atomicReplaceFile({
+    targetPath: filePath,
+    content: source,
+    beforeReplace: beforeRename
+      ? ({ tempPath, targetPath }) => beforeRename({ tempPath, filePath: targetPath, database })
+      : null,
+  });
 };
 
 export const withMutationLock = (task) => {
