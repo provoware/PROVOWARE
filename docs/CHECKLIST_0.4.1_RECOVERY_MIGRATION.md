@@ -73,12 +73,9 @@
 - [x] Runtime-Backups explizit aus Quellcode-/Auto-Fix-Walk ausschließen.
 - [x] `data-recovery` in das Verbot einer zweiten Browser-Persistenz aufnehmen.
 - [x] Linter-Regel für Recovery-Zweitpersistenz automatisiert testen.
-- [x] `npm run lint` im ersten 0.4.1-Gate grün.
-- [x] `npm run verify` im ersten 0.4.1-Gate auf Node 20 grün.
-- [x] `npm run verify` im ersten 0.4.1-Gate auf Node 24 grün.
-- [x] erster Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 81/81 Tests erfolgreich.
-- [ ] finaler Gate-Lauf nach Quality-Gate-/Lint-/Dokumentationshärtung auf Node 20 grün.
-- [ ] finaler Gate-Lauf nach Quality-Gate-/Lint-/Dokumentationshärtung auf Node 24 grün.
+- [x] finaler Gate-Lauf auf Node 20 grün.
+- [x] finaler Gate-Lauf auf Node 24 grün.
+- [x] finaler Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 82/82 Tests erfolgreich, 0 fehlgeschlagen.
 
 ## G – Dokumentation / Merge
 
@@ -89,11 +86,11 @@
 - [x] VERSION-Entwicklungsphase aktualisieren; Produktversion bleibt `0.2.0`.
 - [x] Plan, Checkpoint und Checkliste angelegt.
 - [x] Draft-PR #82 erstellt.
-- [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR mergebar und finalen CI-Lauf vollständig grün bestätigen.
-- [ ] PR auf `ready for review` setzen.
-- [ ] Squash-Merge durchführen.
-- [ ] `main` nach Merge prüfen.
+- [x] finalen Diff gegen `main` geprüft: 21 Commits voraus, 0 hinter `main`, 19 begründete Dateien.
+- [x] PR mergebar und finalen CI-Lauf vollständig grün bestätigt.
+- [x] PR auf `ready for review` gesetzt.
+- [x] Squash-Merge durchgeführt: `babdc49367a4fe6b07ce64599fedf23c552ab173`.
+- [x] `main` nach Merge geprüft: Registry, VERSION und Recovery-Service vorhanden und konsistent.
 
 ## Bewusst nicht Teil von 0.4.1
 
@@ -104,4 +101,4 @@
 
 ## Definition of Done
 
-0.4.1 ist für den definierten Scope abgeschlossen, wenn die verbleibenden finalen CI-, Diff-, Merge- und Main-Check-Punkte grün beziehungsweise abgeschlossen sind. Die bewusst ausgeschlossenen Punkte erweitern den Scope und sind keine versteckten Abnahmefehler.
+0.4.1 ist für den definierten Iterationsscope abgeschlossen. Die bewusst ausgeschlossenen Punkte sind folgende Härtungs- beziehungsweise Funktionsstufen und keine versteckten Abnahmefehler.
