@@ -4,6 +4,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const SELF_PATH = "scripts/project-lint.mjs";
 const IGNORED_DIRECTORIES = new Set([".git", "node_modules"]);
 const JAVASCRIPT_EXTENSIONS = new Set([".js", ".mjs"]);
 
@@ -28,22 +29,31 @@ export const lintSource = (filePath, source) => {
   const projectDataModule = rel.startsWith("modules/data-studio/")
     || rel.startsWith("modules/development-notes/");
 
-  const forbidden = [
-    [/(^|[^\w])eval\s*\(/, "eval() ist im Projektcode nicht erlaubt."],
-    [/new\s+Function\s*\(/, "new Function() ist im Projektcode nicht erlaubt."],
-    [/document\.write\s*\(/, "document.write() ist im Projektcode nicht erlaubt."],
-    [/fetch\s*\(\s*["']https?:\/\//i, "Absolute externe fetch()-URLs sind nicht erlaubt."],
-  ];
+  // Die Regelspezifikation enthält ihre Suchmuster selbst und wird deshalb nicht
+  // mit den textbasierten Policy-Regeln gegen sich selbst geprüft. Syntax und
+  // Format dieser Datei bleiben weiterhin Teil des separaten Quality Gates.
+  if (rel !== SELF_PATH) {
+    const forbidden = [
+      [/(^|[^\w])eval\s*\(/, "eval() ist im Projektcode nicht erlaubt."],
+      [/new\s+Function\s*\(/, "new Function() ist im Projektcode nicht erlaubt."],
+      [/document\.write\s*\(/, "document.write() ist im Projektcode nicht erlaubt."],
+      [/fetch\s*\(\s*["']https?:\/\//i, "Absolute externe fetch()-URLs sind nicht erlaubt."],
+    ];
 
-  if (browserCode) {
-    forbidden.push([/localStorage\.clear\s*\(/, "localStorage.clear() darf keine fremden Projektdaten löschen."]);
-  }
-  if (projectDataModule) {
-    forbidden.push([/\b(?:localStorage|sessionStorage)\b/, "Project-Data-Module dürfen keine zweite Browser-Datenquelle anlegen."]);
-  }
+    if (browserCode) {
+      forbidden.push([/localStorage\.clear\s*\(/, "localStorage.clear() darf keine fremden Projektdaten löschen."]);
+    }
+    if (projectDataModule) {
+      forbidden.push([/\b(?:localStorage|sessionStorage)\b/, "Project-Data-Module dürfen keine zweite Browser-Datenquelle anlegen."]);
+    }
 
-  for (const [pattern, message] of forbidden) {
-    if (pattern.test(source)) errors.push(`${rel}: ${message}`);
+    for (const [pattern, message] of forbidden) {
+      if (pattern.test(source)) errors.push(`${rel}: ${message}`);
+    }
+
+    if (rel.startsWith("scripts/") && /["']0\.0\.0\.0["']/.test(source)) {
+      errors.push(`${rel}: Server dürfen nicht unbeabsichtigt an 0.0.0.0 gebunden werden.`);
+    }
   }
 
   if (browserCode && path.extname(filePath) === ".js") {
@@ -51,10 +61,6 @@ export const lintSource = (filePath, source) => {
     if (!/["']use strict["']/.test(firstChunk)) {
       errors.push(`${rel}: Browser-JavaScript benötigt 'use strict' im Einstieg.`);
     }
-  }
-
-  if (rel.startsWith("scripts/") && /["']0\.0\.0\.0["']/.test(source)) {
-    errors.push(`${rel}: Server dürfen nicht unbeabsichtigt an 0.0.0.0 gebunden werden.`);
   }
 
   return errors;
