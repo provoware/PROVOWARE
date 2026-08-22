@@ -48,13 +48,13 @@ Drag & Drop folgt erst nach Workspace-Vertrag, State Foundation, Autosave/Reset,
 
 **Entscheidung:** Die freigegebene Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
 
-**Begründung:** Interne Teilstufen wie 0.3.0-B werden transparent dokumentiert, aber nicht als vollständig freigegebene 0.3.0-Funktion ausgegeben.
+**Begründung:** Interne Teilstufen wie 0.3.0-B und 0.3.0-C werden transparent dokumentiert, aber nicht als vollständig freigegebene 0.3.0-Funktion ausgegeben.
 
 ## D-008 – Vollständig ausgeblendeter Workspace
 
 **Entscheidung:** Option A.
 
-Alle Panels dürfen später vollständig ausgeblendet werden.
+Alle Panels dürfen vollständig ausgeblendet werden.
 
 **Schutzmaßnahme:** Ein permanenter `Layout`-Schalter bleibt außerhalb des veränderbaren Workspace jederzeit erreichbar. Darüber können einzelne Panels wieder eingeblendet oder das Standardlayout vollständig wiederhergestellt werden.
 
@@ -62,7 +62,7 @@ Alle Panels dürfen später vollständig ausgeblendet werden.
 
 ## D-009 – Kompakte Schnellstarter- und Menüleiste
 
-**Entscheidung:** Unter dem festen oberen Bereich wird ab 0.3.0-C eine moderne kompakte Schnellstarter-/Menüleiste vorgesehen.
+**Entscheidung:** Unter dem festen oberen Bereich wird ab 0.3.0-C eine moderne kompakte Schnellstarter-/Menüleiste eingesetzt.
 
 Die Leiste:
 
@@ -81,3 +81,13 @@ Die Leiste:
 Neue Workspace-Funktionsnamen werden verständlich und konsistent deutsch benannt. Bestehende veröffentlichte Schnittstellen anderer Subsysteme werden nicht nur aus Stilgründen umbenannt.
 
 **Begründung:** Weniger doppelte Logik, reproduzierbare Tests und geringeres Risiko bei späteren Erweiterungen.
+
+## D-011 – Mobile Schnellstarterleiste
+
+**Entscheidung:** Option A.
+
+Die kompakte Schnellstarterleiste bleibt auch auf kleinen Displays einzeilig. Der primäre `Layout`-Schalter liegt in einem festen, nicht horizontal scrollenden Bereich. Nur sekundäre Informationen oder spätere zusätzliche Aktionen dürfen horizontal überlaufen.
+
+**Begründung:** Der wichtigste Wiederherstellungsweg bleibt jederzeit sichtbar. Gleichzeitig bleibt die Bedienlogik auf Desktop und Mobil konsistent und benötigt keine separate mobile Aktionsleiste.
+
+**Grenze:** Die Leiste darf nicht zu einer zweiten parallelen Seitennavigation ausgebaut werden. Neue Einträge brauchen einen konkreten, häufigen Nutzen.
