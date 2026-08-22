@@ -158,8 +158,15 @@
       workspace.loggerSetzen(log);
       const workspaceState = workspace.initialisieren();
       log(2, "WORKSPACE", `Workspace-Zustand bereit (${workspaceState.order.length} Panels).`);
+
+      const workspaceUi = window.PROVOWARE_WORKSPACE_UI;
+      if (!workspaceUi) {
+        log(1, "WORKSPACE", "Workspace-Layoutsteuerung ist nicht verfügbar.");
+        return;
+      }
+      workspaceUi.initialisieren({ workspace, logger: log });
     } catch (error) {
-      log(1, "WORKSPACE", "Workspace-Zustand konnte nicht initialisiert werden.", {
+      log(1, "WORKSPACE", "Workspace konnte nicht vollständig initialisiert werden.", {
         message: error instanceof Error ? error.message : String(error),
       });
     }
