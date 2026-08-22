@@ -1,0 +1,89 @@
+name: Browser E2E Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      firefox:
+        description: "Firefox als alternativen Kompatibilitätslauf zusätzlich ausführen"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    name: Browser-E2E · Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v7
+
+      - name: Node 20 bereitstellen
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Browser-Testwerkzeuge installieren
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Chromium für Playwright installieren
+        run: npm run browser:install:chromium
+
+      - name: Chromium-E2E und HTML-Mirror prüfen
+        run: npm run test:e2e:chromium
+
+      - name: Chromium-Evidenz hochladen
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-e2e-chromium
+          path: |
+            artifacts/browser-e2e/chromium
+            playwright-report
+            test-results/browser-e2e
+          if-no-files-found: warn
+          retention-days: 14
+
+  firefox-alternative:
+    name: Browser-E2E · Firefox alternativ
+    if: github.event_name == 'workflow_dispatch' && inputs.firefox == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v7
+
+      - name: Node 20 bereitstellen
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Browser-Testwerkzeuge installieren
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Firefox für Playwright installieren
+        run: npm run browser:install:firefox
+
+      - name: Firefox-Kompatibilitätslauf ausführen
+        run: npm run test:e2e:firefox
+
+      - name: Firefox-Evidenz hochladen
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-e2e-firefox
+          path: |
+            artifacts/browser-e2e/firefox
+            playwright-report
+            test-results/browser-e2e
+          if-no-files-found: warn
+          retention-days: 14

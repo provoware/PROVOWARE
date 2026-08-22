@@ -6,231 +6,233 @@
 
 Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
 
-Aktuelle interne Entwicklungsstufe: `0.4.1 – Recovery & Migration · Backup, Restore, Import/Export & Failure Injection`
+Interne Entwicklungsstufe: `0.4.1-E2E – Chromium Gate & HTML UI Mirror`
 
-Modulvertragsversion: `1`
+Verträge:
 
-Workspace-Vertragsversion: `1`
+- Modulvertrag: `1`
+- Workspace-Vertrag: `1`
+- Project-Data-Produktionsschema: `1`
+- Workspace-Schlüssel: `provoware.allin.workspace.main.v1`
+- Recovery-Backup-Limit: `10`
 
-Project-Data-Schemaversion: `1`
-
-Persistenter Workspace-Schlüssel:
-
-`provoware.allin.workspace.main.v1`
-
-Die Produktversion und das Produktions-Datenschema bleiben unverändert, bis jeweils ein eigener Release- beziehungsweise Migrationsvertrag abgenommen wurde.
+Produktversion und Produktions-Datenschema ändern sich durch den E2E-Strang nicht.
 
 ## Laufzeitstruktur
 
 ### Einstieg
 
-- `index.html` – lokale HTML-Einstiegsdatei und deterministische Asset-Reihenfolge
+- `index.html` – HTML-Einstieg
 - `start.cmd` / `start.sh` – Plattform-Einstiege
-- `scripts/start.mjs` – Node-Prüfung, lokaler Webserver, statische Auslieferung und Project-Data-API-Routing
+- `scripts/start.mjs` – lokaler Server, Node-Prüfung, statische Auslieferung und Project-Data-API-Routing
 
-### Oberfläche und Kernlogik
+### Oberfläche
 
-- `assets/styles.css` – Dark-/Petrol-Basisdarstellung
-- `assets/workspace-layout.css` – Desktop-Größen- und Resize-Darstellung
-- `assets/project-data.css` – gemeinsame Darstellung für Project-Data-Module
-- `assets/app.js` – App-Start und Subsysteminitialisierung
+- `assets/styles.css` – Basisdarstellung
+- `assets/workspace-layout.css` – Workspace-Größen-/Resize-Darstellung
+- `assets/project-data.css` – Project-Data-/Recovery-Darstellung, jetzt container-responsive
+- `assets/app.js` – App-Initialisierung
 - `assets/module-registry.js` – Modulvertrag und Lifecycle
 - `modules/registry.js` – kanonischer Modulkatalog
 
-### Aktive Fachmodule
+### Fachmodule
 
 | Modul | Version | Slot | Aufgabe |
 | --- | --- | --- | --- |
-| `development-notes` | `0.4.0` | `quickbar` | zeitgestempelte Schnellnotiz in feste Projekttextdatei |
-| `data-studio` | `0.4.0` | `details` | Vorlagenbaukasten und Datensatzverwaltung |
-| `data-recovery` | `0.4.1` | `details` | Backup, Restore-Vorschau, Export/Import und Migrationsvertrag |
+| `development-notes` | `0.4.0` | `quickbar` | zeitgestempelte Schnellnotiz |
+| `data-studio` | `0.4.0` | `details` | Vorlagen und Datensätze |
+| `data-recovery` | `0.4.1` | `details` | Backup, Restore, Export/Import und Migrationsvertrag |
 
-## Project-Data-Dateien
+## Project Data
 
-### Entwicklungsnotizen
-
-`data/ENTWICKLUNGSNOTIZEN.txt`
-
-Format:
-
-```text
-[YYYY-MM-DD HH:mm:ss] Text
-```
-
-### Live-Datenbank
+Live-Datenbank:
 
 `data/project-data.json`
 
-Schema Version 1:
+Schema v1:
 
 - `schemaVersion`
 - `revision`
 - `templates[]`
 - `records[]`
 
-Temporäre atomare Dateien:
-
-`data/project-data.json.tmp-*`
-
-Live-Datenbank und Temp-Dateien bleiben aus Git ausgeschlossen und werden vom Auto-Fix nicht verändert.
-
-### Recovery-Backups
+Recovery-Backups:
 
 `data/backups/project-data/*.pwbak`
 
-Vertrag:
+Schutz:
 
-- Inhalt sind die exakten Rohbytes des gesicherten Live-Zustands.
-- valide JSON-Bestände erhalten zusätzlich eine Schema-/Inhaltszusammenfassung.
-- beschädigte Live-Dateien dürfen als `valid: false` gesichert werden, damit Recovery keine Ausgangsdaten vernichtet.
-- maximale Rotation: `10` Backups.
-- Backup-ID besitzt ein festes serverseitiges Muster.
-- keine freie Dateipfadwahl durch Browserdaten.
-- Verzeichnis bleibt aus Git ausgeschlossen.
-- Verzeichnis ist gegen statische Auslieferung geschützt.
-- Dateiendung `.pwbak` verhindert eine Behandlung als Quellcode-JSON durch den semantikneutralen Auto-Fix.
+- atomare Temp-Datei-zu-Rename-Persistenz
+- gemeinsame Mutationssperre für CRUD und Recovery
+- Same-Origin-Schutz
+- keine freie Serverpfadwahl aus Browserdaten
+- Laufzeitdatenbank, Temp-Dateien und Backups aus Git ausgeschlossen
+- statische Auslieferung von Datenbank und Backupbereich blockiert
+- automatische Sicherung vor Restore/Import
+- SHA-256-Bindung zwischen Vorschau und Ausführung
+- Backup-Rotation auf 10
+- beschädigte Live-Rohbytes können vor Recovery erhalten werden
 
-## Verantwortungsgrenzen
+## Recovery- und Migrationsvertrag
 
-### `scripts/project-data-service.mjs`
+`scripts/project-data-recovery.mjs` verantwortet:
 
-Verantwortet:
-
-- Produktionsschema v1
-- CRUD-Validierung
-- feste Live-Dateipfade
-- atomare Persistenz
-- gemeinsame serialisierte Mutationssperre
-- Vorlagenkompatibilität
-- Basis-API und Same-Origin-Schutz
-
-Zusätzlich für Recovery freigegeben:
-
-- `writeProjectDatabaseAtomic`
-- `withMutationLock`
-
-Der atomare Writer besitzt einen optionalen `beforeRename`-Hook ausschließlich für deterministische Fehlerproben und kontrollierte Vorprüfungen. Standard-CRUD übergibt keinen Hook.
-
-### `scripts/project-data-recovery.mjs`
-
-Verantwortet:
-
-- Backup-Erzeugung
-- Rotation
+- Backup und Rotation
 - Backup-Liste und Vorschau
-- SHA-256-Fingerprints
+- SHA-256
 - Restore
-- JSON-Export
+- Export
 - Import-Vorschau und Import
-- Sicherheitsbackup vor Restore/Import
-- Erhalt beschädigter Live-Rohbytes vor Recovery
-- Migrationsplanung und Migrationskette
-- Recovery-API
+- Sicherheitsbackup vor vollständigem Datenersatz
+- Migrationsplanung und schrittweise Migration
 
-Recovery und CRUD schreiben niemals parallel an der gemeinsamen Mutationssperre vorbei.
+Produktionsschema bleibt `1`. Eine `v1 -> v2`-Migration existiert nur als Testfixture. Produktionsmigrationen dürfen nur deterministisch `n -> n+1` erfolgen; fehlende Schritte und Rückwärtsmigrationen sind Fehler.
 
-## Recovery-Ablauf
+## Project-Data-UI-Vertrag
 
-### Restore
+Der Detailbereich kann als Workspace-Panel schmal oder breit sein. Project Data reagiert deshalb auf die **eigene Containerbreite**:
 
-```text
-Backup auswählen
--> Backup erneut lesen
--> JSON/Schemavertrag validieren
--> SHA-256-Vorschau erzeugen
--> Nutzer bestätigt
--> Backup erneut lesen
--> SHA-256 gegen Vorschau prüfen
--> aktuellen Live-Rohzustand sichern
--> Ziel in Temp-Datei vollständig schreiben
--> optionaler Failure-Injection-Hook
--> atomarer Rename
-```
+- Standard: eine Spalte
+- Feldzeilen werden erst ab ausreichender Containerbreite mehrspaltig
+- Hauptkarten werden erst ab `760px` Containerbreite zweispaltig
+- interaktive Controls besitzen Scroll-Abstand zur sticky Schnellleiste
 
-### Import
+Diese Regel wurde eingeführt, nachdem der erste echte Chromium-E2E-Lauf überlagerte Bedienelemente im schmalen Detailpanel reproduzierbar nachgewiesen hatte.
 
-```text
-JSON-Datei auswählen
--> Browser parst JSON
--> Server prüft Kandidat/Migrationsplan
--> SHA-256-Vorschau erzeugen
--> Nutzer bestätigt
--> Kandidat serverseitig erneut normalisieren
--> SHA-256 gegen Vorschau prüfen
--> aktuellen Live-Rohzustand sichern
--> Kandidat atomar ersetzen
-```
+## Browser-E2E-Struktur
 
-Eine geänderte Quelle zwischen Vorschau und Ausführung führt zu `409 Conflict` statt zu einem stillen Ersatz.
+### Werkzeuge
 
-## Migrationsvertrag
+- `@playwright/test` exakt `1.62.1` als Dev-Abhängigkeit
+- `tests/browser/playwright.config.mjs`
+- `scripts/browser-e2e-server.mjs`
+- `tests/browser/project-data.e2e.spec.mjs`
+- `.github/workflows/browser-e2e.yml`
 
-Produktionsziel bleibt Schema `1`.
+Runtime-Abhängigkeiten bleiben unverändert leer.
 
-Zukünftige Migrationen dürfen ausschließlich schrittweise erfolgen:
+### Browserpriorität
 
-```text
-1 -> 2 -> 3 -> ...
-```
-
-Regeln:
-
-- jeder Schritt ist explizit registriert
-- kein Überspringen fehlender Schritte
-- keine Rückwärtsmigration
-- jeder Migrator muss exakt `n+1` liefern
-- Quellobjekt wird vor jedem Schritt geklont
-- Plan kann vor Mutation beschrieben werden
-
-Aktuell existiert **keine Produktionsmigration v1→v2**. Eine isolierte Testfixture beweist lediglich Engine, Schrittfolge und Determinismus.
-
-## Recovery-API
-
-- `GET /api/provoware/project-data/recovery/backups`
-- `POST /api/provoware/project-data/recovery/backups`
-- `POST /api/provoware/project-data/recovery/preview-backup`
-- `POST /api/provoware/project-data/recovery/restore`
-- `GET /api/provoware/project-data/recovery/export`
-- `POST /api/provoware/project-data/recovery/preview-import`
-- `POST /api/provoware/project-data/recovery/import`
-
-Recovery-Schreibzugriffe sind Same-Origin-gebunden. Recovery-JSON-Anfragen besitzen eine feste Payload-Obergrenze.
-
-## Bestehende Project-Data-API
-
-- `POST /api/provoware/development-notes`
-- `GET /api/provoware/project-data`
-- `POST /api/provoware/project-data/templates`
-- `PUT /api/provoware/project-data/templates/:id`
-- `POST /api/provoware/project-data/records`
-- `PUT /api/provoware/project-data/records/:id`
-- `DELETE /api/provoware/project-data/records/:id`
-
-## `file://`-Vertrag
-
-Direkter Start über `index.html` bleibt möglich.
-
-- Workspace und statische Oberfläche bleiben verfügbar.
-- Project-Data-Module laden kontrolliert.
-- Datei-Schreibzugriffe, Data-Studio-Mutationen und Recovery-Aktionen werden deaktiviert.
-- Nutzerhinweis verweist auf den lokalen Klick-&-Start-Server.
-
-## Workspace-Vertrag
-
-Workspace-Version bleibt `1`.
-
-Persistiert werden weiterhin nur:
-
-- Panelreihenfolge
-- Sichtbarkeit
-- Rasterbreite `widthUnits`
-- optionale Höhe `heightPx`
-
-0.4.1 verändert weder Workspace-Key noch Workspace-Schema.
-
-## Qualitätskette
+- Primär: `chromium`
+- Alternativ: `firefox`
+- Chromium läuft automatisch bei Pull Requests und `main`-Pushes.
+- Firefox läuft nur optional über manuellen Workflow-Dispatch.
 
 Kanonische Befehle:
+
+```bash
+npm run test:e2e
+npm run test:e2e:chromium
+npm run test:e2e:firefox
+```
+
+Browserinstallation:
+
+```bash
+npm run browser:install:chromium
+npm run browser:install:firefox
+```
+
+## Isolierter Browser-Testserver
+
+`scripts/browser-e2e-server.mjs` kopiert das Projekt vor jedem Browserlauf in ein temporäres OS-Verzeichnis und startet dort den normalen lokalen Server auf `127.0.0.1:4173`.
+
+Nicht in die Testkopie übernommen beziehungsweise aus dem Test-Walk ausgeschlossen werden unter anderem:
+
+- `.git`
+- `node_modules`
+- Playwright-Reports
+- Browser-Evidenzartefakte
+
+Dadurch kann der Test echte Entwicklungsnotizen, Datenbankdateien und Backups schreiben, ohne reale Nutzdaten der Arbeitskopie zu verändern.
+
+## Funktionaler Chromium-Vertrag
+
+Automatisierte UI-Kette:
+
+```text
+Start
+-> Entwicklungsnotiz speichern
+-> feste Notizdatei prüfen
+-> Vorlage erzeugen
+-> Datensatz speichern
+-> Reload
+-> Persistenz prüfen
+-> Datensatz bearbeiten
+-> Backup erzeugen
+-> Daten verändern
+-> Restore-Vorschau
+-> Restore bestätigen
+-> alten Datenstand nachweisen
+-> JSON exportieren
+-> Datensatz löschen
+-> Export importieren
+-> wiederhergestellten Datensatz nachweisen
+```
+
+Der erfolgreiche Lauf prüft die echte UI; Aktionen werden nicht mit erzwungenen Klicks an sichtbaren Überlagerungen vorbeigeführt.
+
+## HTML UI Mirror
+
+Dateien:
+
+- `tests/browser/ui-mirror.html`
+- `tests/browser/ui-mirror.css`
+- `tests/browser/ui-mirror.js`
+
+Vertrag:
+
+- Referenz lädt echte `/index.html`.
+- Spiegel lädt dieselbe echte `/index.html`.
+- beide Frames: interner Viewport `1366 × 900`
+- Spiegel: ausschließlich externe CSS-Skalierung `0.5`
+- erwartete sichtbare Spiegelgröße: `683 × 450`
+- zentrale Rechtecke beider Frames müssen intern identisch sein
+- gemessener Skalierungsfaktor muss `0.5` sein
+
+Geometrie-Selektoren:
+
+- `body`
+- `.app-shell`
+- `.sidebar`
+- `.workspace`
+- `.topbar`
+- `#quickbar`
+- `#arbeitsbereich`
+- `#details`
+
+Screenshots sind Evidenz und Diagnose, aber kein OS-abhängiger Pixel-Diff-Blocker.
+
+## Browser-Evidenz
+
+Erfolgreicher Chromium-Lauf erzeugt:
+
+- `01-start.png`
+- `02-record-created.png`
+- `03-restored.png`
+- `04-import-restored.png`
+- `05-ui-mirror-pipeline.png`
+- `06-ui-mirror-scaled.png`
+- `project-data-export.json`
+- Playwright HTML-Report
+
+Bei Fehlern werden zusätzlich Trace, Fehler-Screenshot und Video aufbewahrt.
+
+Finaler dokumentierter Browser-Abnahmelauf auf Head `3b2fc8f5b90d79fe895b82d1357960b025bd781b`:
+
+- Chromium: `2/2` Browsertests PASS
+- Firefox im automatischen Lauf: wie vorgesehen `skipped`
+- Mirror: PASS
+- internes Mirror-Layout: `1366 × 900`
+- Skalierung: `0.5`
+- sichtbarer Spiegel: `683 × 450`
+- Schlüsselgeometrie: identisch
+- Browser-Evidenzartefakt: `9474652501`
+- Artefakt-SHA-256: `5006875f74dfe91d2fb1c752bc70f540b1573a2170446e260aaba70d124e945c`
+
+## Core-Qualitätskette
+
+Kanonisch:
 
 ```bash
 npm run lint
@@ -238,7 +240,7 @@ npm run fix
 npm run verify
 ```
 
-`verify`:
+`verify` bleibt bewusst browserfrei:
 
 ```text
 PROJECT LINT
@@ -246,42 +248,20 @@ PROJECT LINT
 -> NODE TEST RUNNER
 ```
 
-GitHub Actions führt dasselbe Gate auf Node 20 und Node 24 aus.
+Finaler dokumentierter Core-Abnahmelauf auf demselben Head:
 
-### 0.4.1-Testgruppen
+- Node 20: PASS
+- Node 24: PASS
+- 35 JavaScript-Dateien gelintet
+- 94 Projektdateien geprüft
+- 87/87 Node-Tests PASS
+- 0 fehlgeschlagen
 
-- `tests/project-data-recovery.test.mjs`
-- `tests/project-data-recovery-api.test.mjs`
-- `tests/project-data-recovery-ui.test.mjs`
-
-Zusätzlich bleiben sämtliche bestehenden 0.4.0-, Workspace-, Registry-, Start- und Quality-Gate-Tests aktiv.
-
-### Failure-Injection-Nachweise
-
-Automatisiert geprüft:
-
-- Fehler direkt vor dem atomaren Rename
-- bytegenau unveränderte Live-Datei nach diesem Fehler
-- erhaltenes Sicherheitsbackup trotz fehlgeschlagenem Restore
-- beschädigte Live-Datei vor Import und Erhalt ihrer Rohbytes
-- veraltete SHA-256-Bestätigung
-- unbekannte/höhere Schemaversion
-- Rückwärtsmigration
-- fehlender Migrationsschritt
-- deterministische isolierte v1→v2-Migrationsfixture
-- Backup-Rotation auf zehn Dateien
-
-## Erster technischer 0.4.1-Gate-Stand
-
-- Node 20: `success`
-- Node 24: `success`
-- Project Lint: `30` JavaScript-Dateien
-- Quality Gate: `82` Projektdateien
-- Tests: `81/81` erfolgreich, `0` fehlgeschlagen
-
-Ein finaler Gate-Lauf nach vollständiger Dokumentationssynchronisierung bleibt vor Merge verpflichtend.
+Der zentrale Quality Gate prüft zusätzlich den Browser-E2E-Vertrag, Pflichtdateien, Chromium-Priorität, Firefox-Alternativstatus, Artifact-Workflow und echten Zwei-Frame-Mirror.
 
 ## Entwicklungsdokumente
+
+Project Data / Recovery:
 
 - `docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md`
 - `docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md`
@@ -289,13 +269,22 @@ Ein finaler Gate-Lauf nach vollständiger Dokumentationssynchronisierung bleibt 
 - `docs/PLAN_0.4.1_RECOVERY_MIGRATION.md`
 - `docs/CHECKPOINT_0.4.1_RECOVERY_MIGRATION.md`
 - `docs/CHECKLIST_0.4.1_RECOVERY_MIGRATION.md`
+
+Browser-E2E / Mirror:
+
+- `docs/PLAN_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
+- `docs/CHECKPOINT_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
+- `docs/CHECKLIST_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
+
+Workspace:
+
 - `docs/WORKSPACE_CONTRACT.md`
 - `docs/RESIZE_CONTRACT_0.3.0.md`
 
-## Bewusst noch offen
+## Bewusst offen
 
-- reale Schema-v2-Produktionsmigration erst bei realem Bedarf
-- Firefox-/Chrome-E2E-Gate
-- Cross-OS-CI Windows/macOS
-- 0.4.2 Suche/Filter/Vorlagenbibliothek und optionaler Storage-Adapter
-- paralleler Workspace-Strang D3b/E/F/G
+- Cross-OS-CI für Windows und zusätzliche Linux-Dateirechte-/Lock-Fälle
+- 0.4.2 Data Studio PRO mit Suche, Filtern, Vorlagenbibliothek und besserer Maskenorganisation
+- optionaler SQLite-Adapter erst bei realem Bedarf
+- Workspace D3b Pointer/Maus/Touch/Stift
+- echte Produktionsmigration auf Schema v2 erst bei fachlich benötigtem v2-Vertrag

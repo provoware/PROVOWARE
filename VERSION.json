@@ -7,11 +7,15 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.4.1 Recovery & Migration – Backup, Restore, Import/Export & Failure Injection",
-  "development_baseline_commit": "a3f6f17d3e9c50bb83392588b6eec17ba8fb9d8f",
+  "development_phase": "0.4.1-E2E Chromium Gate & HTML UI Mirror",
+  "development_baseline_commit": "7f59c727bcef6b959e3fcc49d7c796b088bc197a",
   "project_data_schema_version": "1",
   "project_data_store": "data/project-data.json",
   "project_data_backup_store": "data/backups/project-data/*.pwbak",
   "project_data_backup_limit": 10,
-  "development_notes_file": "data/ENTWICKLUNGSNOTIZEN.txt"
+  "development_notes_file": "data/ENTWICKLUNGSNOTIZEN.txt",
+  "browser_e2e_primary": "chromium",
+  "browser_e2e_alternative": "firefox",
+  "ui_mirror_layout_viewport": "1366x900",
+  "ui_mirror_scale": 0.5
 }
