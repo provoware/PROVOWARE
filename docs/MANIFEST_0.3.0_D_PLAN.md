@@ -2,7 +2,7 @@
 
 ## Zweck
 
-Dieses Manifest beschreibt ausschließlich den **Planungs- und Vertrags-Patch** vor der technischen Resize-Implementierung.
+Dieses Manifest beschreibt ausschließlich den abgeschlossenen **Planungs- und Vertrags-Patch** vor der technischen Resize-Implementierung.
 
 ## Baseline
 
@@ -18,7 +18,7 @@ Workspace-Vertragsversion bleibt:
 
 `1`
 
-Es werden keine neuen persistenten Schemafelder eingeführt.
+Es wurden keine neuen persistenten Schemafelder eingeführt.
 
 ## Bestätigte Bedienentscheidung
 
@@ -57,8 +57,6 @@ Option A:
 
 ## Aktualisierte Dokumente
 
-Vorgesehen:
-
 - `TODO.md`
 - `docs/STATUS_0.3.0.md`
 - `docs/PLAN_0.3.0.md`
@@ -70,7 +68,7 @@ Vorgesehen:
 
 Keine.
 
-Dieser Patch verändert nicht:
+Der Planungs-Patch veränderte nicht:
 
 - HTML
 - CSS
@@ -79,9 +77,27 @@ Dieser Patch verändert nicht:
 - Quality-Gate-Code
 - Browser-Speicherung
 
+## Reale Abnahme
+
+- Planungs-PR: `#70`
+- Branch vor Merge: `0` Commits hinter `main`
+- geänderte Dateien: `9`
+- Dateityp: ausschließlich Dokumentation und Entwicklungsmetadaten
+- PR: mergebar
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `42` Dateien
+- bestehende automatische Tests: `18/18` erfolgreich
+- fehlgeschlagene Tests: `0`
+- verwendete Projekt-Node-Version: `20.20.2`
+- Squash-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`
+- Main-Stichprobe erfolgreich für:
+  - `docs/RESIZE_CONTRACT_0.3.0.md`
+  - `docs/PLAN_0.3.0_D.md`
+  - `VERSION.json`
+
 ## Verbindliche technische Richtung für den Folgepatch
 
-Vorgesehene Verantwortungstrennung:
+Verantwortungstrennung:
 
 - `assets/workspace-state.js` → einzige persistente Größenquelle
 - `assets/workspace-ui.js` → gültige gespeicherte Größe auf DOM anwenden
@@ -111,7 +127,7 @@ Responsive:
 
 ## Teststrategie für den Folgepatch
 
-Die Testmatrix deckt ab:
+Die Testmatrix deckt 40 Prüfziele ab:
 
 1. State-API
 2. Raster-/Höhenberechnung
@@ -121,27 +137,21 @@ Die Testmatrix deckt ab:
 6. UI/Zugänglichkeit
 7. Quality Gate
 
-Ziel: 40 klar benannte Prüfziele.
-
 ## Änderungsvolumen
 
 Planungs-Patch: **klein bis mittel, nur Dokumentation**.
 
-Folgepatch erwartet: **mittel**.
+Technischer Folgepatch erwartet: **mittel**.
 
 ## Rückweg
 
-Revert dieses Dokumentations-Pull-Requests.
+Revert des Planungs-Pull-Requests `#70`.
 
-Da keine Laufzeitdatei verändert wird, entstehen keine Datenmigrationen und keine Änderungen am aktuellen Funktionsstand 0.3.0-C.
+Da keine Laufzeitdatei verändert wurde, entstanden keine Datenmigrationen und keine Änderungen am Funktionsstand 0.3.0-C.
 
-## Nächster technischer Schritt
+## Nächste zwei Schritte
 
-Nach erfolgreicher Planungsabnahme:
-
-1. State-API für Größenwerte
-2. reine Größenberechnung
-3. automatische Tests
-4. erst danach Resize-Griffe und Eingabesteuerung
+1. State-API für Größenwerte + reine Größenberechnung implementieren und testen.
+2. Danach Resize-Griffe und Pointer-/Tastatursteuerung auf diese geprüfte Basis setzen.
 
 Drag & Drop bleibt bis `0.3.0-E` gesperrt.

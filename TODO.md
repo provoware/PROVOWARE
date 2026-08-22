@@ -118,10 +118,12 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [x] Tablet-/Mobilansichten dürfen gespeicherte Desktopwerte nicht überschreiben.
 - [x] 40-teilige Testmatrix definieren.
 - [x] Drag & Drop weiterhin bis 0.3.0-E sperren.
-- [ ] Planungs-Diff gegen `main` prüfen.
-- [ ] Planungs-Quality-Gate erfolgreich abschließen.
-- [ ] Planungs-PR mergebar prüfen und mergen.
-- [ ] Planungsdokumente auf `main` stichproartig nachprüfen.
+- [x] Planungs-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
+- [x] Planungs-Quality-Gate erfolgreich: 42 Dateien geprüft, 18/18 bestehende Tests erfolgreich.
+- [x] Planungs-PR #70 als mergebar prüfen und per Squash mergen.
+- [x] `docs/RESIZE_CONTRACT_0.3.0.md`, `docs/PLAN_0.3.0_D.md` und `VERSION.json` auf `main` stichproartig nachprüfen.
+
+0.3.0-D-Planungs-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`
 
 ##### Technische Implementierung nach Planungsmerge
 
