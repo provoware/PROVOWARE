@@ -96,7 +96,17 @@ export const atomicReplaceFile = async ({
   const removeTemp = operations.unlink || unlink;
   const delay = operations.wait || wait;
 
-  await makeDirectory(path.dirname(targetPath), { recursive: true });
+  try {
+    await makeDirectory(path.dirname(targetPath), { recursive: true });
+  } catch (error) {
+    throw asPersistenceError(error, {
+      phase: "prepare-directory",
+      targetPath,
+      tempPath: null,
+      attempts: 0,
+    });
+  }
+
   const tempPath = `${targetPath}.tmp-${process.pid}-${tempId()}`;
   let tempCreated = false;
 
@@ -106,6 +116,7 @@ export const atomicReplaceFile = async ({
       tempCreated = true;
     } catch (error) {
       const phase = errorCode(error) === "EEXIST" ? "temp-create" : "write";
+      if (phase === "write") await removeTemp(tempPath).catch(() => {});
       throw asPersistenceError(error, { phase, targetPath, tempPath, attempts: 0 });
     }
 
