@@ -2,7 +2,7 @@
 
 ## Ziel
 
-Ein kleiner, lokaler Diagnosekanal für Oberfläche, Modul-Registry und Workspace-Zustand. Standardmäßig bleibt der Bereich verborgen.
+Ein kleiner, lokaler Diagnosekanal für Oberfläche, Modul-Registry und Workspace. Standardmäßig bleibt der Bereich verborgen.
 
 ## Ereignisse
 
@@ -19,17 +19,21 @@ Erfasst werden technische Laufzeitereignisse der Oberfläche, insbesondere:
 - Initialisierung des Workspace-Zustands
 - sichere Korrektur ungültiger Workspace-Daten
 - Speicher- und Lesefehler des lokalen Workspace-Schlüssels
+- Initialisierung der Layoutsteuerung
+- Ein-/Ausblenden von Panels
+- `Alle anzeigen`
 - Workspace-Reset
+- kontrolliert fehlgeschlagene Layoutaktionen
 
 ## Stufen
 
 ### Stufe 1 · Ereignisse
 
-Wichtige Laufzeitereignisse und Fehler, zum Beispiel beschädigte Workspace-Daten, nicht nutzbarer lokaler Speicher oder ein Reset.
+Wichtige Laufzeitereignisse und Fehler, zum Beispiel beschädigte Workspace-Daten, nicht nutzbarer lokaler Speicher, fehlgeschlagene Layoutaktionen oder ein Reset.
 
 ### Stufe 2 · Diagnose
 
-Stufe 1 plus Zustandsänderungen des Debugbereichs, Registry-Abläufe und nachvollziehbare Workspace-Korrekturen wie fehlende oder unbekannte Panels.
+Stufe 1 plus Zustandsänderungen des Debugbereichs, Registry-Abläufe, Workspace-Korrekturen und erfolgreich ausgeführte Layout-Sichtbarkeitsaktionen.
 
 ### Stufe 3 · Trace
 
@@ -43,7 +47,7 @@ Stufe 1 und 2 plus feingranulare technische Baseline-Informationen. Trace darf n
 - `ERROR` – globale JavaScript-Fehler
 - `PROMISE` – unbehandelte Promise-Ablehnungen
 - `MODULES` – Modulvertrag, Registry und Lebenszyklus
-- `WORKSPACE` – Layoutzustand, Normalisierung, lokale Speicherung und Reset
+- `WORKSPACE` – Layoutzustand, Sichtbarkeit, Normalisierung, lokale Speicherung, Bedienlogik und Reset
 
 ## Format
 
@@ -62,6 +66,15 @@ Beispiel:
 `[WORKSPACE] Gespeicherter Workspace-Zustand ist beschädigt; Standardlayout wird verwendet.`
 
 Technische Zusatzdaten werden nur ergänzt, wenn sie die Reproduktion erleichtern.
+
+## Nutzerfeedback und technisches Logging
+
+Das sichtbare Layout-Nutzerfeedback und der technische Logger haben getrennte Aufgaben:
+
+- sichtbares Feedback: kurze Bestätigung für den Nutzer
+- technisches Logging: reproduzierbare Diagnose für Entwickler
+
+Die sichtbare Meldung steuert niemals die Programmlogik.
 
 ## Datenschutz
 
@@ -82,5 +95,7 @@ Der zentrale Logger ist unter `window.PROVOWARE_DEBUG` erreichbar.
 Die Modul-Registry erhält ihn über `setLogger()`.
 
 Die Workspace-Zustandsverwaltung erhält denselben Logger über `loggerSetzen()`.
+
+Die Workspace-UI erhält denselben Logger bei `initialisieren()`.
 
 Dadurch existiert nur eine sichtbare Log-Infrastruktur und keine doppelte Diagnoseanzeige.
