@@ -73,8 +73,10 @@
     const breite = panelZustand?.widthUnits;
     if (Number.isInteger(breite) && breite > 0) {
       panel.style.setProperty("--panel-spalten", String(breite));
+      panel.dataset.workspaceSizeReady = "true";
     } else {
       panel.style.removeProperty("--panel-spalten");
+      delete panel.dataset.workspaceSizeReady;
     }
 
     const hoehe = panelZustand?.heightPx;
