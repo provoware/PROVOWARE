@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROVOWARE UI Mirror Pipeline</title>
+  <link rel="stylesheet" href="ui-mirror.css">
+  <script defer src="ui-mirror.js"></script>
+</head>
+<body>
+  <main class="mirror-page">
+    <header class="mirror-header">
+      <div>
+        <p class="mirror-kicker">Browser-E2E · visuelle Pipeline</p>
+        <h1>PROVOWARE UI · proportionaler HTML-Spiegel</h1>
+      </div>
+      <div class="mirror-status" data-mirror-status data-state="pending">Prüfung läuft …</div>
+    </header>
+
+    <section class="mirror-info" aria-label="Mirror-Metadaten">
+      <span>Layout-Viewport: <strong data-mirror-viewport>1366 × 900</strong></span>
+      <span>Spiegelfaktor: <strong data-mirror-scale>0,50</strong></span>
+      <span>Quelle: <code>/index.html</code></span>
+    </section>
+
+    <section class="mirror-stage" aria-labelledby="mirror-source-title">
+      <div class="mirror-stage-header">
+        <h2 id="mirror-source-title">Referenz · 100 %</h2>
+        <span>echte Anwendung</span>
+      </div>
+      <div class="mirror-source-viewport">
+        <iframe
+          id="mirror-source"
+          title="PROVOWARE Referenzansicht"
+          src="/index.html?ui-mirror=source"
+        ></iframe>
+      </div>
+    </section>
+
+    <section class="mirror-stage" aria-labelledby="mirror-scaled-title">
+      <div class="mirror-stage-header">
+        <h2 id="mirror-scaled-title">Proportionaler Spiegel · 50 %</h2>
+        <span>identischer Layout-Viewport, nur visuell skaliert</span>
+      </div>
+      <div id="mirror-scaled-wrap" class="mirror-scaled-wrap">
+        <iframe
+          id="mirror-scaled"
+          title="PROVOWARE proportional skalierter Spiegel"
+          src="/index.html?ui-mirror=scaled"
+        ></iframe>
+      </div>
+    </section>
+
+    <section class="mirror-contract" aria-labelledby="mirror-contract-title">
+      <h2 id="mirror-contract-title">Geometrievertrag</h2>
+      <p>
+        Beide Frames verwenden exakt denselben internen Layout-Viewport. Der zweite Frame wird ausschließlich
+        außerhalb des Dokuments skaliert. Schlüsselrechtecke werden nach dem Laden automatisch verglichen.
+      </p>
+      <pre data-mirror-evidence aria-live="polite">Noch keine Geometrie-Evidenz.</pre>
+    </section>
+  </main>
+</body>
+</html>
