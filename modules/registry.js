@@ -48,14 +48,22 @@
     },
     {
       id: "data-recovery",
-      name: "Project Data Recovery",
-      version: "0.4.1",
+      name: "Project Recovery",
+      version: "0.4.3",
       apiVersion: "1",
       entry: "modules/data-recovery/index.js",
       enabledByDefault: true,
-      description: "Lokale Backups, Restore-Vorschau, Export/Import und Migrationsvorbereitung für Project Data.",
+      description: "Legacy-.pwbak-Recovery plus versionierter Multi-Datei-Recovery-Envelope für Project Data und Data Studio PRO.",
       slots: ["details"],
-      capabilities: ["backup", "restore-preview", "export-import", "migration-contract"],
+      capabilities: [
+        "backup",
+        "restore-preview",
+        "export-import",
+        "migration-contract",
+        "recovery-envelope",
+        "multi-file-rollback",
+        "recovery-journal",
+      ],
     },
   ];
 

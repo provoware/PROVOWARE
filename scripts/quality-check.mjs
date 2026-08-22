@@ -31,7 +31,11 @@ const IGNORED_RUNTIME_FILES = new Set([
   "data/project-data.json",
   "data/data-studio-pro.json",
 ]);
-const IGNORED_RUNTIME_PREFIXES = ["data/backups/project-data/"];
+const IGNORED_RUNTIME_PREFIXES = [
+  "data/backups/project-data/",
+  "data/backups/project-envelope/",
+  "data/recovery/",
+];
 const errors = [];
 const fixes = [];
 
@@ -124,6 +128,7 @@ const checkRequiredFiles = async () => {
     "index.html",
     ".gitignore",
     ".github/workflows/browser-e2e.yml",
+    ".github/workflows/persistence-portability.yml",
     "assets/app.js",
     "assets/module-registry.js",
     "assets/workspace-state.js",
@@ -138,9 +143,11 @@ const checkRequiredFiles = async () => {
     "modules/data-recovery/index.js",
     "scripts/start.mjs",
     "scripts/browser-e2e-server.mjs",
+    "scripts/atomic-file.mjs",
     "scripts/project-data-service.mjs",
     "scripts/project-data-recovery.mjs",
     "scripts/data-studio-pro-service.mjs",
+    "scripts/recovery-envelope.mjs",
     "scripts/project-lint.mjs",
     "start.cmd",
     "start.sh",
@@ -148,6 +155,7 @@ const checkRequiredFiles = async () => {
     "tests/start.test.mjs",
     "tests/workspace-state.test.mjs",
     "tests/workspace-ui.test.mjs",
+    "tests/atomic-file.test.mjs",
     "tests/project-data-service.test.mjs",
     "tests/project-data-api.test.mjs",
     "tests/project-data-recovery.test.mjs",
@@ -156,6 +164,9 @@ const checkRequiredFiles = async () => {
     "tests/data-studio-pro-service.test.mjs",
     "tests/data-studio-pro-api.test.mjs",
     "tests/data-studio-pro-ui.test.mjs",
+    "tests/recovery-envelope.test.mjs",
+    "tests/recovery-envelope-api.test.mjs",
+    "tests/recovery-envelope-integration.test.mjs",
     "tests/project-lint.test.mjs",
     "tests/browser-e2e-contract.test.mjs",
     "tests/browser/playwright.config.mjs",
@@ -177,6 +188,9 @@ const checkRequiredFiles = async () => {
     "docs/PLAN_0.4.2_DATA_STUDIO_PRO.md",
     "docs/CHECKPOINT_0.4.2_DATA_STUDIO_PRO.md",
     "docs/CHECKLIST_0.4.2_DATA_STUDIO_PRO.md",
+    "docs/PLAN_0.4.3_RECOVERY_ENVELOPE.md",
+    "docs/CHECKPOINT_0.4.3_RECOVERY_ENVELOPE.md",
+    "docs/CHECKLIST_0.4.3_RECOVERY_ENVELOPE.md",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -222,20 +236,35 @@ const checkVersion = async () => {
   if (!version.entrypoint || !(await exists(path.join(ROOT, version.entrypoint)))) {
     fail(`VERSION.json: Einstiegspunkt fehlt oder existiert nicht (${version.entrypoint || "leer"}).`);
   }
+  if (version.persistence_atomic_writer !== "scripts/atomic-file.mjs") {
+    fail("VERSION.json: kanonischer Atomic-Writer muss scripts/atomic-file.mjs sein.");
+  }
   if (version.project_data_schema_version !== "1") {
     fail("VERSION.json: Project-Data-Produktionsschema muss in 0.4.x weiterhin '1' sein.");
   }
   if (version.project_data_backup_store !== "data/backups/project-data/*.pwbak") {
-    fail("VERSION.json: Recovery-Backup-Pfad muss auf *.pwbak zeigen.");
+    fail("VERSION.json: Legacy-Recovery-Backup-Pfad muss auf *.pwbak zeigen.");
   }
   if (version.project_data_backup_limit !== 10) {
-    fail("VERSION.json: Recovery-Backup-Limit muss 10 sein.");
+    fail("VERSION.json: Legacy-Recovery-Backup-Limit muss 10 sein.");
   }
   if (version.data_studio_pro_schema_version !== "1") {
     fail("VERSION.json: Data-Studio-PRO-Metadatenvertrag muss Version '1' sein.");
   }
   if (version.data_studio_pro_store !== "data/data-studio-pro.json") {
     fail("VERSION.json: Data-Studio-PRO-Store muss data/data-studio-pro.json sein.");
+  }
+  if (version.recovery_envelope_format_version !== "1") {
+    fail("VERSION.json: Recovery-Envelope-Formatversion muss '1' sein.");
+  }
+  if (version.recovery_envelope_store !== "data/backups/project-envelope/*.pwenvelope") {
+    fail("VERSION.json: Recovery-Envelope-Store muss auf *.pwenvelope zeigen.");
+  }
+  if (version.recovery_envelope_limit !== 10) {
+    fail("VERSION.json: Recovery-Envelope-Limit muss 10 sein.");
+  }
+  if (version.recovery_envelope_journal !== "data/recovery/recovery-envelope-journal.json") {
+    fail("VERSION.json: Recovery-Envelope-Journalpfad weicht vom Vertrag ab.");
   }
 };
 
@@ -433,7 +462,7 @@ const checkProjectDataContract = async () => {
     ["data-studio", "0.4.0"],
     ["data-studio-pro", "0.4.2"],
     ["data-studio-pro-bridge", "0.4.2"],
-    ["data-recovery", "0.4.1"],
+    ["data-recovery", "0.4.3"],
   ]);
 
   for (const [id, expectedVersion] of requiredModules) {
@@ -457,25 +486,39 @@ const checkProjectDataContract = async () => {
 
   const ignore = await readFile(path.join(ROOT, "data/.gitignore"), "utf8");
   const ignoreLines = ignore.split(/\r?\n/).map((line) => line.trim());
-  if (!ignoreLines.includes("project-data.json")) {
-    fail("data/.gitignore: lokale project-data.json muss aus Git ausgeschlossen bleiben.");
-  }
-  if (!ignoreLines.includes("project-data.json.tmp-*")) {
-    fail("data/.gitignore: temporäre atomare Datenbankdateien müssen aus Git ausgeschlossen bleiben.");
-  }
-  if (!ignoreLines.includes("data-studio-pro.json")) {
-    fail("data/.gitignore: lokale Data-Studio-PRO-Metadaten müssen aus Git ausgeschlossen bleiben.");
-  }
-  if (!ignoreLines.includes("data-studio-pro.json.tmp-*")) {
-    fail("data/.gitignore: temporäre PRO-Dateien müssen aus Git ausgeschlossen bleiben.");
-  }
-  if (!ignoreLines.includes("backups/")) {
-    fail("data/.gitignore: Recovery-Backups müssen vollständig aus Git ausgeschlossen bleiben.");
+  for (const required of [
+    "project-data.json",
+    "project-data.json.tmp-*",
+    "data-studio-pro.json",
+    "data-studio-pro.json.tmp-*",
+    "backups/",
+    "recovery/",
+  ]) {
+    if (!ignoreLines.includes(required)) {
+      fail(`data/.gitignore: Runtime-Ausschluss fehlt (${required}).`);
+    }
   }
 
   const start = await readFile(path.join(ROOT, "scripts/start.mjs"), "utf8");
   if (!start.includes("handleDataStudioProApi") || !start.includes("isProtectedDataStudioProPath")) {
     fail("scripts/start.mjs: PRO-API und Schutz der PRO-Runtime-Datei müssen aktiv sein.");
+  }
+  if (
+    !start.includes("handleRecoveryEnvelopeApi")
+    || !start.includes("isProtectedRecoveryEnvelopePath")
+    || !start.includes("recoverInterruptedEnvelopeTransaction")
+  ) {
+    fail("scripts/start.mjs: Recovery-Envelope-Routing, Pfadschutz und Startup-Recovery müssen aktiv sein.");
+  }
+  const envelopeRoute = start.indexOf("handleRecoveryEnvelopeApi(anfrage, antwort");
+  const projectRoute = start.indexOf("handleProjectDataApi(anfrage, antwort");
+  const recoveryCall = start.indexOf("recoverInterruptedEnvelopeTransaction({ root: ROOT })");
+  const serverStart = start.indexOf("serverStarten(optionen.port)");
+  if (envelopeRoute < 0 || projectRoute <= envelopeRoute) {
+    fail("scripts/start.mjs: Envelope-Router muss vor dem Legacy-Project-Data-Router laufen.");
+  }
+  if (recoveryCall < 0 || serverStart <= recoveryCall) {
+    fail("scripts/start.mjs: Journal-Recovery muss vor dem lokalen Serverstart laufen.");
   }
 
   const packageJson = await readJson("package.json");
@@ -484,6 +527,48 @@ const checkProjectDataContract = async () => {
   }
   if (packageJson && !String(packageJson.scripts?.verify || "").includes("npm run lint")) {
     fail("package.json: verify muss den Lint-Gate ausführen.");
+  }
+};
+
+const checkRecoveryEnvelopeContract = async () => {
+  const service = await readFile(path.join(ROOT, "scripts/recovery-envelope.mjs"), "utf8");
+  for (const marker of [
+    'RECOVERY_ENVELOPE_FORMAT = "provoware-recovery-envelope"',
+    "RECOVERY_ENVELOPE_FORMAT_VERSION = 1",
+    'RECOVERY_JOURNAL_RELATIVE_PATH = "data/recovery/recovery-envelope-journal.json"',
+    "atomicReplaceFile",
+    "Safety Envelope",
+    "ROLLBACK_FAILED",
+    "recoverInterruptedEnvelopeTransaction",
+  ]) {
+    if (!service.includes(marker)) fail(`Recovery Envelope: Pflichtmarker fehlt (${marker}).`);
+  }
+  if (service.includes("unlink(filePath);\n  await atomicReplaceFile")) {
+    fail("Recovery Envelope: destruktiver Ziel-Unlink vor Atomic-Replace ist nicht erlaubt.");
+  }
+
+  const ui = await readFile(path.join(ROOT, "modules/data-recovery/index.js"), "utf8");
+  for (const marker of [
+    "/envelopes/preview",
+    "/envelopes/restore",
+    "/envelopes/journal",
+    'data-action="confirm-envelope-restore" disabled',
+    "Legacy `.pwbak` · 0.4.1",
+  ]) {
+    if (!ui.includes(marker)) fail(`Recovery-UI: Envelope-/Legacy-Vertrag fehlt (${marker}).`);
+  }
+
+  const portability = await readFile(path.join(ROOT, ".github/workflows/persistence-portability.yml"), "utf8");
+  if (!portability.includes("ubuntu-latest") || !portability.includes("windows-latest")) {
+    fail("Persistence Portability Gate muss Ubuntu und Windows prüfen.");
+  }
+  for (const marker of [
+    "scripts/recovery-envelope.mjs",
+    "tests/recovery-envelope.test.mjs",
+    "tests/recovery-envelope-api.test.mjs",
+    "tests/recovery-envelope-integration.test.mjs",
+  ]) {
+    if (!portability.includes(marker)) fail(`Persistence Portability Gate: Envelope-Pflichtpfad fehlt (${marker}).`);
   }
 };
 
@@ -541,6 +626,7 @@ const main = async () => {
   await checkWorkspaceLayout();
   await checkRegistry();
   await checkProjectDataContract();
+  await checkRecoveryEnvelopeContract();
   await checkBrowserE2EContract();
 
   if (fixes.length) {

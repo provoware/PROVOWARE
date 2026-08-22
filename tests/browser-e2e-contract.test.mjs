@@ -24,19 +24,34 @@ test("Browser-E2E ist Chromium-first und Firefox bleibt alternativer Lauf", asyn
   assert.match(workflow, /inputs\.firefox == true/);
 });
 
-test("E2E-Metadaten halten Chromium, Firefox, Mirror und Data-Studio-PRO-Vertrag kanonisch fest", async () => {
+test("E2E-Metadaten halten Chromium, PRO und Recovery-Envelope-Verträge kanonisch fest", async () => {
   const version = JSON.parse(await read("VERSION.json"));
   assert.equal(version.version, "0.2.0");
   assert.equal(version.project_data_schema_version, "1");
   assert.equal(version.data_studio_pro_schema_version, "1");
   assert.equal(version.data_studio_pro_store, "data/data-studio-pro.json");
+  assert.equal(version.recovery_envelope_format_version, "1");
+  assert.equal(version.recovery_envelope_store, "data/backups/project-envelope/*.pwenvelope");
+  assert.equal(version.recovery_envelope_journal, "data/recovery/recovery-envelope-journal.json");
+  assert.equal(version.persistence_atomic_writer, "scripts/atomic-file.mjs");
   assert.equal(version.browser_e2e_primary, "chromium");
   assert.equal(version.browser_e2e_alternative, "firefox");
   assert.equal(version.ui_mirror_layout_viewport, "1366x900");
   assert.equal(version.ui_mirror_scale, 0.5);
 });
 
-test("HTML-Mirror verwendet zweimal dieselbe echte UI, wartet auf PRO und skaliert nur die zweite Darstellung", async () => {
+test("Chromium-Spec enthält echten Multi-Datei-Envelope-Restore mit Journal-Abschluss", async () => {
+  const spec = await read("tests/browser/project-data.e2e.spec.mjs");
+  assert.match(spec, /Recovery Envelope: Project Data und PRO werden als ein journalisierter Zustand wiederhergestellt/);
+  assert.match(spec, /data-action='create-envelope'/);
+  assert.match(spec, /data-action='confirm-envelope-restore'/);
+  assert.match(spec, /data-envelope-journal/);
+  assert.match(spec, /08-recovery-envelope-restored\.png/);
+  assert.match(spec, /categoryBefore/);
+  assert.match(spec, /categoryAfter/);
+});
+
+test("HTML-Mirror wartet auf fertige Recovery-/PRO-States und vergleicht stabile Geometrie", async () => {
   const html = await read("tests/browser/ui-mirror.html");
   const css = await read("tests/browser/ui-mirror.css");
   const js = await read("tests/browser/ui-mirror.js");
@@ -48,7 +63,13 @@ test("HTML-Mirror verwendet zweimal dieselbe echte UI, wartet auf PRO und skalie
   assert.match(css, /#mirror-scaled[\s\S]*transform: scale\(var\(--mirror-scale\)\)/);
   assert.match(css, /transform-origin: top left/);
   assert.match(js, /\.data-studio-pro/);
+  assert.match(js, /\.data-recovery/);
+  assert.match(js, /data-data-studio-status/);
   assert.match(js, /data-data-studio-pro-status/);
+  assert.match(js, /data-recovery-status/);
+  assert.match(js, /readyText\(recoveryStatus\)/);
+  assert.match(js, /waitForStableGeometry/);
+  assert.match(js, /geometryDifferences/);
   assert.match(js, /keyGeometryIdentical/);
   assert.match(js, /sameGeometry\(sourceGeometry, scaledGeometry\)/);
   assert.match(js, /provoware:mirror-ready/);
