@@ -24,9 +24,11 @@ Erst wenn diese Basis automatisch geprüft ist, darf ein späterer Patch sie an 
 
 # 1. Ausgangsstand
 
-- [x] aktueller `main`-Commit vor Patch bestätigt: `a9b23b8d16e96142f35904a08315ca3f2f4495a0`
+- [x] `main`-Commit vor Patch bestätigt: `a9b23b8d16e96142f35904a08315ca3f2f4495a0`
 - [x] Branch direkt von diesem Stand erstellt: `feature/0.3.0-d-state-size-foundation`
 - [x] die separat gemergte Designänderung PR #72 ist Teil der Baseline und wird nicht überschrieben
+- [x] während der Umsetzung eingetroffenen PR #73 vor der finalen Abnahme kontrolliert übernommen
+- [x] final mit `main` `887ff10363662935c385e1f7e965e0eb75be5918` synchronisiert
 - [x] Workspace-Vertrag Version `1` bleibt unverändert
 - [x] Persistenzschlüssel bleibt `provoware.allin.workspace.main.v1`
 - [x] Resize-Vertrag `docs/RESIZE_CONTRACT_0.3.0.md` wurde als verbindliche Grundlage verwendet
@@ -194,7 +196,11 @@ Schutz: `workspace-size.js` ist absichtlich rein. DOM-Messung folgt erst im näc
 
 ## Risiko: aktuelles Erscheinungsbild wird überschrieben
 
-Schutz: Branch basiert auf dem aktuellen `main` nach PR #72; HTML und CSS werden in diesem Patch nicht verändert.
+Schutz: Der Branch startete nach PR #72; HTML und CSS wurden in diesem Patch nicht verändert.
+
+## Risiko: paralleler `main`-Patch geht verloren
+
+Schutz: PR #73 wurde vor Abschluss explizit in den Branch übernommen. Seine Quality-Gate-Härtung und Regressionstests liefen im finalen D1-Gate mit.
 
 ## Risiko: falscher Wert wird dauerhaft gespeichert
 
@@ -227,23 +233,35 @@ Nicht betroffen:
 
 # 8. Abschlussvalidierung
 
-- [ ] vollständigen Diff gegen aktuellen `main` prüfen
-- [ ] Branch 0 Commits hinter `main`
-- [ ] `npm run verify` im Pull Request erfolgreich
-- [ ] alle bestehenden Tests weiterhin erfolgreich
-- [ ] alle neuen State-/Berechnungstests erfolgreich
-- [ ] PR mergebar
-- [ ] keine ungeplanten HTML-/CSS-Änderungen
-- [ ] technischen PR mergen
-- [ ] `assets/workspace-state.js`, `assets/workspace-size.js` und `VERSION.json` auf `main` erneut lesen
+- [x] vollständigen Diff gegen aktuellen `main` geprüft: 11 geplante Dateien
+- [x] Branch final 0 Commits hinter `main`
+- [x] `npm run verify` im Pull Request erfolgreich
+- [x] alle bestehenden Tests weiterhin erfolgreich
+- [x] alle neuen State-/Berechnungstests erfolgreich
+- [x] final `48` Dateien statisch geprüft
+- [x] final `31/31` Tests erfolgreich, `0` fehlgeschlagen
+- [x] PR #74 mergebar
+- [x] keine ungeplanten HTML-/CSS-Änderungen
+- [x] PR #74 per Squash gemergt
+- [x] `assets/workspace-state.js`, `assets/workspace-size.js` und `VERSION.json` auf `main` erneut gelesen
+
+Merge:
+
+`1de0999cd570c612a80649cfe4975d8531947935`
+
+### Behobener Testfehler
+
+Der erste Lauf erkannte einen Fehlschlag beim strikten Objektvergleich über eine separate JavaScript-VM-Grenze. Die berechneten Inhalte waren korrekt. Nur der Testvergleich wurde normalisiert; die Produktlogik blieb unverändert. Der anschließende komplette Lauf war grün.
 
 ---
 
 # 9. Rückweg
 
-Der Patch wird als eigener Pull Request umgesetzt.
+Bei einem Fehler kann der D1-Squash-Merge gezielt zurückgenommen werden:
 
-Bei einem Fehler kann genau dieser PR zurückgenommen werden. Der bereits stabile Stand 0.3.0-C und der separat gemergte Designstand bleiben davon getrennt.
+`1de0999cd570c612a80649cfe4975d8531947935`
+
+Der bereits stabile Stand 0.3.0-C und die separat gemergten Design-/Quality-Gate-Patches bleiben davon getrennt.
 
 Es existiert keine Datenmigration und kein neuer Speicher-Schlüssel.
 
