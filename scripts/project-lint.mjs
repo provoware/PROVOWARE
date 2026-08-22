@@ -27,7 +27,8 @@ export const lintSource = (filePath, source) => {
   const errors = [];
   const browserCode = rel.startsWith("assets/") || rel.startsWith("modules/");
   const projectDataModule = rel.startsWith("modules/data-studio/")
-    || rel.startsWith("modules/development-notes/");
+    || rel.startsWith("modules/development-notes/")
+    || rel.startsWith("modules/data-recovery/");
 
   // Die Regelspezifikation enthält ihre Suchmuster selbst und wird deshalb nicht
   // mit den textbasierten Policy-Regeln gegen sich selbst geprüft. Syntax und
