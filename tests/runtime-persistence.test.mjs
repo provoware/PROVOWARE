@@ -126,6 +126,34 @@ test("permanenter EACCES-Replace bricht beim ersten Versuch fail-closed ab", asy
   }
 });
 
+test("teilweise angelegte Temp-Datei wird nach ENOSPC-Schreibfehler entfernt", async () => {
+  const root = await temporaryRoot();
+  try {
+    const targetPath = path.join(root, "runtime.json");
+    await writeFile(targetPath, "alt", "utf8");
+    await assert.rejects(
+      atomicReplaceFile({
+        targetPath,
+        content: "neu",
+        tempId: () => "partial",
+        operations: {
+          writeFile: async (tempPath) => {
+            await writeFile(tempPath, "teilweise", { encoding: "utf8", flag: "wx" });
+            throw errorWithCode("ENOSPC", "Speicher voll");
+          },
+        },
+      }),
+      (error) => error instanceof RuntimePersistenceError
+        && error.kind === RUNTIME_PERSISTENCE_ERROR_KINDS.NO_SPACE
+        && error.phase === "write",
+    );
+    assert.equal(await readFile(targetPath, "utf8"), "alt");
+    assert.deepEqual(await tempEntries(root, "runtime.json"), []);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("Schreib- und Temp-Erzeugungsfehler werden stabil klassifiziert", async () => {
   const root = await temporaryRoot();
   try {
@@ -150,6 +178,29 @@ test("Schreib- und Temp-Erzeugungsfehler werden stabil klassifiziert", async () 
         && error.kind === RUNTIME_PERSISTENCE_ERROR_KINDS.TEMP_CREATE
         && error.phase === "temp-create",
     );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("Verzeichnisvorbereitung klassifiziert Rechtefehler ohne Schreibversuch", async () => {
+  const root = await temporaryRoot();
+  try {
+    let writeAttempts = 0;
+    await assert.rejects(
+      atomicReplaceFile({
+        targetPath: path.join(root, "nested", "runtime.json"),
+        content: "x",
+        operations: {
+          mkdir: async () => { throw errorWithCode("EACCES", "Verzeichnis gesperrt"); },
+          writeFile: async () => { writeAttempts += 1; },
+        },
+      }),
+      (error) => error instanceof RuntimePersistenceError
+        && error.kind === RUNTIME_PERSISTENCE_ERROR_KINDS.PERMISSION
+        && error.phase === "prepare-directory",
+    );
+    assert.equal(writeAttempts, 0);
   } finally {
     await rm(root, { recursive: true, force: true });
   }
