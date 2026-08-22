@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -104,15 +104,6 @@ test("Vorlage und Datensatz werden versioniert persistiert und editierbar gehalt
 test("beschädigte Datenbank wird nicht still überschrieben", async () => {
   await withTempRoot(async (root) => {
     const filePath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
-    await writeFile(filePath, "{kaputt", { encoding: "utf8", flag: "w" }).catch(async (error) => {
-      if (error.code !== "ENOENT") throw error;
-      await writeFile(path.dirname(filePath), "", "utf8");
-    });
-  }).catch(() => {});
-
-  await withTempRoot(async (root) => {
-    const filePath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
-    const { mkdir } = await import("node:fs/promises");
     await mkdir(path.dirname(filePath), { recursive: true });
     await writeFile(filePath, "{kaputt", "utf8");
     await assert.rejects(readProjectDatabase(root), /beschädigt/);
