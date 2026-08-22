@@ -2,6 +2,21 @@
 
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
+### Erscheinungsbild nach Referenz
+
+#### Geändert
+
+- Farbwirkung, Ebenen, Schatten und Abstände an eine kompakte Petrol-/Cyan-Kartenoberfläche angeglichen.
+- Seitenleiste auf eine schmale, nummerierte Bereichsnavigation verdichtet.
+- Kopf-, Schnellstarter-, Panel- und Debugbereiche visuell vereinheitlicht, ohne Funktionen oder Zustandsverträge zu ändern.
+- Mobile Darstellung der verdichteten Navigation und Oberflächenrahmung abgesichert.
+
+#### Bewusst nicht enthalten
+
+- keine neuen Fachinhalte oder Module
+- keine Änderung an Speicherung oder öffentlichen Schnittstellen
+- kein Resize und kein Drag & Drop
+
 ### 0.3.0-C – Visibility Controls & Compact Menu
 
 #### Hinzugefügt
