@@ -60,70 +60,121 @@ PR `#82` · Squash-Merge `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
 ## Abgeschlossen – 0.4.1-E2E Chromium Gate & HTML UI Mirror
 
-Baseline: `7f59c727bcef6b959e3fcc49d7c796b088bc197a`
+- [x] Chromium als automatischen Primärbrowser festgelegt; Firefox bleibt optional.
+- [x] echte CRUD-/Recovery-Kette automatisiert.
+- [x] proportionalen Mirror `1366 × 900 @ 0,5` aufgebaut.
+- [x] Screenshot-/Export-Evidenz eingeführt.
+- [x] realen UI-Überlagerungsfehler gefunden und container-responsiv repariert.
+- [x] finaler Core-Stand: 35 JavaScript-Dateien, 94 Projektdateien, 87/87 Node-Tests.
+- [x] Chromium 2/2, Mirror PASS.
 
-Pull Request: `#83`
+PR `#83` · Squash-Merge `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
 
-Squash-Merge: `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
+## Aktueller Funktionsstrang – 0.4.2 Data Studio PRO
 
-### A – Chromium-first Browser-E2E
+Baseline: `acf36db29460b2ce25922aeaf065745c04c59176`
 
-- [x] Playwright als exakt gepinnte Dev-Abhängigkeit einführen.
-- [x] Chromium als primäres automatisches Browserprojekt festlegen.
-- [x] Firefox ausschließlich als optionalen manuellen Alternativlauf behalten.
-- [x] Testserver aus temporärer Projektkopie starten, damit echte Nutzdaten unangetastet bleiben.
-- [x] Browserpfad `Start -> Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import` automatisieren.
-- [x] Browserartefakte, Reports und Fehler-Traces aus Git ausschließen.
-- [x] Chromium-Gate bei Pull Requests und `main`-Pushes automatisch ausführen.
+Arbeitsbranch: `feat/0.4.2-data-studio-pro`
 
-### B – HTML-Mirror & Screenshot-Evidenz
+Pull Request: `#84`
 
-- [x] reale `index.html` zweimal laden statt eine Testattrappe nachzubauen.
-- [x] Referenz und Spiegel intern exakt auf 1366 × 900 festlegen.
-- [x] Spiegel ausschließlich visuell auf Faktor 0,5 skalieren.
-- [x] zentrale DOM-Rechtecke zwischen Referenz und Spiegel vergleichen.
-- [x] gemessenen Skalierungsfaktor validieren.
-- [x] vollständigen Mirror-Screenshot und separaten 683 × 450-Spiegel erzeugen.
-- [x] Start-, Datensatz-, Restore- und Import-Screenshots erzeugen.
-- [x] Abschlussartefakt mit sechs PNGs und JSON-Export tatsächlich entpacken und prüfen.
+### A – Architektur / Persistenz
 
-### C – real gefundener UI-Fehler
+- [x] PRO als Companion-Modul statt CRUD-Monolith aufgebaut.
+- [x] `data-studio` unverändert als stabilen CRUD-Editor auf 0.4.0 belassen.
+- [x] `data-studio-pro` 0.4.2 für Recherche und Organisation ergänzt.
+- [x] kleine `data-studio-pro-bridge` für Navigation und Revisionssynchronisierung ergänzt.
+- [x] Project-Data-Produktionsschema ausdrücklich bei Version 1 belassen.
+- [x] eigenen PRO-Metadatenvertrag Version 1 definiert.
+- [x] feste Runtime-Datei `data/data-studio-pro.json` implementiert.
+- [x] atomare PRO-Persistenz über Temp-Datei und Rename implementiert.
+- [x] dieselbe zentrale Mutationssperre wie Project Data/Recovery wiederverwendet.
+- [x] PRO-Datei und Temp-Dateien aus Git, Auto-Fix und statischer Auslieferung ausgeschlossen.
+- [x] Same-Origin-geschützte PRO-API integriert.
+- [x] beschädigte PRO-Datei wird nicht still überschrieben.
 
-- [x] erster echter Chromium-Lauf deckte überlappende Data-Studio-/Recovery-Bedienelemente im schmalen Detailpanel auf.
-- [x] Project-Data-UI von viewport-basiertem Zwei-Spalten-Verhalten auf container-responsive Darstellung umstellen.
-- [x] schmale Modulbreite auf eine Spalte begrenzen; Zwei-Spalten-Modus erst bei ausreichend echter Containerbreite aktivieren.
-- [x] Bedienelemente mit Scroll-Abstand zur sticky Schnellleiste härten.
-- [x] denselben unveränderten Chromium-E2E-Pfad danach vollständig grün ausführen.
+### B – Suche / Filter / Sortierung
 
-### D – Abschluss-Evidenz
+- [x] Datensatz-Volltextsuche über Feldbezeichnungen und sichtbare Werte ergänzt.
+- [x] Filter nach Vorlage ergänzt.
+- [x] Filter nach Kategorie ergänzt.
+- [x] Trefferzahl und Nulltrefferanzeige ergänzt.
+- [x] Sortierung nach Aktualisierung neu→alt / alt→neu ergänzt.
+- [x] Sortierung nach Erstellung neu→alt / alt→neu ergänzt.
 
-- [x] Node 20 Core Quality Gate grün.
-- [x] Node 24 Core Quality Gate grün.
-- [x] finaler Core-Stand: 35 JavaScript-Dateien gelintet, 94 Projektdateien geprüft, 87/87 Node-Tests erfolgreich.
-- [x] Chromium: 2/2 echte Browserprüfungen erfolgreich.
-- [x] HTML-Mirror: PASS, 1366 × 900 intern, Faktor 0,5, Schlüsselgeometrie identisch.
-- [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
-- [x] finales Browser-Abnahmeartefakt `9474686971`, SHA-256 `0ed384715c715ec78c9bfbabfc283e26f490fc7c83fa66f0355a60340118a8fe`.
-- [x] finaler Dokumentationsstand durch Core- und Chromium-Gate geprüft.
-- [x] finaler Diff: 26 Commits voraus, 0 hinter `main`, 20 begründete Dateien.
-- [x] PR #83 auf ready for review gesetzt und kontrolliert per Squash gemergt.
-- [x] `main` auf Merge-SHA, VERSION, Browserworkflow, Mirror und container-responsiven UI-Fix geprüft.
+### C – Kategorien / Vorlagenbibliothek
 
-## Nächste Funktionsstufe – 0.4.2 Data Studio PRO
+- [x] frei benennbare Kategorien ergänzt.
+- [x] case-insensitive doppelte Kategorienamen serverseitig verhindert.
+- [x] Vorlagen einer Kategorie zuweisbar und wieder lösbar gemacht.
+- [x] Kategorie löschen ohne Vorlagenverlust implementiert.
+- [x] Bibliothek mit Name, Kategorie, Feldanzahl und Datensatzanzahl ergänzt.
+- [x] Bibliothek nach Text und Kategorie filterbar gemacht.
+- [x] Vorlagen über die PRO-Brücke im bestehenden Editor öffnbar gemacht.
 
-- [ ] Filter- und Suchansicht ergänzen.
-- [ ] Vorlagenbibliothek und Vorlagenexport verbessern.
-- [ ] bessere Maskenorganisation und Kategorien ergänzen.
-- [ ] relationale Feldtypen fachlich definieren.
-- [ ] optionalen Storage-Adapter-Vertrag vorbereiten.
-- [ ] SQLite nur bei nachgewiesenem Bedarf hinter demselben Datenservice einführen.
+### D – Gespeicherte Ansichten
 
-## Danach – Cross-OS-/Release-Hardening
+- [x] benannte Ansicht serverseitig speichern.
+- [x] Vorlage, Kategorie, Suchtext und Sortierung speichern.
+- [x] gespeicherte Ansicht anwenden.
+- [x] gespeicherte Ansicht löschen.
+- [x] doppelte Namen case-insensitiv verhindern.
+- [x] Ansicht über Reload hinweg erhalten.
+- [x] keine Datensatzkopien in Ansichten speichern.
 
-- [ ] Linux-Pfade zusätzlich mit expliziten Rechte-/Temp-/Rename-Fällen härten.
-- [ ] Windows-CI für Pfadseparatoren, Dateisperren, Rename und Recovery ergänzen.
-- [ ] Browser-E2E auf Windows erst nach stabilem Dateisystem-Gate aktivieren.
+### E – Vorlagenexport
+
+- [x] gewählte Vorlage als JSON exportieren.
+- [x] Formatkennung `provoware-data-studio-template` und Formatversion 1 verwenden.
+- [x] Kategorie optional mitgeben.
+- [x] Datensätze bewusst nicht in Vorlagenexport aufnehmen.
+- [x] sicheren Dateinamen aus Vorlagenname ableiten.
+
+### F – Regression / Browser
+
+- [x] PRO-Service-Tests für Kategorien, Zuweisungen, Views und atomare Persistenz ergänzt.
+- [x] Failure-Injection direkt vor PRO-Rename ergänzt und bytegenauen Erhalt nachgewiesen.
+- [x] API-Tests für Routing, Same-Origin, Referenzen und Validierung ergänzt.
+- [x] UI-/Registry-/Bridge-Vertragstests ergänzt.
+- [x] Browser-Zweitpersistenz-Verbot explizit auf PRO erweitert und getestet.
+- [x] PRO im zentralen Quality Gate als Pflichtbestandteil verankert.
+- [x] Chromium-E2E um Kategorie, Bibliothek, Suche, View, Export und Reload erweitert.
+- [x] HTML-Mirror wartet auf PRO und vergleicht dessen Geometrie mit.
+- [x] erster kompletter Core-Gate: Node 20 + Node 24 PASS, 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Node-Tests.
+- [x] erster kompletter Browser-Gate: Chromium 3/3 PASS, Firefox wie vorgesehen übersprungen.
+- [x] Browserartefakt `9476750307`, SHA-256 `f2eee6beb9baec81126885ce23c8543070afec0fae088045d104cd68a8628f99`.
+- [x] Artefakt tatsächlich geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
+
+### G – Dokumentation / Abschluss
+
+- [x] Plan, Baseline-Checkpoint und Checkliste angelegt.
+- [x] VERSION auf 0.4.2-Entwicklungsstufe aktualisiert; Produktversion bleibt 0.2.0.
+- [x] README auf Funktionen, Verträge, E2E und Recovery-Grenze synchronisiert.
+- [ ] TODO, CHANGELOG, MANIFEST und Checkliste abschließend synchronisieren.
+- [ ] finalen Dokumentationsstand erneut durch Node 20/24 und Chromium prüfen.
+- [ ] finalen Diff gegen `main` prüfen.
+- [ ] PR #84 auf ready for review setzen und kontrolliert squash-mergen.
+- [ ] `main` nach Merge prüfen.
+
+### Bewusst nicht Teil von 0.4.2
+
+- [ ] relationale Feldtypen – eigener späterer Datenmodellvertrag.
+- [ ] Template-Import – erst nach eigenem Konflikt-/ID-Vertrag.
+- [ ] SQLite-Adapter – nur bei nachgewiesenem Bedarf.
+- [ ] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – eigener versionierter Folgeschritt.
+
+## Nächster Qualitätsstrang – Cross-OS-/Release-Hardening
+
+- [ ] Linux-Rechte, Temp-Verzeichnisse und Rename-/Lock-Fehler systematisch injizieren.
+- [ ] Windows-CI für Pfadseparatoren, Dateisperren, atomaren Ersatz und Recovery ergänzen.
+- [ ] Verhalten von Temp-Dateien und Cleanup auf realen Plattformen vergleichen.
+- [ ] Chromium-E2E auf Windows erst nach stabilem Dateisystem-Gate aktivieren.
 - [ ] Firefox bei Bedarf als manuellen Kompatibilitätslauf verwenden, nicht als primären Blocker.
+
+## Optional danach – 0.4.3 Recovery Envelope
+
+- [ ] gemeinsamen, versionierten Backup-/Restore-Vertrag für Project Data und PRO-Metadaten fachlich definieren.
+- [ ] keine stillschweigende Änderung des bestehenden `.pwbak`-Formats vornehmen.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
 
