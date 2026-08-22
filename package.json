@@ -10,7 +10,16 @@
     "lint": "node scripts/project-lint.mjs",
     "start": "node scripts/start.mjs",
     "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test --config=tests/browser/playwright.config.mjs --project=chromium",
+    "test:e2e:chromium": "playwright test --config=tests/browser/playwright.config.mjs --project=chromium",
+    "test:e2e:firefox": "playwright test --config=tests/browser/playwright.config.mjs --project=firefox",
+    "test:e2e:mirror": "playwright test --config=tests/browser/playwright.config.mjs --project=chromium --grep=HTML-Mirror",
+    "browser:install:chromium": "playwright install --with-deps chromium",
+    "browser:install:firefox": "playwright install --with-deps firefox",
     "verify": "npm run lint && node scripts/quality-check.mjs && npm run test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
   },
   "engines": {
     "node": ">=20"
