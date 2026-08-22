@@ -5,6 +5,10 @@ import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import {
+  handleProjectDataApi,
+  isProtectedProjectDataPath,
+} from "./project-data-service.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HOST = "127.0.0.1";
@@ -54,6 +58,7 @@ export const inhaltstyp = (datei) => ({
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".txt": "text/plain; charset=utf-8",
 }[path.extname(datei).toLowerCase()] || "application/octet-stream");
 
 const abhaengigkeitenAufloesen = async () => {
@@ -79,9 +84,15 @@ const abhaengigkeitenAufloesen = async () => {
 };
 
 const antworten = async (anfrage, antwort) => {
+  if (await handleProjectDataApi(anfrage, antwort, { root: ROOT })) return;
+
   const datei = anfragepfadAufloesen(anfrage.url);
   if (!datei) {
     antwort.writeHead(403).end("Zugriff außerhalb des Projektordners ist nicht erlaubt.");
+    return;
+  }
+  if (isProtectedProjectDataPath(datei, ROOT)) {
+    antwort.writeHead(403).end("Direkter Zugriff auf die Projekt-Datenbank ist nicht erlaubt.");
     return;
   }
   try {
