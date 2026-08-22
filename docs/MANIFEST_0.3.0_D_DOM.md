@@ -90,7 +90,7 @@ Keine neue Bibliothek und kein neues npm-Laufzeitpaket.
 
 Einstufung: **klein bis mittel**.
 
-Direkt betroffen:
+Technischer PR #76 änderte `11` Dateien. Direkt betroffen waren:
 
 - DOM-Darstellung des Workspace
 - kleine neue Desktop-CSS-Datei
@@ -121,23 +121,28 @@ Schutz: Das neue Overlay ist ausschließlich innerhalb `@media (min-width: 981px
 
 ### Basisdesign wird unbeabsichtigt verändert
 
-Schutz: `assets/styles.css` wird in D2 nicht geändert.
+Schutz: `assets/styles.css` wurde in D2 nicht geändert.
 
-## Validierung vor Merge
+## Reale Abnahme
 
-Noch ausstehend:
+- vollständiger Diff gegen `main` geprüft: `11` geplante Dateien
+- Branch beim finalen Diff-Check: `0` Commits hinter `main`
+- technischer Pull Request: `#76`
+- PR vor Merge: mergebar
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `51` Dateien erfolgreich geprüft
+- automatische Tests: `36/36` erfolgreich
+- fehlgeschlagene Tests: `0`
+- Projektprüfung: Node `20.20.2`
+- keine ungeplante Resize-, Pointer- oder Drag-Eingabelogik im Patch
+- Squash-Merge: `249df54ec13fa632f74400897dd3d83da3332bcb`
+- Main-Stichprobe erfolgreich: `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css`, `VERSION.json`
 
-- vollständiger Branch-Diff gegen `main`
-- Branch 0 Commits hinter `main`
-- `npm run verify` im Pull Request
-- alle Tests grün
-- PR mergebar
-- keine ungeplante Resize-Eingabelogik
-- Main-Stichprobe nach Merge
+Der bekannte GitHub-Actions-Hinweis zur internen Node-20-Laufzeit der Actions ist nicht blockierend und bleibt von diesem Funktionspatch getrennt.
 
 ## Rückweg
 
-Revert dieses Pull Requests. Dadurch verschwinden ausschließlich das CSS-Overlay, die Größenübertragung und der lokale Stylesheet-Verweis. D1-State und D1-Berechnung bleiben erhalten.
+Revert von PR #76. Dadurch verschwinden ausschließlich das CSS-Overlay, die Größenübertragung und der lokale Stylesheet-Verweis. D1-State und D1-Berechnung bleiben erhalten.
 
 ## Nächste zwei Schritte
 
