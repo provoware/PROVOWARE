@@ -2,9 +2,9 @@
 
 ## Ziel in einfacher Sprache
 
-Dieser Patch macht bereits gespeicherte Panelgrößen erstmals sichtbar, ohne eine neue Bedienmöglichkeit einzuführen.
+Dieser Patch macht bereits gespeicherte Panelgrößen sichtbar, ohne eine neue Bedienmöglichkeit einzuführen.
 
-Die zentrale Zustandsverwaltung liefert weiterhin `widthUnits` und `heightPx`. `assets/workspace-ui.js` überträgt diese gültigen Werte ausschließlich in zwei CSS-Variablen. Eine kleine neue Datei `assets/workspace-layout.css` entscheidet daraus über die Desktopdarstellung. Die bereits bewährten Tablet-/Mobilregeln in `assets/styles.css` bleiben dadurch unangetastet.
+Die zentrale Zustandsverwaltung liefert weiterhin `widthUnits` und `heightPx`. `assets/workspace-ui.js` überträgt diese gültigen Werte ausschließlich in zwei CSS-Variablen. Die kleine Datei `assets/workspace-layout.css` entscheidet daraus über die Desktopdarstellung. Die bereits bewährten Tablet-/Mobilregeln in `assets/styles.css` bleiben unangetastet.
 
 Noch **nichts wird mit Maus, Touch, Stift oder Tastatur vergrößert oder verkleinert**. Die sichtbare Resize-Bedienung bleibt vollständig für D3 gesperrt.
 
@@ -23,12 +23,12 @@ Noch **nichts wird mit Maus, Touch, Stift oder Tastatur vergrößert oder verkle
 
 - [x] aktueller `main`-Commit vor Patch bestätigt: `5542f90edb6b2079ef4e55f5e217f3b0e05422c4`
 - [x] eigener Branch direkt von diesem Stand erstellt: `feature/0.3.0-d2-dom-size-application`
-- [x] D1 mit State-API und reiner Größenberechnung ist vollständig gemergt
-- [x] freigegebene Produktversion bleibt `0.2.0`
-- [x] Workspace-Vertrag bleibt Version `1`
-- [x] Speicher-Schlüssel bleibt `provoware.allin.workspace.main.v1`
+- [x] D1 mit State-API und reiner Größenberechnung vollständig gemergt
+- [x] freigegebene Produktversion bei `0.2.0` belassen
+- [x] Workspace-Vertrag Version `1` unverändert gelassen
+- [x] Speicher-Schlüssel `provoware.allin.workspace.main.v1` unverändert gelassen
 - [x] Option A bestätigt: CSS-Variablen statt direkter `grid-column`-/`height`-Logik in JavaScript
-- [x] Precheck optimiert die Änderungsgrenze: statt die große `assets/styles.css` umzubauen, wird ein isoliertes Desktop-Overlay verwendet
+- [x] Precheck optimiert die Änderungsgrenze: isoliertes Desktop-Overlay statt Umbau der großen `assets/styles.css`
 
 ---
 
@@ -42,25 +42,30 @@ Verbindliche Kette:
 Workspace-State -> workspace-ui.js -> CSS-Variablen -> workspace-layout.css -> sichtbares Panel
 ```
 
-Es entsteht **keine zweite Größenberechnung** und **keine zweite Persistenzschicht**.
+Ergebnis:
+
+- [x] keine zweite Größenberechnung entstanden
+- [x] keine zweite Persistenzschicht entstanden
+- [x] JavaScript überträgt nur Werte
+- [x] CSS entscheidet über die Darstellung
 
 ---
 
 # 3. Änderungsgrenze
 
-## Enthalten
+## Enthalten und umgesetzt
 
-- [ ] `workspace-ui.js` überträgt `widthUnits` in `--panel-spalten`
-- [ ] `workspace-ui.js` überträgt eine konkrete `heightPx` in `--panel-hoehe`
-- [ ] `heightPx: null` entfernt die Inline-Höhenvariable und stellt damit automatische Höhe wieder her
-- [ ] neue `assets/workspace-layout.css` verwendet die Variablen ausschließlich ab 981 px
-- [ ] vorhandene 4/8/12-Standardklassen aus `assets/styles.css` bleiben sichere Fallbacks ohne JavaScript
-- [ ] Tablet bis 980 px verwendet unverändert die bestehende responsive Basis-CSS
-- [ ] Mobil bis 680 px bleibt unverändert vollbreit und inhaltsgerecht hoch
-- [ ] `index.html` lädt das lokale Workspace-Overlay direkt nach der Basis-CSS
-- [ ] State wird durch die Darstellung niemals verändert
-- [ ] automatische Tests für Breite, Höhe, Rückkehr zu `auto`, Stylesheet-Vertrag und Ladeposition
-- [ ] Dokumentation und Entwicklungsmetadaten auf den realen D2-Stand aktualisieren
+- [x] `workspace-ui.js` überträgt `widthUnits` in `--panel-spalten`
+- [x] `workspace-ui.js` überträgt eine konkrete `heightPx` in `--panel-hoehe`
+- [x] `heightPx: null` entfernt die Inline-Höhenvariable und stellt automatische Höhe wieder her
+- [x] `assets/workspace-layout.css` verwendet die Variablen ausschließlich ab 981 px
+- [x] vorhandene 4/8/12-Standardklassen aus `assets/styles.css` bleiben sichere Fallbacks ohne JavaScript
+- [x] Tablet bis 980 px verwendet unverändert die bestehende responsive Basis-CSS
+- [x] Mobil bis 680 px bleibt unverändert vollbreit und inhaltsgerecht hoch
+- [x] `index.html` lädt das lokale Workspace-Overlay direkt nach der Basis-CSS
+- [x] State wird durch die Darstellung nicht verändert
+- [x] automatische Tests für Breite, Höhe, Rückkehr zu `auto`, Stylesheet-Vertrag und Ladeposition ergänzt
+- [x] Dokumentation und Entwicklungsmetadaten auf den realen D2-Stand aktualisiert
 
 ## Ausdrücklich nicht enthalten
 
@@ -95,9 +100,9 @@ Das Desktop-Overlay entscheidet:
 grid-column: span var(--panel-spalten)
 ```
 
-Die eigentlichen Min-/Max-Grenzen bleiben weiterhin ausschließlich in `PANEL_DEFINITIONEN` und der Workspace-Normalisierung.
+Die eigentlichen Min-/Max-Grenzen bleiben ausschließlich in `PANEL_DEFINITIONEN` und der Workspace-Normalisierung.
 
-Wenn JavaScript ausfällt oder keine gültige Variable vorhanden ist, ist die Overlay-Deklaration ungültig und die bereits vorhandene 4/8/12-Basisregel bleibt wirksam. Es wird deshalb kein zweiter Standardwert im Overlay dupliziert.
+Falls keine gültige Breite übertragen wurde, wird `data-workspace-size-ready` entfernt. Dadurch greift das Overlay nicht und die vorhandene Basisdarstellung bleibt zuständig.
 
 ## 4.2 Höhe
 
@@ -107,7 +112,7 @@ Bei einer gespeicherten Pixelhöhe setzt JavaScript:
 --panel-hoehe: <heightPx>px
 ```
 
-Bei `heightPx: null` wird die Inline-Variable entfernt. Das Desktop-Overlay fällt durch `var(--panel-hoehe, auto)` auf automatische Höhe zurück.
+Bei `heightPx: null` wird die Inline-Variable entfernt. Das Desktop-Overlay fällt über `var(--panel-hoehe, auto)` auf automatische Höhe zurück.
 
 JavaScript setzt **nicht** direkt `height`, `min-height` oder `grid-column`.
 
@@ -115,55 +120,54 @@ JavaScript setzt **nicht** direkt `height`, `min-height` oder `grid-column`.
 
 ### Desktop ab 981 px
 
-- `assets/workspace-layout.css` ist aktiv
-- gespeicherte `--panel-spalten` werden sichtbar verwendet
-- gespeicherte `--panel-hoehe` wird sichtbar verwendet
-- `null` bleibt automatische Höhe
+- [x] `assets/workspace-layout.css` aktiv
+- [x] gespeicherte `--panel-spalten` sichtbar verwendet
+- [x] gespeicherte `--panel-hoehe` sichtbar verwendet
+- [x] `heightPx: null` bleibt automatische Höhe
 
 ### Tablet bis 980 px
 
-- das neue Overlay enthält absichtlich keine aktive Regel
-- bestehende 6-/12-Spalten-Rückfallregeln aus `assets/styles.css` bleiben maßgeblich
-- bestehende inhaltsgerechte Höhen bleiben maßgeblich
-- gespeicherte Desktopwerte bleiben unverändert im State
+- [x] neues Overlay nicht aktiv
+- [x] bestehende 6-/12-Spalten-Rückfallregeln aus `assets/styles.css` bleiben maßgeblich
+- [x] gespeicherte Desktopwerte bleiben unverändert im State
 
 ### Mobil bis 680 px
 
-- bestehende Basis-CSS bleibt allein maßgeblich
-- alle Panels bleiben vollbreit
-- Höhe bleibt inhaltsgerecht
-- Desktopwerte bleiben unverändert gespeichert
+- [x] bestehende Basis-CSS allein maßgeblich
+- [x] Panels weiterhin vollbreit
+- [x] Höhe weiterhin inhaltsgerecht
+- [x] Desktopwerte bleiben unverändert gespeichert
 
 ---
 
-# 5. Implementierungsreihenfolge
+# 5. Implementierung
 
 ## 5.1 `assets/workspace-ui.js`
 
-- [x] kleine Hilfsfunktion für die Größenübertragung ergänzen
-- [x] nur ganzzahlige positive Breitenwerte auf CSS übertragen
-- [x] nur ganzzahlige positive Höhenwerte auf CSS übertragen
+- [x] kleine Hilfsfunktion `panelGroesseAnwenden` ergänzt
+- [x] nur positive ganzzahlige Breitenwerte auf CSS übertragen
+- [x] nur positive ganzzahlige Höhenwerte auf CSS übertragen
 - [x] ungültige Darstellungswerte defensiv durch Entfernen der betreffenden CSS-Variable behandeln
 - [x] `heightPx: null` ausdrücklich als automatische Höhe behandeln
-- [x] Größenübertragung in den bestehenden zentralen `zustandAnwenden`-Pfad integrieren
+- [x] Größenübertragung in den bestehenden zentralen `zustandAnwenden`-Pfad integriert
 - [x] Sichtbarkeitslogik unverändert erhalten
-- [x] keine Speicherung aus `workspace-ui.js` hinzufügen
+- [x] keine Speicherung aus `workspace-ui.js` hinzugefügt
 
 ## 5.2 `assets/workspace-layout.css`
 
-- [ ] neue kleine CSS-Datei ausschließlich für den Größen-Darstellungsvertrag anlegen
-- [ ] Regel ausschließlich unter `@media (min-width: 981px)` aktivieren
-- [ ] Breite ausschließlich aus `--panel-spalten` beziehen
-- [ ] Höhe aus `--panel-hoehe` mit Fallback `auto` beziehen
-- [ ] keine Min-/Max-Regeln duplizieren
-- [ ] keine Resize-Griffdarstellung vorziehen
-- [ ] keine vorhandene Tablet-/Mobilregel überschreiben
+- [x] neue kleine CSS-Datei ausschließlich für den Größen-Darstellungsvertrag angelegt
+- [x] Regel ausschließlich unter `@media (min-width: 981px)` aktiviert
+- [x] Breite ausschließlich aus `--panel-spalten` bezogen
+- [x] Höhe aus `--panel-hoehe` mit Fallback `auto` bezogen
+- [x] keine Min-/Max-Regeln dupliziert
+- [x] keine Resize-Griffdarstellung vorgezogen
+- [x] keine vorhandene Tablet-/Mobilregel überschrieben
 
 ## 5.3 `index.html`
 
-- [ ] `assets/workspace-layout.css` direkt nach `assets/styles.css` lokal laden
-- [ ] keine Script-Reihenfolge ändern
-- [ ] keine neue externe Ressource einführen
+- [x] `assets/workspace-layout.css` direkt nach `assets/styles.css` lokal geladen
+- [x] Script-Reihenfolge unverändert gelassen
+- [x] keine externe Ressource eingeführt
 
 ---
 
@@ -171,21 +175,31 @@ JavaScript setzt **nicht** direkt `height`, `min-height` oder `grid-column`.
 
 ## 6.1 DOM-Anwendung
 
-- [ ] gespeicherte Breite wird als `--panel-spalten` gesetzt
-- [ ] gespeicherte Höhe wird als `--panel-hoehe` mit `px` gesetzt
-- [ ] `heightPx: null` hinterlässt keine Inline-Höhenvariable
-- [ ] Wechsel von konkreter Höhe zurück zu `null` entfernt einen alten Inline-Wert
-- [ ] Größenübertragung verändert Sichtbarkeit nicht
-- [ ] Größenübertragung verändert den übergebenen Workspace-Zustand nicht
+- [x] gespeicherte Breite wird als `--panel-spalten` gesetzt
+- [x] gespeicherte Höhe wird als `--panel-hoehe` mit `px` gesetzt
+- [x] `heightPx: null` hinterlässt keine Inline-Höhenvariable
+- [x] Wechsel von konkreter Höhe zurück zu `null` entfernt einen alten Inline-Wert
+- [x] Größenübertragung verändert Sichtbarkeit nicht
+- [x] Größenübertragung verändert den übergebenen Workspace-Zustand nicht
+- [x] ungültige Darstellungsbreite entfernt Variable und Bereitschaftsmarker
 
 ## 6.2 CSS-/Ladevertrag
 
-- [ ] Overlay ist auf Desktop `min-width: 981px` begrenzt
-- [ ] Overlay verwendet `--panel-spalten`
-- [ ] Overlay verwendet `--panel-hoehe` mit `auto`-Fallback
-- [ ] Overlay enthält keine duplizierten 4/8/12-Panelgrenzen
-- [ ] `index.html` lädt Basis-CSS vor Workspace-Overlay
-- [ ] keine Resize-Griff- oder Pointer-Regel wird vorgezogen
+- [x] Overlay auf Desktop `min-width: 981px` begrenzt
+- [x] Overlay verwendet `--panel-spalten`
+- [x] Overlay verwendet `--panel-hoehe` mit `auto`-Fallback
+- [x] Overlay dupliziert keine 4/8/12-Panelgrenzen
+- [x] `index.html` lädt Basis-CSS vor Workspace-Overlay
+- [x] keine Resize-Griff-, Pointer- oder Drag-Regel vorgezogen
+
+## 6.3 Vollständiges Quality Gate
+
+- [x] `QUALITY GATE: OK`
+- [x] `51` Dateien statisch geprüft
+- [x] `36/36` automatische Tests erfolgreich
+- [x] `0` Tests fehlgeschlagen
+- [x] Projektprüfung mit Node `20.20.2`
+- [x] bestehende Modul-, State-, Größenberechnungs-, UI- und Quality-Gate-Regressionstests weiterhin grün
 
 ---
 
@@ -193,47 +207,52 @@ JavaScript setzt **nicht** direkt `height`, `min-height` oder `grid-column`.
 
 ## Risiko: CSS und JavaScript definieren dieselbe Größenlogik doppelt
 
-Schutz: JavaScript überträgt nur Werte. Das Overlay besitzt ausschließlich die Darstellungsregel. Grenzen bleiben im State.
+Schutz umgesetzt: JavaScript überträgt nur Werte. Das Overlay besitzt ausschließlich die Darstellungsregel. Grenzen bleiben im State.
 
 ## Risiko: `heightPx: null` hinterlässt eine alte feste Höhe
 
-Schutz: Die Inline-CSS-Variable wird bei `null` ausdrücklich entfernt und automatisch getestet.
+Schutz umgesetzt: Die Inline-CSS-Variable wird bei `null` ausdrücklich entfernt und automatisch getestet.
 
 ## Risiko: gespeicherte Desktopwerte verformen Tablet/Mobil
 
-Schutz: Das neue Stylesheet ist ausschließlich ab 981 px aktiv. Unterhalb davon bleibt die bewährte Basis-CSS unverändert allein zuständig.
+Schutz umgesetzt: Das neue Stylesheet ist ausschließlich ab 981 px aktiv. Unterhalb davon bleibt die bewährte Basis-CSS allein zuständig.
 
 ## Risiko: bestehende Standardklassen funktionieren ohne JavaScript nicht mehr
 
-Schutz: `assets/styles.css` wird nicht verändert. Ohne gültige `--panel-spalten` bleibt die vorhandene 4/8/12-Basisdarstellung bestehen.
+Schutz umgesetzt: `assets/styles.css` wurde nicht verändert. Ohne gültigen Bereitschaftsmarker bleibt die vorhandene Basisdarstellung bestehen.
 
 ## Risiko: zusätzlicher CSS-Dateizugriff wird vergessen
 
-Schutz: `index.html` und Tests prüfen die lokale Ladeposition; das bestehende Quality Gate kontrolliert lokale Asset-Verweise.
+Schutz umgesetzt: `index.html` und automatische Tests prüfen die lokale Ladeposition; das bestehende Quality Gate kontrolliert lokale Asset-Verweise.
 
-## Risiko: D2 zieht bereits Eingabelogik aus D3 vor
+## Risiko: D2 zieht Eingabelogik aus D3 vor
 
-Schutz: Keine neuen Event-Listener, Griffe, Pointer- oder Tastaturereignisse in diesem Patch.
+Schutz umgesetzt: Keine neuen Event-Listener, Griffe, Pointer- oder Resize-Tastaturereignisse in D2.
 
 ---
 
-# 8. Erwartetes Änderungsvolumen
+# 8. Änderungsvolumen
 
 Einstufung: **klein bis mittel**.
 
-Voraussichtlich direkt betroffen:
+Technischer PR #76 änderte `11` Dateien.
+
+Direkte Laufzeitänderungen:
 
 - `assets/workspace-ui.js`
 - neue `assets/workspace-layout.css`
 - `index.html`
+
+Tests und Dokumentation:
+
 - `tests/workspace-ui.test.mjs`
 - `TODO.md`
 - `CHANGELOG.md`
 - `MANIFEST.md`
 - `VERSION.json`
 - `docs/STATUS_0.3.0.md`
-- dieses Teilplandokument
-- D2-Patchmanifest
+- `docs/PLAN_0.3.0_D_DOM.md`
+- `docs/MANIFEST_0.3.0_D_DOM.md`
 
 Bewusst nicht betroffen:
 
@@ -245,26 +264,27 @@ Bewusst nicht betroffen:
 
 ---
 
-# 9. Abnahmekriterien
+# 9. Abschlussvalidierung
 
-D2 ist erst abgeschlossen, wenn:
+- [x] vollständigen Diff gegen aktuellen `main` geprüft
+- [x] exakt `11` geplante Dateien im technischen PR
+- [x] Branch beim finalen Diff-Check `0` Commits hinter `main`
+- [x] `npm run verify` über GitHub Quality Gate erfolgreich
+- [x] alle bestehenden Tests weiterhin erfolgreich
+- [x] alle neuen D2-Tests erfolgreich
+- [x] PR #76 mergebar
+- [x] keine ungeplante Resize-Eingabelogik
+- [x] technischen PR #76 per Squash gemergt
+- [x] Merge-Commit `249df54ec13fa632f74400897dd3d83da3332bcb`
+- [x] `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css` und `VERSION.json` auf `main` erneut gelesen
 
-- [ ] gespeicherte Desktopbreiten sichtbar über CSS-Variablen angewendet werden
-- [ ] gespeicherte Pixelhöhen sichtbar über CSS-Variablen angewendet werden
-- [ ] `heightPx: null` zuverlässig automatische Höhe ergibt
-- [ ] Tablet/Mobil bleiben durch das Desktop-Overlay unverändert
-- [ ] die bestehende Sichtbarkeitssteuerung unverändert funktioniert
-- [ ] keine Resize-Eingabemechanik hinzugekommen ist
-- [ ] `npm run verify` vollständig grün ist
-- [ ] Branch beim finalen Diff-Check 0 Commits hinter `main` ist
-- [ ] PR mergebar ist
-- [ ] zentrale Dateien nach Merge erneut auf `main` gelesen wurden
+Eine echte interaktive Firefox-/Chrome-Abnahme gehört nicht zu D2 und wurde noch nicht durchgeführt. Sie bleibt Bestandteil des Release Gates 0.3.0-G.
 
 ---
 
 # 10. Rückweg
 
-D2 bleibt ein eigener Pull Request. Ein Revert entfernt ausschließlich die DOM-/CSS-Darstellung der gespeicherten Größen sowie den lokalen Overlay-Verweis.
+D2 ist ein eigener Pull Request. Ein Revert von PR #76 entfernt ausschließlich die DOM-/CSS-Darstellung der gespeicherten Größen und den lokalen Overlay-Verweis.
 
 D1-State und D1-Berechnungslogik bleiben dabei vollständig erhalten. Es gibt keine Datenmigration und keinen neuen Speicher-Schlüssel.
 
@@ -272,11 +292,11 @@ D1-State und D1-Berechnungslogik bleiben dabei vollständig erhalten. Es gibt ke
 
 # 11. Nächste zwei Schritte
 
-## Nächster Schritt nach D2
+## Nächster Schritt
 
 **0.3.0-D3 – Resize-Griff + Eingabe**
 
-Erst auf der geprüften D1-/D2-Basis:
+Auf der geprüften D1-/D2-Basis:
 
 - genau ein Griff pro sichtbarem Panel
 - Pointer Events für Maus, Touch und Stift
@@ -293,4 +313,4 @@ Neuordnung bleibt gesperrt, bis die vollständige Resize-Stufe D grün abgenomme
 
 ## Empfehlung
 
-Option A konsequent beibehalten: JavaScript setzt nur `--panel-spalten` und `--panel-hoehe`; das isolierte Desktop-CSS bleibt allein für die Darstellung zuständig. Die bereits getestete responsive Basis-CSS wird nicht umgebaut. Dadurch kann D3 später Werte ändern, ohne Darstellungslogik zu duplizieren.
+Die erfolgreiche Trennung beibehalten: D3 darf die vorhandenen State-, Berechnungs- und CSS-Darstellungsschichten nur ansteuern und soll keine dieser Regeln erneut implementieren.
