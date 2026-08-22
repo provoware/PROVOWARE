@@ -24,6 +24,16 @@ test("Browser-E2E ist Chromium-first und Firefox bleibt alternativer Lauf", asyn
   assert.match(workflow, /inputs\.firefox == true/);
 });
 
+test("E2E-Metadaten halten Chromium, Firefox und Mirror-Maße kanonisch fest", async () => {
+  const version = JSON.parse(await read("VERSION.json"));
+  assert.equal(version.version, "0.2.0");
+  assert.equal(version.project_data_schema_version, "1");
+  assert.equal(version.browser_e2e_primary, "chromium");
+  assert.equal(version.browser_e2e_alternative, "firefox");
+  assert.equal(version.ui_mirror_layout_viewport, "1366x900");
+  assert.equal(version.ui_mirror_scale, 0.5);
+});
+
 test("HTML-Mirror verwendet zweimal dieselbe echte UI und skaliert nur die zweite Darstellung", async () => {
   const html = await read("tests/browser/ui-mirror.html");
   const css = await read("tests/browser/ui-mirror.css");
@@ -46,4 +56,12 @@ test("Browser-E2E arbeitet in isolierter temporärer Projektkopie", async () => 
   assert.match(server, /await cp\(ROOT, workspace/);
   assert.match(server, /"--no-browser", "--port=4173"/);
   assert.match(server, /PROVOWARE_E2E: "1"/);
+});
+
+test("Project-Data-UI bleibt container-responsiv und schützt klickbare Bereiche vor Überlagerung", async () => {
+  const css = await read("assets/project-data.css");
+  assert.match(css, /\.data-studio\s*\{[\s\S]*container-type: inline-size/);
+  assert.match(css, /\.data-studio-grid\s*\{[\s\S]*grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(css, /@container \(min-width: 760px\)[\s\S]*\.data-studio-grid[\s\S]*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
+  assert.match(css, /scroll-margin-top: 84px/);
 });
