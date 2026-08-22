@@ -15,6 +15,7 @@ on:
       - "tests/recovery-envelope.test.mjs"
       - "tests/recovery-envelope-api.test.mjs"
       - "tests/recovery-envelope-integration.test.mjs"
+      - "tests/recovery-envelope-failure-matrix.test.mjs"
   push:
     branches:
       - main
@@ -31,6 +32,7 @@ on:
       - "tests/recovery-envelope.test.mjs"
       - "tests/recovery-envelope-api.test.mjs"
       - "tests/recovery-envelope-integration.test.mjs"
+      - "tests/recovery-envelope-failure-matrix.test.mjs"
 
 permissions:
   contents: read
@@ -57,4 +59,4 @@ jobs:
           node-version: "20"
 
       - name: Portability-Vertrag prüfen
-        run: node --test tests/atomic-file.test.mjs tests/project-data-recovery.test.mjs tests/data-studio-pro-service.test.mjs tests/recovery-envelope.test.mjs tests/recovery-envelope-api.test.mjs tests/recovery-envelope-integration.test.mjs
+        run: node --test tests/atomic-file.test.mjs tests/project-data-recovery.test.mjs tests/data-studio-pro-service.test.mjs tests/recovery-envelope.test.mjs tests/recovery-envelope-api.test.mjs tests/recovery-envelope-integration.test.mjs tests/recovery-envelope-failure-matrix.test.mjs
