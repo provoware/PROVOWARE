@@ -8,8 +8,11 @@
   let listenersAbort = null;
   const state = {
     backups: [],
+    envelopes: [],
     pendingRestore: null,
     pendingImport: null,
+    pendingEnvelopeRestore: null,
+    envelopeJournal: null,
   };
 
   const log = (level, message, data) => {
@@ -47,12 +50,20 @@
     return `Schema ${summary.schemaVersion} · Revision ${summary.revision} · ${summary.templates} Vorlagen · ${summary.records} Datensätze`;
   };
 
+  const envelopeComponentText = (component) => {
+    const label = component.id === "project-data" ? "Project Data" : "Data Studio PRO";
+    if (component.state === "missing") return `${label}: fehlt`;
+    if (component.state === "invalid") return `${label}: ungültig`;
+    const revision = component.summary?.revision;
+    return `${label}: gültig${Number.isInteger(revision) ? ` · Revision ${revision}` : ""}`;
+  };
+
   const renderPendingRestore = () => {
     const box = query("[data-restore-preview]");
     const confirmButton = query("[data-action='confirm-restore']");
     if (!box || !confirmButton) return;
     if (!state.pendingRestore) {
-      box.textContent = "Noch kein Backup zur Wiederherstellung vorgemerkt.";
+      box.textContent = "Noch kein Legacy-Backup zur Wiederherstellung vorgemerkt.";
       confirmButton.disabled = true;
       return;
     }
@@ -76,6 +87,31 @@
     confirmButton.disabled = false;
   };
 
+  const renderPendingEnvelopeRestore = () => {
+    const box = query("[data-envelope-preview]");
+    const confirmButton = query("[data-action='confirm-envelope-restore']");
+    if (!box || !confirmButton) return;
+    if (!state.pendingEnvelopeRestore) {
+      box.textContent = "Noch kein Projekt-Envelope zur gemeinsamen Wiederherstellung vorgemerkt.";
+      confirmButton.disabled = true;
+      return;
+    }
+    const preview = state.pendingEnvelopeRestore;
+    const components = preview.components.map(envelopeComponentText).join(" · ");
+    box.textContent = `${preview.envelopeId} · ${components} · SHA-256 ${preview.envelopeSha256.slice(0, 16)}…`;
+    confirmButton.disabled = !preview.restorable;
+  };
+
+  const renderEnvelopeJournal = () => {
+    const box = query("[data-envelope-journal]");
+    if (!box) return;
+    if (!state.envelopeJournal) {
+      box.textContent = "Journal: kein offener Multi-Datei-Vorgang.";
+      return;
+    }
+    box.textContent = `Journal: ${state.envelopeJournal.stage} · Transaktion ${state.envelopeJournal.transactionId}`;
+  };
+
   const renderBackups = () => {
     const list = query("[data-backup-list]");
     if (!list) return;
@@ -84,7 +120,7 @@
     if (!state.backups.length) {
       const empty = document.createElement("p");
       empty.className = "data-studio-empty";
-      empty.textContent = "Noch keine Recovery-Backups vorhanden.";
+      empty.textContent = "Noch keine Legacy-Project-Data-Backups vorhanden.";
       list.append(empty);
       return;
     }
@@ -117,34 +153,101 @@
     });
   };
 
+  const renderEnvelopes = () => {
+    const list = query("[data-envelope-list]");
+    if (!list) return;
+    list.replaceChildren();
+
+    if (!state.envelopes.length) {
+      const empty = document.createElement("p");
+      empty.className = "data-studio-empty";
+      empty.textContent = "Noch keine gemeinsamen Projekt-Envelopes vorhanden.";
+      list.append(empty);
+      return;
+    }
+
+    state.envelopes.forEach((envelope) => {
+      const item = document.createElement("article");
+      item.className = "data-studio-record-item";
+
+      const text = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = envelope.id;
+      const meta = document.createElement("small");
+      meta.textContent = envelope.valid
+        ? `${envelope.components.map(envelopeComponentText).join(" · ")} · ${Math.ceil(envelope.bytes / 1024)} KiB`
+        : `UNGÜLTIG · ${envelope.error || "Envelope konnte nicht validiert werden"}`;
+      text.append(title, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "data-studio-record-actions";
+      const preview = document.createElement("button");
+      preview.type = "button";
+      preview.dataset.action = "preview-envelope-restore";
+      preview.dataset.envelopeId = envelope.id;
+      preview.textContent = "Vorschau";
+      preview.disabled = !envelope.valid || !envelope.restorable;
+      actions.append(preview);
+
+      item.append(text, actions);
+      list.append(item);
+    });
+  };
+
   const refreshBackups = async () => {
     const payload = await api("GET", "/backups");
     state.backups = payload.backups;
     renderBackups();
   };
 
+  const refreshEnvelopes = async () => {
+    const [envelopes, journal] = await Promise.all([
+      api("GET", "/envelopes"),
+      api("GET", "/envelopes/journal"),
+    ]);
+    state.envelopes = envelopes.envelopes;
+    state.envelopeJournal = journal.journal;
+    renderEnvelopes();
+    renderEnvelopeJournal();
+  };
+
   const createBackup = async () => {
-    setStatus("Backup wird erstellt …");
+    setStatus("Legacy-Backup wird erstellt …");
     const payload = await api("POST", "/backups", {});
     await refreshBackups();
-    setStatus(`Backup erstellt: ${payload.backup.id}`, "success");
-    log(1, "Backup erstellt.", { id: payload.backup.id });
+    setStatus(`Legacy-Backup erstellt: ${payload.backup.id}`, "success");
+    log(1, "Legacy-Backup erstellt.", { id: payload.backup.id });
+  };
+
+  const createEnvelope = async () => {
+    setStatus("Gemeinsamer Projekt-Envelope wird erstellt …");
+    const payload = await api("POST", "/envelopes", {});
+    await refreshEnvelopes();
+    setStatus(`Projekt-Envelope erstellt: ${payload.envelope.id}`, payload.envelope.restorable ? "success" : "info");
+    log(1, "Recovery Envelope erstellt.", payload.envelope);
   };
 
   const previewRestore = async (backupId) => {
     const payload = await api("POST", "/preview-backup", { backupId });
     state.pendingRestore = payload.preview;
     renderPendingRestore();
-    setStatus("Restore-Vorschau geprüft. Noch wurde nichts ersetzt.", "success");
+    setStatus("Legacy-Restore-Vorschau geprüft. Noch wurde nichts ersetzt.", "success");
+  };
+
+  const previewEnvelopeRestore = async (envelopeId) => {
+    const payload = await api("POST", "/envelopes/preview", { envelopeId });
+    state.pendingEnvelopeRestore = payload.preview;
+    renderPendingEnvelopeRestore();
+    setStatus("Envelope-Vorschau geprüft. Project Data und PRO sind noch unverändert.", "success");
   };
 
   const confirmRestore = async () => {
-    if (!state.pendingRestore) throw new Error("Keine Restore-Vorschau vorhanden.");
+    if (!state.pendingRestore) throw new Error("Keine Legacy-Restore-Vorschau vorhanden.");
     const confirmed = window.confirm(
-      "Diesen Backup-Stand wiederherstellen? Der aktuelle Bestand wird vorher automatisch gesichert.",
+      "Diesen Legacy-Project-Data-Stand wiederherstellen? Der aktuelle Project-Data-Bestand wird vorher automatisch gesichert.",
     );
     if (!confirmed) return;
-    setStatus("Restore wird atomar ausgeführt …");
+    setStatus("Legacy-Restore wird atomar ausgeführt …");
     const payload = await api("POST", "/restore", {
       backupId: state.pendingRestore.backupId,
       expectedSha256: state.pendingRestore.sha256,
@@ -152,8 +255,27 @@
     state.pendingRestore = null;
     renderPendingRestore();
     await refreshBackups();
-    setStatus(`Restore abgeschlossen. Sicherheitsbackup: ${payload.result.safetyBackup.id}`, "success");
-    log(1, "Backup wiederhergestellt.", payload.result);
+    setStatus(`Legacy-Restore abgeschlossen. Sicherheitsbackup: ${payload.result.safetyBackup.id}`, "success");
+    log(1, "Legacy-Backup wiederhergestellt.", payload.result);
+  };
+
+  const confirmEnvelopeRestore = async () => {
+    if (!state.pendingEnvelopeRestore) throw new Error("Keine Envelope-Restore-Vorschau vorhanden.");
+    if (!state.pendingEnvelopeRestore.restorable) throw new Error("Envelope ist nicht vollständig wiederherstellbar.");
+    const confirmed = window.confirm(
+      "Diesen Projekt-Envelope wiederherstellen? Project Data und Data Studio PRO werden gemeinsam ersetzt. Vorher wird ein Safety-Envelope erzeugt.",
+    );
+    if (!confirmed) return;
+    setStatus("Gemeinsamer Multi-Datei-Restore wird journalisiert ausgeführt …");
+    const payload = await api("POST", "/envelopes/restore", {
+      envelopeId: state.pendingEnvelopeRestore.envelopeId,
+      expectedSha256: state.pendingEnvelopeRestore.envelopeSha256,
+    });
+    state.pendingEnvelopeRestore = null;
+    renderPendingEnvelopeRestore();
+    await refreshEnvelopes();
+    setStatus(`Projekt-Envelope wiederhergestellt: ${payload.result.restoredEnvelopeId}`, "success");
+    log(1, "Recovery Envelope wiederhergestellt.", payload.result);
   };
 
   const exportSnapshot = async () => {
@@ -194,7 +316,7 @@
   const confirmImport = async () => {
     if (!state.pendingImport) throw new Error("Keine Import-Vorschau vorhanden.");
     const confirmed = window.confirm(
-      `Import '${state.pendingImport.filename}' ausführen? Der aktuelle Bestand wird vorher automatisch gesichert.`,
+      `Import '${state.pendingImport.filename}' ausführen? Der aktuelle Project-Data-Bestand wird vorher automatisch gesichert.`,
     );
     if (!confirmed) return;
     setStatus("Import wird atomar ausgeführt …");
@@ -218,11 +340,14 @@
 
     const run = async () => {
       if (action === "create-backup") await createBackup();
+      else if (action === "create-envelope") await createEnvelope();
       else if (action === "refresh-backups") {
-        await refreshBackups();
-        setStatus("Backup-Liste aktualisiert.", "success");
+        await Promise.all([refreshBackups(), refreshEnvelopes()]);
+        setStatus("Recovery-Listen und Journal aktualisiert.", "success");
       } else if (action === "preview-restore") await previewRestore(button.dataset.backupId);
+      else if (action === "preview-envelope-restore") await previewEnvelopeRestore(button.dataset.envelopeId);
       else if (action === "confirm-restore") await confirmRestore();
+      else if (action === "confirm-envelope-restore") await confirmEnvelopeRestore();
       else if (action === "export") await exportSnapshot();
       else if (action === "confirm-import") await confirmImport();
     };
@@ -255,28 +380,40 @@
     section.innerHTML = `
       <div class="data-studio-toolbar">
         <div>
-          <p class="data-studio-kicker">Recovery &amp; Migration · 0.4.1</p>
-          <h3>Backup, Restore, Export &amp; Import</h3>
+          <p class="data-studio-kicker">Recovery &amp; Migration · 0.4.3</p>
+          <h3>Legacy-Backup, Projekt-Envelope, Restore &amp; Import</h3>
         </div>
         <div class="data-studio-toolbar-actions">
           <button type="button" data-action="refresh-backups">Neu laden</button>
-          <button type="button" class="data-studio-primary" data-action="create-backup">Backup jetzt</button>
+          <button type="button" data-action="create-backup">Legacy-Backup</button>
+          <button type="button" class="data-studio-primary" data-action="create-envelope">Projekt-Envelope</button>
         </div>
       </div>
       <p class="data-studio-status" data-recovery-status role="status" aria-live="polite">Initialisierung …</p>
       <div class="data-studio-grid">
+        <section class="data-studio-card" aria-labelledby="recovery-envelope-title">
+          <div class="data-studio-card-header">
+            <h4 id="recovery-envelope-title">Projekt-Envelope · 0.4.3</h4>
+          </div>
+          <p class="data-studio-empty">Sichert Project Data und Data Studio PRO gemeinsam. Ein Restore verwendet Safety-Envelope, Journal, Verifikation und Rollback.</p>
+          <p class="data-studio-empty" data-envelope-journal>Journal wird geprüft …</p>
+          <div class="data-studio-record-list" data-envelope-list></div>
+          <h4>Envelope-Restore-Vorschau</h4>
+          <p class="data-studio-empty" data-envelope-preview>Noch kein Projekt-Envelope zur gemeinsamen Wiederherstellung vorgemerkt.</p>
+          <button type="button" class="data-studio-primary" data-action="confirm-envelope-restore" disabled>Project Data + PRO gemeinsam wiederherstellen</button>
+        </section>
         <section class="data-studio-card" aria-labelledby="recovery-backup-title">
           <div class="data-studio-card-header">
-            <h4 id="recovery-backup-title">Backups</h4>
+            <h4 id="recovery-backup-title">Legacy `.pwbak` · 0.4.1</h4>
           </div>
           <div class="data-studio-record-list" data-backup-list></div>
-          <h4>Restore-Vorschau</h4>
-          <p class="data-studio-empty" data-restore-preview>Noch kein Backup zur Wiederherstellung vorgemerkt.</p>
-          <button type="button" class="data-studio-primary" data-action="confirm-restore" disabled>Vorschau wiederherstellen</button>
+          <h4>Legacy-Restore-Vorschau</h4>
+          <p class="data-studio-empty" data-restore-preview>Noch kein Legacy-Backup zur Wiederherstellung vorgemerkt.</p>
+          <button type="button" data-action="confirm-restore" disabled>Legacy-Project-Data wiederherstellen</button>
         </section>
         <section class="data-studio-card" aria-labelledby="recovery-transfer-title">
           <div class="data-studio-card-header">
-            <h4 id="recovery-transfer-title">Export / Import</h4>
+            <h4 id="recovery-transfer-title">Legacy Export / Import</h4>
             <button type="button" data-action="export">JSON exportieren</button>
           </div>
           <label>Importdatei
@@ -284,8 +421,8 @@
           </label>
           <h4>Import-Vorschau</h4>
           <p class="data-studio-empty" data-import-preview>Noch keine Importdatei geprüft.</p>
-          <button type="button" class="data-studio-primary" data-action="confirm-import" disabled>Geprüften Import ausführen</button>
-          <p class="data-studio-empty">Vor Restore und Import wird der aktuelle Rohzustand automatisch gesichert. Produktionsschema bleibt v1.</p>
+          <button type="button" data-action="confirm-import" disabled>Geprüften Import ausführen</button>
+          <p class="data-studio-empty">Legacy-Import und `.pwbak` bleiben Project-Data-only. Das alte Format wird nicht umgedeutet.</p>
         </section>
       </div>
     `;
@@ -306,8 +443,11 @@
     root?.remove();
     root = null;
     state.backups = [];
+    state.envelopes = [];
     state.pendingRestore = null;
     state.pendingImport = null;
+    state.pendingEnvelopeRestore = null;
+    state.envelopeJournal = null;
   };
 
   window.PROVOWARE_MODULES.define(MODULE_ID, {
@@ -318,6 +458,8 @@
       }
       renderPendingRestore();
       renderPendingImport();
+      renderPendingEnvelopeRestore();
+      renderEnvelopeJournal();
 
       if (window.location.protocol === "file:") {
         root.dataset.serverRequired = "true";
@@ -330,9 +472,12 @@
       }
 
       try {
-        await refreshBackups();
-        setStatus("Recovery & Migration bereit.", "success");
-        log(1, "Recovery-Modul aktiviert.", { backupCount: state.backups.length });
+        await Promise.all([refreshBackups(), refreshEnvelopes()]);
+        setStatus("Recovery 0.4.3 bereit. Legacy-Backups bleiben kompatibel.", "success");
+        log(1, "Recovery-Modul aktiviert.", {
+          backupCount: state.backups.length,
+          envelopeCount: state.envelopes.length,
+        });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         setStatus(`Fehler: ${message}`, "error");
