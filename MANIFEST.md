@@ -151,6 +151,7 @@ Weder Größenberechnung noch spätere Resize-Eingabeschicht dürfen direkt in `
 - `docs/PLAN_0.3.0_B.md` – State Foundation
 - `docs/PLAN_0.3.0_C.md` – Visibility Controls
 - `docs/PLAN_0.3.0_D.md` – detaillierter Resize-Implementierungsplan
+- `docs/PLAN_0.3.0_D_STATE.md` – kleiner Teilplan für State-API und reine Größenberechnung
 - `docs/WORKSPACE_CONTRACT.md` – allgemeiner Workspace-Vertrag Version 1
 - `docs/RESIZE_CONTRACT_0.3.0.md` – detaillierter Resize-Vertrag und 40-teilige Testmatrix
 - `docs/DECISIONS_0.3.0.md`
@@ -167,6 +168,7 @@ Bestehend:
 - `.editorconfig`
 - `package.json`
 - `scripts/quality-check.mjs`
+- `tests/quality-check.test.mjs`
 - `tests/module-registry.test.mjs`
 - `tests/workspace-state.test.mjs`
 - `tests/workspace-size.test.mjs`
@@ -175,6 +177,7 @@ Bestehend:
 
 Bereits abgedeckt:
 
+- verständlicher kontrollierter Fehlerpfad des Quality Gates
 - Modul-Lebenszyklus
 - Workspace-Normalisierung und Speicherung
 - Sichtbarkeit
@@ -207,6 +210,8 @@ npm run verify
 ## Aktueller Patchtyp
 
 **State-API + reine Größenberechnung + automatische Tests.**
+
+Die bereits auf `main` vorhandene Quality-Gate-Härtung bleibt unverändert erhalten.
 
 Keine Änderung an:
 
