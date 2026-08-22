@@ -147,6 +147,23 @@
     }
   };
 
+  const initializeWorkspaceResize = (workspace, workspaceUi) => {
+    const resize = window.PROVOWARE_WORKSPACE_RESIZE;
+    const groessenLogik = window.PROVOWARE_WORKSPACE_SIZE;
+
+    if (!resize || !groessenLogik) {
+      log(1, "WORKSPACE", "Workspace-Resize-Grundlage ist nicht vollständig verfügbar.");
+      return;
+    }
+
+    resize.initialisieren({
+      workspace,
+      ui: workspaceUi,
+      groessenLogik,
+      logger: log,
+    });
+  };
+
   const initializeWorkspace = () => {
     const workspace = window.PROVOWARE_WORKSPACE;
     if (!workspace) {
@@ -165,6 +182,7 @@
         return;
       }
       workspaceUi.initialisieren({ workspace, logger: log });
+      initializeWorkspaceResize(workspace, workspaceUi);
     } catch (error) {
       log(1, "WORKSPACE", "Workspace konnte nicht vollständig initialisiert werden.", {
         message: error instanceof Error ? error.message : String(error),
