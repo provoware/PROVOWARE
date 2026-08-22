@@ -165,21 +165,48 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 ##### D3 – Resize-Griff + Eingabesteuerung
 
-- [ ] genau einen Resize-Griff pro sichtbarem Panel integrieren.
-- [ ] ungefähr 44 × 44 px sichere Trefferfläche gewährleisten.
-- [ ] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
-- [ ] Pointer Capture und Pointer-Abbruch robust behandeln.
-- [ ] während Pointerbewegung niemals persistent speichern.
-- [ ] `pointerup` auf genau einen Commit begrenzen.
-- [ ] Tastatur-Pfeile, `Home`, `Escape` implementieren.
-- [ ] Resize bis 980 px kontrolliert deaktivieren.
-- [ ] Nutzerfeedback und WORKSPACE-Logging für die sichtbare Resize-Bedienung ergänzen.
-- [ ] automatische Pointer-, Tastatur- und Responsive-Tests ergänzen.
-- [ ] Quality Gate um Resize-Vertragsprüfungen für die sichtbare Bedienung erweitern.
-- [ ] vollständigen D3-Diff gegen `main` prüfen.
-- [ ] technisches Quality Gate erfolgreich abschließen.
-- [ ] technischen PR mergebar prüfen und mergen.
-- [ ] zentrale Laufzeitdateien nach Merge auf `main` stichproartig prüfen.
+###### D3a – Resize-Griff + Tastatur-Vorschau
+
+- [x] D3a bewusst von Pointer/Maus/Touch/Stift trennen.
+- [x] detaillierten Teilplan `docs/PLAN_0.3.0_D3A_KEYBOARD.md` vor der Implementierung anlegen.
+- [x] D3a-Patchmanifest `docs/MANIFEST_0.3.0_D3A_KEYBOARD.md` anlegen.
+- [x] genau einen dynamischen Resize-Griff pro Workspace-Panel integrieren.
+- [x] ungefähr 44 × 44 px sichere Trefferfläche ab 981 px gewährleisten.
+- [x] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
+- [x] transiente Größenvorschau über die bestehende Workspace-UI und dieselben CSS-Variablen umsetzen.
+- [x] Tastatur-Pfeile für 1 Rastereinheit beziehungsweise 24 px implementieren.
+- [x] Tastenwiederholung ohne Zwischen-Speicherung unterstützen.
+- [x] nach letzter passenden Tastenfreigabe höchstens einen Größen-Commit ausführen.
+- [x] `Escape` als Abbruch ohne Größen-Commit implementieren.
+- [x] `Home` als isolierten Größen-Reset nur für das aktuelle Panel implementieren.
+- [x] Resize bis 980 px zusätzlich zur CSS-Sperre logisch deaktivieren.
+- [x] Wechsel auf kleinen Viewport während Vorschau ohne Zustandsänderung abbrechen.
+- [x] verständliches Nutzerfeedback und zusammenfassendes WORKSPACE-Logging ergänzen.
+- [x] neue Tests `workspace-resize.test.mjs` und `workspace-resize-load.test.mjs` ergänzen.
+- [x] UI-Test um nicht persistente Größenvorschau erweitern.
+- [x] automatisiert absichern, dass D3a noch keine Pointer-Ziehlogik enthält.
+- [x] finalen D3a-Diff prüfen: 11 Dateien, 0 Commits hinter `main`.
+- [x] GitHub Quality Gate erfolgreich: 56 Dateien geprüft, 48/48 Tests erfolgreich, 0 fehlgeschlagen.
+- [x] PR #78 als mergebar prüfen und D3a per Squash mergen.
+- [x] `assets/workspace-resize.js`, `index.html` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
+
+0.3.0-D3a-Merge: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
+
+###### D3b – Pointer/Maus/Touch/Stift
+
+- [ ] vorhandenen Resize-Griff für Pointer Events wiederverwenden; keinen zweiten Bedienweg anlegen.
+- [ ] `pointerdown` kontrolliert starten und Startzustand/DOM-Maße erfassen.
+- [ ] Pointer Capture robust aktivieren und wieder freigeben.
+- [ ] `pointermove` ausschließlich als transiente Vorschau verarbeiten.
+- [ ] reale Grid-Metrik und `column-gap` über die bestehende D1-Größenberechnung verwenden.
+- [ ] während der Bewegung niemals persistent speichern oder pro Bewegung loggen.
+- [ ] `pointerup` auf höchstens einen validierten Commit begrenzen.
+- [ ] `pointercancel` und `Escape` ohne Persistenz behandeln.
+- [ ] Maus, Touch und Stift über dieselbe Pointer-Logik abdecken.
+- [ ] Resize bis 980 px weiterhin kontrolliert deaktivieren.
+- [ ] automatisierte Pointer-, Capture-, Commit-, Abbruch- und Responsive-Tests ergänzen.
+- [ ] vollständigen D3b-Diff gegen `main` prüfen und Quality Gate grün abschließen.
+- [ ] D3b-PR erst bei vollständiger Abnahme mergen und zentrale Laufzeitdateien auf `main` nachprüfen.
 
 #### 0.3.0-E – Reorder & Drag and Drop
 

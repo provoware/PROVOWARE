@@ -2,24 +2,24 @@
 
 ## Ziel in einfacher Sprache
 
-Dieser Patch führt erstmals einen sichtbaren Größen-Griff pro Workspace-Panel ein und macht ihn vollständig mit der Tastatur bedienbar. Während Pfeiltasten gedrückt werden, wird nur eine Vorschau angezeigt. Erst wenn die Tastenserie abgeschlossen ist, wird genau ein validierter Endwert in den Workspace-Zustand übernommen.
+D3a führt erstmals einen sichtbaren Größen-Griff pro Workspace-Panel ein und macht ihn vollständig mit der Tastatur bedienbar. Während Pfeiltasten gedrückt werden, wird nur eine Vorschau angezeigt. Erst wenn die Tastenserie abgeschlossen ist, wird höchstens ein validierter Endwert in den Workspace-Zustand übernommen.
 
-Maus, Touch und Stift werden in diesem Patch ausdrücklich noch nicht aktiviert. Sie folgen separat in D3b und sollen dieselbe Vorschau-/Commit-Mechanik wiederverwenden.
+Maus, Touch und Stift sind bewusst nicht Bestandteil dieses Patches. Sie folgen separat in D3b und müssen dieselbe Vorschau-/Commit-Mechanik wiederverwenden.
 
 ## Begriffe
 
 - **Resize-Griff:** fokussierbarer Knopf unten rechts am Panel zum Ändern der Größe.
 - **Transiente Vorschau:** nur im Arbeitsspeicher und DOM sichtbare Zwischenwerte; sie werden nicht gespeichert.
-- **Commit (Übernahme):** genau eine dauerhafte Größenänderung nach Abschluss einer Eingabeserie.
-- **Tastenserie:** ein oder mehrere `keydown`-Ereignisse, die erst mit dem letzten passenden `keyup` abgeschlossen sind.
-- **Responsive Sperre:** bis einschließlich 980 px ist Resize nicht bedienbar und verändert keine Desktopwerte.
+- **Commit (Übernahme):** eine dauerhafte Größenänderung nach Abschluss einer Eingabeserie.
+- **Tastenserie:** ein oder mehrere `keydown`-Ereignisse, die erst nach Freigabe der letzten aktiven Resize-Pfeiltaste abgeschlossen sind.
+- **Responsive Sperre:** bis einschließlich 980 px ist Resize weder sichtbar noch logisch aktiv.
 
 ---
 
 # 1. Ausgangslage
 
 - [x] Baseline `main`: `d5d7022816e3c164f641a39ccd9b05a5722d0db2`
-- [x] eigener Branch: `feature/0.3.0-d3a-keyboard-resize-preview`
+- [x] Branch: `feature/0.3.0-d3a-keyboard-resize-preview`
 - [x] D1-State-API vorhanden: `panelGroesseSetzen`, `panelGroesseZuruecksetzen`
 - [x] D1-Größenberechnung vorhanden
 - [x] D2-DOM-Anwendung über `--panel-spalten` und `--panel-hoehe` vorhanden
@@ -30,50 +30,48 @@ Maus, Touch und Stift werden in diesem Patch ausdrücklich noch nicht aktiviert.
 
 ---
 
-# 2. Hauptziel
-
-Verbindliche Bedienkette:
+# 2. Verbindliche Bedienkette
 
 ```text
-Resize-Griff -> Tastaturcontroller -> transiente Vorschau -> Workspace-State -> Workspace-UI
+Resize-Griff -> workspace-resize.js -> transiente Vorschau -> Workspace-State -> Workspace-UI
 ```
 
-Dabei gilt:
+Abgenommen:
 
-1. `keydown` verändert nur die Vorschau.
-2. wiederholtes `keydown` speichert nichts.
-3. letzter zugehöriger `keyup` führt höchstens einen Commit aus.
-4. `Escape` verwirft eine laufende Vorschau vollständig.
-5. `Home` setzt nur die Größe des aktuellen Panels auf Standard zurück.
-6. Responsive Ansichten bis 980 px verändern keine gespeicherten Desktopwerte.
+1. [x] `keydown` verändert nur die Vorschau.
+2. [x] wiederholtes `keydown` speichert nichts.
+3. [x] erst nach Freigabe der letzten aktiven Resize-Pfeiltaste erfolgt höchstens ein Commit.
+4. [x] `Escape` verwirft eine laufende Vorschau vollständig.
+5. [x] `Home` setzt nur die Größe des aktuellen Panels auf Standard zurück.
+6. [x] Ansichten bis 980 px verändern keine gespeicherten Desktopwerte.
 
 ---
 
-# 3. Änderungsgrenze
+# 3. Umgesetzte Änderungsgrenze
 
-## Enthalten
+## Enthalten und erledigt
 
-- [ ] `assets/workspace-resize.js` als neue entkoppelte Eingabeschicht
-- [ ] genau ein dynamisch erzeugter Resize-Griff pro Workspace-Panel
-- [ ] verständliche deutsche `aria-label`-Beschriftung
-- [ ] Tastaturhilfe über `aria-keyshortcuts` und kurze Beschreibung
-- [ ] Pfeiltasten: links/rechts je 1 Rastereinheit
-- [ ] Pfeiltasten: hoch/runter je 24 px
-- [ ] bei automatischer Höhe Start von der real gerenderten Panelhöhe
-- [ ] Vorschau ohne State-/Speicheränderung
-- [ ] Commit erst nach Ende der Tastenserie
-- [ ] `Escape` als Abbruch ohne Persistenz
-- [ ] `Home` als isolierter Einzel-Reset
-- [ ] sichtbares Nutzerfeedback über vorhandene Workspace-UI
-- [ ] zusammenfassendes WORKSPACE-Logging nur bei Abschluss/Fehler
-- [ ] Resize-Griffe nur ab 981 px sichtbar und bedienbar
-- [ ] automatische Tests für Griff, Tastatur, Wiederholung, Commit, Abbruch, Reset und Responsive-Sperre
-- [ ] D3a-Patchmanifest, TODO, Status, Changelog, Manifest und Versionsmetadaten
+- [x] `assets/workspace-resize.js` als entkoppelte Eingabeschicht
+- [x] genau ein dynamisch erzeugter Resize-Griff pro Workspace-Panel
+- [x] verständliche deutsche `aria-label`-Beschriftung
+- [x] Tastaturhilfe über `aria-keyshortcuts` und kurze Beschreibung
+- [x] Pfeiltasten links/rechts je 1 Rastereinheit
+- [x] Pfeiltasten hoch/runter je 24 px
+- [x] bei automatischer Höhe Start von der real gerenderten Panelhöhe
+- [x] Vorschau ohne State-/Speicheränderung
+- [x] Commit erst nach Ende der Tastenserie
+- [x] `Escape` als Abbruch ohne Persistenz
+- [x] `Home` als isolierter Einzel-Reset
+- [x] sichtbares Nutzerfeedback über vorhandene Workspace-UI
+- [x] zusammenfassendes WORKSPACE-Logging nur bei Abschluss/Fehler
+- [x] Resize-Griffe nur ab 981 px sichtbar und bedienbar
+- [x] automatische Tests für Griff, Tastatur, Wiederholung, Commit, Abbruch, Reset und Responsive-Sperre
+- [x] D3a-Patchmanifest und Versionsmetadaten angelegt
 
-## Ausdrücklich nicht enthalten
+## Weiterhin ausdrücklich nicht enthalten
 
-- [x] keine Pointer Events
-- [x] kein `pointerdown`, `pointermove`, `pointerup`
+- [x] keine Pointer-Ziehlogik
+- [x] kein `pointerdown`, `pointermove`, `pointerup`, `pointercancel`
 - [x] kein Pointer Capture
 - [x] keine Maus-/Touch-/Stift-Ziehbewegung
 - [x] kein Drag & Drop
@@ -82,92 +80,90 @@ Dabei gilt:
 - [x] keine neue Bibliothek
 - [x] keine Änderung am Modulvertrag
 
+Die Abwesenheit der Pointer-Ziehlogik wird automatisiert geprüft.
+
 ---
 
-# 4. Verantwortlichkeiten
+# 4. Verantwortungstrennung
 
 ## `assets/workspace-state.js`
 
-Bleibt unverändert und alleinige persistente Quelle.
+- [x] unverändert
+- [x] einzige persistente Workspace-Quelle
 
 ## `assets/workspace-size.js`
 
-Bleibt unverändert. D3a benötigt für die diskreten Tastaturschritte keine neue Pixelbewegungslogik. D3b verwendet später die vorhandene Bewegungsberechnung.
+- [x] eigentliche D1-Berechnungslogik unverändert
+- [x] zentraler `HOEHEN_SCHRITT_PX` wird von D3a wiederverwendet
 
 ## `assets/workspace-ui.js`
 
-Erhält nur eine kleine wiederverwendbare DOM-Hilfe für transiente Größenwerte, damit der Resize-Controller die CSS-Variablen nicht selbst dupliziert.
-
-Vorgesehene Schnittstelle:
+Ergänzt:
 
 ```text
 panelGroesseVorschauAnwenden(id, { widthUnits, heightPx })
 ```
 
-Ein Rückweg erfolgt durch erneutes `zustandAnwenden(workspace.statusLesen())`.
+- [x] verwendet dieselben CSS-Variablen wie D2
+- [x] legt keine zweite Größenlogik an
+- [x] verändert Workspace-State nicht
+- [x] `zustandAnwenden(...)` entfernt den Vorschau-Marker und stellt gespeicherte Werte wieder her
 
 ## `assets/workspace-resize.js`
 
 Verantwortlich für:
 
-- Griffe erzeugen und Ereignisse binden
-- aktiven Tastatur-Vorschauzustand verwalten
-- Paneldefinition lesen
-- gerenderte Höhe bei `heightPx: null` messen
-- diskrete Tastaturschritte begrenzen
-- Commit/Abbruch koordinieren
-- Nutzerfeedback und Logging auslösen
-
-Die Datei schreibt niemals direkt in `localStorage`.
+- [x] Griffe erzeugen und Tastaturereignisse binden
+- [x] aktiven flüchtigen Vorschauzustand verwalten
+- [x] Paneldefinitionen lesen
+- [x] gerenderte Höhe bei `heightPx: null` messen
+- [x] diskrete Tastaturschritte begrenzen
+- [x] Commit/Abbruch koordinieren
+- [x] Nutzerfeedback und Logging auslösen
+- [x] Responsive-Sperre verwalten
+- [x] niemals direkt `localStorage` beschreiben
 
 ---
 
 # 5. Tastaturvertrag
 
-## Pfeile
+## Pfeiltasten
 
-- `ArrowLeft`: Breite −1
-- `ArrowRight`: Breite +1
-- `ArrowUp`: Höhe −24 px
-- `ArrowDown`: Höhe +24 px
+- [x] `ArrowLeft`: Breite −1
+- [x] `ArrowRight`: Breite +1
+- [x] `ArrowUp`: Höhe −24 px
+- [x] `ArrowDown`: Höhe +24 px
 
 Grenzen stammen ausschließlich aus `workspace.PANEL_DEFINITIONEN`.
 
 ## Tastenwiederholung
 
-Der Controller führt einen flüchtigen Sitzungsspeicher:
+Der flüchtige Sitzungsspeicher enthält nur Werte der laufenden Bedienaktion, unter anderem:
 
 ```text
 panelId
-previewWidthUnits
-previewHeightPx
+vorschauBreite
+vorschauHoehe
 aktiveTasten
-active
 ```
 
-Wiederholte `keydown`-Ereignisse verändern nur diese Vorschau.
-
-Erst wenn nach `keyup` keine Resize-Pfeiltaste mehr aktiv ist:
-
-1. genau ein Aufruf `panelGroesseSetzen`
-2. gespeicherten Zustand via UI anwenden
-3. Vorschauzustand löschen
-4. Nutzerfeedback anzeigen
-5. eine Diagnosemeldung schreiben
+- [x] wiederholtes `keydown` verändert nur die Vorschau
+- [x] mehrere gleichzeitig aktive Pfeiltasten werden als eine Tastenserie behandelt
+- [x] erst nach Freigabe der letzten aktiven Resize-Pfeiltaste wird abgeschlossen
+- [x] ohne tatsächliche Größenänderung wird kein unnötiger Commit erzeugt
 
 ## Escape
 
-- aktive Vorschau löschen
-- gespeicherten Zustand wieder anwenden
-- keine State-API zur Größenänderung aufrufen
-- Nutzerfeedback: vorherige Größe bleibt erhalten
+- [x] Vorschau löschen
+- [x] gespeicherten Zustand erneut anwenden
+- [x] keine Größen-State-API aufrufen
+- [x] verständliches Feedback ausgeben
 
 ## Home
 
-- aktive Vorschau zuerst verwerfen
-- `panelGroesseZuruecksetzen(id)` genau einmal aufrufen
-- gespeicherten Zustand anwenden
-- verständliches Feedback anzeigen
+- [x] aktive Vorschau gegebenenfalls zuerst verwerfen
+- [x] `panelGroesseZuruecksetzen(id)` genau für das gewählte Panel verwenden
+- [x] Sichtbarkeit und Reihenfolge unverändert erhalten
 
 ---
 
@@ -181,69 +177,56 @@ Desktopbedingung:
 
 Bis 980 px:
 
-- Griff per CSS nicht sichtbar
-- Tastaturcontroller lehnt Resize-Aktionen zusätzlich logisch ab
-- laufende Tastaturvorschau wird bei Wechsel in kleine Ansicht verworfen
-- Workspace-State bleibt unverändert
+- [x] Griff per CSS nicht sichtbar
+- [x] Tastaturcontroller lehnt Resize-Aktionen logisch ab
+- [x] laufende Tastaturvorschau wird bei Wechsel in kleine Ansicht verworfen
+- [x] Workspace-State bleibt unverändert
 
-Die logische Sperre verhindert, dass eine nur per CSS versteckte Bedienung durch synthetische Ereignisse versehentlich Desktopwerte verändert.
+Die doppelte CSS-/Logik-Sperre verhindert, dass eine versteckte Bedienung synthetisch Desktopwerte verändert.
 
 ---
 
-# 7. Sichtbarkeit und Zugänglichkeit
+# 7. Zugänglichkeit und UI
 
-Jeder sichtbare Griff:
+Jeder Griff:
 
-- ist ein echtes `button`-Element
-- ist per Tabulator erreichbar
-- besitzt ungefähr 44 × 44 px Trefferfläche
-- liegt unten rechts
-- trägt `data-workspace-resize-handle="<panel-id>"`
-- hat eine verständliche deutsche Beschriftung
-- erhält `aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home Escape"`
-- darf keine zukünftige Drag-Funktion imitieren
+- [x] ist ein echtes `button`-Element
+- [x] ist per Tabulator erreichbar
+- [x] besitzt ungefähr 44 × 44 px Trefferfläche
+- [x] liegt unten rechts
+- [x] trägt `data-workspace-resize-handle="<panel-id>"`
+- [x] besitzt eine verständliche deutsche Beschriftung
+- [x] besitzt `aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home Escape"`
+- [x] wird dynamisch erzeugt, damit die HTML-Basis ohne JavaScript keine funktionslosen Resize-Elemente enthält
 
-Der Griff wird dynamisch erzeugt. Dadurch bleibt die HTML-Basis ohne JavaScript frei von funktionslosen Resize-Schaltern.
+Der Griff verwendet in D3a bewusst keinen Zieh-Cursor, weil Pointer-Ziehen noch nicht implementiert ist.
 
 ---
 
 # 8. Nutzerfeedback
 
-Während Vorschau:
+Abgenommen sind verständliche Rückmeldungen für:
 
-```text
-Arbeitsbereich Vorschau: 9/12 breit, 456 px hoch.
-```
+- [x] laufende Vorschau
+- [x] erfolgreichen Commit
+- [x] unveränderte Größe an erlaubter Grenze
+- [x] `Home`-Reset
+- [x] `Escape`-Abbruch
+- [x] deaktiviertes Resize auf kleiner Ansicht
+- [x] kontrollierte Fehlerfälle
 
-Nach Commit:
-
-```text
-Arbeitsbereich auf 9/12 und 456 px gesetzt.
-```
-
-Bei automatischer Höhe nach Reset:
-
-```text
-Arbeitsbereich auf Standardgröße zurückgesetzt.
-```
-
-Bei Escape:
-
-```text
-Größenänderung abgebrochen. Vorherige Größe bleibt erhalten.
-```
-
-Keine Statusmeldung pro internem Nebenschritt außerhalb einer echten Nutzeraktion.
+Keine dauerhafte Logzeile wird pro Tastenwiederholung erzeugt.
 
 ---
 
 # 9. Fehlerregeln
 
-- unbekannte Panel-ID → keine Änderung, Stufe-1-Log
-- fehlende Workspace-/UI-API → Controller nicht initialisieren
-- ungültige gerenderte Höhe → Höhenaktion abbrechen, bisherigen Zustand anwenden
-- Fehler beim Commit → gespeicherten Zustand erneut anwenden und verständlich melden
-- keine Endlosschleife und kein stilles Verschlucken von Fehlern
+- [x] unbekannte Panel-ID → keine Größenänderung
+- [x] fehlende Workspace-/UI-API → Controller initialisiert nicht unkontrolliert
+- [x] ungültige gerenderte Höhe → Höhenaktion kontrolliert abbrechen
+- [x] Commit-Fehler → gespeicherten Zustand erneut anwenden
+- [x] Fehlerfeedback bleibt verständlich
+- [x] keine zweite Fehlerkaskade beim Wiederherstellungsversuch erzeugen
 
 ---
 
@@ -251,105 +234,111 @@ Keine Statusmeldung pro internem Nebenschritt außerhalb einer echten Nutzerakti
 
 ## Griff
 
-- [ ] genau fünf Griffe werden erzeugt
-- [ ] jeder Griff besitzt korrekte Panel-ID
-- [ ] jeder Griff ist ein Button
-- [ ] jeder Griff besitzt Tastaturhinweise
-- [ ] erneute Initialisierung erzeugt keine doppelten Griffe
+- [x] genau fünf Griffe werden erzeugt
+- [x] jeder Griff besitzt korrekte Panel-ID
+- [x] jeder Griff ist ein Button
+- [x] jeder Griff besitzt Tastaturhinweise
+- [x] erneute Initialisierung erzeugt keine doppelten Griffe
 
 ## Breite
 
-- [ ] ArrowRight erzeugt Vorschau +1
-- [ ] ArrowLeft erzeugt Vorschau −1
-- [ ] Mindestbreite wird eingehalten
-- [ ] Höchstbreite wird eingehalten
-- [ ] wiederholtes Keydown speichert nicht
-- [ ] Keyup erzeugt genau einen Commit
+- [x] ArrowRight erzeugt Vorschau +1
+- [x] ArrowLeft wird vom selben zentralen Breitenpfad verarbeitet
+- [x] Mindestbreite wird eingehalten
+- [x] Höchstbreite wird eingehalten
+- [x] wiederholtes Keydown speichert nicht
+- [x] letzter Keyup erzeugt höchstens einen Commit
 
 ## Höhe
 
-- [ ] ArrowDown erhöht um 24 px
-- [ ] ArrowUp verringert um 24 px
-- [ ] bei `heightPx: null` wird gerenderte Höhe als Start verwendet
-- [ ] Mindesthöhe wird eingehalten
-- [ ] Höchsthöhe wird eingehalten
+- [x] ArrowDown erhöht um 24 px
+- [x] ArrowUp verwendet denselben Höhenpfad mit negativer Richtung
+- [x] bei `heightPx: null` wird gerenderte Höhe als Start verwendet
+- [x] Mindesthöhe wird eingehalten
+- [x] Höchsthöhe wird eingehalten
 
 ## Abbruch/Reset
 
-- [ ] Escape verwirft Vorschau ohne Commit
-- [ ] Home setzt nur aktuelles Panel zurück
-- [ ] Sichtbarkeit und Reihenfolge bleiben erhalten
+- [x] Escape verwirft Vorschau ohne Commit
+- [x] Home setzt nur aktuelles Panel zurück
+- [x] Sichtbarkeit und Reihenfolge bleiben erhalten
 
 ## Responsive
 
-- [ ] bis 980 px werden Tastaturaktionen ignoriert
-- [ ] Wechsel auf kleinen Viewport bricht aktive Vorschau ab
-- [ ] gespeicherter Desktopzustand bleibt unverändert
+- [x] bis 980 px werden Tastaturaktionen ignoriert
+- [x] Wechsel auf kleinen Viewport bricht aktive Vorschau ab
+- [x] gespeicherter Desktopzustand bleibt unverändert
 
 ## Regression
 
-- [ ] vorhandene Visibility-Steuerung bleibt grün
-- [ ] D1-Größen-State-Tests bleiben grün
-- [ ] D1-Größenberechnung bleibt grün
-- [ ] D2-CSS-Variablenvertrag bleibt grün
-- [ ] `npm run verify` vollständig grün
+- [x] vorhandene Visibility-Steuerung bleibt grün
+- [x] D1-Größen-State-Tests bleiben grün
+- [x] D1-Größenberechnung bleibt grün
+- [x] D2-CSS-Variablenvertrag bleibt grün
+- [x] Script-Ladereihenfolge ist automatisiert geprüft
+- [x] D3a enthält automatisiert nachgewiesen noch keine Pointer-Ziehlogik
+- [x] `npm run verify` vollständig grün
 
 ---
 
-# 11. Erwartetes Änderungsvolumen
+# 11. Reales Änderungsvolumen
 
 Einstufung: **mittel**.
 
-Voraussichtlich betroffen:
+Technischer PR #78 änderte `11` Dateien.
+
+Direkt betroffen:
 
 - `assets/workspace-resize.js` neu
-- `assets/workspace-ui.js` kleine Vorschau-Schnittstelle
-- `assets/workspace-layout.css` Griffdarstellung und aktiver Vorschauzustand
-- `assets/app.js` Initialisierung
-- `index.html` Script-Ladereihenfolge
+- `assets/workspace-ui.js`
+- `assets/workspace-layout.css`
+- `assets/app.js`
+- `index.html`
 - `tests/workspace-resize.test.mjs` neu
-- `tests/workspace-ui.test.mjs` nur falls Vorschau-API separat geprüft werden muss
-- `scripts/quality-check.mjs` nur falls die neue Pflichtdatei/Ladereihenfolge noch nicht automatisch abgedeckt ist
-- `TODO.md`
-- `CHANGELOG.md`
-- `MANIFEST.md`
+- `tests/workspace-resize-load.test.mjs` neu
+- `tests/workspace-ui.test.mjs`
 - `VERSION.json`
-- `docs/STATUS_0.3.0.md`
-- `docs/MANIFEST_0.3.0_D3A_KEYBOARD.md` neu
+- D3a-Plan und D3a-Patchmanifest
 
-Nicht vorgesehen:
+Nicht verändert:
 
 - `assets/workspace-state.js`
-- `assets/workspace-size.js`
+- eigentliche D1-Bewegungsberechnung in `assets/workspace-size.js`
 - Moduldateien
 - Netzwerkcode
+- persistentes Workspace-Schema
 
 ---
 
-# 12. Abnahmekriterien
+# 12. Reale Abnahme
 
-D3a ist erst abgeschlossen, wenn:
+- [x] Tastatur-Resize ab 981 px implementiert und automatisiert geprüft
+- [x] Vorschau während `keydown` ohne persistente Änderung
+- [x] Tastenserie mit höchstens einem Commit abgeschlossen
+- [x] Escape ohne Persistenz
+- [x] Home nur für aktuelles Panel
+- [x] ungefähr 44 × 44 px Griff
+- [x] kein Pointer-Ziehcode in D3a
+- [x] keine neue Abhängigkeit
+- [x] finaler Branch `0` Commits hinter `main`
+- [x] PR #78 mergebar
+- [x] GitHub Quality Gate `success`
+- [x] `56` Dateien statisch geprüft
+- [x] `48/48` automatische Tests erfolgreich
+- [x] `0` Tests fehlgeschlagen
+- [x] Projektprüfung mit Node `20.20.2`
+- [x] Squash-Merge `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
+- [x] Main-Stichprobe: `assets/workspace-resize.js`, `index.html`, `VERSION.json`
 
-- [ ] Tastatur-Resize ab 981 px vollständig funktioniert
-- [ ] Vorschau während `keydown` keine persistente Änderung auslöst
-- [ ] `keyup` eine Tastenserie mit höchstens einem Commit abschließt
-- [ ] Escape ohne Persistenz zurückkehrt
-- [ ] Home nur das aktuelle Panel zurücksetzt
-- [ ] Griffe zugänglich und ungefähr 44 × 44 px bedienbar sind
-- [ ] kein Pointer-Code im Patch enthalten ist
-- [ ] keine neue Abhängigkeit entstanden ist
-- [ ] `npm run verify` vollständig grün ist
-- [ ] Branch beim finalen Diff-Check 0 Commits hinter `main` ist
-- [ ] PR mergebar ist
-- [ ] zentrale Dateien nach Merge auf `main` erneut gelesen wurden
+Nicht durchgeführt: echte interaktive Firefox-/Chrome-Abnahme. Diese bleibt Bestandteil von `0.3.0-G`.
 
 ---
 
 # 13. Rückweg
 
-D3a bleibt ein eigener Pull Request. Ein Revert entfernt ausschließlich Griff, Tastaturcontroller, transiente Vorschau und zugehörige Tests/Dokumentation.
+Ein Revert des technischen PR #78 entfernt Griff, Tastaturcontroller, transiente Vorschau und zugehörige Tests/Dokumentation.
 
-D1-State, D1-Berechnung und D2-Darstellung bleiben vollständig erhalten. Keine Datenmigration ist zurückzunehmen.
+D1-State, D1-Berechnung und D2-Darstellung bleiben erhalten. Es existiert keine Datenmigration.
 
 ---
 
@@ -359,17 +348,18 @@ D1-State, D1-Berechnung und D2-Darstellung bleiben vollständig erhalten. Keine 
 
 **0.3.0-D3b – Pointer/Maus/Touch/Stift**
 
-Auf derselben Vorschau-/Commit-Architektur:
+Die bestehende D3a-Infrastruktur wird wiederverwendet:
 
 - `pointerdown`
 - Pointer Capture
 - `pointermove` nur Vorschau
-- `pointerup` genau ein Commit
+- D1-Grid-Metrik und echter `column-gap`
+- `pointerup` höchstens ein Commit
 - `pointercancel` ohne Persistenz
-- reale Grid-Metrik aus D1-Berechnung
+- `Escape` auch für Pointer-Abbruch
 
 ## Danach
 
 **0.3.0-E – Reorder & Drag and Drop**
 
-Erst nach vollständiger grüner D3a-/D3b-Abnahme. Resize-Griff und Drag-Griff bleiben getrennte Mechaniken.
+Erst nach vollständig grüner D3a-/D3b-Abnahme. Resize-Griff und Drag-Griff bleiben getrennte Mechaniken.
