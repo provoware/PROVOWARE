@@ -127,12 +127,13 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 ##### Technische Implementierung nach Planungsmerge
 
-- [ ] State-API `panelGroesseSetzen` ergänzen.
-- [ ] State-API `panelGroesseZuruecksetzen` ergänzen.
-- [ ] reine Raster-/Höhenberechnung implementieren.
-- [ ] Größenberechnung inklusive realem CSS-`column-gap` testen.
+- [x] State-API `panelGroesseSetzen` ergänzen.
+- [x] State-API `panelGroesseZuruecksetzen` ergänzen.
+- [x] reine Raster-/Höhenberechnung in `assets/workspace-size.js` implementieren.
+- [x] Größenberechnung inklusive realem CSS-`column-gap` automatisiert testen.
+- [x] automatische State- und Berechnungstests ergänzen.
 - [ ] gespeicherte Breite/Höhe zentral auf DOM anwenden.
-- [ ] `heightPx: null` als automatische Höhe erhalten.
+- [ ] `heightPx: null` als automatische Höhe in der DOM-Anwendung erhalten.
 - [ ] genau einen Resize-Griff pro sichtbarem Panel integrieren.
 - [ ] ungefähr 44 × 44 px sichere Trefferfläche gewährleisten.
 - [ ] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
@@ -141,9 +142,9 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [ ] `pointerup` auf genau einen Commit begrenzen.
 - [ ] Tastatur-Pfeile, `Home`, `Escape` implementieren.
 - [ ] Resize bis 980 px kontrolliert deaktivieren.
-- [ ] Nutzerfeedback und WORKSPACE-Logging ergänzen.
-- [ ] automatische State-, Berechnungs-, Pointer-, Tastatur- und Responsive-Tests ergänzen.
-- [ ] Quality Gate um Resize-Vertragsprüfungen erweitern.
+- [ ] Nutzerfeedback und WORKSPACE-Logging für die sichtbare Resize-Bedienung ergänzen.
+- [ ] automatische Pointer-, Tastatur- und Responsive-Tests ergänzen.
+- [ ] Quality Gate um Resize-Vertragsprüfungen für die sichtbare Bedienung erweitern.
 - [ ] vollständigen technischen Diff gegen `main` prüfen.
 - [ ] technisches Quality Gate erfolgreich abschließen.
 - [ ] technischen PR mergebar prüfen und mergen.
