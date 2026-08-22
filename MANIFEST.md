@@ -6,13 +6,13 @@
 
 Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
 
-Aktuelle Entwicklungsstufe: `0.3.0-C – Visibility Controls & Compact Menu`
+Aktuelle interne Entwicklungsstufe: `0.3.0-D – Resize Planning & Contract`
 
 Modulvertragsversion: `1`
 
 Workspace-Vertragsversion: `1`
 
-## Laufzeitstruktur
+## Laufzeitstruktur – unverändert gegenüber 0.3.0-C
 
 ### Einstieg
 
@@ -24,14 +24,14 @@ Workspace-Vertragsversion: `1`
 - `assets/app.js` – App-Start, Debug-UI und Initialisierung der Subsysteme
 - `assets/module-registry.js` – Modulvertrag und Modul-Lebenszyklus
 - `assets/workspace-state.js` – Workspace-Zustand, Normalisierung, Sichtbarkeitsaktionen, lokale Speicherung und Reset
-- `assets/workspace-ui.js` – entkoppelte DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus und Nutzerfeedback
+- `assets/workspace-ui.js` – DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus und Nutzerfeedback
 - `modules/registry.js` – zentraler Modulkatalog, aktuell bewusst leer
 
 ### Versionsmetadaten
 
 - `VERSION.json`
 
-## Feste Bedienzone 0.3.0-C
+## Feste Bedienzone
 
 Außerhalb des veränderbaren Workspace liegen:
 
@@ -43,12 +43,6 @@ Außerhalb des veränderbaren Workspace liegen:
 
 Der `Layout`-Schalter bleibt auch dann erreichbar, wenn alle fünf Workspace-Panels ausgeblendet wurden.
 
-Mobile Regel Option A:
-
-- `Layout` bleibt im festen Primärbereich sichtbar
-- sekundäre Status-/Aktionsinhalte dürfen horizontal überlaufen
-- keine separate mobile Zweitnavigation
-
 ## Workspace-Kernpanels
 
 | Sichtbarer Bereich | stabile Panel-ID |
@@ -59,36 +53,69 @@ Mobile Regel Option A:
 | Detailbereich | `details` |
 | Systemstatus | `system-status` |
 
-Die HTML-Zuordnung erfolgt über `data-workspace-panel`. Die Layout-Schalter verwenden dieselben stabilen IDs über `data-layout-panel`.
-
 ## Workspace-Zustand
 
-Eigener lokaler Schlüssel:
+Persistenter Schlüssel:
 
 `provoware.allin.workspace.main.v1`
 
-Gespeichert werden ausschließlich Layoutdaten:
+Gespeichert werden ausschließlich:
 
 - Panelreihenfolge
 - Sichtbarkeit
-- Rasterbreite
-- optionale Höhe
+- Rasterbreite `widthUnits`
+- optionale Höhe `heightPx`
 
-Nicht gespeichert werden Fachinhalte, Debuglogs, Modul-Laufzeitstatus, Fokus, Scrollposition oder Zeigerbewegungen.
+Nicht gespeichert werden:
 
-Sichtbarkeitsänderungen laufen ausschließlich über die zentrale Workspace-State-API. `assets/workspace-ui.js` schreibt nicht direkt in `localStorage`.
+- Fachinhalte
+- Debuglogs
+- Modul-Laufzeitstatus
+- Fokus
+- Scrollposition
+- Zeigerbewegungen
+- Resize-/Drag-Vorschau
 
-Der Reset entfernt ausschließlich den Workspace-Schlüssel. Andere lokale PROVOWARE-Daten bleiben unangetastet.
+Die Resize-Planung führt **keine neuen persistenten Felder** ein. Workspace-Vertragsversion `1` bleibt deshalb unverändert.
 
-## Sichtbarkeitsfunktionen 0.3.0-C
+## 0.3.0-C – freigegebene interne Funktionsbasis
 
-- einzelne Panels ein-/ausblenden
-- alle fünf Panels gleichzeitig ausblenden dürfen
+Vorhanden:
+
+- kompakte Schnellstarterleiste
+- permanenter `Layout`-Schalter
+- einzelne Panel-Sichtbarkeit
+- alle Panels ausblendbar
 - `Alle anzeigen`
 - `Standardlayout wiederherstellen`
-- gespeicherte Reihenfolge und Größenwerte beim Aus-/Einblenden erhalten
+- gespeicherte Reihenfolge und Größenwerte bleiben beim Aus-/Einblenden erhalten
 - Live-Nutzerfeedback
-- Menü per `Escape` schließen und Fokus zum `Layout`-Schalter zurückführen
+- Tastatur-/Fokus-Grundlage
+
+## 0.3.0-D – aktueller Planungsstand
+
+Bestätigte Resize-Option A:
+
+- ein Resize-Griff pro sichtbarem Panel
+- Maus/Touch/Stift über gemeinsame Pointer Events
+- derselbe Griff per Tastatur bedienbar
+- Breite: Schritt 1 Rastereinheit
+- Höhe: Schritt 24 px
+- Vorschau während Bewegung nur transient
+- Persistenz erst nach validiertem Ende
+- `Home/Pos1` setzt die einzelne Panelgröße auf Standard zurück
+- Resize in 0.3.0-D aktiv ab 981 px
+- Tablet/Mobil überschreiben keine gespeicherten Desktopgrößen
+- keine zweite vollständige Größensteuerung im Layout-Menü
+- Drag & Drop bleibt bis 0.3.0-E gesperrt
+
+## Vorgesehene Verantwortungstrennung für die Resize-Implementierung
+
+- `assets/workspace-state.js` – einzige persistente Größenquelle
+- `assets/workspace-ui.js` – gültige gespeicherte Größe auf DOM anwenden
+- neue `assets/workspace-resize.js` – Pointer/Tastatur, transiente Vorschau, Commit/Abbruch
+
+Die geplante Resize-Eingabeschicht darf nicht direkt in `localStorage` schreiben.
 
 ## Hauptdokumente
 
@@ -109,30 +136,38 @@ Der Reset entfernt ausschließlich den Workspace-Schlüssel. Andere lokale PROVO
 
 ### 0.3.0
 
-- `docs/PLAN_0.3.0.md`
-- `docs/PLAN_0.3.0_B.md`
-- `docs/PLAN_0.3.0_C.md`
-- `docs/WORKSPACE_CONTRACT.md`
+- `docs/PLAN_0.3.0.md` – Masterplan
+- `docs/PLAN_0.3.0_B.md` – State Foundation
+- `docs/PLAN_0.3.0_C.md` – Visibility Controls
+- `docs/PLAN_0.3.0_D.md` – detaillierter Resize-Implementierungsplan
+- `docs/WORKSPACE_CONTRACT.md` – allgemeiner Workspace-Vertrag Version 1
+- `docs/RESIZE_CONTRACT_0.3.0.md` – detaillierter Resize-Vertrag und 40-teilige Testmatrix
 - `docs/DECISIONS_0.3.0.md`
 - `docs/STATUS_0.3.0.md`
-- `docs/IMPLEMENTATION_ORDER_0.3.0.md`
-- `docs/README_WORKSPACE_0.3.0.md`
-- `docs/QA_0.3.0_A.md`
-- `docs/PR_0.3.0_A.md`
-- `docs/ROLLBACK_0.3.0_A.md`
-- `docs/SCOPE_0.3.0_A.md`
 - `docs/MANIFEST_0.3.0_B.md`
 - `docs/MANIFEST_0.3.0_C.md`
+- `docs/MANIFEST_0.3.0_D_PLAN.md` – aktueller Planungs-Patch
 
 ## Entwicklungs- und Qualitätssicherung
 
-- `.editorconfig` – einheitliche Textgrundregeln
-- `package.json` – kanonische Entwicklungsbefehle
-- `scripts/quality-check.mjs` – Format-, Syntax-, Struktur-, Referenz- und Workspace-UI-Vertragsprüfung
-- `tests/module-registry.test.mjs` – Modul-Lebenszyklus
-- `tests/workspace-state.test.mjs` – Workspace-Zustand, Sichtbarkeit, Speicherfehler und Reset
-- `tests/workspace-ui.test.mjs` – DOM-Anwendung, Sichtbarkeit, Wiederherstellung und Tastatur-Menüverhalten
-- `.github/workflows/quality.yml` – automatisches Quality Gate
+Bestehend:
+
+- `.editorconfig`
+- `package.json`
+- `scripts/quality-check.mjs`
+- `tests/module-registry.test.mjs`
+- `tests/workspace-state.test.mjs`
+- `tests/workspace-ui.test.mjs`
+- `.github/workflows/quality.yml`
+
+Geplant für den technischen Resize-Patch:
+
+- Resize-State-Tests
+- reine Raster-/Höhenberechnungstests
+- Pointer-Abbruch-/Commit-Tests
+- Tastaturtests
+- Responsive-Tests
+- statische Resize-Vertragsprüfungen im Quality Gate
 
 ## Kanonische Befehle
 
@@ -148,16 +183,26 @@ Vollständige Prüfung:
 npm run verify
 ```
 
-## Noch nicht Bestandteil
+## Aktueller Patchtyp
 
-- Resize
-- Drag & Drop
-- Fachmodule
-- Cloud-Synchronisation
-- Remote-Plugins
+**Nur Dokumentation und Entwicklungsmetadaten.**
+
+Keine Änderung an:
+
+- HTML
+- CSS
+- JavaScript-Laufzeit
+- Testcode
+- Quality-Gate-Code
+- Browser-Speicherung
+
+## Nächste zwei technischen Schritte
+
+1. State-API + reine Größenberechnung implementieren und testen.
+2. Danach Resize-Griffe + Pointer-/Tastatur-Controller auf diese geprüfte Logik setzen.
+
+Danach erst `0.3.0-E – Reorder & Drag and Drop`.
 
 ## Status
 
-Die Oberfläche bleibt fachlich leer. Modulvertrag und Registry sind stabil vorhanden. 0.3.0-C ergänzt ausschließlich die sichtbare, sicher wiederherstellbare Panel-Sichtbarkeit und die kompakte feste Layoutsteuerung auf Basis der vorhandenen Workspace-Zustandsverwaltung.
-
-Die Produktversion wird erst nach vollständiger Abnahme der Workspace Engine auf `0.3.0` erhöht.
+Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`. Die aktuelle interne Entwicklungsphase ist transparent als `0.3.0-D Resize Planning & Contract` dokumentiert.
