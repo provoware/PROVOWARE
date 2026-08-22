@@ -38,8 +38,8 @@ test("Data Studio bietet alle vorgesehenen Feldtypen und keine Browser-Zweitpers
   assert.doesNotMatch(source, /localStorage|sessionStorage/);
   assert.match(source, /data-action=\"save-template\"/);
   assert.match(source, /data-action=\"save-record\"/);
-  assert.match(source, /data-action=\"edit-record\"/);
-  assert.match(source, /data-action=\"delete-record\"/);
+  assert.match(source, /edit\.dataset\.action = "edit-record"/);
+  assert.match(source, /remove\.dataset\.action = "delete-record"/);
 });
 
 test("HTML lädt Project-Data-Styles ohne bestehende Scriptreihenfolge zu ersetzen", async () => {
