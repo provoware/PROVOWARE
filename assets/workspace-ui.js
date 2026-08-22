@@ -69,6 +69,12 @@
     elemente.zusammenfassung.textContent = `Arbeitsfläche · ${sichtbar}/${gesamt} sichtbar`;
   };
 
+  const panelLesen = (id) => {
+    const panel = elemente?.panels.get(id);
+    if (!panel) throw new RangeError(`Layout-Panel nicht gefunden: ${String(id)}.`);
+    return panel;
+  };
+
   const panelGroesseAnwenden = (panel, panelZustand) => {
     const breite = panelZustand?.widthUnits;
     if (Number.isInteger(breite) && breite > 0) {
@@ -87,6 +93,14 @@
     }
   };
 
+  const panelGroesseVorschauAnwenden = (id, groesse) => {
+    if (!initialisiert) throw new Error("Layoutsteuerung ist noch nicht initialisiert.");
+    const panel = panelLesen(id);
+    panelGroesseAnwenden(panel, groesse);
+    panel.dataset.workspaceResizePreview = "true";
+    return true;
+  };
+
   const zustandAnwenden = (zustand) => {
     for (const definition of workspace.PANEL_DEFINITIONEN) {
       const panelZustand = zustand.panels[definition.id];
@@ -94,6 +108,7 @@
       const sichtbar = panelZustand?.visible === true;
 
       panel.hidden = !sichtbar;
+      delete panel.dataset.workspaceResizePreview;
       panelGroesseAnwenden(panel, panelZustand);
       elemente.schalter.get(definition.id).checked = sichtbar;
     }
@@ -197,6 +212,7 @@
   window.PROVOWARE_WORKSPACE_UI = Object.freeze({
     initialisieren,
     zustandAnwenden,
+    panelGroesseVorschauAnwenden,
     menueSetzen,
     statusMelden,
     istInitialisiert: () => initialisiert,
