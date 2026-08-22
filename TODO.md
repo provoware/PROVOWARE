@@ -14,7 +14,7 @@
 ### 0.2.0 – Module Contract & Registry
 
 - [x] Detaillierten, nummerierten Entwicklungsplan mit Abnahmekriterien anlegen.
-- [x] `AGENTS.md` auf kleine, reproduzierbare und begründete Patches ausrichten.
+- [x] `AGENTS.md` auf kleine, begründete und reproduzierbare Patches ausrichten.
 - [x] Minimalen Modulvertrag mit Vertragsversion `1` definieren.
 - [x] Leeren kanonischen Modulkatalog anlegen.
 - [x] Registry-Zustände und kontrollierten Modul-Lebenszyklus implementieren.
@@ -76,14 +76,26 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 #### 0.3.0-C – Visibility Controls + kompakte Menüleiste
 
-- [ ] feste kompakte Schnellstarter-/Menüleiste direkt unter dem oberen Bereich anlegen.
-- [ ] permanenten `Layout`-Schalter außerhalb des veränderbaren Workspace integrieren.
-- [ ] Panels zentral ein-/ausblendbar machen.
-- [ ] `Alle anzeigen` und `Standardlayout wiederherstellen` jederzeit erreichbar halten.
-- [ ] ausgeblendete Panels mit gespeicherter Position und Größe wiederherstellen.
-- [ ] Tastaturbedienung und Fokusführung sicherstellen.
-- [ ] Nutzerfeedback nach `Aktion -> Ergebnis -> nächster Schritt` ausgeben.
-- [ ] Leiste kompakt halten und nur Funktionen mit realem Nutzen aufnehmen.
+- [x] Detaillierten Teilplan `docs/PLAN_0.3.0_C.md` anlegen.
+- [x] Mobile Option A festlegen: `Layout` fest sichtbar, sekundärer Bereich darf horizontal scrollen.
+- [x] feste kompakte Schnellstarter-/Menüleiste direkt unter dem oberen Bereich anlegen.
+- [x] permanenten `Layout`-Schalter außerhalb des veränderbaren Workspace integrieren.
+- [x] stabile `data-workspace-panel`-Zuordnung für alle fünf Kernpanels ergänzen.
+- [x] `assets/workspace-ui.js` als entkoppelte DOM-/Bedienlogik anlegen.
+- [x] Panels zentral ein-/ausblendbar machen.
+- [x] alle fünf Panels gleichzeitig ausblendbar lassen.
+- [x] `Alle anzeigen` und `Standardlayout wiederherstellen` jederzeit erreichbar halten.
+- [x] ausgeblendete Panels mit gespeicherter Position und Größe wiederherstellen.
+- [x] Tastaturbedienung mit `Escape` und nachvollziehbarer Fokusführung ergänzen.
+- [x] verständliches Live-Nutzerfeedback ergänzen.
+- [x] Workspace-State-API um zentrale Sichtbarkeitsaktionen erweitern.
+- [x] automatische Zustands- und UI-Tests ergänzen.
+- [x] Quality Gate um UI-Pflichtdatei, Panel-Zuordnung und sicheren Layout-Schalter erweitern.
+- [x] Patchmanifest `docs/MANIFEST_0.3.0_C.md` anlegen.
+- [ ] vollständigen Branch-Diff gegen aktuellen `main` prüfen.
+- [ ] GitHub Quality Gate erfolgreich durchlaufen lassen.
+- [ ] PR als mergebar prüfen und 0.3.0-C mergen.
+- [ ] zentrale Dateien nach Merge auf `main` stichproartig nachprüfen.
 
 #### 0.3.0-D – Resize
 
@@ -114,6 +126,7 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [ ] Chrome-Kompatibilität stichprobenartig prüfen.
 - [ ] README, CHANGELOG, MANIFEST und VERSION auf den realen Releasezustand synchronisieren.
 - [ ] Version erst nach vollständiger Abnahme auf `0.3.0` setzen.
+- [ ] Workflow-Hygiene inklusive GitHub-Actions-Node-Laufzeit prüfen.
 - [ ] Release-PR nur bei grünem Quality Gate mergen.
 
 ## Danach

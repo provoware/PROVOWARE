@@ -105,10 +105,12 @@ const checkRequiredFiles = async () => {
     "assets/app.js",
     "assets/module-registry.js",
     "assets/workspace-state.js",
+    "assets/workspace-ui.js",
     "assets/styles.css",
     "modules/registry.js",
     "tests/module-registry.test.mjs",
     "tests/workspace-state.test.mjs",
+    "tests/workspace-ui.test.mjs",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -190,14 +192,77 @@ const checkHtml = async () => {
     "modules/registry.js",
     "assets/module-registry.js",
     "assets/workspace-state.js",
+    "assets/workspace-ui.js",
     "assets/app.js",
   ].map((item) => html.indexOf(item));
 
   const ordered = scriptOrder.every((position, index) => index === 0 || scriptOrder[index - 1] < position);
   if (scriptOrder.some((position) => position < 0) || !ordered) {
     fail(
-      "index.html: Script-Reihenfolge muss registry.js -> module-registry.js -> workspace-state.js -> app.js sein.",
+      "index.html: Script-Reihenfolge muss registry.js -> module-registry.js -> workspace-state.js -> workspace-ui.js -> app.js sein.",
     );
+  }
+};
+
+const workspaceDefinitionenLesen = async () => {
+  const source = await readFile(path.join(ROOT, "assets/workspace-state.js"), "utf8");
+  const sandbox = { window: {} };
+
+  try {
+    vm.runInNewContext(source, sandbox, { filename: "assets/workspace-state.js", timeout: 1000 });
+  } catch (error) {
+    fail(`assets/workspace-state.js: Vertrag konnte nicht ausgewertet werden (${error.message}).`);
+    return [];
+  }
+
+  return sandbox.window.PROVOWARE_WORKSPACE?.PANEL_DEFINITIONEN || [];
+};
+
+const checkWorkspaceLayout = async () => {
+  const html = await readFile(path.join(ROOT, "index.html"), "utf8");
+  const definitionen = await workspaceDefinitionenLesen();
+  if (!definitionen.length) {
+    fail("Workspace-Vertrag enthält keine Paneldefinitionen.");
+    return;
+  }
+
+  const erwartet = definitionen.map((definition) => definition.id).sort();
+  const panelIds = [...html.matchAll(/\bdata-workspace-panel=["']([^"']+)["']/g)].map(
+    (match) => match[1],
+  );
+  const schalterIds = [...html.matchAll(/\bdata-layout-panel=["']([^"']+)["']/g)].map(
+    (match) => match[1],
+  );
+
+  const pruefeZuordnung = (name, werte) => {
+    if (new Set(werte).size !== werte.length) fail(`index.html: ${name} enthält doppelte Panel-IDs.`);
+    const aktuell = [...werte].sort();
+    if (JSON.stringify(aktuell) !== JSON.stringify(erwartet)) {
+      fail(`index.html: ${name} muss exakt alle Workspace-Panel-IDs enthalten.`);
+    }
+  };
+
+  pruefeZuordnung("data-workspace-panel", panelIds);
+  pruefeZuordnung("data-layout-panel", schalterIds);
+
+  const pflichtIds = [
+    "quickbar",
+    "layout-toggle",
+    "layout-menu",
+    "layout-show-all",
+    "layout-reset",
+    "layout-status",
+    "layout-summary",
+    "arbeitsbereich",
+  ];
+  for (const id of pflichtIds) {
+    if (!new RegExp(`\\bid=["']${id}["']`).test(html)) fail(`index.html: Layout-Pflichtelement fehlt (${id}).`);
+  }
+
+  const layoutToggle = html.indexOf('id="layout-toggle"');
+  const workspaceMain = html.indexOf('id="arbeitsbereich"');
+  if (layoutToggle < 0 || workspaceMain < 0 || layoutToggle > workspaceMain) {
+    fail("index.html: permanenter Layout-Schalter muss vor und außerhalb des veränderbaren Workspace liegen.");
   }
 };
 
@@ -285,6 +350,7 @@ const main = async () => {
   await checkJavaScriptSyntax(refreshedFiles);
   await checkVersion();
   await checkHtml();
+  await checkWorkspaceLayout();
   await checkRegistry();
 
   if (fixes.length) {

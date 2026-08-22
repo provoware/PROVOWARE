@@ -10,6 +10,7 @@
   <script defer src="modules/registry.js"></script>
   <script defer src="assets/module-registry.js"></script>
   <script defer src="assets/workspace-state.js"></script>
+  <script defer src="assets/workspace-ui.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body>
@@ -49,24 +50,103 @@
         </button>
       </header>
 
+      <section id="quickbar" class="quickbar" aria-label="Layout und Schnellzugriff">
+        <div class="quickbar-primary">
+          <button
+            id="layout-toggle"
+            class="quickbar-button"
+            type="button"
+            aria-controls="layout-menu"
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            Layout
+          </button>
+        </div>
+
+        <div class="quickbar-scroll" aria-label="Layoutstatus">
+          <span id="layout-summary" class="quickbar-summary">Arbeitsfläche · 5/5 sichtbar</span>
+          <span id="layout-status" class="quickbar-status" role="status" aria-live="polite">Layoutsteuerung wird geladen.</span>
+        </div>
+
+        <section id="layout-menu" class="layout-menu" aria-label="Layout einstellen" hidden>
+          <div class="layout-menu-header">
+            <div>
+              <p class="layout-menu-kicker">Arbeitsfläche</p>
+              <h2>Bereiche anzeigen</h2>
+            </div>
+          </div>
+
+          <div class="layout-options" role="group" aria-label="Sichtbare Bereiche">
+            <label class="layout-option">
+              <input type="checkbox" data-layout-panel="overview" data-layout-name="Übersicht" checked>
+              <span>Übersicht</span>
+            </label>
+            <label class="layout-option">
+              <input type="checkbox" data-layout-panel="modules" data-layout-name="Module" checked>
+              <span>Module</span>
+            </label>
+            <label class="layout-option">
+              <input type="checkbox" data-layout-panel="work" data-layout-name="Arbeitsbereich" checked>
+              <span>Arbeitsbereich</span>
+            </label>
+            <label class="layout-option">
+              <input type="checkbox" data-layout-panel="details" data-layout-name="Detailbereich" checked>
+              <span>Detailbereich</span>
+            </label>
+            <label class="layout-option">
+              <input type="checkbox" data-layout-panel="system-status" data-layout-name="Systemstatus" checked>
+              <span>Systemstatus</span>
+            </label>
+          </div>
+
+          <div class="layout-actions">
+            <button id="layout-show-all" class="layout-action" type="button">Alle anzeigen</button>
+            <button id="layout-reset" class="layout-action layout-action-secondary" type="button">
+              Standardlayout wiederherstellen
+            </button>
+          </div>
+        </section>
+      </section>
+
       <main class="main-grid" id="arbeitsbereich">
-        <section class="panel panel-wide" id="uebersicht" aria-labelledby="title-uebersicht">
+        <section
+          class="panel panel-wide"
+          id="uebersicht"
+          data-workspace-panel="overview"
+          aria-labelledby="title-uebersicht"
+        >
           <h2 id="title-uebersicht">Übersicht</h2>
         </section>
 
-        <section class="panel" id="module" aria-labelledby="title-module">
+        <section
+          class="panel"
+          id="module"
+          data-workspace-panel="modules"
+          aria-labelledby="title-module"
+        >
           <h2 id="title-module">Module</h2>
         </section>
 
-        <section class="panel panel-feature" aria-labelledby="title-arbeitsbereich">
+        <section class="panel panel-feature" data-workspace-panel="work" aria-labelledby="title-arbeitsbereich">
           <h2 id="title-arbeitsbereich">Arbeitsbereich</h2>
         </section>
 
-        <section class="panel" id="details" aria-labelledby="title-details">
+        <section
+          class="panel"
+          id="details"
+          data-workspace-panel="details"
+          aria-labelledby="title-details"
+        >
           <h2 id="title-details">Detailbereich</h2>
         </section>
 
-        <section class="panel panel-wide" id="systemstatus" aria-labelledby="title-systemstatus">
+        <section
+          class="panel panel-wide"
+          id="systemstatus"
+          data-workspace-panel="system-status"
+          aria-labelledby="title-systemstatus"
+        >
           <h2 id="title-systemstatus">Systemstatus</h2>
         </section>
       </main>

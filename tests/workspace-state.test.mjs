@@ -152,3 +152,50 @@ test("Reset entfernt nur Workspace-Daten und lässt Debug-Einstellungen bestehen
   assert.notEqual(speicher.getItem(DEBUG_KEY), null);
   assert.deepEqual(zurueckgesetzt, alsStandardObjekt(api.standardzustandErstellen()));
 });
+
+test("Ein- und Ausblenden erhält Reihenfolge und Größenwerte", () => {
+  const speicher = speicherErstellen();
+  const api = laufzeitErstellen(speicher);
+  api.initialisieren({ speicher });
+
+  const vorbereitet = api.standardzustandErstellen();
+  vorbereitet.order = ["details", "overview", "modules", "work", "system-status"];
+  vorbereitet.panels.details.widthUnits = 10;
+  vorbereitet.panels.details.heightPx = 420;
+  api.zustandSetzen(vorbereitet);
+
+  const ausgeblendet = alsStandardObjekt(api.panelSichtbarkeitSetzen("details", false));
+  const eingeblendet = alsStandardObjekt(api.panelSichtbarkeitSetzen("details", true));
+
+  assert.equal(ausgeblendet.panels.details.visible, false);
+  assert.equal(eingeblendet.panels.details.visible, true);
+  assert.equal(eingeblendet.order[0], "details");
+  assert.equal(eingeblendet.panels.details.widthUnits, 10);
+  assert.equal(eingeblendet.panels.details.heightPx, 420);
+});
+
+test("Alle Panels dürfen ausgeblendet und gemeinsam wieder angezeigt werden", () => {
+  const speicher = speicherErstellen();
+  const api = laufzeitErstellen(speicher);
+  api.initialisieren({ speicher });
+
+  for (const definition of api.PANEL_DEFINITIONEN) {
+    api.panelSichtbarkeitSetzen(definition.id, false);
+  }
+
+  const leer = alsStandardObjekt(api.statusLesen());
+  assert.ok(Object.values(leer.panels).every((panel) => panel.visible === false));
+
+  const wiederhergestellt = alsStandardObjekt(api.allePanelsAnzeigen());
+  assert.ok(Object.values(wiederhergestellt.panels).every((panel) => panel.visible === true));
+  assert.deepEqual(wiederhergestellt.order, leer.order);
+});
+
+test("Unbekannte Panel-ID verändert den gültigen Zustand nicht", () => {
+  const api = laufzeitErstellen();
+  api.initialisieren({ speicher: speicherErstellen() });
+  const vorher = alsStandardObjekt(api.statusLesen());
+
+  assert.throws(() => api.panelSichtbarkeitSetzen("unbekannt", false), /Unbekannte Panel-ID/);
+  assert.deepEqual(alsStandardObjekt(api.statusLesen()), vorher);
+});

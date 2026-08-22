@@ -2,6 +2,37 @@
 
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
+### 0.3.0-C – Visibility Controls & Compact Menu
+
+#### Hinzugefügt
+
+- kompakte Schnellstarter-/Menüleiste direkt unter dem oberen Bereich.
+- permanenter `Layout`-Schalter außerhalb des veränderbaren Workspace.
+- Layout-Menü für alle fünf Kernpanels.
+- einzelne Panel-Sichtbarkeit mit automatischer lokaler Speicherung.
+- `Alle anzeigen`.
+- dauerhaft erreichbarer Befehl `Standardlayout wiederherstellen`.
+- Live-Nutzerfeedback für Layoutaktionen.
+- `assets/workspace-ui.js` als getrennte DOM- und Bedienlogik ohne eigene Persistenz.
+- stabile Zuordnung zwischen Workspace-Vertrag und HTML über `data-workspace-panel` und `data-layout-panel`.
+- automatische Workspace-UI-Tests ohne externe Testbibliothek.
+- Quality-Gate-Prüfung für Panel-Zuordnung und permanenten Layout-Schalter.
+- Teilplan und Patchmanifest für 0.3.0-C.
+
+#### Geändert
+
+- Workspace-State-API um `panelSichtbarkeitSetzen` und `allePanelsAnzeigen` erweitert.
+- `assets/app.js` initialisiert die Workspace-UI nach der Zustandsbasis.
+- `assets/styles.css` enthält kompakte feste Layoutsteuerung und responsive mobile Option A.
+- Sichtbarkeitstests prüfen Erhalt von Reihenfolge und Größenwerten.
+- Dokumentation und Entwicklungsmetadaten auf 0.3.0-C fortgeschrieben.
+
+#### Bewusst noch nicht enthalten
+
+- kein Resize
+- kein Drag & Drop
+- keine Fachmodule
+
 ### 0.3.0-B – State Foundation & Autosave/Reset
 
 #### Hinzugefügt
@@ -22,14 +53,6 @@
 - `npm run test` führt alle Testdateien aus.
 - das Quality Gate prüft die neuen Workspace-Pflichtdateien und die Script-Reihenfolge.
 - `AGENTS.md` stärkt Wartbarkeit, Zustandsverwaltung, Entkopplung und Patchtransparenz.
-
-#### Bewusst noch nicht enthalten
-
-- keine sichtbare Schnellstarter-/Menüleiste
-- kein sichtbarer `Layout`-Schalter
-- kein Ein-/Ausblenden
-- kein Resize
-- kein Drag & Drop
 
 Die freigegebene Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
 

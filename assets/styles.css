@@ -50,7 +50,8 @@ button {
 }
 
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
@@ -149,7 +150,7 @@ a:focus-visible {
   justify-content: space-between;
   gap: 22px;
   min-height: 82px;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .eyebrow {
@@ -181,7 +182,9 @@ h2 {
 
 .debug-toggle,
 .debug-levels button,
-.text-button {
+.text-button,
+.quickbar-button,
+.layout-action {
   min-height: 42px;
   padding: 9px 14px;
   border: 1px solid var(--border-strong);
@@ -202,6 +205,159 @@ h2 {
   border-color: var(--accent);
 }
 
+.quickbar {
+  position: sticky;
+  z-index: 40;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 8px;
+  background: rgba(5, 20, 25, 0.92);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.quickbar-primary {
+  flex: 0 0 auto;
+}
+
+.quickbar-button {
+  min-height: 38px;
+  padding: 7px 13px;
+  color: #001715;
+  font-weight: 800;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.quickbar-button:hover,
+.quickbar-button[aria-expanded="true"] {
+  background: #a2f5e9;
+  border-color: #a2f5e9;
+}
+
+.quickbar-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+
+.quickbar-summary {
+  color: #dffbf6;
+  font-weight: 700;
+}
+
+.quickbar-status {
+  color: var(--text-muted);
+}
+
+.layout-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 8px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 16px;
+  background: rgba(3, 16, 21, 0.98);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.layout-menu[hidden] {
+  display: none;
+}
+
+.layout-menu-header {
+  margin-bottom: 12px;
+}
+
+.layout-menu-kicker {
+  margin-bottom: 4px;
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.layout-options {
+  display: grid;
+  gap: 6px;
+}
+
+.layout-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: #dffbf6;
+  font-size: 0.88rem;
+  background: rgba(113, 224, 208, 0.04);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.layout-option:hover {
+  background: rgba(113, 224, 208, 0.08);
+  border-color: var(--border);
+}
+
+.layout-option input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent-strong);
+}
+
+.layout-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.layout-action {
+  min-height: 38px;
+  color: #001715;
+  font-weight: 750;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.layout-action:hover {
+  background: #a2f5e9;
+  border-color: #a2f5e9;
+}
+
+.layout-action-secondary {
+  color: #dffbf6;
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+
+.layout-action-secondary:hover {
+  color: var(--text);
+  background: var(--surface-soft);
+  border-color: var(--accent);
+}
+
 .main-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -217,6 +373,10 @@ h2 {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
+}
+
+.panel[hidden] {
+  display: none;
 }
 
 .panel-wide {
@@ -380,11 +540,32 @@ h2 {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
 
   .debug-toggle {
     width: 100%;
+  }
+
+  .quickbar {
+    top: 8px;
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .quickbar-button {
+    min-height: 36px;
+    padding-inline: 12px;
+  }
+
+  .quickbar-scroll {
+    gap: 10px;
+    font-size: 0.74rem;
+  }
+
+  .layout-menu {
+    left: 0;
+    width: min(360px, calc(100vw - 36px));
   }
 
   .main-grid {
