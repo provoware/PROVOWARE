@@ -7,6 +7,6 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.3.0-D Resize State & Calculation",
-  "development_baseline_commit": "a9b23b8d16e96142f35904a08315ca3f2f4495a0"
+  "development_phase": "0.3.0-D Resize DOM Application",
+  "development_baseline_commit": "5542f90edb6b2079ef4e55f5e217f3b0e05422c4"
 }

@@ -7,9 +7,41 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = await readFile(path.join(ROOT, "assets/workspace-ui.js"), "utf8");
+const WORKSPACE_LAYOUT_CSS = await readFile(
+  path.join(ROOT, "assets/workspace-layout.css"),
+  "utf8",
+);
+const INDEX_HTML = await readFile(path.join(ROOT, "index.html"), "utf8");
 const PANEL_IDS = ["overview", "modules", "work", "details", "system-status"];
+const STANDARD_BREITEN = {
+  overview: 12,
+  modules: 4,
+  work: 8,
+  details: 4,
+  "system-status": 12,
+};
 
 const klonen = (wert) => JSON.parse(JSON.stringify(wert));
+
+class TestStyle {
+  constructor() {
+    this.werte = new Map();
+  }
+
+  setProperty(name, wert) {
+    this.werte.set(name, String(wert));
+  }
+
+  removeProperty(name) {
+    const vorher = this.werte.get(name) || "";
+    this.werte.delete(name);
+    return vorher;
+  }
+
+  getPropertyValue(name) {
+    return this.werte.get(name) || "";
+  }
+}
 
 class TestElement {
   constructor(id = "") {
@@ -22,6 +54,7 @@ class TestElement {
     this.listeners = new Map();
     this.focused = false;
     this.children = new Set();
+    this.style = new TestStyle();
   }
 
   addEventListener(type, listener) {
@@ -56,7 +89,10 @@ const standardzustand = () => ({
   workspaceId: "main",
   order: [...PANEL_IDS],
   panels: Object.fromEntries(
-    PANEL_IDS.map((id) => [id, { visible: true, widthUnits: 12, heightPx: null }]),
+    PANEL_IDS.map((id) => [
+      id,
+      { visible: true, widthUnits: STANDARD_BREITEN[id], heightPx: null },
+    ]),
   ),
 });
 
@@ -159,6 +195,54 @@ test("gespeicherte Sichtbarkeit wird beim Start auf DOM und Schalter angewendet"
   assert.equal(ids.get("layout-summary").textContent, "Arbeitsfläche · 4/5 sichtbar");
 });
 
+test("gespeicherte Panelgröße wird ausschließlich als CSS-Variablen auf das DOM übertragen", () => {
+  const start = standardzustand();
+  start.panels.modules.widthUnits = 6;
+  start.panels.modules.heightPx = 268;
+  const unveraendert = klonen(start);
+  const { api, workspace, panels } = umgebungErstellen(start);
+
+  api.initialisieren({ workspace });
+
+  const panel = panels.get("modules");
+  assert.equal(panel.style.getPropertyValue("--panel-spalten"), "6");
+  assert.equal(panel.style.getPropertyValue("--panel-hoehe"), "268px");
+  assert.equal(panel.dataset.workspaceSizeReady, "true");
+  assert.deepEqual(workspace.statusLesen(), unveraendert);
+});
+
+test("automatische Höhe entfernt einen alten Inline-Höhenwert reproduzierbar", () => {
+  const start = standardzustand();
+  start.panels.work.heightPx = 408;
+  const { api, workspace, panels } = umgebungErstellen(start);
+  api.initialisieren({ workspace });
+
+  const panel = panels.get("work");
+  assert.equal(panel.style.getPropertyValue("--panel-hoehe"), "408px");
+
+  const naechsterZustand = workspace.statusLesen();
+  naechsterZustand.panels.work.heightPx = null;
+  const vorher = JSON.stringify(naechsterZustand);
+  api.zustandAnwenden(naechsterZustand);
+
+  assert.equal(panel.style.getPropertyValue("--panel-hoehe"), "");
+  assert.equal(panel.style.getPropertyValue("--panel-spalten"), "8");
+  assert.equal(JSON.stringify(naechsterZustand), vorher);
+});
+
+test("ungültige Darstellungsbreite aktiviert das Desktop-Overlay nicht", () => {
+  const { api, workspace, panels } = umgebungErstellen();
+  api.initialisieren({ workspace });
+
+  const fehlerhafterZustand = workspace.statusLesen();
+  fehlerhafterZustand.panels.details.widthUnits = Number.NaN;
+  api.zustandAnwenden(fehlerhafterZustand);
+
+  const panel = panels.get("details");
+  assert.equal(panel.style.getPropertyValue("--panel-spalten"), "");
+  assert.equal(panel.dataset.workspaceSizeReady, undefined);
+});
+
 test("Sichtbarkeitsschalter aktualisiert Zustand, Panel und Nutzerfeedback", () => {
   const { api, workspace, panels, schalter, ids } = umgebungErstellen();
   api.initialisieren({ workspace });
@@ -202,4 +286,20 @@ test("Layout-Menü lässt sich per Schalter öffnen und per Escape schließen", 
   document.dispatch("keydown", { key: "Escape" });
   assert.equal(ids.get("layout-menu").hidden, true);
   assert.equal(ids.get("layout-toggle").focused, true);
+});
+
+test("Workspace-Größenstylesheet ist ausschließlich auf Desktop aktiv und nutzt nur CSS-Variablen", () => {
+  assert.match(WORKSPACE_LAYOUT_CSS, /@media \(min-width: 981px\)/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /data-workspace-size-ready="true"/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /grid-column: span var\(--panel-spalten\)/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /height: var\(--panel-hoehe, auto\)/);
+  assert.doesNotMatch(WORKSPACE_LAYOUT_CSS, /pointer|resize|drag|localStorage/i);
+});
+
+test("Basis-CSS wird vor dem isolierten Workspace-Größenstylesheet geladen", () => {
+  const basis = INDEX_HTML.indexOf('href="assets/styles.css"');
+  const overlay = INDEX_HTML.indexOf('href="assets/workspace-layout.css"');
+
+  assert.ok(basis >= 0);
+  assert.ok(overlay > basis);
 });

@@ -69,10 +69,32 @@
     elemente.zusammenfassung.textContent = `Arbeitsfläche · ${sichtbar}/${gesamt} sichtbar`;
   };
 
+  const panelGroesseAnwenden = (panel, panelZustand) => {
+    const breite = panelZustand?.widthUnits;
+    if (Number.isInteger(breite) && breite > 0) {
+      panel.style.setProperty("--panel-spalten", String(breite));
+      panel.dataset.workspaceSizeReady = "true";
+    } else {
+      panel.style.removeProperty("--panel-spalten");
+      delete panel.dataset.workspaceSizeReady;
+    }
+
+    const hoehe = panelZustand?.heightPx;
+    if (Number.isInteger(hoehe) && hoehe > 0) {
+      panel.style.setProperty("--panel-hoehe", `${hoehe}px`);
+    } else {
+      panel.style.removeProperty("--panel-hoehe");
+    }
+  };
+
   const zustandAnwenden = (zustand) => {
     for (const definition of workspace.PANEL_DEFINITIONEN) {
-      const sichtbar = zustand.panels[definition.id]?.visible === true;
-      elemente.panels.get(definition.id).hidden = !sichtbar;
+      const panelZustand = zustand.panels[definition.id];
+      const panel = elemente.panels.get(definition.id);
+      const sichtbar = panelZustand?.visible === true;
+
+      panel.hidden = !sichtbar;
+      panelGroesseAnwenden(panel, panelZustand);
       elemente.schalter.get(definition.id).checked = sichtbar;
     }
     zusammenfassungAktualisieren(zustand);

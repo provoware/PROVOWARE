@@ -142,11 +142,24 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 
 ##### D2 – DOM-Anwendung gespeicherter Größen
 
-- [ ] gespeicherte Breite/Höhe zentral auf DOM anwenden.
-- [ ] `heightPx: null` als automatische Höhe in der DOM-Anwendung erhalten.
-- [ ] Desktopwerte auf Tablet/Mobil nur visuell begrenzen und nicht überschreiben.
-- [ ] automatische DOM-/Responsive-Tests ergänzen.
-- [ ] noch keinen Resize-Griff und keine Pointerlogik einführen.
+- [x] Option A festlegen: Größenübergabe über CSS-Variablen statt direkter Layout-Eigenschaften in JavaScript.
+- [x] detaillierten D2-Teilplan `docs/PLAN_0.3.0_D_DOM.md` anlegen.
+- [x] `widthUnits` als `--panel-spalten` auf das zugehörige Panel übertragen.
+- [x] konkrete `heightPx` als `--panel-hoehe` übertragen.
+- [x] `heightPx: null` durch Entfernen der Inline-Höhenvariable als automatische Höhe erhalten.
+- [x] ungültige Darstellungsbreite defensiv auf vorhandene Basisdarstellung zurückfallen lassen.
+- [x] `assets/workspace-layout.css` als isoliertes Desktop-Overlay ab 981 px anlegen.
+- [x] vorhandene Tablet-/Mobilregeln in `assets/styles.css` unangetastet lassen.
+- [x] `index.html` um ausschließlich den lokalen CSS-Verweis ergänzen; Script-Reihenfolge unverändert lassen.
+- [x] automatische DOM-Tests für Breite, Höhe, Auto-Höhe und sicheren Fallback ergänzen.
+- [x] automatische CSS-Vertrags- und Ladereihenfolge-Prüfung ergänzen.
+- [x] noch keinen Resize-Griff, keine Pointerlogik und kein Drag & Drop einführen.
+- [x] D2-Patchmanifest `docs/MANIFEST_0.3.0_D_DOM.md` anlegen.
+- [ ] vollständigen D2-Diff gegen aktuellen `main` prüfen.
+- [ ] Branch beim finalen Diff-Check 0 Commits hinter `main` bestätigen.
+- [ ] GitHub Quality Gate vollständig grün abschließen.
+- [ ] PR als mergebar prüfen und D2 per Squash mergen.
+- [ ] `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
 
 ##### D3 – Resize-Griff + Eingabesteuerung
 
