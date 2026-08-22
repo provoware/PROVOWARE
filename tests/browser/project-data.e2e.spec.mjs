@@ -221,6 +221,74 @@ test("Data Studio PRO: Kategorie, Bibliothek, Suche, gespeicherte Ansicht, Reloa
   await expect(page.locator("[data-pro-record-count]")).toContainText("1 Treffer");
 });
 
+test("Recovery Envelope: Project Data und PRO werden als ein journalisierter Zustand wiederhergestellt", async ({ page }, testInfo) => {
+  const suffix = testInfo.project.name;
+  const templateName = `Envelope Vorlage ${suffix}`;
+  const fieldLabel = `Envelope Titel ${suffix}`;
+  const alpha = `Envelope Alpha ${suffix}`;
+  const beta = `Envelope Beta ${suffix}`;
+  const categoryBefore = `Envelope Kategorie A ${suffix}`;
+  const categoryAfter = `Envelope Kategorie B ${suffix}`;
+
+  await page.goto("/");
+  await waitForModules(page);
+
+  await page.locator("[data-action='new-template']").click();
+  await page.locator("[data-template-name]").fill(templateName);
+  await page.locator(".data-studio-field-label").first().fill(fieldLabel);
+  await page.locator("[data-action='save-template']").click();
+  await currentRecordInput(page).fill(alpha);
+  await page.locator("[data-record-form]").getByRole("button", { name: "Datensatz speichern" }).click();
+  await expect(recordItem(page, alpha)).toHaveCount(1);
+
+  await page.locator("[data-pro-category-name]").fill(categoryBefore);
+  await page.locator("[data-action='create-category']").click();
+  await page.locator("[data-action='refresh-pro']").click();
+  const libraryBefore = page.locator("[data-pro-template-library] [data-pro-template-id]", { hasText: templateName });
+  await expect(libraryBefore).toHaveCount(1);
+  await libraryBefore.locator("[data-pro-template-category]").selectOption({ label: categoryBefore });
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("zugewiesen", { ignoreCase: true });
+
+  await page.locator("[data-action='create-envelope']").click();
+  await expect(page.locator("[data-recovery-status]")).toContainText("Projekt-Envelope erstellt", { ignoreCase: true });
+  const envelopeStatus = await page.locator("[data-recovery-status]").textContent();
+  const envelopeId = envelopeStatus?.match(/project-envelope-\d{8}T\d{6}Z-[0-9a-f-]+\.pwenvelope/)?.[0];
+  expect(envelopeId).toBeTruthy();
+
+  await recordItem(page, alpha).getByRole("button", { name: "Bearbeiten" }).click();
+  await currentRecordInput(page).fill(beta);
+  await page.locator("[data-record-form]").getByRole("button", { name: "Änderungen speichern" }).click();
+  await expect(recordItem(page, beta)).toHaveCount(1);
+
+  await page.locator("[data-pro-category-name]").fill(categoryAfter);
+  await page.locator("[data-action='create-category']").click();
+  await page.locator("[data-action='refresh-pro']").click();
+  const libraryAfter = page.locator("[data-pro-template-library] [data-pro-template-id]", { hasText: templateName });
+  await libraryAfter.locator("[data-pro-template-category]").selectOption({ label: categoryAfter });
+  await expect(page.locator("[data-data-studio-pro-status]")).toContainText("zugewiesen", { ignoreCase: true });
+
+  const envelopeItem = page.locator("[data-envelope-list] .data-studio-record-item", { hasText: envelopeId });
+  await expect(envelopeItem).toHaveCount(1);
+  await envelopeItem.getByRole("button", { name: "Vorschau" }).click();
+  await expect(page.locator("[data-envelope-preview]")).toContainText(envelopeId);
+  await expect(page.locator("[data-envelope-preview]")).toContainText("Project Data: gültig");
+  await expect(page.locator("[data-envelope-preview]")).toContainText("Data Studio PRO: gültig");
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator("[data-action='confirm-envelope-restore']").click();
+  await expect(page.locator("[data-recovery-status]")).toContainText("Projekt-Envelope wiederhergestellt", { ignoreCase: true });
+  await expect(page.locator("[data-envelope-journal]")).toContainText("kein offener", { ignoreCase: true });
+
+  await page.reload();
+  await waitForModules(page);
+  await selectTemplate(page, templateName);
+  await expect(recordItem(page, alpha)).toHaveCount(1);
+  await expect(recordItem(page, beta)).toHaveCount(0);
+  await expect(page.locator("[data-pro-category-list]", { hasText: categoryBefore })).toHaveCount(1);
+  await expect(page.locator("[data-pro-category-list]", { hasText: categoryAfter })).toHaveCount(0);
+  await screenshot(page, suffix, "08-recovery-envelope-restored.png");
+});
+
 test("HTML-Mirror bildet die echte UI geometrisch proportional ab und erzeugt Screenshot-Evidenz", async ({ page }, testInfo) => {
   await page.goto("/tests/browser/ui-mirror.html");
 
