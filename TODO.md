@@ -99,10 +99,11 @@ Pull Request: `#83`
 
 - [x] Node 20 Core Quality Gate grün.
 - [x] Node 24 Core Quality Gate grün.
-- [x] paketfreier Core-Stand: 35 JavaScript-Dateien gelintet, 94 Projektdateien geprüft, 85/85 Node-Tests erfolgreich.
+- [x] finaler Core-Stand: 35 JavaScript-Dateien gelintet, 94 Projektdateien geprüft, 87/87 Node-Tests erfolgreich.
 - [x] Chromium: 2/2 echte Browserprüfungen erfolgreich.
 - [x] HTML-Mirror: PASS, 1366 × 900 intern, Faktor 0,5, Schlüsselgeometrie identisch.
 - [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
+- [x] Browser-Abnahmeartefakt `9474652501`, SHA-256 `5006875f74dfe91d2fb1c752bc70f540b1573a2170446e260aaba70d124e945c`.
 - [ ] finalen Dokumentationsstand erneut durch Core- und Chromium-Gate prüfen.
 - [ ] finalen Diff gegen `main` prüfen.
 - [ ] PR #83 auf ready for review setzen und kontrolliert squash-mergen.
