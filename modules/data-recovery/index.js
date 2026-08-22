@@ -3,6 +3,7 @@
 
   const MODULE_ID = "data-recovery";
   const API_ROOT = "/api/provoware/project-data/recovery";
+  const LEGACY_BACKUP_LABEL = "Legacy `.pwbak` · 0.4.1";
 
   let root = null;
   let listenersAbort = null;
@@ -404,7 +405,7 @@
         </section>
         <section class="data-studio-card" aria-labelledby="recovery-backup-title">
           <div class="data-studio-card-header">
-            <h4 id="recovery-backup-title">Legacy `.pwbak` · 0.4.1</h4>
+            <h4 id="recovery-backup-title">${LEGACY_BACKUP_LABEL}</h4>
           </div>
           <div class="data-studio-record-list" data-backup-list></div>
           <h4>Legacy-Restore-Vorschau</h4>
