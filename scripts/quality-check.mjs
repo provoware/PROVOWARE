@@ -21,6 +21,7 @@ const TEXT_EXTENSIONS = new Set([
 const TEXT_FILENAMES = new Set([".editorconfig", ".gitignore"]);
 const IGNORED_DIRECTORIES = new Set([".git", "node_modules"]);
 const IGNORED_RUNTIME_FILES = new Set(["data/project-data.json"]);
+const IGNORED_RUNTIME_PREFIXES = ["data/backups/project-data/"];
 const errors = [];
 const fixes = [];
 
@@ -38,7 +39,9 @@ const exists = async (filePath) => {
 
 const ignoredRuntimeFile = (filePath) => {
   const item = relative(filePath);
-  return IGNORED_RUNTIME_FILES.has(item) || item.startsWith("data/project-data.json.tmp-");
+  return IGNORED_RUNTIME_FILES.has(item)
+    || item.startsWith("data/project-data.json.tmp-")
+    || IGNORED_RUNTIME_PREFIXES.some((prefix) => item.startsWith(prefix));
 };
 
 const walk = async (directory) => {
@@ -117,8 +120,10 @@ const checkRequiredFiles = async () => {
     "modules/registry.js",
     "modules/development-notes/index.js",
     "modules/data-studio/index.js",
+    "modules/data-recovery/index.js",
     "scripts/start.mjs",
     "scripts/project-data-service.mjs",
+    "scripts/project-data-recovery.mjs",
     "scripts/project-lint.mjs",
     "start.cmd",
     "start.sh",
@@ -128,12 +133,18 @@ const checkRequiredFiles = async () => {
     "tests/workspace-ui.test.mjs",
     "tests/project-data-service.test.mjs",
     "tests/project-data-api.test.mjs",
+    "tests/project-data-recovery.test.mjs",
+    "tests/project-data-recovery-api.test.mjs",
+    "tests/project-data-recovery-ui.test.mjs",
     "tests/project-lint.test.mjs",
     "data/ENTWICKLUNGSNOTIZEN.txt",
     "data/.gitignore",
     "docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md",
     "docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md",
     "docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md",
+    "docs/PLAN_0.4.1_RECOVERY_MIGRATION.md",
+    "docs/CHECKPOINT_0.4.1_RECOVERY_MIGRATION.md",
+    "docs/CHECKLIST_0.4.1_RECOVERY_MIGRATION.md",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -178,6 +189,15 @@ const checkVersion = async () => {
   }
   if (!version.entrypoint || !(await exists(path.join(ROOT, version.entrypoint)))) {
     fail(`VERSION.json: Einstiegspunkt fehlt oder existiert nicht (${version.entrypoint || "leer"}).`);
+  }
+  if (version.project_data_schema_version !== "1") {
+    fail("VERSION.json: Project-Data-Produktionsschema muss in 0.4.1 weiterhin '1' sein.");
+  }
+  if (version.project_data_backup_store !== "data/backups/project-data/*.pwbak") {
+    fail("VERSION.json: Recovery-Backup-Pfad muss auf *.pwbak zeigen.");
+  }
+  if (version.project_data_backup_limit !== 10) {
+    fail("VERSION.json: Recovery-Backup-Limit muss 10 sein.");
   }
 };
 
@@ -371,23 +391,29 @@ const checkRegistry = async () => {
 const checkProjectDataContract = async () => {
   const catalog = await registryCatalogLesen();
   const byId = new Map(catalog.map((manifest) => [manifest.id, manifest]));
-  for (const id of ["development-notes", "data-studio"]) {
+  const requiredModules = new Map([
+    ["development-notes", "0.4.0"],
+    ["data-studio", "0.4.0"],
+    ["data-recovery", "0.4.1"],
+  ]);
+
+  for (const [id, expectedVersion] of requiredModules) {
     const manifest = byId.get(id);
     if (!manifest) {
-      fail(`Project Data Studio: Pflichtmodul '${id}' fehlt im Katalog.`);
+      fail(`Project Data: Pflichtmodul '${id}' fehlt im Katalog.`);
       continue;
     }
     if (manifest.enabledByDefault !== true) {
-      fail(`Project Data Studio: Pflichtmodul '${id}' muss standardmäßig aktiv sein.`);
+      fail(`Project Data: Pflichtmodul '${id}' muss standardmäßig aktiv sein.`);
     }
-    if (manifest.version !== "0.4.0") {
-      fail(`Project Data Studio: Modul '${id}' muss Entwicklungsstand 0.4.0 tragen.`);
+    if (manifest.version !== expectedVersion) {
+      fail(`Project Data: Modul '${id}' muss Entwicklungsstand ${expectedVersion} tragen.`);
     }
   }
 
   const html = await readFile(path.join(ROOT, "index.html"), "utf8");
   if (!html.includes('href="assets/project-data.css"')) {
-    fail("index.html: Styles für Project Data Studio fehlen.");
+    fail("index.html: Styles für Project Data fehlen.");
   }
 
   const ignore = await readFile(path.join(ROOT, "data/.gitignore"), "utf8");
@@ -397,6 +423,9 @@ const checkProjectDataContract = async () => {
   }
   if (!ignoreLines.includes("project-data.json.tmp-*")) {
     fail("data/.gitignore: temporäre atomare Datenbankdateien müssen aus Git ausgeschlossen bleiben.");
+  }
+  if (!ignoreLines.includes("backups/")) {
+    fail("data/.gitignore: Recovery-Backups müssen vollständig aus Git ausgeschlossen bleiben.");
   }
 
   const packageJson = await readJson("package.json");
