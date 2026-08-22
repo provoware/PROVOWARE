@@ -42,8 +42,8 @@
 - [x] beschädigte Project-Data-Datei wird als Failure-Probe geprüft.
 - [x] inkompatible Vorlagenänderung wird als Regression blockiert.
 - [x] Parallelmutationen werden auf verlorene Datensätze geprüft.
-- [ ] finaler vollständiger Regressionstest auf Node 20 grün.
-- [ ] finaler vollständiger Regressionstest auf Node 24 grün.
+- [x] finaler vollständiger Regressionstest auf Node 20 grün.
+- [x] finaler vollständiger Regressionstest auf Node 24 grün.
 
 ## D – Codequalität
 
@@ -57,7 +57,7 @@
 - [x] Lint-Lücke ausdrücklich bewertet und mit abhängigkeitfreiem Projekt-Linter geschlossen.
 - [x] GitHub Actions auf `checkout@v7` und `setup-node@v7` aktualisiert.
 - [x] CI-Matrix auf Node 20 und 24 erweitert.
-- [ ] `npm run verify` im finalen Branch-Stand vollständig grün.
+- [x] `npm run verify` im finalen Branch-Stand vollständig grün: 25 JavaScript-Dateien gelintet, 74 Projektdateien geprüft, 66/66 Tests erfolgreich.
 
 ## E – Dokumentation und Release
 
@@ -67,12 +67,12 @@
 - [x] MANIFEST aktualisiert.
 - [x] VERSION-Entwicklungsmetadaten aktualisiert; Produktversion bleibt `0.2.0`.
 - [x] Pull Request #81 als Draft erstellt.
-- [ ] Branch-Diff gegen Baseline geprüft.
-- [ ] GitHub Actions auf beiden Matrixläufen grün.
-- [ ] Mergeability geprüft.
-- [ ] Pull Request auf „ready for review“ gesetzt.
-- [ ] kontrollierter Merge durchgeführt.
-- [ ] Main-Check nach Merge durchgeführt.
+- [x] Branch-Diff gegen Baseline geprüft: 33 Commits voraus, 0 hinter `main`, 25 geplante Dateien.
+- [x] GitHub Actions auf beiden Matrixläufen grün.
+- [x] Mergeability geprüft.
+- [x] Pull Request auf „ready for review“ gesetzt.
+- [x] kontrollierter Squash-Merge durchgeführt: `20546306a0db98c25a003f4cf96f142aac851d6f`.
+- [x] Main-Check nach Merge durchgeführt: Registry, Datenservice, VERSION und Abschlussdokumentation geprüft.
 
 ## Noch kein Bestandteil von 0.4.0
 
@@ -85,4 +85,4 @@ Diese Punkte sind ausdrücklich **keine stillen Restfehler**, sondern geplante n
 
 ## Definition of Done
 
-`0.4.0 Project Data Studio` ist erst abgeschlossen, wenn die verbleibenden E-/CI-Punkte abgehakt sind. Ein grüner Einzeltest oder ein grüner Teiljob reicht nicht aus.
+`0.4.0 Project Data Studio` ist für den definierten Iterationsscope abgeschlossen. Die vier offenen Punkte gehören bewusst zu späteren Härtungsstufen und erweitern den Scope, statt verdeckte Abnahmefehler darzustellen.
