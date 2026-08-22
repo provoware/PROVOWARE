@@ -155,11 +155,13 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [x] automatische CSS-Vertrags- und Ladereihenfolge-Prüfung ergänzen.
 - [x] noch keinen Resize-Griff, keine Pointerlogik und kein Drag & Drop einführen.
 - [x] D2-Patchmanifest `docs/MANIFEST_0.3.0_D_DOM.md` anlegen.
-- [ ] vollständigen D2-Diff gegen aktuellen `main` prüfen.
-- [ ] Branch beim finalen Diff-Check 0 Commits hinter `main` bestätigen.
-- [ ] GitHub Quality Gate vollständig grün abschließen.
-- [ ] PR als mergebar prüfen und D2 per Squash mergen.
-- [ ] `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
+- [x] vollständigen D2-Diff gegen aktuellen `main` prüfen; 11 geplante Dateien.
+- [x] Branch beim finalen Diff-Check 0 Commits hinter `main` bestätigt.
+- [x] GitHub Quality Gate vollständig grün: 51 Dateien geprüft, 36/36 Tests erfolgreich, 0 fehlgeschlagen.
+- [x] PR #76 als mergebar geprüft und D2 per Squash gemergt.
+- [x] `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css` und `VERSION.json` nach Merge auf `main` stichproartig nachgeprüft.
+
+0.3.0-D2-Merge: `249df54ec13fa632f74400897dd3d83da3332bcb`
 
 ##### D3 – Resize-Griff + Eingabesteuerung
 

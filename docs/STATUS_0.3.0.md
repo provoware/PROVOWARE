@@ -2,9 +2,9 @@
 
 ## Aktueller Stand
 
-`0.3.0-A – Workspace-Vertrag`, `0.3.0-B – State Foundation & Autosave/Reset`, `0.3.0-C – Visibility Controls + kompakte Menüleiste` sowie `0.3.0-D1 – State-API + reine Größenberechnung` sind abgeschlossen.
+`0.3.0-A – Workspace-Vertrag`, `0.3.0-B – State Foundation & Autosave/Reset`, `0.3.0-C – Visibility Controls + kompakte Menüleiste`, `0.3.0-D1 – State-API + reine Größenberechnung` und **`0.3.0-D2 – DOM-Anwendung gespeicherter Größen`** sind abgeschlossen.
 
-`0.3.0-D2 – DOM-Anwendung gespeicherter Größen` ist technisch implementiert und befindet sich in der Abschlussvalidierung. Es gibt weiterhin **keinen Resize-Griff und keine Pointer-/Tastaturbedienung**.
+Es gibt weiterhin **keinen Resize-Griff und keine Pointer-/Tastaturbedienung**. Diese Eingabeschicht beginnt erst in D3.
 
 Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. Die interne Entwicklungsphase lautet `0.3.0-D Resize DOM Application`.
 
@@ -78,17 +78,17 @@ Reale D1-Abnahme:
 
 ### Ziel
 
-Bereits gespeicherte Größen sichtbar machen, ohne schon eine neue Bedienmechanik einzuführen.
+Bereits gespeicherte Größen sichtbar machen, ohne eine neue Bedienmechanik einzuführen.
 
-### Bestätigte Option A
-
-JavaScript setzt nur Darstellungswerte als CSS-Variablen. CSS entscheidet über `grid-column` und `height`.
+### Umgesetzte Architektur
 
 Verbindliche Kette:
 
 ```text
 Workspace-State -> workspace-ui.js -> CSS-Variablen -> workspace-layout.css -> Panel
 ```
+
+JavaScript überträgt Werte. CSS entscheidet über die Darstellung.
 
 ### Implementiert
 
@@ -97,11 +97,11 @@ Workspace-State -> workspace-ui.js -> CSS-Variablen -> workspace-layout.css -> P
 - `heightPx: null` entfernt die Inline-Höhenvariable und stellt automatische Höhe wieder her.
 - bei ungültiger Breite werden Breitenvariable und technischer Bereitschaftsmarker entfernt.
 - der nicht persistente Marker `data-workspace-size-ready="true"` verhindert, dass das neue Overlay ohne gültige Größenübergabe die bisherige Basisdarstellung verdrängt.
-- neue Datei `assets/workspace-layout.css` enthält ausschließlich den Desktopvertrag ab 981 px.
-- `assets/styles.css` bleibt vollständig unverändert.
+- `assets/workspace-layout.css` enthält ausschließlich den Desktopvertrag ab 981 px.
+- `assets/styles.css` blieb vollständig unverändert.
 - Tablet- und Mobilansichten verwenden weiterhin ausschließlich die bereits vorhandenen responsive Regeln.
-- `index.html` lädt das neue lokale Stylesheet direkt nach der Basis-CSS; Script-Reihenfolge bleibt unverändert.
-- `tests/workspace-ui.test.mjs` prüft jetzt auch Breite, Höhe, Auto-Höhe, Zustandsunveränderlichkeit, ungültigen Fallback, CSS-Vertrag und Stylesheet-Reihenfolge.
+- `index.html` lädt das neue lokale Stylesheet direkt nach der Basis-CSS; Script-Reihenfolge blieb unverändert.
+- `tests/workspace-ui.test.mjs` prüft Breite, Höhe, Auto-Höhe, Zustandsunveränderlichkeit, ungültigen Fallback, CSS-Vertrag und Stylesheet-Reihenfolge.
 
 ### Bewusst nicht enthalten
 
@@ -114,6 +114,21 @@ Workspace-State -> workspace-ui.js -> CSS-Variablen -> workspace-layout.css -> P
 - keine neue Workspace-State-API
 - keine Datenmigration
 - keine neue Bibliothek
+
+## Reale D2-Abnahme
+
+- technische Baseline: `5542f90edb6b2079ef4e55f5e217f3b0e05422c4`
+- technischer Pull Request: `#76`
+- geänderte Dateien im PR: `11`
+- Branch beim finalen Diff-Check: `0` Commits hinter `main`
+- PR vor Merge: mergebar
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `51` Dateien erfolgreich geprüft
+- automatische Tests: `36/36` erfolgreich
+- fehlgeschlagene Tests: `0`
+- Projektprüfung: Node `20.20.2`
+- Squash-Merge: `249df54ec13fa632f74400897dd3d83da3332bcb`
+- Main-Stichprobe erfolgreich: `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css`, `VERSION.json`
 
 ## D2-Änderungsvolumen
 
@@ -145,27 +160,17 @@ Nicht betroffen:
 - Netzwerk
 - persistentes Workspace-Schema
 
-## D2-Abschlussvalidierung
+## Offene technische Grenze
 
-Noch offen bis zum Merge:
+Die automatischen Prüfungen decken Struktur, Zustandslogik und DOM-/CSS-Vertrag ab. Eine echte interaktive Firefox-/Chrome-Abnahme wurde in D2 noch nicht durchgeführt und bleibt Bestandteil des späteren Release Gates 0.3.0-G.
 
-- vollständiger Diff gegen aktuellen `main`
-- Branch 0 Commits hinter `main`
-- GitHub Quality Gate erfolgreich
-- alle neuen und bestehenden Tests erfolgreich
-- PR mergebar
-- technischer Squash-Merge
-- Main-Stichprobe der zentralen D2-Dateien
-
-## Technischer Hinweis
-
-Der bekannte nicht blockierende GitHub-Actions-Hinweis zur internen Node-20-Laufzeit der verwendeten Actions bleibt von D2 getrennt. Die Workflow-Hygiene wird spätestens in 0.3.0-G behandelt.
+Der bekannte nicht blockierende GitHub-Actions-Hinweis zur internen Node-20-Laufzeit der verwendeten Actions bleibt ebenfalls getrennt und wird spätestens in 0.3.0-G behandelt.
 
 ## Nächste zwei Schritte
 
-1. **0.3.0-D3 – Resize-Griff + Eingabe:** genau einen Griff pro Panel, Pointer Events für Maus/Touch/Stift, Tastaturbedienung, transiente Vorschau, ein Commit am Ende und sicherer Abbruch.
+1. **0.3.0-D3 – Resize-Griff + Eingabe:** genau einen Griff pro Panel und die Eingabeschicht auf der geprüften D1-/D2-Basis aufsetzen.
 2. **0.3.0-E – Reorder & Drag and Drop:** erst nach vollständig grüner D-Abnahme; Resize- und Drag-Griff bleiben technisch getrennt.
 
 ## Empfehlung
 
-D2 in dieser kleinen Grenze abschließen. Keine Pointer-/Resize-Eingabelogik mehr in denselben Patch aufnehmen.
+D3 erneut in einen kleinen, klar rücknehmbaren Eingabe-Patch teilen und die vorhandene State-, Berechnungs- und Darstellungslogik unverändert wiederverwenden.
