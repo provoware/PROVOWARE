@@ -39,11 +39,14 @@ test("Recovery-UI erzwingt Vorschau vor Legacy-Restore, Envelope-Restore und Imp
   assert.doesNotMatch(source, /localStorage|sessionStorage/);
 });
 
-test("Legacy-.pwbak-Label wird sicher interpoliert statt Backticks im innerHTML-Template auszuwerten", async () => {
+test("Legacy-.pwbak-Texte werden sicher interpoliert statt Backticks im innerHTML-Template auszuwerten", async () => {
   const source = await read("modules/data-recovery/index.js");
+  assert.match(source, /const LEGACY_BACKUP_FORMAT = "\.pwbak";/);
   assert.match(source, /const LEGACY_BACKUP_LABEL = "Legacy `\.pwbak` · 0\.4\.1";/);
   assert.match(source, /<h4 id="recovery-backup-title">\$\{LEGACY_BACKUP_LABEL\}<\/h4>/);
+  assert.match(source, /Legacy-Import und \$\{LEGACY_BACKUP_FORMAT\} bleiben Project-Data-only/);
   assert.doesNotMatch(source, /<h4 id="recovery-backup-title">Legacy `\.pwbak`/);
+  assert.doesNotMatch(source, /Legacy-Import und `\.pwbak` bleiben/);
 });
 
 test("Recovery-UI zeigt Envelope-Journalstatus und degradiert bei file:// kontrolliert", async () => {
