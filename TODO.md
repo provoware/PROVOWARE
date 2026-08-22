@@ -164,7 +164,7 @@ PR `#84` · Squash-Merge `d22a4ba51a970966b8f0242186094fb894e14356`
 - [ ] SQLite-Adapter – nur bei nachgewiesenem Bedarf.
 - [ ] gemeinsame Recovery-Hülle für `project-data.json` + `data-studio-pro.json` – eigener versionierter Folgeschritt.
 
-## Nächster Qualitätsstrang – 0.4.3 Persistence Portability Foundation
+## Nächster Qualitätsstrang – 0.4.2-H1 Persistence Portability Foundation
 
 Ziel: **eine** belastbare, plattformneutrale Persistenzbasis schaffen, bevor der gemeinsame Recovery Envelope mehrere Live-Dateien transaktional ersetzen muss.
 
@@ -177,7 +177,7 @@ Ziel: **eine** belastbare, plattformneutrale Persistenzbasis schaffen, bevor der
 - [ ] bestehenden Node-20/24-Core-Gate und Chromium-E2E unverändert grün halten.
 - [ ] Windows-Browser-E2E erst aktivieren, wenn das Dateisystem-Gate stabil ist.
 
-## Danach – 0.4.4 Recovery Envelope
+## Danach – 0.4.3 Recovery Envelope
 
 Ziel: Project Data und PRO-Metadaten gemeinsam sichern, ohne das bestehende `.pwbak`-Format still umzudeuten.
 
@@ -186,7 +186,7 @@ Ziel: Project Data und PRO-Metadaten gemeinsam sichern, ohne das bestehende `.pw
 - [ ] fehlende oder beschädigte Komponenten als Zustand dokumentieren statt still zu normalisieren.
 - [ ] bestehende `.pwbak`-Backups weiterhin lesbar halten.
 - [ ] Restore-Vorschau auf Envelope-Ebene mit Komponentenstatus und Prüfsummen aufbauen.
-- [ ] Multi-Datei-Restore mit Journal/Rollback auf der 0.4.3-Persistenzbasis implementieren.
+- [ ] Multi-Datei-Restore mit Journal/Rollback auf der 0.4.2-H1-Persistenzbasis implementieren.
 - [ ] Crash-/Failure-Injection zwischen den Komponenten ausführen und vollständige Wiederanlaufstrategie nachweisen.
 
 ## Danach – 0.5.0 Diagnose Foundation PRO
