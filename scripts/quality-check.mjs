@@ -19,7 +19,14 @@ const TEXT_EXTENSIONS = new Set([
   ".yaml",
 ]);
 const TEXT_FILENAMES = new Set([".editorconfig", ".gitignore"]);
-const IGNORED_DIRECTORIES = new Set([".git", "node_modules"]);
+const IGNORED_DIRECTORIES = new Set([
+  ".git",
+  ".tmp",
+  "artifacts",
+  "node_modules",
+  "playwright-report",
+  "test-results",
+]);
 const IGNORED_RUNTIME_FILES = new Set(["data/project-data.json"]);
 const IGNORED_RUNTIME_PREFIXES = ["data/backups/project-data/"];
 const errors = [];
@@ -111,6 +118,8 @@ const readJson = async (relativePath) => {
 const checkRequiredFiles = async () => {
   const required = [
     "index.html",
+    ".gitignore",
+    ".github/workflows/browser-e2e.yml",
     "assets/app.js",
     "assets/module-registry.js",
     "assets/workspace-state.js",
@@ -122,6 +131,7 @@ const checkRequiredFiles = async () => {
     "modules/data-studio/index.js",
     "modules/data-recovery/index.js",
     "scripts/start.mjs",
+    "scripts/browser-e2e-server.mjs",
     "scripts/project-data-service.mjs",
     "scripts/project-data-recovery.mjs",
     "scripts/project-lint.mjs",
@@ -137,6 +147,12 @@ const checkRequiredFiles = async () => {
     "tests/project-data-recovery-api.test.mjs",
     "tests/project-data-recovery-ui.test.mjs",
     "tests/project-lint.test.mjs",
+    "tests/browser-e2e-contract.test.mjs",
+    "tests/browser/playwright.config.mjs",
+    "tests/browser/project-data.e2e.spec.mjs",
+    "tests/browser/ui-mirror.html",
+    "tests/browser/ui-mirror.css",
+    "tests/browser/ui-mirror.js",
     "data/ENTWICKLUNGSNOTIZEN.txt",
     "data/.gitignore",
     "docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md",
@@ -257,7 +273,6 @@ const workspaceDefinitionenLesen = async () => {
     fail(`assets/workspace-state.js: Vertrag konnte nicht ausgewertet werden (${error.message}).`);
     return [];
   }
-
   return sandbox.window.PROVOWARE_WORKSPACE?.PANEL_DEFINITIONEN || [];
 };
 
@@ -437,6 +452,48 @@ const checkProjectDataContract = async () => {
   }
 };
 
+const checkBrowserE2EContract = async () => {
+  const packageJson = await readJson("package.json");
+  if (!packageJson) return;
+
+  const chromiumCommand = "playwright test --config=tests/browser/playwright.config.mjs --project=chromium";
+  if (packageJson.scripts?.["test:e2e"] !== chromiumCommand) {
+    fail("package.json: test:e2e muss Chromium als primären Browser verwenden.");
+  }
+  if (packageJson.scripts?.["test:e2e:chromium"] !== chromiumCommand) {
+    fail("package.json: expliziter Chromium-E2E-Befehl fehlt oder weicht ab.");
+  }
+  if (!String(packageJson.scripts?.["test:e2e:firefox"] || "").endsWith("--project=firefox")) {
+    fail("package.json: Firefox muss als separater alternativer E2E-Lauf verfügbar bleiben.");
+  }
+  if (packageJson.devDependencies?.["@playwright/test"] !== "1.62.1") {
+    fail("package.json: Browser-E2E muss die geprüfte Playwright-Version 1.62.1 exakt pinnen.");
+  }
+
+  const workflow = await readFile(path.join(ROOT, ".github/workflows/browser-e2e.yml"), "utf8");
+  if (!workflow.includes("npm run test:e2e:chromium")) {
+    fail("Browser-E2E-Workflow: automatischer Chromium-Lauf fehlt.");
+  }
+  if (!workflow.includes("github.event_name == 'workflow_dispatch' && inputs.firefox == true")) {
+    fail("Browser-E2E-Workflow: Firefox darf nur als alternativer manueller Lauf aktiviert werden.");
+  }
+  if (!workflow.includes("actions/upload-artifact@v7")) {
+    fail("Browser-E2E-Workflow: Screenshot-/Report-Evidenz muss als Artefakt hochgeladen werden.");
+  }
+
+  const mirror = await readFile(path.join(ROOT, "tests/browser/ui-mirror.html"), "utf8");
+  if ((mirror.match(/src="\/index\.html\?ui-mirror=/g) || []).length !== 2) {
+    fail("UI-Mirror: Quelle und Spiegel müssen beide die echte index.html laden.");
+  }
+
+  const rootIgnore = await readFile(path.join(ROOT, ".gitignore"), "utf8");
+  for (const required of ["node_modules/", "playwright-report/", "test-results/", "artifacts/browser-e2e/"]) {
+    if (!rootIgnore.split(/\r?\n/).includes(required)) {
+      fail(`.gitignore: Browser-Testartefakt '${required}' muss ausgeschlossen bleiben.`);
+    }
+  }
+};
+
 const main = async () => {
   const files = await walk(ROOT);
   await enforceFormatting(files);
@@ -449,6 +506,7 @@ const main = async () => {
   await checkWorkspaceLayout();
   await checkRegistry();
   await checkProjectDataContract();
+  await checkBrowserE2EContract();
 
   if (fixes.length) {
     console.log(`AUTO-FIX: ${fixes.length} Datei(en) sicher normalisiert:`);
