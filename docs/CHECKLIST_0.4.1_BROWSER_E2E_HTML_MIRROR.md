@@ -43,13 +43,15 @@
 - [x] automatischen Chromium-Workflow für PR und `main` definieren.
 - [x] Firefox nur über optionalen Workflow-Dispatch definieren.
 - [x] Screenshot-/Export-/Report-Artefakte hochladen.
-- [x] Core Quality Gate Node 20 grün.
-- [x] Core Quality Gate Node 24 grün.
-- [x] Chromium-Browser-E2E grün: 2/2 echte Browserprüfungen bestanden.
-- [x] Browser-Evidenzartefakt `9474583341` vorhanden; SHA-256 `f2009e5b8c1ae992a8894fcb1d3d4d5bc41bd5aaa4e24fad0dd4747a6c8eff27`.
-- [x] sechs Screenshotdateien und JSON-Export aus dem Erfolgsartefakt entpackt und geprüft.
+- [x] finaler Core Quality Gate auf Node 20 grün.
+- [x] finaler Core Quality Gate auf Node 24 grün.
+- [x] finaler Core-Stand: 35 JavaScript-Dateien gelintet, 94 Projektdateien geprüft, 87/87 Node-Tests erfolgreich.
+- [x] finaler Chromium-Browser-E2E grün: 2/2 echte Browserprüfungen bestanden.
+- [x] finales Browser-Evidenzartefakt `9474686971`; SHA-256 `0ed384715c715ec78c9bfbabfc283e26f490fc7c83fa66f0355a60340118a8fe`.
+- [x] sechs Screenshotdateien und JSON-Export aus dem finalen Erfolgsartefakt entpackt und geprüft.
 - [x] Mirror-Evidenz bestätigt 1366 × 900 intern, Faktor 0,5, 683 × 450 visuell und identische Schlüsselgeometrie.
 - [x] erster echter Browserlauf deckte einen UI-Überlagerungsfehler auf; Container-Responsive-Reparatur anschließend im unveränderten E2E-Test grün validiert.
+- [x] Firefox im automatischen Abnahmelauf wie vorgesehen übersprungen.
 
 ## E – Dokumentation / Abschluss
 
@@ -57,14 +59,18 @@
 - [x] Checkpoint anlegen.
 - [x] Checkliste anlegen.
 - [x] README auf Chromium-first, Mirror, E2E-Befehle und reale Evidenz aktualisieren.
-- [x] TODO auf aktuellen Qualitätsstrang und Cross-OS-Folgeschritt aktualisieren.
+- [x] TODO auf Chromium-first-E2E und Cross-OS-Folgeschritt aktualisieren.
 - [x] CHANGELOG mit E2E-Strang ergänzen und bestehende Historie erhalten.
 - [x] MANIFEST um Browser-, Mirror-, Isolierungs- und Evidenzvertrag erweitern.
 - [x] VERSION-Entwicklungsphase aktualisieren; Produktversion bleibt 0.2.0 und Datenschema v1.
 - [x] E2E-Metadaten und Container-Responsive-Reparatur zusätzlich mit paketfreien Node-Vertragstests absichern.
-- [ ] finalen Dokumentationsstand auf Node 20 und Node 24 grün prüfen.
-- [ ] finalen Dokumentationsstand im Chromium-Browser-Gate grün prüfen.
-- [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR auf ready for review setzen.
-- [ ] Squash-Merge durchführen.
-- [ ] `main` nach Merge prüfen.
+- [x] finalen Dokumentationsstand auf Node 20 und Node 24 grün geprüft.
+- [x] finalen Dokumentationsstand im Chromium-Browser-Gate grün geprüft.
+- [x] finalen Diff gegen `main` geprüft: 26 Commits voraus, 0 hinter, 20 begründete Dateien.
+- [x] PR #83 auf ready for review gesetzt.
+- [x] PR #83 per Squash gemergt: `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`.
+- [x] `main` auf Merge-SHA, VERSION, Browserworkflow, Mirror und container-responsiven UI-Fix geprüft.
+
+## Definition of Done
+
+0.4.1-E2E ist vollständig abgeschlossen. Chromium ist der automatische Primärbrowser, Firefox bleibt optionaler Alternativlauf, die HTML-Mirror-Pipeline ist prüf- und screenshotfähig, und der reale Browserpfad hat bereits einen UI-Fehler gefunden, dessen Reparatur im unveränderten E2E-Test bestätigt wurde.
