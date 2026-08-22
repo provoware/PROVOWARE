@@ -24,17 +24,19 @@ test("Browser-E2E ist Chromium-first und Firefox bleibt alternativer Lauf", asyn
   assert.match(workflow, /inputs\.firefox == true/);
 });
 
-test("E2E-Metadaten halten Chromium, Firefox und Mirror-Maße kanonisch fest", async () => {
+test("E2E-Metadaten halten Chromium, Firefox, Mirror und Data-Studio-PRO-Vertrag kanonisch fest", async () => {
   const version = JSON.parse(await read("VERSION.json"));
   assert.equal(version.version, "0.2.0");
   assert.equal(version.project_data_schema_version, "1");
+  assert.equal(version.data_studio_pro_schema_version, "1");
+  assert.equal(version.data_studio_pro_store, "data/data-studio-pro.json");
   assert.equal(version.browser_e2e_primary, "chromium");
   assert.equal(version.browser_e2e_alternative, "firefox");
   assert.equal(version.ui_mirror_layout_viewport, "1366x900");
   assert.equal(version.ui_mirror_scale, 0.5);
 });
 
-test("HTML-Mirror verwendet zweimal dieselbe echte UI und skaliert nur die zweite Darstellung", async () => {
+test("HTML-Mirror verwendet zweimal dieselbe echte UI, wartet auf PRO und skaliert nur die zweite Darstellung", async () => {
   const html = await read("tests/browser/ui-mirror.html");
   const css = await read("tests/browser/ui-mirror.css");
   const js = await read("tests/browser/ui-mirror.js");
@@ -45,6 +47,8 @@ test("HTML-Mirror verwendet zweimal dieselbe echte UI und skaliert nur die zweit
   assert.match(css, /--mirror-scale: 0\.5/);
   assert.match(css, /#mirror-scaled[\s\S]*transform: scale\(var\(--mirror-scale\)\)/);
   assert.match(css, /transform-origin: top left/);
+  assert.match(js, /\.data-studio-pro/);
+  assert.match(js, /data-data-studio-pro-status/);
   assert.match(js, /keyGeometryIdentical/);
   assert.match(js, /sameGeometry\(sourceGeometry, scaledGeometry\)/);
   assert.match(js, /provoware:mirror-ready/);
