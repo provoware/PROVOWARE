@@ -14,36 +14,100 @@ Freigegebene Produktversion bleibt während dieser Teilstufe `0.2.0`.
 
 Workspace-Vertragsversion: `1`.
 
-## Geplante Laufzeitänderungen
+## Laufzeitänderungen
 
-- `index.html`
-  - feste Schnellstarter-/Menüleiste unter dem oberen Bereich
-  - permanenter `Layout`-Schalter außerhalb des Workspace
-  - Layout-Menü mit fünf Panels
-  - `Alle anzeigen`
-  - `Standardlayout wiederherstellen`
-  - Live-Status
-  - stabile `data-workspace-panel`-Zuordnung
-- `assets/styles.css`
-  - kompakte Leiste
-  - fester Primärbereich für `Layout`
-  - sekundärer Bereich darf horizontal überlaufen
-  - Layout-Menü und Fokuszustände
-- `assets/workspace-state.js`
-  - kleine zentrale Methoden für Panel-Sichtbarkeit und `Alle anzeigen`
-- `assets/workspace-ui.js`
-  - neue entkoppelte DOM-/Bedienlogik ohne eigene Persistenz
-- `assets/app.js`
-  - UI-Controller mit bestehendem Logger verbinden und initialisieren
+### `index.html`
+
+- feste Schnellstarter-/Menüleiste unter dem oberen Bereich
+- permanenter `Layout`-Schalter außerhalb des Workspace
+- Layout-Menü mit fünf Kernpanels
+- `Alle anzeigen`
+- `Standardlayout wiederherstellen`
+- sichtbarer Live-Status
+- stabile `data-workspace-panel`-Zuordnung
+- Layout-Schalter verwenden dieselben IDs über `data-layout-panel`
+- `assets/workspace-ui.js` wird zwischen Workspace-State und App geladen
+
+### `assets/styles.css`
+
+- kompakte, sticky Schnellstarterleiste
+- fester Primärbereich für `Layout`
+- horizontal scrollbarer sekundärer Statusbereich
+- modernes Layout-Menü
+- Fokusdarstellung für Kontrollfelder
+- versteckte Panels werden sicher aus dem Grid entfernt
+- mobile Option A ohne separate Zweitnavigation
+
+### `assets/workspace-state.js`
+
+Neue zentrale Methoden:
+
+- `panelSichtbarkeitSetzen(id, sichtbar)`
+- `allePanelsAnzeigen()`
+
+Eigenschaften:
+
+- unbekannte Panel-ID wird vor Zustandsänderung abgelehnt
+- keine Änderung, wenn der Zielwert bereits gilt
+- Reihenfolge, Breite und Höhe bleiben erhalten
+- Speicherung läuft weiterhin ausschließlich über `zustandSetzen()`/`zustandSpeichern()`
+
+### `assets/workspace-ui.js`
+
+Neue entkoppelte Bedienlogik ohne eigene Persistenz:
+
+- Workspace-Zustand auf DOM anwenden
+- Kontrollfelder synchron halten
+- Layout-Menü öffnen/schließen
+- einzelne Panel-Sichtbarkeit ausführen
+- `Alle anzeigen`
+- Standardlayout wiederherstellen
+- verständliches Nutzerfeedback
+- `Escape` schließt Menü und setzt Fokus auf `Layout`
+- Klick außerhalb schließt das Menü kontrolliert
+- Fehler führen auf den letzten gültigen Workspace-Zustand zurück
+
+### `assets/app.js`
+
+- initialisiert zuerst Workspace-State
+- verbindet danach Workspace-UI mit derselben Workspace-API und demselben Logger
+- keine zweite Zustands- oder Log-Infrastruktur
 
 ## Qualitätssicherung
 
-Geplant:
+### `tests/workspace-state.test.mjs`
 
-- Workspace-State-Tests um Sichtbarkeit erweitern
-- eigener kleiner Workspace-UI-Test
-- Quality Gate um neue Pflichtdatei, Script-Reihenfolge und statische Layout-Sicherheitsregeln erweitern
-- `npm run verify` bleibt einziger kanonischer Prüfaufruf
+Zusätzlich geprüft:
+
+- Aus-/Einblenden erhält Reihenfolge und Größenwerte
+- alle fünf Panels dürfen gleichzeitig ausgeblendet werden
+- `allePanelsAnzeigen()` stellt alle wieder sichtbar
+- unbekannte Panel-ID verändert keinen gültigen Zustand
+
+### `tests/workspace-ui.test.mjs`
+
+Neu geprüft:
+
+- gespeicherte Sichtbarkeit wird auf DOM und Kontrollfelder angewendet
+- Sichtbarkeitsschalter aktualisiert Zustand, DOM und Nutzerfeedback
+- `Alle anzeigen`
+- Standardlayout wiederherstellen
+- Layout-Menü öffnen
+- `Escape` schließen und Fokus zurückführen
+
+### `scripts/quality-check.mjs`
+
+Zusätzlich geprüft:
+
+- `assets/workspace-ui.js` ist Pflichtdatei
+- `tests/workspace-ui.test.mjs` ist Pflichtdatei
+- Script-Reihenfolge ist deterministisch
+- `data-workspace-panel` enthält exakt die Vertrags-IDs
+- `data-layout-panel` enthält exakt die Vertrags-IDs
+- Layout-Pflichtelemente sind vorhanden
+- `Layout` liegt statisch vor dem veränderbaren Workspace
+
+`npm run verify` bleibt der einzige kanonische Prüfaufruf.
 
 ## Datenhaltung
 
@@ -59,8 +123,24 @@ Mobile Option A:
 
 - Schnellstarterleiste bleibt kompakt und einzeilig
 - `Layout` bleibt immer sichtbar
-- nur sekundäre Inhalte dürfen bei Bedarf horizontal gescrollt werden
+- nur sekundäre Inhalte dürfen horizontal gescrollt werden
 - keine zweite unnötige Navigation
+
+## Dokumentation
+
+Betroffen:
+
+- `README.md`
+- `TODO.md`
+- `CHANGELOG.md`
+- `MANIFEST.md`
+- `LOGGING.md`
+- `PRO_DEBUGGING.md`
+- `VERSION.json`
+- `docs/PLAN_0.3.0_C.md`
+- `docs/DECISIONS_0.3.0.md`
+- `docs/STATUS_0.3.0.md`
+- dieses Patchmanifest
 
 ## Nicht Bestandteil
 
@@ -75,9 +155,11 @@ Mobile Option A:
 
 Einstufung: **mittel**.
 
-Betroffen sind feste Bedienzone, Panel-Sichtbarkeit, Workspace-UI-Anbindung, Tests und Dokumentation.
+Betroffen sind feste Bedienzone, Panel-Sichtbarkeit, Workspace-State-API, Workspace-UI-Anbindung, Tests, Quality Gate und Dokumentation.
 
 ## Validierung vor Merge
+
+Noch ausstehend:
 
 - vollständiger Diff gegen `main`
 - Branch 0 Commits hinter `main`
