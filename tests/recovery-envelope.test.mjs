@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -52,6 +52,7 @@ const proData = (revision, category = "") => ({
 const writeLive = async (root, project, pro) => {
   const projectPath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
   const proPath = path.join(root, DATA_STUDIO_PRO_RELATIVE_PATH);
+  await mkdir(path.dirname(projectPath), { recursive: true });
   await writeFile(projectPath, jsonSource(project), { encoding: "utf8", flag: "w" });
   await writeFile(proPath, jsonSource(pro), { encoding: "utf8", flag: "w" });
 };
@@ -200,6 +201,7 @@ test("fehlende oder beschädigte Komponenten werden gesichert, aber nicht als no
   const root = await temporaryRoot();
   try {
     const projectPath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
+    await mkdir(path.dirname(projectPath), { recursive: true });
     await writeFile(projectPath, "{kaputt", "utf8");
     const envelope = await createRecoveryEnvelope({ root, now: fixedNow, uuid: uuidSequence() });
     const preview = await previewRecoveryEnvelope(envelope.id, { root });
