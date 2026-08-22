@@ -8,9 +8,15 @@ Der Patch setzt **noch keine sichtbare Größenänderung** um. Er schafft nur di
 
 ## Baseline
 
+Ursprünglicher Branchstart:
+
 `a9b23b8d16e96142f35904a08315ca3f2f4495a0`
 
-Diese Baseline enthält bereits PR #72 mit den separat gemergten Erscheinungsbildänderungen.
+Während der Umsetzung wurde PR #73 parallel auf `main` gemergt. Vor der finalen Abnahme wurde der Branch kontrolliert mit folgendem `main` synchronisiert:
+
+`887ff10363662935c385e1f7e965e0eb75be5918`
+
+Die Quality-Gate-Härtung aus PR #73 bleibt dadurch vollständig erhalten.
 
 ## Produkt- und Vertragsstand
 
@@ -135,31 +141,42 @@ Schutz: Rastermetrik berücksichtigt `column-gap` ausdrücklich.
 
 Schutz: eigene symmetrische Rundung statt asymmetrischem Verhalten an negativen Halbwerten.
 
-### Designänderungen werden überschrieben
+### Parallele Änderungen auf `main` gehen verloren
 
-Schutz: Patch basiert auf aktuellem `main` nach PR #72 und ändert weder HTML noch CSS.
+Schutz: Der Branch wurde vor der finalen Abnahme mit PR #73 synchronisiert. `CHANGELOG.md` und `MANIFEST.md` wurden bewusst zusammengeführt statt überschrieben.
 
-## Validierung vor Merge
+## Reale Validierung
 
-Noch ausstehend:
+- Pull Request: `#74`
+- geänderte Dateien: `11`
+- finaler Branch: `0` Commits hinter `main`
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `48` Dateien erfolgreich geprüft
+- automatische Tests: `31/31` erfolgreich
+- fehlgeschlagene Tests: `0`
+- Projektprüfung: Node `20.20.2`
+- Regressionstest der parallel übernommenen Quality-Gate-Härtung: erfolgreich
+- PR war mergebar
+- Squash-Merge: `1de0999cd570c612a80649cfe4975d8531947935`
+- Main-Stichprobe: `assets/workspace-state.js`, `assets/workspace-size.js`, `VERSION.json`
 
-- Branch-Diff gegen `main`
-- Branch 0 Commits hinter `main`
-- `npm run verify` im PR
-- alle Tests grün
-- PR mergebar
-- keine ungeplanten UI-Dateien
-- Main-Stichprobe nach Merge
+### Behobener Testfehler während der Entwicklung
+
+Der erste vollständige Lauf zeigte einen einzelnen Fehlschlag beim strikten Vergleich eines Ergebnisobjekts aus einer separaten JavaScript-VM. Inhalt und berechnete Werte waren bereits korrekt. Der Test wurde so korrigiert, dass das VM-Objekt vor dem Vergleich in ein normales Datenobjekt umgewandelt wird.
+
+Es war **keine Änderung der Produktlogik** erforderlich. Der anschließende vollständige Lauf war grün.
 
 ## Rückweg
 
-Revert dieses Pull Requests.
+Revert des Squash-Merges:
+
+`1de0999cd570c612a80649cfe4975d8531947935`
 
 Keine Migration und kein neuer Daten-Schlüssel müssen zurückgerollt werden.
 
 ## Nächste zwei Schritte
 
-1. gespeicherte Breite/Höhe zentral auf DOM anwenden, weiterhin ohne Resize-Griff
-2. danach Resize-Griff plus Pointer-/Tastatur-Controller auf die geprüfte Basis setzen
+1. `0.3.0-D2`: gespeicherte Breite/Höhe zentral auf DOM anwenden, weiterhin ohne Resize-Griff
+2. `0.3.0-D3`: danach Resize-Griff plus Pointer-/Tastatur-Controller auf die geprüfte Basis setzen
 
 Drag & Drop bleibt bis `0.3.0-E` gesperrt.
