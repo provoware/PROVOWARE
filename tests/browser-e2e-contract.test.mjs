@@ -51,7 +51,7 @@ test("Chromium-Spec enthält echten Multi-Datei-Envelope-Restore mit Journal-Abs
   assert.match(spec, /categoryAfter/);
 });
 
-test("HTML-Mirror verwendet zweimal dieselbe echte UI, wartet auf PRO und skaliert nur die zweite Darstellung", async () => {
+test("HTML-Mirror wartet auf fertige Recovery-/PRO-States und vergleicht stabile Geometrie", async () => {
   const html = await read("tests/browser/ui-mirror.html");
   const css = await read("tests/browser/ui-mirror.css");
   const js = await read("tests/browser/ui-mirror.js");
@@ -63,7 +63,13 @@ test("HTML-Mirror verwendet zweimal dieselbe echte UI, wartet auf PRO und skalie
   assert.match(css, /#mirror-scaled[\s\S]*transform: scale\(var\(--mirror-scale\)\)/);
   assert.match(css, /transform-origin: top left/);
   assert.match(js, /\.data-studio-pro/);
+  assert.match(js, /\.data-recovery/);
+  assert.match(js, /data-data-studio-status/);
   assert.match(js, /data-data-studio-pro-status/);
+  assert.match(js, /data-recovery-status/);
+  assert.match(js, /readyText\(recoveryStatus\)/);
+  assert.match(js, /waitForStableGeometry/);
+  assert.match(js, /geometryDifferences/);
   assert.match(js, /keyGeometryIdentical/);
   assert.match(js, /sameGeometry\(sourceGeometry, scaledGeometry\)/);
   assert.match(js, /provoware:mirror-ready/);
