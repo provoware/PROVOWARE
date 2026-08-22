@@ -8,9 +8,13 @@ on:
       - "scripts/project-data-service.mjs"
       - "scripts/project-data-recovery.mjs"
       - "scripts/data-studio-pro-service.mjs"
+      - "scripts/recovery-envelope.mjs"
       - "tests/atomic-file.test.mjs"
       - "tests/project-data-recovery.test.mjs"
       - "tests/data-studio-pro-service.test.mjs"
+      - "tests/recovery-envelope.test.mjs"
+      - "tests/recovery-envelope-api.test.mjs"
+      - "tests/recovery-envelope-integration.test.mjs"
   push:
     branches:
       - main
@@ -20,9 +24,13 @@ on:
       - "scripts/project-data-service.mjs"
       - "scripts/project-data-recovery.mjs"
       - "scripts/data-studio-pro-service.mjs"
+      - "scripts/recovery-envelope.mjs"
       - "tests/atomic-file.test.mjs"
       - "tests/project-data-recovery.test.mjs"
       - "tests/data-studio-pro-service.test.mjs"
+      - "tests/recovery-envelope.test.mjs"
+      - "tests/recovery-envelope-api.test.mjs"
+      - "tests/recovery-envelope-integration.test.mjs"
 
 permissions:
   contents: read
@@ -49,4 +57,4 @@ jobs:
           node-version: "20"
 
       - name: Portability-Vertrag prüfen
-        run: node --test tests/atomic-file.test.mjs tests/project-data-recovery.test.mjs tests/data-studio-pro-service.test.mjs
+        run: node --test tests/atomic-file.test.mjs tests/project-data-recovery.test.mjs tests/data-studio-pro-service.test.mjs tests/recovery-envelope.test.mjs tests/recovery-envelope-api.test.mjs tests/recovery-envelope-integration.test.mjs
