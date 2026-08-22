@@ -6,17 +6,19 @@
 
 Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
 
-Aktuelle interne Entwicklungsstufe: `0.3.0-D3a – Keyboard Resize Preview`
+Aktuelle interne Entwicklungsstufe: `0.4.0 – Project Data Studio · Integration & Regression Hardening`
 
 Modulvertragsversion: `1`
 
 Workspace-Vertragsversion: `1`
 
+Project-Data-Schemaversion: `1`
+
 Persistenter Workspace-Schlüssel:
 
 `provoware.allin.workspace.main.v1`
 
-Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
+Die Produktversion bleibt bis zu einem ausdrücklich freigegebenen Release unverändert `0.2.0`.
 
 ## Laufzeitstruktur
 
@@ -24,27 +26,147 @@ Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine be
 
 - `index.html` – lokale HTML-Einstiegsdatei und deterministische Asset-Reihenfolge
 - `start.cmd` / `start.sh` – Plattform-Einstiege für die automatische lokale Startroutine
-- `scripts/start.mjs` – Node-20-Prüfung, bedarfsgesteuerte Paketauflösung, lokaler Webserver und Browserstart
+- `scripts/start.mjs` – Node-Prüfung, lokaler Webserver, statische Auslieferung und Project-Data-API-Routing
 
 ### Oberfläche und Kernlogik
 
-- `assets/styles.css` – Dark-/Petrol-Basisdarstellung inklusive Tablet-/Mobilregeln
-- `assets/workspace-layout.css` – Desktop-Größendarstellung, Resize-Griff sowie Aktiv-/Vorschauzustand ab 981 px
+- `assets/styles.css` – Dark-/Petrol-Basisdarstellung
+- `assets/workspace-layout.css` – Desktop-Größen- und Resize-Darstellung
+- `assets/project-data.css` – isolierte Darstellung für Schnellnotiz und Data Studio
 - `assets/app.js` – App-Start, Debug-UI und Initialisierung der Subsysteme
 - `assets/module-registry.js` – Modulvertrag und Modul-Lebenszyklus
-- `assets/workspace-state.js` – einzige persistente Workspace-Zustandsquelle; Normalisierung, Sichtbarkeit, Größenaktionen, Speicherung und Reset
-- `assets/workspace-size.js` – reine Raster-/Höhenberechnung und kanonischer 24-px-Höhenschritt
-- `assets/workspace-ui.js` – DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus, Feedback sowie gespeicherte und transiente Größenwerte
-- `assets/workspace-resize.js` – Resize-Griffe, Tastatur-Vorschau, Commit/Abbruch und Responsive-Sperre; noch ohne Pointer-Ziehen
-- `modules/registry.js` – zentraler Modulkatalog, aktuell bewusst leer
+- `assets/workspace-state.js` – persistenter Workspace-Zustand
+- `assets/workspace-size.js` – reine Raster-/Höhenberechnung
+- `assets/workspace-ui.js` – Workspace-DOM-/Bedienlogik
+- `assets/workspace-resize.js` – D3a-Tastatur-Resize
+- `modules/registry.js` – kanonischer Modulkatalog
 
-### Versionsmetadaten
+### Aktive Fachmodule
 
-- `VERSION.json`
+| Modul | Version | Slot | Aufgabe |
+| --- | --- | --- | --- |
+| `development-notes` | `0.4.0` | `quickbar` | zeitgestempelte Schnellnotiz in feste Projekttextdatei |
+| `data-studio` | `0.4.0` | `details` | Vorlagenbaukasten und zentrale Datensatzverwaltung |
 
-## Script-Reihenfolge des Workspace
+## Project-Data-Persistenz
 
-Verbindlich:
+### Entwicklungsnotizen
+
+Feste Datei:
+
+`data/ENTWICKLUNGSNOTIZEN.txt`
+
+Vertrag:
+
+```text
+[YYYY-MM-DD HH:mm:ss] Text
+```
+
+Eigenschaften:
+
+- Zielpfad ist fest verdrahtet.
+- Browser kann keinen eigenen Dateipfad vorgeben.
+- Zeilenumbrüche werden vor dem Speichern normalisiert.
+- Eintrag kann über Button oder Formular-Submit per Enter ausgelöst werden.
+- Datei bleibt direkt über `Datei öffnen` erreichbar.
+
+### Zentrale Laufzeitdatenbank
+
+Feste lokale Datei:
+
+`data/project-data.json`
+
+Schema Version 1:
+
+- `schemaVersion`
+- `revision`
+- `templates[]`
+- `records[]`
+
+Die Datei wird nicht in Git aufgenommen und wird vom Auto-Fix nicht verändert.
+
+Temporäre atomare Austauschdateien:
+
+`data/project-data.json.tmp-*`
+
+Auch diese bleiben aus Git ausgeschlossen.
+
+## Project-Data-Service
+
+`scripts/project-data-service.mjs` besitzt die zentrale Verantwortung für:
+
+- Datenvertrag und Schemaversion
+- serverseitige Eingabevalidierung
+- feste Dateipfade
+- atomare JSON-Persistenz
+- serialisierte Mutationen
+- beschädigte Datenbankerkennung
+- Vorlagenkompatibilität bei vorhandenen Datensätzen
+- Same-Origin-Prüfung für Browserzugriffe
+- Payload-Obergrenze
+- API-Antworten
+
+Der Browser schreibt nie direkt in `data/project-data.json`.
+
+Der statische Server verweigert direkten Zugriff auf die Laufzeitdatenbank.
+
+## Unterstützte Vorlagenfelder
+
+- `text`
+- `textarea`
+- `number`
+- `date`
+- `checkbox`
+- `select`
+
+Felder besitzen stabile IDs, Bezeichnung, Typ, Pflichtfeldstatus und bei `select` eine eindeutige Optionsliste.
+
+Bei bestehenden Datensätzen werden inkompatible Schemaänderungen blockiert, insbesondere:
+
+- Entfernen benutzter Felder
+- Typwechsel bestehender Felder
+- neue Pflichtfelder ohne Altwerte
+- Entfernen noch verwendeter Auswahlwerte
+
+## API-Routen
+
+- `POST /api/provoware/development-notes`
+- `GET /api/provoware/project-data`
+- `POST /api/provoware/project-data/templates`
+- `PUT /api/provoware/project-data/templates/:id`
+- `POST /api/provoware/project-data/records`
+- `PUT /api/provoware/project-data/records/:id`
+- `DELETE /api/provoware/project-data/records/:id`
+
+API-Schreibzugriffe erwarten JSON und werden auf eine begrenzte Payload-Größe beschränkt.
+
+## Direkter `file://`-Start
+
+Der bestehende direkte Start über `index.html` bleibt erhalten.
+
+Dabei gilt:
+
+- Workspace und statische Oberfläche funktionieren weiter.
+- Project-Data-Module laden kontrolliert.
+- Datei-Schreibfunktionen sind deaktiviert.
+- Nutzerhinweis verweist auf den lokalen Klick-&-Start-Server.
+
+Damit ersetzt 0.4.0 den bisherigen Startvertrag nicht.
+
+## Workspace-Vertrag
+
+Die vorhandene Workspace-Struktur bleibt Version `1` und wird durch 0.4.0 nicht erweitert.
+
+Persistiert werden weiterhin nur:
+
+- Panelreihenfolge
+- Sichtbarkeit
+- Rasterbreite `widthUnits`
+- optionale Höhe `heightPx`
+
+D3a-Tastatur-Resize und bestehende responsive Grenzen bleiben unverändert.
+
+Script-Reihenfolge:
 
 ```text
 workspace-state.js
@@ -54,278 +176,161 @@ workspace-state.js
 -> app.js
 ```
 
-Damit sind Zustand und Größenregeln vor Darstellung und Eingabe verfügbar. Die Reihenfolge wird automatisiert geprüft.
+## Qualitäts- und Regressionskette
 
-## Feste Bedienzone
+### Kanonische Befehle
 
-Außerhalb des veränderbaren Workspace liegen:
+Projekt-Lint:
 
-- Seitenleiste
-- Kopfbereich
-- kompakte Schnellstarter-/Menüleiste
-- permanenter `Layout`-Schalter
-- Debugging & Logging
+```bash
+npm run lint
+```
 
-Der `Layout`-Schalter bleibt erreichbar, auch wenn alle fünf Workspace-Panels ausgeblendet wurden.
-
-## Workspace-Kernpanels
-
-| Sichtbarer Bereich | stabile Panel-ID |
-| --- | --- |
-| Übersicht | `overview` |
-| Module | `modules` |
-| Arbeitsbereich | `work` |
-| Detailbereich | `details` |
-| Systemstatus | `system-status` |
-
-## Persistenter Workspace-Zustand
-
-Gespeichert werden ausschließlich:
-
-- Panelreihenfolge
-- Sichtbarkeit
-- Rasterbreite `widthUnits`
-- optionale Höhe `heightPx`
-
-Nicht gespeichert werden:
-
-- Fachinhalte
-- Debuglogs
-- Modul-Laufzeitstatus
-- Fokus
-- Scrollposition
-- Tastatur-/Zeigerbewegungen
-- Resize-/Drag-Vorschau
-- CSS-Variablen
-- Darstellungsmarker
-- aktive Resize-Tasten
-
-D3a führt keine neuen persistenten Felder ein. Workspace-Vertragsversion `1` bleibt deshalb unverändert.
-
-## 0.3.0-C – vorhandene Funktionsbasis
-
-Vorhanden:
-
-- kompakte Schnellstarterleiste
-- permanenter `Layout`-Schalter
-- einzelne Panel-Sichtbarkeit
-- alle Panels ausblendbar
-- `Alle anzeigen`
-- `Standardlayout wiederherstellen`
-- gespeicherte Reihenfolge und Größenwerte bleiben beim Aus-/Einblenden erhalten
-- Live-Nutzerfeedback
-- Tastatur-/Fokus-Grundlage
-
-## 0.3.0-D1 – State & Calculation
-
-Implementiert:
-
-- `panelGroesseSetzen(id, groesse)` als zentrale State-API
-- `panelGroesseZuruecksetzen(id)` als Einzel-Reset
-- Erhalt von Sichtbarkeit und Reihenfolge bei Größenänderungen
-- individuelle Min-/Max-Grenzen aus `PANEL_DEFINITIONEN`
-- `heightPx: null` als automatische Höhe
-- `assets/workspace-size.js` mit reiner Raster-/Höhenberechnung
-- tatsächlicher `column-gap` in der Rastermetrik
-- symmetrische Rundung horizontaler Bewegung
-- kanonischer 24-px-Höhenschritt
-
-## 0.3.0-D2 – DOM Application
-
-Implementiert:
-
-- `widthUnits` -> CSS-Variable `--panel-spalten`
-- konkrete `heightPx` -> CSS-Variable `--panel-hoehe`
-- `heightPx: null` entfernt die Inline-Höhenvariable
-- ungültige Darstellungsbreite fällt sicher auf die Basisdarstellung zurück
-- `assets/workspace-layout.css` wendet Größen ausschließlich ab 981 px an
-- Tablet-/Mobilbasis in `assets/styles.css` blieb unverändert
-
-## 0.3.0-D3a – aktueller technischer Stand
-
-### Resize-Griff
-
-Implementiert:
-
-- genau ein dynamischer Griff pro Workspace-Panel
-- echtes `button`-Element
-- ungefähr 44 × 44 px Trefferfläche
-- verständliche deutsche `aria-label`-Beschriftung
-- `aria-keyshortcuts` für Pfeile, `Home`, `Escape`
-- Griff ausschließlich ab 981 px sichtbar
-- kein funktionsloser Griff statisch im HTML
-
-### Tastatursteuerung
-
-- `ArrowLeft` → Breite −1 Rastereinheit
-- `ArrowRight` → Breite +1 Rastereinheit
-- `ArrowUp` → Höhe −24 px
-- `ArrowDown` → Höhe +24 px
-- `Home` → nur aktuelles Panel auf Standardgröße
-- `Escape` → laufende Vorschau ohne Persistenz verwerfen
-
-### Vorschau-/Commit-Vertrag
-
-- `keydown` ändert nur den flüchtigen Vorschauzustand
-- wiederholtes `keydown` speichert nichts
-- mehrere gleichzeitig gehaltene Resize-Pfeile werden als eine Tastenserie behandelt
-- erst nach Freigabe der letzten aktiven Resize-Pfeiltaste erfolgt höchstens ein Commit
-- ohne tatsächliche Größenänderung erfolgt kein unnötiger Commit
-- transiente Vorschau verwendet dieselben CSS-Variablen wie D2
-- gespeicherter Workspace-State kann die Vorschau jederzeit reproduzierbar überschreiben
-- Resize-Controller schreibt niemals direkt in `localStorage`
-
-### Automatische Höhe
-
-Bei `heightPx: null` dient die tatsächlich gerenderte Panelhöhe als Ausgangswert für die erste Höhenänderung. Danach greifen 24-px-Raster und Panelgrenzen.
-
-### Responsive Schutz
-
-Bis 980 px:
-
-- Griff per CSS verborgen
-- Tastaturaktionen logisch blockiert
-- laufende Vorschau bei Viewport-Wechsel verworfen
-- gespeicherte Desktopwerte unverändert
-
-## Verantwortungstrennung für Resize
-
-- `assets/workspace-state.js` – persistente Wahrheit und normalisierte Endwerte
-- `assets/workspace-size.js` – reine Größenregeln/Berechnung
-- `assets/workspace-ui.js` – DOM-Anwendung gespeicherter und transienter Größenwerte
-- `assets/workspace-layout.css` – visuelle Desktopdarstellung
-- `assets/workspace-resize.js` – Eingabesitzung, Tastatur, Vorschau, Commit/Abbruch
-
-Keiner der Darstellungs-/Eingabeteile legt eine zweite persistente Größenquelle an.
-
-## Bewusst noch nicht implementiert
-
-D3b bleibt offen für:
-
-- `pointerdown`
-- `pointermove`
-- `pointerup`
-- `pointercancel`
-- Pointer Capture
-- Mausziehen
-- Touchziehen
-- Stiftziehen
-
-Ebenfalls noch nicht implementiert:
-
-- Drag & Drop / Reorder
-- reale interaktive Browser-Endabnahme
-
-## Hauptdokumente
-
-- `README.md`
-- `TODO.md`
-- `CHANGELOG.md`
-- `GLOBAL_STANDARDS.md`
-- `LOGGING.md`
-- `PRO_DEBUGGING.md`
-- `AGENTS.md`
-
-## Architektur- und Entwicklungsdokumentation
-
-### 0.2.0
-
-- `docs/PLAN_0.2.0.md`
-- `docs/MODULE_CONTRACT.md`
-
-### 0.3.0
-
-- `docs/PLAN_0.3.0.md` – Masterplan
-- `docs/PLAN_0.3.0_B.md` – State Foundation
-- `docs/PLAN_0.3.0_C.md` – Visibility Controls
-- `docs/PLAN_0.3.0_D.md` – Resize-Gesamtplan
-- `docs/PLAN_0.3.0_D_STATE.md` – D1 State/Berechnung
-- `docs/PLAN_0.3.0_D_DOM.md` – D2 DOM/CSS
-- `docs/PLAN_0.3.0_D3A_KEYBOARD.md` – D3a Tastatur/Vorschau
-- `docs/WORKSPACE_CONTRACT.md` – Workspace-Vertrag Version 1
-- `docs/RESIZE_CONTRACT_0.3.0.md` – Resize-Vertrag und Testmatrix
-- `docs/DECISIONS_0.3.0.md`
-- `docs/STATUS_0.3.0.md`
-- `docs/MANIFEST_0.3.0_B.md`
-- `docs/MANIFEST_0.3.0_C.md`
-- `docs/MANIFEST_0.3.0_D_PLAN.md`
-- `docs/MANIFEST_0.3.0_D_STATE.md`
-- `docs/MANIFEST_0.3.0_D_DOM.md`
-- `docs/MANIFEST_0.3.0_D3A_KEYBOARD.md`
-
-## Entwicklungs- und Qualitätssicherung
-
-Bestehend:
-
-- `.editorconfig`
-- `package.json`
-- `scripts/quality-check.mjs`
-- `scripts/start.mjs`
-- `start.cmd`
-- `start.sh`
-- `tests/quality-check.test.mjs`
-- `tests/start.test.mjs`
-- `tests/module-registry.test.mjs`
-- `tests/workspace-state.test.mjs`
-- `tests/workspace-size.test.mjs`
-- `tests/workspace-ui.test.mjs`
-- `tests/workspace-resize.test.mjs`
-- `tests/workspace-resize-load.test.mjs`
-- `.github/workflows/quality.yml`
-
-Bereits abgedeckt:
-
-- Modul-Lebenszyklus
-- Workspace-Normalisierung und Speicherung
-- Sichtbarkeit
-- Größen-State-API
-- Rastermetrik und Grenzen
-- DOM-Übertragung über CSS-Variablen
-- Rückkehr zu automatischer Höhe
-- transiente Größenvorschau ohne State-Mutation
-- eindeutige zugängliche Resize-Griffe
-- Tastatur-Schritte und Tastenwiederholung
-- höchstens ein Commit nach einer Tastenserie
-- `Escape`-Abbruch und `Home`-Einzelreset
-- Responsive-Sperre bis 980 px
-- Abbruch bei Viewport-Wechsel
-- sichere Workspace-Script-Reihenfolge
-- automatischer Nachweis, dass D3a noch keine Pointer-Ziehlogik enthält
-
-## Reale D3a-Qualität
-
-Technischer PR #78:
-
-- Branch final `0` Commits hinter `main`
-- `11` geänderte Dateien
-- GitHub Quality Gate: `success`
-- `56` Dateien statisch geprüft
-- `48/48` Tests erfolgreich
-- `0` fehlgeschlagen
-- Projektprüfung Node `20.20.2`
-- Squash-Merge `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
-
-Eine echte interaktive Firefox-/Chrome-Abnahme steht weiterhin für `0.3.0-G` aus.
-
-## Kanonische Befehle
-
-Sichere Formatkorrektur:
+Semantikneutraler Auto-Fix:
 
 ```bash
 npm run fix
 ```
 
-Vollständige Prüfung:
+Vollständiges Gate:
 
 ```bash
 npm run verify
 ```
 
-## Nächste zwei technischen Schritte
+Reihenfolge von `verify`:
 
-1. `0.3.0-D3b – Pointer/Maus/Touch/Stift`: vorhandenen Griff und Vorschau-/Commit-Architektur mit Pointer Events ergänzen; Bewegung bleibt transient, Abschluss höchstens ein Commit.
-2. `0.3.0-E – Reorder & Drag and Drop`: erst nach vollständig grüner D3b-Abnahme; eigener Drag-Griff und Tastaturalternative.
+```text
+PROJECT LINT
+-> QUALITY GATE
+-> NODE TEST RUNNER
+```
 
-## Status
+### Projekt-Linter
 
-D3a ist technisch abgeschlossen und gemergt. Die Produktversion bleibt `0.2.0`; der nächste Funktionspatch ist ausschließlich D3b.
+`scripts/project-lint.mjs` prüft unter anderem:
+
+- verbotene dynamische Codeausführung
+- `document.write`
+- absolute externe `fetch`-Ziele
+- unkontrolliertes `localStorage.clear()`
+- Browser-Zweitpersistenz in Project-Data-Modulen
+- unbeabsichtigte Serverbindung an `0.0.0.0`
+- `use strict` in Browser-JavaScript
+
+Der Linter bleibt ohne externe npm-Pakete.
+
+### Quality Gate
+
+`scripts/quality-check.mjs` prüft unter anderem:
+
+- JavaScript-Syntax
+- Text-/JSON-Format
+- Pflichtdateien
+- lokale HTML-Referenzen
+- Versionskonsistenz
+- Workspace-Vertrag
+- Modulregistry
+- beide 0.4.0-Pflichtmodule
+- Project-Data-Styles
+- Git-Ausschluss der Laufzeitdatenbank
+- Einbindung des Lint-Gates in `npm run verify`
+
+`data/project-data.json` und temporäre Austauschdateien werden ausdrücklich nicht vom Auto-Fix oder statischen Quellcode-Walk verändert.
+
+### Testgruppen
+
+Bestehende Tests bleiben aktiv:
+
+- Modul-Lifecycle
+- Workspace-State
+- Workspace-Größenberechnung
+- Workspace-UI
+- Tastatur-Resize
+- Startserver
+- Quality-Gate-Fehlerbehandlung
+
+Neu in 0.4.0:
+
+- `tests/project-data-service.test.mjs`
+- `tests/project-data-api.test.mjs`
+- `tests/project-data-ui-contract.test.mjs`
+- `tests/project-lint.test.mjs`
+
+Zusätzliche Regressionen prüfen:
+
+- Zeitstempel und Einzeilen-Normalisierung
+- beschädigte Datenbank ohne stilles Überschreiben
+- unzulässige Vorlagenänderungen
+- ungültige Auswahlwerte
+- Datenbearbeitung und Löschung
+- Same-Origin-Schutz
+- geschützte direkte Datenbankauslieferung
+- parallele Mutationen ohne verlorene Datensätze
+- Linter-Fehlerprobe
+
+## GitHub Actions
+
+Workflow:
+
+`.github/workflows/quality.yml`
+
+Aktuelle Actions:
+
+- `actions/checkout@v7`
+- `actions/setup-node@v7`
+
+CI-Matrix:
+
+- Node 20
+- Node 24
+
+Beide Matrixläufe führen vollständig `npm run verify` aus.
+
+## Checkpoint und Abnahme
+
+- `docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md`
+- `docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md`
+- `docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md`
+
+Baseline für 0.4.0:
+
+`6fd1123122cca0c69fd50bdbf69ef2186cc930d0`
+
+Arbeitsbranch:
+
+`feat/0.4.0-project-data-studio`
+
+Pull Request:
+
+`#81`
+
+## Bewusst noch nicht implementiert
+
+### Project Data
+
+- Backup/Restore
+- Export/Import
+- Schema-Migrationsengine
+- relationale Feldtypen
+- Volltextsuche/Filter
+- SQLite-Adapter
+- Mehrbenutzerbetrieb
+- Cloud-Synchronisation
+
+### Regression/Release
+
+- echte Firefox-/Chrome-E2E-Tests
+- Cross-OS-CI auf Windows/macOS
+- Recovery-/Write-Abbruch-Failure-Injection
+
+### Workspace
+
+- Pointer-/Maus-/Touch-/Stift-Resize D3b
+- Drag & Drop / Reorder
+
+## Nächste technische Schritte
+
+1. `0.4.1 – Recovery & Migration`: Backup/Restore, Export/Import, Write-Failure-Injection und Schemamigrationen.
+2. `0.4.2 – Data Studio PRO`: Suche/Filter, Vorlagenbibliothek und optionaler Storage-Adapter.
+3. Workspace-Strang unabhängig mit `0.3.0-D3b` fortsetzen, ohne Project-Data-Verträge zu vermischen.
