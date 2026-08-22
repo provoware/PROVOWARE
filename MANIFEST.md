@@ -23,6 +23,8 @@ Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine be
 ### Einstieg
 
 - `index.html` – lokale HTML-Einstiegsdatei und deterministische Asset-Reihenfolge
+- `start.cmd` / `start.sh` – Plattform-Einstiege für die automatische lokale Startroutine
+- `scripts/start.mjs` – Node-20-Prüfung, bedarfsgesteuerte Paketauflösung, lokaler Webserver und Browserstart
 
 ### Oberfläche und Kernlogik
 
@@ -258,7 +260,11 @@ Bestehend:
 - `.editorconfig`
 - `package.json`
 - `scripts/quality-check.mjs`
+- `scripts/start.mjs`
+- `start.cmd`
+- `start.sh`
 - `tests/quality-check.test.mjs`
+- `tests/start.test.mjs`
 - `tests/module-registry.test.mjs`
 - `tests/workspace-state.test.mjs`
 - `tests/workspace-size.test.mjs`
