@@ -39,7 +39,7 @@ Neue kleine Schnittstelle:
 
 `panelGroesseVorschauAnwenden(id, groesse)`
 
-Sie verwendet denselben D2-CSS-Variablenvertrag wie persistente Größen. `zustandAnwenden(...)` entfernt den Vorschau-Marker wieder und stellt damit gespeicherte Werte reproduzierbar her.
+Sie verwendet denselben D2-CSS-Variablenvertrag wie persistente Größen. `zustandAnwenden(...)` entfernt den Vorschau-Marker wieder und stellt gespeicherte Werte reproduzierbar her.
 
 ### `assets/workspace-layout.css`
 
@@ -47,13 +47,13 @@ Ergänzt:
 
 - Resize-Griff nur ab 981 px
 - ungefähr 44 × 44 px Trefferfläche
-- klaren Fokus-/Aktivzustand über bestehende Designvariablen
-- optischen Vorschauzustand
-- zusätzlichen unteren Innenabstand, damit der Griff den normalen Inhalt nicht überlagert
+- Aktiv-/Vorschauzustand über bestehende Designvariablen
+- zusätzlichen unteren Innenabstand, damit der Griff normalen Panelinhalt nicht überlagert
+- in D3a bewusst noch keinen Zieh-Cursor
 
 ### `index.html`
 
-Lädt neu in definierter Reihenfolge:
+Lädt in definierter Reihenfolge:
 
 1. `assets/workspace-state.js`
 2. `assets/workspace-size.js`
@@ -74,7 +74,7 @@ Initialisiert den Resize-Controller erst nach Workspace-State und Workspace-UI.
 - `Home`: nur aktuelles Panel auf Standardgröße
 - `Escape`: aktive Vorschau ohne Persistenz verwerfen
 - wiederholtes `keydown`: nur Vorschau
-- letzter zugehöriger `keyup`: höchstens ein Commit
+- Freigabe der letzten aktiven Resize-Pfeiltaste: höchstens ein Commit
 
 Grenzen stammen aus `PANEL_DEFINITIONEN`. Der 24-px-Schritt wird aus `PROVOWARE_WORKSPACE_SIZE.HOEHEN_SCHRITT_PX` übernommen und nicht doppelt definiert.
 
@@ -105,6 +105,7 @@ Abgedeckt werden:
 - Breiten-/Höhenschritte und Grenzen
 - automatische Höhe aus gerenderter Höhe
 - Tastenwiederholung ohne Zwischen-Commit
+- mehrere gleichzeitig gehaltene Resize-Pfeile
 - genau ein Commit nach letzter Tastenfreigabe
 - `Escape` ohne Commit
 - `Home` als Einzel-Reset
@@ -133,25 +134,38 @@ Abgedeckt werden:
 
 Einstufung: **mittel**.
 
+Technischer PR #78:
+
+- `11` geänderte Dateien
+- `assets/workspace-state.js` unverändert
+- eigentliche D1-Bewegungsberechnung in `assets/workspace-size.js` unverändert
+- kein persistentes Schema geändert
+
 Betroffen sind Eingabe-/DOM-Schicht, kleine CSS-Erweiterung, App-Initialisierung, lokale Script-Reihenfolge, Tests und Entwicklungsdokumentation.
 
-Nicht betroffen sind persistentes Workspace-Schema, Modulvertrag, Netzwerk und Fachmodule.
+Nicht betroffen sind Modulvertrag, Netzwerk und Fachmodule.
 
-## Validierung
+## Reale Validierung und Merge
 
-Vor Merge zwingend:
+- technischer Pull Request: `#78`
+- Branch beim finalen Diff-Check: `0` Commits hinter `main`
+- PR vor Merge: mergebar
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `56` Dateien erfolgreich geprüft
+- automatische Tests: `48/48` erfolgreich
+- fehlgeschlagene Tests: `0`
+- Projektprüfung: Node `20.20.2`
+- keine Pointer-Ziehlogik im D3a-Quelltext, automatisiert geprüft
+- Squash-Merge: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
+- Main-Stichprobe erfolgreich: `assets/workspace-resize.js`, `index.html`, `VERSION.json`
 
-- Branch-Diff gegen aktuellen `main`
-- Branch 0 Commits hinter `main`
-- GitHub Quality Gate `success`
-- alle automatischen Tests grün
-- keine Pointer-Ziehlogik im D3a-Patch
-- PR mergebar
-- Main-Stichprobe nach Merge
+Nicht durchgeführt wurde eine echte interaktive Firefox-/Chrome-Abnahme. Sie bleibt Bestandteil des Release Gates `0.3.0-G`.
+
+Der bekannte GitHub-Actions-Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions ist nicht blockierend und bleibt getrennt für `0.3.0-G`.
 
 ## Rückweg
 
-Revert dieses Pull Requests. D1-State, D1-Berechnung und D2-DOM-Anwendung bleiben erhalten. Keine Datenmigration muss rückgängig gemacht werden.
+Revert des technischen PR #78. D1-State, D1-Berechnung und D2-DOM-Anwendung bleiben erhalten. Keine Datenmigration muss rückgängig gemacht werden.
 
 ## Nächste zwei Schritte
 
