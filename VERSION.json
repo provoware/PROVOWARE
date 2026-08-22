@@ -7,6 +7,9 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.3.0-D3a Keyboard Resize Preview",
-  "development_baseline_commit": "d5d7022816e3c164f641a39ccd9b05a5722d0db2"
+  "development_phase": "0.4.0 Project Data Studio – Integration & Regression Hardening",
+  "development_baseline_commit": "6fd1123122cca0c69fd50bdbf69ef2186cc930d0",
+  "project_data_schema_version": "1",
+  "project_data_store": "data/project-data.json",
+  "development_notes_file": "data/ENTWICKLUNGSNOTIZEN.txt"
 }

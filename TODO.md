@@ -1,241 +1,170 @@
 # TODO
 
-## PLAN_DELTA
+Kanonische Entwicklungsroadmap. Abgeschlossene Detailhistorie bleibt über Git/CHANGELOG nachvollziehbar; diese Datei zeigt den aktuellen Arbeitsstand und die nächsten realen Gates.
+
+## Freigegebene Basis
 
 ### 0.1.0 – UI Foundation
 
-- [x] Repository als leeres Projektgerüst neu anlegen.
-- [x] PROVOWARE ALL-IN 2026 als leere modulare HTML-Oberfläche anlegen.
-- [x] Responsive Dark-/Petrol-UI mit Seitenleiste, Kopfbereich und flexiblen Kartenbereichen aufbauen.
-- [x] Versteckbaren Debugging-/Logging-Bereich mit drei Stufen integrieren.
-- [x] Fehler- und Promise-Erfassung sowie begrenzten In-Memory-Logpuffer vorbereiten.
-- [x] Versionsmetadaten für `0.1.0 – UI Foundation` anlegen.
+- [x] modulare HTML-Oberfläche, responsives Dark-/Petrol-Layout und Debugging/Logging aufbauen.
+- [x] Versionsmetadaten und stabile UI-Basis anlegen.
 
 ### 0.2.0 – Module Contract & Registry
 
-- [x] Detaillierten, nummerierten Entwicklungsplan mit Abnahmekriterien anlegen.
-- [x] `AGENTS.md` auf kleine, begründete und reproduzierbare Patches ausrichten.
-- [x] Minimalen Modulvertrag mit Vertragsversion `1` definieren.
-- [x] Leeren kanonischen Modulkatalog anlegen.
-- [x] Registry-Zustände und kontrollierten Modul-Lebenszyklus implementieren.
-- [x] Laden, Aktivieren, Deaktivieren und Entfernen über eine kleine öffentliche API bereitstellen.
-- [x] Registry an das vorhandene dreistufige Logging anbinden.
-- [x] Direkten Browserstart ohne Server oder Laufzeitpakete erhalten.
-- [x] Abhängigkeitsfreies Node-20-Quality-Gate anlegen.
-- [x] Sicheren Auto-Fix für Format-/Textnormalisierung ergänzen.
-- [x] Automatischen Modul-Lebenszyklustest mit Node-Bordmitteln ergänzen.
-- [x] GitHub-Actions-Prüfung für Pull Requests und `main` einrichten.
-- [x] Pull-Request-Quality-Gate erfolgreich durchlaufen lassen (PR #62).
-- [x] Branch-Diff gegen aktuellen `main` abschließend kontrollieren; Branch war 0 Commits hinter `main`.
-- [x] 0.2.0 über PR #62 mergen und `main` stichproartig nachprüfen.
+- [x] Modulvertrag Version 1 definieren.
+- [x] Registry-Lifecycle implementieren.
+- [x] reproduzierbares Quality Gate und GitHub Actions einführen.
+- [x] semantikneutralen Auto-Fix einführen.
+- [x] PR #62 mergen und `main` prüfen.
 
 Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 
-## Nächste Iteration
+## Paralleler Workspace-Strang – 0.3.0 Flexible Workspace Engine
 
-### 0.3.0 – Flexible Workspace Engine
+Die Workspace-Basis bleibt aktiv. 0.4.0 Project Data Studio verändert deren persistente Verträge nicht.
 
-#### 0.3.0-A – Workspace-Vertrag
+### Abgeschlossen
 
-- [x] Option A festlegen: Layout automatisch lokal speichern und vollständig rücksetzbar machen.
-- [x] Detaillierten Entwicklungsplan in `docs/PLAN_0.3.0.md` anlegen.
-- [x] Workspace-Vertrag Version 1 in `docs/WORKSPACE_CONTRACT.md` definieren.
-- [x] Stabile Panel-IDs, Reihenfolge, Sichtbarkeit, Breite, Höhe und erlaubten Bereich festlegen.
-- [x] Persistente Layoutdaten von temporären Drag-/Resize-Zuständen trennen.
-- [x] Responsive Regeln definieren, ohne gespeicherte Desktopwerte auf Mobilgeräten zu überschreiben.
-- [x] Versionierten lokalen Speicher-Schlüssel und sicheren Reset-Vertrag festlegen.
-- [x] Drag & Drop bis nach stabiler State-/Visibility-/Resize-Basis ausdrücklich zurückstellen.
-- [x] Option A für vollständig ausgeblendeten Workspace festlegen: permanenter `Layout`-Schalter außerhalb des Workspace.
-- [x] Kompakte Schnellstarter-/Menüleiste unter dem festen oberen Bereich für 0.3.0-C festlegen.
-- [x] Planungs-PR #64 erfolgreich durch Quality Gate bringen und mergen.
+- [x] 0.3.0-A – Workspace-Vertrag.
+- [x] 0.3.0-B – State Foundation & Autosave/Reset.
+- [x] 0.3.0-C – Visibility Controls und kompakte Layoutsteuerung.
+- [x] 0.3.0-D1 – State-API und reine Größenberechnung.
+- [x] 0.3.0-D2 – DOM-Anwendung über CSS-Variablen.
+- [x] 0.3.0-D3a – Resize-Griff und Tastatur-Vorschau.
 
-Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
+Wichtige Merges:
 
-#### 0.3.0-B – State Foundation & Autosave/Reset
+- 0.3.0-B: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
+- 0.3.0-C: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
+- 0.3.0-D1: `1de0999cd570c612a80649cfe4975d8531947935`
+- 0.3.0-D2: `249df54ec13fa632f74400897dd3d83da3332bcb`
+- 0.3.0-D3a: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
 
-- [x] Detaillierten Teilplan `docs/PLAN_0.3.0_B.md` mit Änderungsvolumen und Abnahmekriterien anlegen.
-- [x] Workspace-Vertrag als kleine validierbare Laufzeitbasis implementieren.
-- [x] Standarddefinition und Standardzustand zentral abbilden.
-- [x] Standardzustand und gespeicherten Zustand deterministisch normalisieren.
-- [x] Daten, reine Logik, Browser-Speicherung und Logging klar trennen.
-- [x] Automatische lokale Speicherung über `zustandSetzen`/`zustandSpeichern` vorbereiten.
-- [x] `zuruecksetzen` isoliert auf den Workspace-Schlüssel begrenzen.
-- [x] beschädigte oder gesperrte Browser-Speicherung robust behandeln.
-- [x] Workspace-Fehler verständlich im Bereich `WORKSPACE` loggen.
-- [x] automatische Tests für Zustand, Validierung, Speicherung und Reset ergänzen.
-- [x] `npm run test` auf alle Testdateien erweitern.
-- [x] Quality Gate um Workspace-Pflichtdateien und Script-Reihenfolge erweitern.
-- [x] `AGENTS.md` um Wartbarkeits-, Zustands- und Transparenzregeln schärfen.
-- [x] Hauptmanifest und Patchmanifest synchronisieren.
-- [x] vollständigen Branch-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
-- [x] GitHub Quality Gate erfolgreich durchlaufen lassen: 35 Dateien geprüft, 11/11 Tests erfolgreich.
-- [x] PR #66 als mergebar prüfen und 0.3.0-B per Squash mergen.
-- [x] `assets/workspace-state.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
+### Offen – 0.3.0-D3b Pointer/Maus/Touch/Stift
 
-0.3.0-B-Merge: `069ad34f2b869fb91dc1c7726cb5903431863cfb`
-
-#### 0.3.0-C – Visibility Controls + kompakte Menüleiste
-
-- [x] Detaillierten Teilplan `docs/PLAN_0.3.0_C.md` anlegen.
-- [x] Mobile Option A festlegen: `Layout` fest sichtbar, sekundärer Bereich darf horizontal scrollen.
-- [x] feste kompakte Schnellstarter-/Menüleiste direkt unter dem oberen Bereich anlegen.
-- [x] permanenten `Layout`-Schalter außerhalb des veränderbaren Workspace integrieren.
-- [x] stabile `data-workspace-panel`-Zuordnung für alle fünf Kernpanels ergänzen.
-- [x] `assets/workspace-ui.js` als entkoppelte DOM-/Bedienlogik anlegen.
-- [x] Panels zentral ein-/ausblendbar machen.
-- [x] alle fünf Panels gleichzeitig ausblendbar lassen.
-- [x] `Alle anzeigen` und `Standardlayout wiederherstellen` jederzeit erreichbar halten.
-- [x] ausgeblendete Panels mit gespeicherter Position und Größe wiederherstellen.
-- [x] Tastaturbedienung mit `Escape` und nachvollziehbarer Fokusführung ergänzen.
-- [x] verständliches Live-Nutzerfeedback ergänzen.
-- [x] Workspace-State-API um zentrale Sichtbarkeitsaktionen erweitern.
-- [x] automatische Zustands- und UI-Tests ergänzen.
-- [x] Quality Gate um UI-Pflichtdatei, Panel-Zuordnung und sicheren Layout-Schalter erweitern.
-- [x] Patchmanifest `docs/MANIFEST_0.3.0_C.md` anlegen.
-- [x] vollständigen Branch-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
-- [x] GitHub Quality Gate erfolgreich: 39 Dateien geprüft, 18/18 Tests erfolgreich, 0 fehlgeschlagen.
-- [x] PR #68 als mergebar prüfen und 0.3.0-C per Squash mergen.
-- [x] `index.html`, `assets/workspace-ui.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
-
-0.3.0-C-Merge: `dce166770cf589a8fb9720cb3c0a650c19151cd9`
-
-#### 0.3.0-D – Resize
-
-##### Planung & Vertrag
-
-- [x] Option A bestätigen: ein Resize-Griff für Maus, Touch/Stift und Tastatur.
-- [x] detaillierten Resize-Vertrag `docs/RESIZE_CONTRACT_0.3.0.md` anlegen.
-- [x] detaillierten Teilplan `docs/PLAN_0.3.0_D.md` anlegen.
-- [x] Planungsmanifest `docs/MANIFEST_0.3.0_D_PLAN.md` anlegen.
-- [x] Breite auf Schritte von 1 Rastereinheit festlegen.
-- [x] Höhe auf Schritte von 24 px festlegen.
-- [x] individuelle Min-/Max-Grenzen aus `PANEL_DEFINITIONEN` als einzige Größenquelle bestätigen.
-- [x] Pointerbewegungen ausschließlich als transiente Vorschau definieren.
-- [x] Persistenz erst nach validiertem Abschluss definieren.
-- [x] Tastaturmodell festlegen: Pfeile, `Home`, `Escape`.
-- [x] Tastenwiederholung auf Vorschau + einen Commit bei `keyup` begrenzen.
-- [x] Resize in 0.3.0-D nur ab 981 px aktiv festlegen.
-- [x] Tablet-/Mobilansichten dürfen gespeicherte Desktopwerte nicht überschreiben.
-- [x] 40-teilige Testmatrix definieren.
-- [x] Drag & Drop weiterhin bis 0.3.0-E sperren.
-- [x] Planungs-Diff gegen `main` prüfen; Branch war 0 Commits hinter `main`.
-- [x] Planungs-Quality-Gate erfolgreich: 42 Dateien geprüft, 18/18 bestehende Tests erfolgreich.
-- [x] Planungs-PR #70 als mergebar prüfen und per Squash mergen.
-- [x] `docs/RESIZE_CONTRACT_0.3.0.md`, `docs/PLAN_0.3.0_D.md` und `VERSION.json` auf `main` stichproartig nachprüfen.
-
-0.3.0-D-Planungs-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`
-
-##### D1 – State-API + reine Größenberechnung
-
-- [x] State-API `panelGroesseSetzen` ergänzen.
-- [x] State-API `panelGroesseZuruecksetzen` ergänzen.
-- [x] reine Raster-/Höhenberechnung in `assets/workspace-size.js` implementieren.
-- [x] Größenberechnung inklusive realem CSS-`column-gap` automatisiert testen.
-- [x] automatische State- und Berechnungstests ergänzen.
-- [x] Branch nach parallelem PR #73 kontrolliert mit aktuellem `main` synchronisieren.
-- [x] D1-Diff gegen `main` prüfen; 11 geplante Dateien, 0 Commits hinter `main`.
-- [x] GitHub Quality Gate erfolgreich: 48 Dateien geprüft, 31/31 Tests erfolgreich, 0 fehlgeschlagen.
-- [x] PR #74 als mergebar prüfen und D1 per Squash mergen.
-- [x] `assets/workspace-state.js`, `assets/workspace-size.js` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
-
-0.3.0-D1-Merge: `1de0999cd570c612a80649cfe4975d8531947935`
-
-##### D2 – DOM-Anwendung gespeicherter Größen
-
-- [x] Option A festlegen: Größenübergabe über CSS-Variablen statt direkter Layout-Eigenschaften in JavaScript.
-- [x] detaillierten D2-Teilplan `docs/PLAN_0.3.0_D_DOM.md` anlegen.
-- [x] `widthUnits` als `--panel-spalten` auf das zugehörige Panel übertragen.
-- [x] konkrete `heightPx` als `--panel-hoehe` übertragen.
-- [x] `heightPx: null` durch Entfernen der Inline-Höhenvariable als automatische Höhe erhalten.
-- [x] ungültige Darstellungsbreite defensiv auf vorhandene Basisdarstellung zurückfallen lassen.
-- [x] `assets/workspace-layout.css` als isoliertes Desktop-Overlay ab 981 px anlegen.
-- [x] vorhandene Tablet-/Mobilregeln in `assets/styles.css` unangetastet lassen.
-- [x] `index.html` um ausschließlich den lokalen CSS-Verweis ergänzen; Script-Reihenfolge unverändert lassen.
-- [x] automatische DOM-Tests für Breite, Höhe, Auto-Höhe und sicheren Fallback ergänzen.
-- [x] automatische CSS-Vertrags- und Ladereihenfolge-Prüfung ergänzen.
-- [x] noch keinen Resize-Griff, keine Pointerlogik und kein Drag & Drop einführen.
-- [x] D2-Patchmanifest `docs/MANIFEST_0.3.0_D_DOM.md` anlegen.
-- [x] vollständigen D2-Diff gegen aktuellen `main` prüfen; 11 geplante Dateien.
-- [x] Branch beim finalen Diff-Check 0 Commits hinter `main` bestätigt.
-- [x] GitHub Quality Gate vollständig grün: 51 Dateien geprüft, 36/36 Tests erfolgreich, 0 fehlgeschlagen.
-- [x] PR #76 als mergebar geprüft und D2 per Squash gemergt.
-- [x] `index.html`, `assets/workspace-ui.js`, `assets/workspace-layout.css` und `VERSION.json` nach Merge auf `main` stichproartig nachgeprüft.
-
-0.3.0-D2-Merge: `249df54ec13fa632f74400897dd3d83da3332bcb`
-
-##### D3 – Resize-Griff + Eingabesteuerung
-
-###### D3a – Resize-Griff + Tastatur-Vorschau
-
-- [x] D3a bewusst von Pointer/Maus/Touch/Stift trennen.
-- [x] detaillierten Teilplan `docs/PLAN_0.3.0_D3A_KEYBOARD.md` vor der Implementierung anlegen.
-- [x] D3a-Patchmanifest `docs/MANIFEST_0.3.0_D3A_KEYBOARD.md` anlegen.
-- [x] genau einen dynamischen Resize-Griff pro Workspace-Panel integrieren.
-- [x] ungefähr 44 × 44 px sichere Trefferfläche ab 981 px gewährleisten.
-- [x] `assets/workspace-resize.js` als entkoppelte Eingabeschicht anlegen.
-- [x] transiente Größenvorschau über die bestehende Workspace-UI und dieselben CSS-Variablen umsetzen.
-- [x] Tastatur-Pfeile für 1 Rastereinheit beziehungsweise 24 px implementieren.
-- [x] Tastenwiederholung ohne Zwischen-Speicherung unterstützen.
-- [x] nach letzter passenden Tastenfreigabe höchstens einen Größen-Commit ausführen.
-- [x] `Escape` als Abbruch ohne Größen-Commit implementieren.
-- [x] `Home` als isolierten Größen-Reset nur für das aktuelle Panel implementieren.
-- [x] Resize bis 980 px zusätzlich zur CSS-Sperre logisch deaktivieren.
-- [x] Wechsel auf kleinen Viewport während Vorschau ohne Zustandsänderung abbrechen.
-- [x] verständliches Nutzerfeedback und zusammenfassendes WORKSPACE-Logging ergänzen.
-- [x] neue Tests `workspace-resize.test.mjs` und `workspace-resize-load.test.mjs` ergänzen.
-- [x] UI-Test um nicht persistente Größenvorschau erweitern.
-- [x] automatisiert absichern, dass D3a noch keine Pointer-Ziehlogik enthält.
-- [x] finalen D3a-Diff prüfen: 11 Dateien, 0 Commits hinter `main`.
-- [x] GitHub Quality Gate erfolgreich: 56 Dateien geprüft, 48/48 Tests erfolgreich, 0 fehlgeschlagen.
-- [x] PR #78 als mergebar prüfen und D3a per Squash mergen.
-- [x] `assets/workspace-resize.js`, `index.html` und `VERSION.json` nach Merge auf `main` stichproartig nachprüfen.
-
-0.3.0-D3a-Merge: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
-
-###### D3b – Pointer/Maus/Touch/Stift
-
-- [ ] vorhandenen Resize-Griff für Pointer Events wiederverwenden; keinen zweiten Bedienweg anlegen.
-- [ ] `pointerdown` kontrolliert starten und Startzustand/DOM-Maße erfassen.
-- [ ] Pointer Capture robust aktivieren und wieder freigeben.
+- [ ] vorhandenen Resize-Griff für Pointer Events wiederverwenden.
+- [ ] `pointerdown` kontrolliert starten und Pointer Capture robust verwalten.
 - [ ] `pointermove` ausschließlich als transiente Vorschau verarbeiten.
-- [ ] reale Grid-Metrik und `column-gap` über die bestehende D1-Größenberechnung verwenden.
-- [ ] während der Bewegung niemals persistent speichern oder pro Bewegung loggen.
+- [ ] Rastermetrik und bestehende D1-Größenberechnung wiederverwenden.
+- [ ] während der Bewegung weder speichern noch pro Bewegung loggen.
 - [ ] `pointerup` auf höchstens einen validierten Commit begrenzen.
 - [ ] `pointercancel` und `Escape` ohne Persistenz behandeln.
 - [ ] Maus, Touch und Stift über dieselbe Pointer-Logik abdecken.
-- [ ] Resize bis 980 px weiterhin kontrolliert deaktivieren.
-- [ ] automatisierte Pointer-, Capture-, Commit-, Abbruch- und Responsive-Tests ergänzen.
-- [ ] vollständigen D3b-Diff gegen `main` prüfen und Quality Gate grün abschließen.
-- [ ] D3b-PR erst bei vollständiger Abnahme mergen und zentrale Laufzeitdateien auf `main` nachprüfen.
+- [ ] Resize bis 980 px weiter deaktiviert halten.
+- [ ] Pointer-/Capture-/Commit-/Abbruchtests ergänzen.
 
-#### 0.3.0-E – Reorder & Drag and Drop
+### Danach – 0.3.0-E/F/G
 
-- [ ] Erst nach vollständig grünem 0.3.0-D beginnen.
-- [ ] Ziehen nur über dedizierten Drag-Griff erlauben.
-- [ ] Resize-Griff darf niemals Drag auslösen.
-- [ ] Nur Reihenfolge, keine freien Pixelkoordinaten speichern.
-- [ ] Drag-Abbruch ohne Zustandsverlust ermöglichen.
-- [ ] vollständige Tastaturalternative anbieten.
+- [ ] Reorder & Drag and Drop erst nach grünem D3b beginnen.
+- [ ] Tastaturalternative und Drag-Abbruch ohne Zustandsverlust sicherstellen.
+- [ ] Responsive/Accessibility-Hardening durchführen.
+- [ ] Firefox-Endabnahme und Chrome-Kompatibilitätsprobe durchführen.
+- [ ] Workspace-Release-Gate vollständig grün abschließen.
 
-#### 0.3.0-F – Responsive & Accessibility Hardening
+## Aktuelle Iteration – 0.4.0 Project Data Studio
 
-- [ ] Desktop-, Tablet- und Mobilregeln vollständig prüfen.
-- [ ] Fokus, Live-Status und `prefers-reduced-motion` absichern.
-- [ ] Touch-Ziele und Tastaturnavigation prüfen.
+Baseline: `6fd1123122cca0c69fd50bdbf69ef2186cc930d0`
 
-#### 0.3.0-G – Release Gate
+Arbeitsbranch: `feat/0.4.0-project-data-studio`
 
-- [ ] `npm run verify` mit allen Workspace-Prüfungen grün abschließen.
-- [ ] manuelle Firefox-Abnahme durchführen.
-- [ ] Chrome-Kompatibilität stichprobenartig prüfen.
-- [ ] README, CHANGELOG, MANIFEST und VERSION auf den realen Releasezustand synchronisieren.
-- [ ] Version erst nach vollständiger Abnahme auf `0.3.0` setzen.
-- [ ] Workflow-Hygiene inklusive GitHub-Actions-Node-Laufzeit prüfen.
-- [ ] Release-PR nur bei grünem Quality Gate mergen.
+Pull Request: `#81`
 
-## Danach
+### A – Entwicklungsnotizen
 
-### 0.4.0 – Diagnose Foundation PRO
+- [x] feste Projektdatei `data/ENTWICKLUNGSNOTIZEN.txt` anlegen.
+- [x] einzeiliges Eingabefeld in die Dashboard-Schnellstarterleiste integrieren.
+- [x] Speichern über `Enter` und Button auf denselben Submit-Pfad legen.
+- [x] lokalen Zeitstempel `YYYY-MM-DD HH:mm:ss` serverseitig erzeugen.
+- [x] Eingabe trimmen, Zeilenumbrüche normalisieren und Länge begrenzen.
+- [x] Link `Datei öffnen` integrieren.
+- [x] `file://`-Start erhalten und Schreibfunktion dort kontrolliert deaktivieren.
+
+### B – Zentrale Projektdatenbank
+
+- [x] versionierten JSON-Vertrag mit `schemaVersion`, `revision`, `templates[]` und `records[]` implementieren.
+- [x] feste Laufzeitdatei `data/project-data.json` definieren.
+- [x] Laufzeitdatenbank und temporäre Austauschdateien aus Git ausschließen.
+- [x] direkte statische Auslieferung der Datenbank blockieren.
+- [x] atomaren Dateiaustausch implementieren.
+- [x] Mutationen innerhalb des lokalen Servers serialisieren.
+- [x] beschädigtes JSON erkennen und nicht still überschreiben.
+- [x] serverseitige Payload-, Typ- und Schema-Prüfung implementieren.
+- [x] Same-Origin-Schutz für Browser-API-Aufrufe implementieren.
+
+### C – Eingabemasken-Baukasten
+
+- [x] Vorlagen erstellen.
+- [x] Vorlagen erneut laden und bearbeiten.
+- [x] Felder hinzufügen und entfernen.
+- [x] Feldtyp `Text` unterstützen.
+- [x] Feldtyp `Mehrzeiliger Text` unterstützen.
+- [x] Feldtyp `Zahl` unterstützen.
+- [x] Feldtyp `Datum` unterstützen.
+- [x] Feldtyp `Checkbox` unterstützen.
+- [x] Feldtyp `Auswahlliste` mit frei definierbaren Optionen unterstützen.
+- [x] Pflichtfelder unterstützen.
+- [x] inkompatible Vorlagenänderungen bei bestehenden Datensätzen blockieren.
+
+### D – Datensatzverwaltung
+
+- [x] Datensätze erstellen.
+- [x] Datensätze anzeigen.
+- [x] Datensätze bearbeiten.
+- [x] Datensätze löschen.
+- [x] Werte bei jedem Schreibvorgang serverseitig gegen die Vorlage validieren.
+- [x] parallele Mutationen automatisiert auf verlorene Schreibvorgänge testen.
+
+### E – Lint, Format und Regression
+
+- [x] `npm run lint` als eigenen projektspezifischen Lint-Gate ergänzen.
+- [x] dynamische Codeausführung, externe absolute `fetch`-Ziele und unsichere Serverbindung prüfen.
+- [x] zweite Browser-Persistenz in Project-Data-Modulen verbieten.
+- [x] `npm run verify` auf `Lint -> Quality Gate -> Tests` erweitern.
+- [x] bestehende Workspace-Regressionstests unverändert weiter ausführen.
+- [x] API-, Daten-, UI- und Linter-Tests ergänzen.
+- [x] beschädigte Datenbank als Failure-Probe testen.
+- [x] parallele Datensatzmutationen als Failure-/Concurrency-Probe testen.
+- [x] lokale Laufzeitdatenbank explizit vom Auto-Fix ausschließen.
+- [x] GitHub Actions von v4 auf aktuelle v7-Actions aktualisieren.
+- [x] CI-Matrix auf Node 20 und Node 24 erweitern.
+- [ ] finalen CI-Lauf auf beiden Node-Versionen vollständig grün bestätigen.
+- [ ] finalen PR-Diff gegen `main` auf ausschließlich begründete Änderungen prüfen.
+
+### F – Dokumentation und Abschluss
+
+- [x] `docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
+- [x] `docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
+- [x] `docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md` anlegen.
+- [x] README auf 0.4.0-Funktion und Grenzen aktualisieren.
+- [x] TODO auf die reale Roadmap aktualisieren und Versionskonflikt mit der früher geplanten Diagnose-Stufe beseitigen.
+- [ ] CHANGELOG aktualisieren.
+- [ ] MANIFEST aktualisieren.
+- [x] VERSION-Entwicklungsmetadaten aktualisieren; Produktversion bleibt `0.2.0`.
+- [ ] PR #81 nach grünem Gate auf „ready for review“ setzen.
+- [ ] PR #81 kontrolliert mergen.
+- [ ] `main` nach Merge erneut prüfen.
+
+## Nächste Project-Data-Stufe – 0.4.1 Recovery & Migration
+
+- [ ] Backup vor Datenbankersatz definieren und implementieren.
+- [ ] Backup-Rotation mit klarer Obergrenze festlegen.
+- [ ] Restore-Vorschau und kontrollierte Wiederherstellung implementieren.
+- [ ] Export/Import mit Schema-Prüfung ergänzen.
+- [ ] beschädigte Datei, Schreibabbruch und Recovery als Failure-Injection automatisieren.
+- [ ] Schema-Migrationsvertrag für zukünftige Versionen definieren.
+- [ ] Migration `v1 -> v2` zuerst als Testfixture entwickeln, bevor ein echtes v2-Schema eingeführt wird.
+
+## Danach – 0.4.2 Data Studio PRO
+
+- [ ] Filter- und Suchansicht ergänzen.
+- [ ] relationale Feldtypen fachlich definieren.
+- [ ] optionalen Storage-Adapter-Vertrag vorbereiten.
+- [ ] SQLite nur bei nachgewiesenem Bedarf hinter demselben Datenservice einführen.
+- [ ] Vorlagenexport und Vorlagenbibliothek ergänzen.
+
+## Danach – 0.5.0 Diagnose Foundation PRO
+
+Die früher als `0.4.0` geplante Diagnose-Stufe wird wegen des jetzt belegten Project-Data-Releases sauber auf `0.5.0` verschoben.
 
 - [ ] Logging nach Bereichen und Stufen filterbar machen.
 - [ ] Zeitmessung und Laufzeitkontext ergänzen.
@@ -243,9 +172,10 @@ Planungs-Merge: `3998373876f087f90ddbf248c316986b85c20fe9`
 - [ ] datensparsamen Diagnosebericht exportierbar machen.
 - [ ] Export vor Speicherung auf sensible oder unnötige Daten begrenzen.
 
-## Später
+## Langfristig
 
-- [ ] Erst bei realem Bedarf UI-Slots für echte Fachmodule definieren.
-- [ ] Modulzustände optional lokal speichern.
+- [ ] Modulzustände nur bei realem Bedarf lokal speichern.
 - [ ] Berechtigungsmodell erst mit einem echten privilegierten Modul entwerfen.
-- [ ] Keine Remote-Plugin-Installation ohne eigenes Sicherheitskonzept einführen.
+- [ ] keine Remote-Plugin-Installation ohne eigenes Sicherheitskonzept einführen.
+- [ ] Browser-E2E-Tests für Firefox und Chrome als Release-Gate etablieren.
+- [ ] Cross-OS-CI erst nach Stabilisierung der lokalen Datenpfade auf Windows/macOS erweitern.

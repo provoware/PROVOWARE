@@ -18,8 +18,9 @@ const TEXT_EXTENSIONS = new Set([
   ".yml",
   ".yaml",
 ]);
-const TEXT_FILENAMES = new Set([".editorconfig"]);
+const TEXT_FILENAMES = new Set([".editorconfig", ".gitignore"]);
 const IGNORED_DIRECTORIES = new Set([".git", "node_modules"]);
+const IGNORED_RUNTIME_FILES = new Set(["data/project-data.json"]);
 const errors = [];
 const fixes = [];
 
@@ -35,6 +36,11 @@ const exists = async (filePath) => {
   }
 };
 
+const ignoredRuntimeFile = (filePath) => {
+  const item = relative(filePath);
+  return IGNORED_RUNTIME_FILES.has(item) || item.startsWith("data/project-data.json.tmp-");
+};
+
 const walk = async (directory) => {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
@@ -43,7 +49,7 @@ const walk = async (directory) => {
     if (entry.isDirectory() && IGNORED_DIRECTORIES.has(entry.name)) continue;
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...(await walk(fullPath)));
-    else files.push(fullPath);
+    else if (!ignoredRuntimeFile(fullPath)) files.push(fullPath);
   }
 
   return files;
@@ -107,14 +113,27 @@ const checkRequiredFiles = async () => {
     "assets/workspace-state.js",
     "assets/workspace-ui.js",
     "assets/styles.css",
+    "assets/project-data.css",
     "modules/registry.js",
+    "modules/development-notes/index.js",
+    "modules/data-studio/index.js",
     "scripts/start.mjs",
+    "scripts/project-data-service.mjs",
+    "scripts/project-lint.mjs",
     "start.cmd",
     "start.sh",
     "tests/module-registry.test.mjs",
     "tests/start.test.mjs",
     "tests/workspace-state.test.mjs",
     "tests/workspace-ui.test.mjs",
+    "tests/project-data-service.test.mjs",
+    "tests/project-data-api.test.mjs",
+    "tests/project-lint.test.mjs",
+    "data/ENTWICKLUNGSNOTIZEN.txt",
+    "data/.gitignore",
+    "docs/PLAN_0.4.0_PROJECT_DATA_STUDIO.md",
+    "docs/CHECKPOINT_0.4.0_PROJECT_DATA_STUDIO.md",
+    "docs/CHECKLIST_0.4.0_PROJECT_DATA_STUDIO.md",
     "README.md",
     "TODO.md",
     "CHANGELOG.md",
@@ -318,7 +337,7 @@ const validateManifest = (manifest, seenIds) => {
   return typeof entry === "string" ? entry : null;
 };
 
-const checkRegistry = async () => {
+const registryCatalogLesen = async () => {
   const registryPath = path.join(ROOT, "modules/registry.js");
   const source = await readFile(registryPath, "utf8");
   const sandbox = { window: {} };
@@ -327,21 +346,65 @@ const checkRegistry = async () => {
     vm.runInNewContext(source, sandbox, { filename: "modules/registry.js", timeout: 1000 });
   } catch (error) {
     fail(`modules/registry.js: Katalog konnte nicht ausgewertet werden (${error.message}).`);
-    return;
+    return [];
   }
 
   const catalog = sandbox.window.PROVOWARE_MODULE_CATALOG;
   if (!Array.isArray(catalog)) {
     fail("modules/registry.js: PROVOWARE_MODULE_CATALOG muss eine Liste sein.");
-    return;
+    return [];
   }
+  return catalog;
+};
 
+const checkRegistry = async () => {
+  const catalog = await registryCatalogLesen();
   const seenIds = new Set();
   for (const manifest of catalog) {
     const entry = validateManifest(manifest, seenIds);
     if (entry && !(await exists(path.join(ROOT, entry)))) {
       fail(`Modul ${manifest.id}: Einstiegspunkt existiert nicht (${entry}).`);
     }
+  }
+};
+
+const checkProjectDataContract = async () => {
+  const catalog = await registryCatalogLesen();
+  const byId = new Map(catalog.map((manifest) => [manifest.id, manifest]));
+  for (const id of ["development-notes", "data-studio"]) {
+    const manifest = byId.get(id);
+    if (!manifest) {
+      fail(`Project Data Studio: Pflichtmodul '${id}' fehlt im Katalog.`);
+      continue;
+    }
+    if (manifest.enabledByDefault !== true) {
+      fail(`Project Data Studio: Pflichtmodul '${id}' muss standardmäßig aktiv sein.`);
+    }
+    if (manifest.version !== "0.4.0") {
+      fail(`Project Data Studio: Modul '${id}' muss Entwicklungsstand 0.4.0 tragen.`);
+    }
+  }
+
+  const html = await readFile(path.join(ROOT, "index.html"), "utf8");
+  if (!html.includes('href="assets/project-data.css"')) {
+    fail("index.html: Styles für Project Data Studio fehlen.");
+  }
+
+  const ignore = await readFile(path.join(ROOT, "data/.gitignore"), "utf8");
+  const ignoreLines = ignore.split(/\r?\n/).map((line) => line.trim());
+  if (!ignoreLines.includes("project-data.json")) {
+    fail("data/.gitignore: lokale project-data.json muss aus Git ausgeschlossen bleiben.");
+  }
+  if (!ignoreLines.includes("project-data.json.tmp-*")) {
+    fail("data/.gitignore: temporäre atomare Datenbankdateien müssen aus Git ausgeschlossen bleiben.");
+  }
+
+  const packageJson = await readJson("package.json");
+  if (packageJson && packageJson.scripts?.lint !== "node scripts/project-lint.mjs") {
+    fail("package.json: kanonischer Lint-Befehl muss scripts/project-lint.mjs verwenden.");
+  }
+  if (packageJson && !String(packageJson.scripts?.verify || "").includes("npm run lint")) {
+    fail("package.json: verify muss den Lint-Gate ausführen.");
   }
 };
 
@@ -356,6 +419,7 @@ const main = async () => {
   await checkHtml();
   await checkWorkspaceLayout();
   await checkRegistry();
+  await checkProjectDataContract();
 
   if (fixes.length) {
     console.log(`AUTO-FIX: ${fixes.length} Datei(en) sicher normalisiert:`);

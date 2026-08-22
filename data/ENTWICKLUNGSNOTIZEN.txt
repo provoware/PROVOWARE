@@ -1,0 +1,3 @@
+PROVOWARE – ENTWICKLUNGSNOTIZEN
+Diese Datei wird über die Dashboard-Schnelleingabe zeilenweise mit lokalem Zeitstempel ergänzt.
+

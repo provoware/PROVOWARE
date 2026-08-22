@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## In Entwicklung – 0.4.0 Project Data Studio
+
+### Hinzugefügt
+
+- Modul `development-notes` mit einzeiliger Dashboard-Schnelleingabe, Speichern per Enter oder Button und direktem Link zur festen Datei `data/ENTWICKLUNGSNOTIZEN.txt`.
+- serverseitiger lokaler Zeitstempel im Format `YYYY-MM-DD HH:mm:ss` sowie Einzeilen-Normalisierung für Entwicklungsnotizen.
+- Modul `data-studio` als zentrale lokale Projektdatenverwaltung im Detailbereich.
+- flexibler Eingabemasken-Baukasten mit Text, Mehrzeiler, Zahl, Datum, Checkbox und frei definierbarer Auswahlliste.
+- Vorlagen erstellen und bearbeiten sowie Datensätze erstellen, anzeigen, bearbeiten und löschen.
+- versionierter Project-Data-Vertrag Version 1 mit `schemaVersion`, `revision`, `templates[]` und `records[]`.
+- lokale API-Schicht in `scripts/project-data-service.mjs` mit festen Dateipfaden, JSON-Payload-Limit, Same-Origin-Prüfung und serverseitiger Datenvalidierung.
+- atomare JSON-Persistenz und serialisierte Datenmutationen für `data/project-data.json`.
+- Schutz vor inkompatiblen Vorlagenänderungen, solange bestehende Datensätze davon betroffen wären.
+- eigener abhängigkeitfreier Projekt-Linter `scripts/project-lint.mjs` und Befehl `npm run lint`.
+- automatische Project-Data-Service-, API-, UI-Vertrags-, Linter- und Parallelmutations-Tests.
+- Plan, Checkpoint und Abnahmecheckliste für 0.4.0.
+
+### Geändert
+
+- `scripts/start.mjs` routet definierte lokale Project-Data-API-Endpunkte vor der statischen Dateiauslieferung.
+- direkte statische Auslieferung von `data/project-data.json` wird blockiert.
+- `npm run verify` führt jetzt `Lint -> Quality Gate -> Tests` aus.
+- Quality Gate kennt die neuen Pflichtmodule und schützt `data/project-data.json` sowie atomare Temp-Dateien vor Auto-Fix/Quellcode-Walk.
+- GitHub Actions von `actions/checkout@v4` / `actions/setup-node@v4` auf die aktuellen v7-Actions aktualisiert.
+- CI auf Matrixprüfung mit Node 20 und Node 24 erweitert.
+- `modules/registry.js` enthält erstmals echte Fachmodule; Modulvertrag bleibt Version 1.
+- README, TODO, MANIFEST und VERSION-Entwicklungsmetadaten auf den neuen Funktionsstand synchronisiert.
+- die früher vorgesehene `0.4.0 Diagnose Foundation PRO` wird wegen der jetzt belegten Project-Data-Version sauber auf `0.5.0` verschoben.
+
+### Sicherheits- und Datenintegritätsgrenzen
+
+- der Browser kann keine frei wählbaren Dateipfade an die Schreib-API übergeben.
+- `data/project-data.json` und `data/project-data.json.tmp-*` bleiben aus Git ausgeschlossen.
+- beschädigte bestehende JSON-Daten werden nicht still überschrieben.
+- Project-Data-Module dürfen keine zweite Persistenz über `localStorage` oder `sessionStorage` anlegen.
+- direkte `file://`-Nutzung bleibt möglich; Schreibfunktionen degradieren dort kontrolliert statt einen Serverzugriff vorzutäuschen.
+- parallele Datensatzmutationen werden automatisiert auf verlorene Schreibvorgänge geprüft.
+
+### Bewusst noch nicht enthalten
+
+- Backup/Restore, Export/Import und Schemamigrationen; vorgesehen für 0.4.1.
+- relationale Feldtypen, Suche/Filter und optionaler SQLite-Adapter.
+- echte Firefox-/Chrome-E2E-Tests.
+- Cross-OS-CI für Windows/macOS.
+- Pointer-/Touch-Resize und Drag & Drop aus dem separaten Workspace-Strang.
+
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
 ### Vollautomatischer lokaler Start
