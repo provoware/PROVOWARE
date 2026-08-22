@@ -1,14 +1,15 @@
 # PROVOWARE ALL-IN 2026
 
-Modulare Offline-First-Oberfläche mit versioniertem Workspace, lokalem Modulvertrag, projektgebundener Datenhaltung und automatisierter Recovery-Prüfung.
+Modulare Offline-First-Oberfläche mit versioniertem Workspace, lokalem Modulvertrag, projektgebundener Datenhaltung, Recovery und realer Chromium-Browserprüfung.
 
 - Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
-- Interne Entwicklungsstufe: `0.4.1-E2E – Chromium Gate & HTML UI Mirror`
+- Interne Entwicklungsstufe: `0.4.2 – Data Studio PRO`
 - Project-Data-Produktionsschema: `1`
+- Data-Studio-PRO-Metadatenvertrag: `1`
 - Modulvertrag: `1`
 - Workspace-Vertrag: `1`
 
-Die bestehenden Stufen `0.3.0-D3a – Keyboard Resize Preview`, `0.4.0 – Project Data Studio` und `0.4.1 – Recovery & Migration` bleiben Bestandteil der Basis.
+Die bestehenden Stufen `0.3.0-D3a – Keyboard Resize Preview`, `0.4.0 – Project Data Studio`, `0.4.1 – Recovery & Migration` und `0.4.1-E2E – Chromium Gate & HTML UI Mirror` bleiben unverändert Bestandteil der Basis.
 
 ## Start für normale Nutzung
 
@@ -29,7 +30,7 @@ Der lokale Server bindet ausschließlich an `127.0.0.1`, prüft die Node-Version
 
 ### Direkter Offline-Start
 
-`index.html` kann weiterhin direkt in **Chromium oder Firefox** geöffnet werden. Workspace und statische Oberfläche bleiben nutzbar. Schreibzugriffe auf Projektdateien benötigen aus Sicherheitsgründen den lokalen Klick-&-Start-Server; bei `file://` degradieren Schnellnotiz, Data Studio und Recovery kontrolliert in einen nicht schreibfähigen Modus.
+`index.html` kann weiterhin direkt in **Chromium oder Firefox** geöffnet werden. Workspace und statische Oberfläche bleiben nutzbar. Schreibzugriffe auf Projektdateien benötigen aus Sicherheitsgründen den lokalen Klick-&-Start-Server; bei `file://` degradieren Schnellnotiz, Data Studio, Data Studio PRO und Recovery kontrolliert in einen nicht schreibfähigen Modus.
 
 ## Entwicklungsnotiz – Schnellspeichern
 
@@ -77,6 +78,93 @@ Vorlagen und Datensätze können erstellt, erneut geladen, bearbeitet und gelös
 - Same-Origin-Prüfung der lokalen Browser-API
 - inkompatible Vorlagenänderungen werden bei vorhandenen Datensätzen abgelehnt
 
+## Data Studio PRO – 0.4.2
+
+`data-studio-pro` ist eine getrennte Recherche- und Organisationsschicht. Der stabile CRUD-Editor `data-studio` bleibt auf Version `0.4.0`; PRO dupliziert dessen Schreiblogik nicht.
+
+### Suche und Filter
+
+Datensätze können über alle sichtbaren Feldbezeichnungen und Werte durchsucht werden. Zusätzlich stehen bereit:
+
+- Vorlagenfilter
+- Kategorienfilter
+- Trefferzahl
+- Sortierung `Aktualisiert neu → alt`
+- Sortierung `Aktualisiert alt → neu`
+- Sortierung `Erstellt neu → alt`
+- Sortierung `Erstellt alt → neu`
+- verständliche Nulltrefferanzeige
+
+Ein Treffer kann über die kleine `data-studio-pro-bridge` direkt im bestehenden CRUD-Editor geöffnet werden.
+
+### Kategorien und Vorlagenbibliothek
+
+Vorlagen können frei benannten Kategorien zugewiesen werden. Die Bibliothek zeigt pro Vorlage:
+
+- Name
+- Kategorie
+- Feldanzahl
+- Datensatzanzahl
+- direkten Öffnen-Befehl
+- Vorlagenexport
+
+Bibliothekssuche und Kategorienfilter arbeiten unabhängig von der Datensatzsuche. Wird eine Kategorie gelöscht, bleiben Vorlagen erhalten und verlieren lediglich ihre Kategoriezuweisung.
+
+### Gespeicherte Ansichten
+
+Eine Ansicht speichert serverseitig:
+
+- Namen
+- gewählte Vorlage
+- Kategorienfilter
+- Suchtext
+- Sortierung
+
+Sie enthält **keine Kopie der Datensätze**. Ansichten können gespeichert, wieder angewendet und gelöscht werden. Namen sind case-insensitiv eindeutig.
+
+### Vorlagenexport
+
+Eine Vorlage kann als portable JSON-Datei exportiert werden.
+
+Vertrag:
+
+```text
+format = provoware-data-studio-template
+formatVersion = 1
+```
+
+Der Export enthält Exportzeitpunkt, optionale Kategorie, Vorlagenname/-beschreibung und Felddefinitionen. Datensätze werden bewusst **nicht** mit exportiert.
+
+### Getrennte PRO-Metadaten
+
+Runtime-Datei:
+
+`data/data-studio-pro.json`
+
+Metadatenvertrag Version 1:
+
+- `schemaVersion`
+- `revision`
+- `categories[]`
+- `templateCategories[]`
+- `savedViews[]`
+
+Die Datei ist absichtlich vom Project-Data-Produktionsschema getrennt. Dadurch bleibt `data/project-data.json` unverändert bei Schema 1.
+
+Schutz:
+
+- feste serverseitige Datei, keine freie Pfadwahl
+- Same-Origin für Schreibzugriffe
+- atomarer Temp-Datei-zu-Rename-Pfad
+- dieselbe zentrale Mutationssperre wie Project Data und Recovery
+- beschädigte PRO-Datei wird nicht still ersetzt
+- Runtime-Datei und Temp-Dateien bleiben aus Git ausgeschlossen
+- statische Direktauslieferung ist blockiert
+- `npm run fix` ignoriert die Runtime-Datei
+- `localStorage` und `sessionStorage` bleiben durch den Projekt-Linter verboten
+
+**Recovery-Grenze:** Die 0.4.1-Project-Data-Backups sichern weiterhin ausschließlich `data/project-data.json`. Kategorien und gespeicherte Ansichten aus `data/data-studio-pro.json` sind in 0.4.2 noch kein Bestandteil dieses Backupformats. Eine gemeinsame Recovery-Hülle wäre ein eigener, versionierter Vertrag und wird nicht still in 0.4.1 hineingemischt.
+
 ## Recovery & Migration – 0.4.1
 
 Recovery ist als eigenes Modul `data-recovery` vom normalen CRUD-Bereich getrennt, verwendet aber dieselbe zentrale Mutationssperre.
@@ -114,20 +202,20 @@ Das Produktionsschema bleibt ausdrücklich **Version 1**. Die Migrationsengine u
 
 ## Project-Data-UI: Container-Responsive
 
-Der echte Chromium-E2E-Lauf deckte einen Layoutfehler auf: In einem schmalen Detailpanel konnten sich die zwei internen Project-Data-Spalten überlagern und sichtbare Buttons gegenseitig abfangen.
+Der echte Chromium-E2E-Lauf deckte in 0.4.1-E2E einen Layoutfehler auf: In einem schmalen Detailpanel konnten sich interne Project-Data-Spalten überlagern und sichtbare Buttons gegenseitig abfangen.
 
-Die Oberfläche reagiert deshalb jetzt auf die **tatsächliche Breite des Project-Data-Containers**, nicht nur auf die Browserbreite:
+Die Oberfläche reagiert deshalb auf die **tatsächliche Breite des Project-Data-Containers**, nicht nur auf die Browserbreite:
 
 - schmaler Detailbereich → eine Spalte
-- breitere Fachmodulfläche → Zwei-Spalten-Modus erst ab ausreichender Containerbreite
-- Feldzeilen werden ebenfalls containerabhängig verdichtet
+- Feldzeilen werden ab 520 px Containerbreite verdichtet
+- Zwei-Spalten-Modus erst ab 760 px Containerbreite
 - Bedienelemente besitzen Scroll-Abstand zur sticky Schnellstarterleiste
 
-Der unveränderte reale Browserpfad wurde nach dieser Reparatur vollständig grün ausgeführt.
+Data Studio PRO verwendet denselben Container-Vertrag.
 
 ## Chromium-first Browser-E2E
 
-Browserprüfungen sind bewusst vom schnellen paketfreien Core-Gate getrennt.
+Browserprüfungen sind bewusst vom schnellen Core-Gate getrennt.
 
 ### Testwerkzeuge installieren
 
@@ -163,21 +251,25 @@ npm run test:e2e:firefox
 
 Firefox ist **kein automatischer Primärblocker**. Im GitHub-Workflow wird er nur über einen optionalen manuellen `workflow_dispatch` zugeschaltet.
 
-### Reale E2E-Kette
+### Reale E2E-Ketten
 
-Der Chromium-Test führt über die tatsächliche UI:
+Chromium führt aktuell drei echte Prüfungen aus:
 
-`Start -> Notiz -> Datei prüfen -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import`
+1. `Start -> Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import`
+2. `Vorlage -> Datensätze -> Kategorie -> Zuweisung -> Bibliotheksfilter -> Volltextsuche -> gespeicherte Ansicht -> Anwenden -> Vorlagenexport -> Reload -> Ansicht erneut anwenden`
+3. proportionaler HTML-Mirror der echten Oberfläche
 
-Die Testdaten werden in einer temporären Projektkopie erzeugt. Dadurch werden echte Entwicklungsnotizen, Datenbank und Backups der Arbeitskopie nicht verändert.
+Die Testdaten werden in einer temporären Projektkopie erzeugt. Dadurch werden echte Entwicklungsnotizen, Datenbank, PRO-Metadaten und Backups der Arbeitskopie nicht verändert.
 
-### Aktuell validierter Stand
+### Erster vollständig grüner 0.4.2-Stand
 
-- Chromium: `2/2` echte Browserprüfungen erfolgreich
-- funktionale CRUD-/Recovery-Kette: PASS
+- Chromium: `3/3` echte Browserprüfungen erfolgreich
+- CRUD-/Recovery-Kette: PASS
+- Data-Studio-PRO-Kette: PASS
 - HTML-Mirror: PASS
 - Firefox im automatischen Lauf: wie vorgesehen übersprungen
-- Erfolgsartefakt enthält sechs PNG-Screenshots plus Project-Data-JSON-Export
+- Browserartefakt: `9476750307`
+- Artefakt-SHA-256: `f2eee6beb9baec81126885ce23c8543070afec0fae088045d104cd68a8628f99`
 
 ## HTML UI Mirror Pipeline
 
@@ -194,7 +286,7 @@ Die Pipeline baut **keine Attrappe** der Oberfläche. Sie lädt zweimal dieselbe
 1. Referenz mit internem Layout-Viewport `1366 × 900` bei 100 %.
 2. Spiegel mit demselben internen Layout-Viewport `1366 × 900`, ausschließlich außen per CSS auf Faktor `0,5` skaliert.
 
-Dadurch bleibt die interne UI-Geometrie identisch. Automatisch verglichen werden unter anderem:
+Automatisch verglichen werden unter anderem:
 
 - `body`
 - `.app-shell`
@@ -204,6 +296,7 @@ Dadurch bleibt die interne UI-Geometrie identisch. Automatisch verglichen werden
 - `#quickbar`
 - `#arbeitsbereich`
 - `#details`
+- `.data-studio-pro`
 
 PASS verlangt:
 
@@ -214,9 +307,9 @@ PASS verlangt:
 
 Screenshots dienen als reproduzierbare Evidenz und Diagnose. Sie sind bewusst **kein betriebssystemabhängiger Pixel-Diff-Blocker**; das eigentliche Mirror-Gate basiert auf DOM- und Geometriemessung.
 
-### Screenshot-Evidenz
+### Screenshot- und Export-Evidenz
 
-Ein erfolgreicher Chromium-Lauf erzeugt:
+Ein erfolgreicher Chromium-Lauf erzeugt aktuell:
 
 - `01-start.png`
 - `02-record-created.png`
@@ -224,7 +317,9 @@ Ein erfolgreicher Chromium-Lauf erzeugt:
 - `04-import-restored.png`
 - `05-ui-mirror-pipeline.png`
 - `06-ui-mirror-scaled.png`
+- `07-data-studio-pro.png`
 - `project-data-export.json`
+- `data-studio-template-export.json`
 
 Bei Fehlern bleiben zusätzlich Playwright-Screenshot, Video und Trace erhalten.
 
@@ -242,13 +337,28 @@ Reihenfolge:
 
 Dieser Pfad bleibt ohne Browserinstallation ausführbar.
 
-Aktueller geprüfter Core-Stand des E2E-Strangs:
+Erster vollständig grüner 0.4.2-Core-Stand:
 
-- 35 JavaScript-Dateien gelintet
-- 94 Projektdateien geprüft
-- 85/85 Node-Tests erfolgreich
+- 41 JavaScript-Dateien gelintet
+- 103 Projektdateien geprüft
+- 101/101 Node-Tests erfolgreich
 - Node 20: PASS
 - Node 24: PASS
+
+Neue PRO-Regressionen prüfen unter anderem:
+
+- Kategorien und case-insensitive Eindeutigkeit
+- Vorlagenzuweisungen
+- gespeicherte Ansichten
+- Referenz- und Sortierprüfung
+- Same-Origin
+- beschädigte PRO-Datei
+- atomaren Schreibabbruch direkt vor Rename
+- bytegenau unveränderte Live-Metadaten nach Schreibabbruch
+- Browser-Zweitpersistenz-Verbot
+- automatische Revisionsbrücke zwischen CRUD und PRO
+- Vorlagenexport ohne Datensätze
+- Reload-Persistenz der PRO-Metadaten
 
 ### Lint
 
@@ -262,7 +372,7 @@ Der eigene abhängigkeitfreie Linter prüft unter anderem:
 - `document.write`
 - absolute externe `fetch`-Ziele
 - unbeabsichtigte Serverbindung an `0.0.0.0`
-- zweite Browser-Persistenz in Project-Data-Modulen
+- zweite Browser-Persistenz in allen Project-Data-/PRO-/Recovery-Modulen
 - `use strict` in Browser-JavaScript
 
 ### Semantikneutraler Auto-Fix
@@ -271,16 +381,16 @@ Der eigene abhängigkeitfreie Linter prüft unter anderem:
 npm run fix
 ```
 
-Der Auto-Fix ist kein aggressiver Quellcode-Reformatter. Er normalisiert nur eindeutig semantikneutrale Text-/JSON-Eigenschaften. Laufzeitdatenbank, Recovery-Backups und Browserartefakte sind vom Quellcode-Walk ausgeschlossen.
+Der Auto-Fix ist kein aggressiver Quellcode-Reformatter. Er normalisiert nur eindeutig semantikneutrale Text-/JSON-Eigenschaften. `data/project-data.json`, `data/data-studio-pro.json`, deren atomare Temp-Dateien, Recovery-Backups und Browserartefakte sind vom Quellcode-Walk ausgeschlossen.
 
 ## Regressionsschichten
 
 1. versionierte Verträge
 2. serverseitige Validierung
 3. atomare und serialisierte Persistenz
-4. automatische Backups vor Datenersatz
+4. automatische Backups vor Project-Data-Ersatz
 5. SHA-gebundene Restore-/Import-Vorschau
-6. Failure-Injection im Schreibpfad
+6. Failure-Injection in Project Data und PRO-Metadaten
 7. Migrationsvertrag
 8. Projekt-Lint
 9. zentraler Quality Gate
@@ -290,7 +400,7 @@ Der Auto-Fix ist kein aggressiver Quellcode-Reformatter. Er normalisiert nur ein
 13. Screenshot-/Export-Evidenz
 14. PR-Diff-Gate und Main-Check
 
-Das ist robust, aber nicht „perfekt“. Offen bleiben insbesondere Cross-OS-CI, reale Windows-Dateisperren/-Rename-Unterschiede, Pointer-/Touch-Workspace-Hardening und eine echte Schema-v2-Migration erst bei tatsächlichem fachlichem Bedarf.
+Das ist robust, aber nicht „perfekt“. Offen bleiben insbesondere Cross-OS-CI, reale Windows-Dateisperren/-Rename-Unterschiede, eine gemeinsame versionierte Recovery-Hülle für PRO-Metadaten, Pointer-/Touch-Workspace-Hardening und eine echte Schema-v2-Migration erst bei tatsächlichem fachlichem Bedarf.
 
 ## Wichtige Entwicklungsdokumente
 
@@ -309,6 +419,12 @@ Browser-E2E / Mirror:
 - `docs/CHECKPOINT_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
 - `docs/CHECKLIST_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
 
+Data Studio PRO:
+
+- `docs/PLAN_0.4.2_DATA_STUDIO_PRO.md`
+- `docs/CHECKPOINT_0.4.2_DATA_STUDIO_PRO.md`
+- `docs/CHECKLIST_0.4.2_DATA_STUDIO_PRO.md`
+
 Workspace:
 
 - `docs/WORKSPACE_CONTRACT.md`
@@ -318,8 +434,8 @@ Verbindliche Agenten-/Entwicklungsregeln: `AGENTS.md`.
 
 ## Nächste Stufen
 
-1. `0.4.2 – Data Studio PRO`: Suche/Filter, Vorlagenbibliothek, Kategorien, bessere Maskenorganisation.
-2. Cross-OS-/Release-Hardening: Linux-Rechte/Temp/Rename und danach Windows-Dateisperren/Pfade/Recovery.
-3. Workspace D3b: Pointer/Maus/Touch/Stift über den bestehenden Resize-Vertrag.
+1. **Cross-OS-/Release-Hardening:** Linux-Rechte/Temp/Rename und Windows-Dateisperren/Pfade/Recovery real prüfen.
+2. **0.4.3 Recovery Envelope:** nur bei Priorisierung PRO-Metadaten in einen eigenen versionierten gemeinsamen Backup-/Restore-Vertrag aufnehmen.
+3. **Workspace D3b:** Pointer/Maus/Touch/Stift über den bestehenden Resize-Vertrag.
 
 SQLite bleibt optional und wird erst hinter derselben Service-Schnittstelle eingeführt, wenn ein realer Bedarf nachgewiesen ist.
