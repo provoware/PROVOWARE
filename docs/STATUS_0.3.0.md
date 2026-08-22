@@ -4,7 +4,7 @@
 
 `0.3.0-A – Workspace-Vertrag`, `0.3.0-B – State Foundation & Autosave/Reset` und `0.3.0-C – Visibility Controls + kompakte Menüleiste` sind abgeschlossen.
 
-Für `0.3.0-D – Resize` sind Planungs- und Vertragsphase ebenfalls abgeschlossen. Der erste bewusst kleine technische Folgepatch **State-API + reine Größenberechnung** ist implementiert und befindet sich jetzt in der Abschlussvalidierung. Es gibt weiterhin **keine sichtbare Resize-Bedienung**.
+Für `0.3.0-D – Resize` sind die Planungs-/Vertragsphase und der erste kleine technische Patch **D1 – State-API + reine Größenberechnung** abgeschlossen. Es gibt weiterhin **keine sichtbare Resize-Bedienung**. Der nächste Patch ist ausschließlich **D2 – DOM-Anwendung gespeicherter Größen**.
 
 Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. `VERSION.json` weist die interne Entwicklungsphase transparent als `0.3.0-D Resize State & Calculation` aus.
 
@@ -77,13 +77,13 @@ Die Resize-Testmatrix enthält **40 klar benannte Prüfziele** für State, Berec
 - Squash-Merge: `c41b958b6a1aa426cd427be4f633742b21e404d0`.
 - Main-Stichprobe: `docs/RESIZE_CONTRACT_0.3.0.md`, `docs/PLAN_0.3.0_D.md` und `VERSION.json` erfolgreich gelesen.
 
-## 0.3.0-D – State & Calculation Foundation
+## 0.3.0-D1 – State & Calculation Foundation
 
-Aktuelle technische Baseline:
+Technische Ausgangsbaseline:
 
 `a9b23b8d16e96142f35904a08315ca3f2f4495a0`
 
-Diese Baseline enthält bereits den separat gemergten Erscheinungsbild-Patch PR #72. Der Resize-Patch baut deshalb bewusst auf dem **aktuellen** `main` auf und überschreibt keine Designänderungen.
+Während der Arbeit wurde PR #73 zur Quality-Gate-Härtung parallel auf `main` gemergt. Der D1-Branch wurde deshalb vor der finalen Abnahme kontrolliert mit `main` `887ff10363662935c385e1f7e965e0eb75be5918` synchronisiert. Die parallele Härtung wurde erhalten.
 
 Implementiert:
 
@@ -91,7 +91,7 @@ Implementiert:
 - `panelGroesseZuruecksetzen(id)` in `assets/workspace-state.js`
 - gemeinsame Panel-ID-Prüfung für Sichtbarkeits- und Größenaktionen
 - Erhalt von Reihenfolge und Sichtbarkeit bei Größenänderungen
-- Größenbegrenzung über die bereits kanonischen `PANEL_DEFINITIONEN`
+- Größenbegrenzung über die kanonischen `PANEL_DEFINITIONEN`
 - `heightPx: null` bleibt als automatische Höhe gültig
 - neue reine Datei `assets/workspace-size.js`
 - Rastermetrik aus Containerbreite, 12 Spalten und realem Spaltenabstand
@@ -113,19 +113,23 @@ Bewusst nicht enthalten:
 - keine neue Workspace-Vertragsversion
 - kein Drag & Drop
 
-## Aktuelle Abschlussvalidierung
+## Reale D1-Abnahme
 
-Noch offen:
+- technischer Pull Request: `#74`
+- finaler Branch: `0` Commits hinter `main`
+- geänderte Dateien im PR: `11`
+- GitHub Quality Gate: `success`
+- statische Projektprüfung: `48` Dateien erfolgreich geprüft
+- automatische Tests: `31/31` erfolgreich, `0` fehlgeschlagen
+- Projektprüfung: Node `20.20.2`
+- paralleler Quality-Gate-Regressionstest aus PR #73 ebenfalls erfolgreich
+- PR war mergebar
+- Squash-Merge: `1de0999cd570c612a80649cfe4975d8531947935`
+- Main-Stichprobe: `assets/workspace-state.js`, `assets/workspace-size.js` und `VERSION.json` erfolgreich gelesen
 
-- vollständiger Diff gegen aktuellen `main`
-- Branch muss 0 Commits hinter `main` bleiben
-- GitHub Quality Gate erfolgreich
-- alle neuen und bestehenden Tests erfolgreich
-- PR mergebar
-- technischer Merge
-- Main-Stichprobe der zentralen Dateien
+Der erste Testlauf meldete einen Fehler ausschließlich beim strikten Vergleich eines Objektwertes aus einer separaten JavaScript-VM. Die berechneten Werte waren bereits korrekt. Der Test wurde gezielt normalisiert; Produktlogik musste dafür nicht geändert werden. Der anschließende vollständige Lauf war grün.
 
-## Änderungsvolumen des aktuellen technischen Patches
+## Änderungsvolumen D1
 
 Einstufung: **klein bis mittel**.
 
@@ -147,17 +151,17 @@ Nicht betroffen:
 
 ## Technischer Hinweis
 
-GitHub Actions meldet weiterhin einen nicht blockierenden Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions `v4`. Das Projekt-Quality-Gate selbst wurde in den bisherigen Stufen erfolgreich mit Node `20.20.2` ausgeführt.
+GitHub Actions meldet weiterhin einen nicht blockierenden Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions `v4`. Das Projekt-Quality-Gate selbst lief erfolgreich mit Node `20.20.2`.
 
 Diese Workflow-Hygiene bleibt von Funktionspatches getrennt und wird spätestens in `0.3.0-G` behandelt.
 
 ## Nächste zwei Schritte
 
-1. **0.3.0-D DOM-Anwendung:** gespeicherte `widthUnits` und `heightPx` zentral auf die Panels anwenden; `heightPx: null` muss sauber automatische Höhe bedeuten. Noch ohne Ziehen.
-2. **0.3.0-D Resize-Griff + Eingabe:** erst danach einen Griff pro Panel und den entkoppelten Pointer-/Tastatur-Controller auf die geprüfte State-/Berechnungsbasis setzen.
+1. **0.3.0-D2 – DOM-Anwendung:** gespeicherte `widthUnits` und `heightPx` zentral auf die Panels anwenden; `heightPx: null` muss automatische Höhe bedeuten. Responsive Ansichten dürfen Desktopwerte nur darstellen, nicht überschreiben. Noch kein Ziehen.
+2. **0.3.0-D3 – Resize-Griff + Eingabe:** erst danach einen Griff pro Panel und den entkoppelten Pointer-/Tastatur-Controller auf die geprüfte State-/Berechnungsbasis setzen.
 
 Anschließend folgt erst `0.3.0-E – Reorder & Drag and Drop`.
 
 ## Empfehlung
 
-Die aktuelle Trennung beibehalten. Dieser Patch darf erst nach grünem Quality Gate gemergt werden. Die sichtbare Resize-Bedienung beginnt erst im nächsten Patch auf der bereits geprüften Größenbasis.
+Die Trennung beibehalten. Als Nächstes ausschließlich D2 umsetzen und die gespeicherten Größen zentral über eine wiederverwendbare Darstellungsregel auf das DOM übertragen. Pointer-/Drag-Logik bleibt weiterhin außen vor.
