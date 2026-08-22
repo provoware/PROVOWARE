@@ -14,6 +14,7 @@
     "#arbeitsbereich",
     "#details",
     ".data-studio-pro",
+    ".data-recovery",
   ];
 
   const source = document.querySelector("#mirror-source");
@@ -22,22 +23,29 @@
   const evidence = document.querySelector("[data-mirror-evidence]");
 
   const round = (value) => Math.round(value * 10) / 10;
+  const sleep = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+  const readyText = (element) => /bereit/i.test(element?.textContent || "");
 
   const frameReady = (frame) => {
     const doc = frame.contentDocument;
     if (!doc?.body) return false;
+    const dataStudioStatus = doc.querySelector("[data-data-studio-status]");
+    const proStatus = doc.querySelector("[data-data-studio-pro-status]");
+    const recoveryStatus = doc.querySelector("[data-recovery-status]");
     return Boolean(
       doc.querySelector("#development-note-input")
       && doc.querySelector(".data-recovery")
       && doc.querySelector(".data-studio-pro")
-      && doc.querySelector("[data-data-studio-pro-status]"),
+      && readyText(dataStudioStatus)
+      && readyText(proStatus)
+      && readyText(recoveryStatus),
     );
   };
 
   const waitForFrame = async (frame) => {
-    for (let attempt = 0; attempt < 100; attempt += 1) {
+    for (let attempt = 0; attempt < 200; attempt += 1) {
       if (frameReady(frame)) return;
-      await new Promise((resolve) => window.setTimeout(resolve, 50));
+      await sleep(50);
     }
     throw new Error(`Frame '${frame.id}' wurde nicht vollständig initialisiert.`);
   };
@@ -69,6 +77,31 @@
 
   const sameGeometry = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 
+  const waitForStableGeometry = async (frame) => {
+    let previous = geometry(frame);
+    let stableSamples = 0;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      await sleep(50);
+      const current = geometry(frame);
+      if (sameGeometry(previous, current)) {
+        stableSamples += 1;
+        if (stableSamples >= 3) return current;
+      } else {
+        stableSamples = 0;
+      }
+      previous = current;
+    }
+    throw new Error(`Frame '${frame.id}' erreichte keine stabile Geometrie.`);
+  };
+
+  const geometryDifferences = (left, right) => SELECTORS
+    .filter((selector) => JSON.stringify(left.rectangles[selector]) !== JSON.stringify(right.rectangles[selector]))
+    .map((selector) => ({
+      selector,
+      source: left.rectangles[selector],
+      mirrored: right.rectangles[selector],
+    }));
+
   const run = async () => {
     if (!source || !scaled || !status || !evidence) throw new Error("Mirror-Pflichtelement fehlt.");
 
@@ -77,9 +110,11 @@
     document.documentElement.style.setProperty("--mirror-scale", String(SCALE));
 
     await Promise.all([waitForFrame(source), waitForFrame(scaled)]);
+    const [sourceGeometry, scaledGeometry] = await Promise.all([
+      waitForStableGeometry(source),
+      waitForStableGeometry(scaled),
+    ]);
 
-    const sourceGeometry = geometry(source);
-    const scaledGeometry = geometry(scaled);
     const scaledRect = scaled.getBoundingClientRect();
     const measuredScale = round(scaledRect.width / scaled.clientWidth);
     const layoutMatches = sameGeometry(sourceGeometry, scaledGeometry);
@@ -98,6 +133,7 @@
       measuredScale,
       keyGeometryIdentical: layoutMatches,
       selectors: SELECTORS,
+      geometryDifferences: geometryDifferences(sourceGeometry, scaledGeometry),
     };
 
     status.dataset.state = pass ? "pass" : "fail";
