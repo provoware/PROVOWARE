@@ -65,12 +65,13 @@
 - [x] PRO-Pflichtdateien, Registry und VERSION im zentralen Quality Gate verankern.
 - [x] Chromium-E2E um Kategorie, Bibliothek, Suche, View, Export und Reload ergänzen.
 - [x] HTML-Mirror auf vollständig geladenes PRO warten lassen und `.data-studio-pro` geometrisch vergleichen.
-- [x] erster Node-20-Core-Gate grün: 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Tests.
-- [x] erster Node-24-Core-Gate grün.
-- [x] erster Chromium-Browser-Gate grün: 3/3 echte Browserprüfungen.
+- [x] finaler Node-20-Core-Gate grün: 41 JavaScript-Dateien, 103 Projektdateien, 101/101 Tests.
+- [x] finaler Node-24-Core-Gate grün.
+- [x] finaler Chromium-Browser-Gate grün: 3/3 echte Browserprüfungen.
 - [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
-- [x] Browserartefakt `9476750307`, SHA-256 `f2eee6beb9baec81126885ce23c8543070afec0fae088045d104cd68a8628f99`.
-- [x] Artefakt tatsächlich entpackt und geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
+- [x] finales Browserartefakt `9476846607`, SHA-256 `afb421a42d6e5a0d83a36940297a7598b49e9f35445ec56096604163a986a4e4`.
+- [x] finales Artefakt tatsächlich entpackt und geprüft: sieben PNGs, Project-Data-Export, Vorlagenexport und Playwright-Report.
+- [x] Vorlagenexport inhaltlich geprüft: Format v1, Kategorie + Felder, keine Datensätze.
 
 ## G – Dokumentation / Abschluss
 
@@ -81,12 +82,13 @@
 - [x] CHANGELOG aktualisiert und bisherige Historie erhalten.
 - [x] MANIFEST auf aktuellen 0.4.2-Vertrag aktualisiert.
 - [x] Recovery-Grenze dokumentiert: 0.4.1-`.pwbak` enthält noch keine PRO-Metadaten.
-- [ ] finalen Dokumentationsstand erneut auf Node 20 und Node 24 grün prüfen.
-- [ ] finalen Dokumentationsstand im Chromium-Gate grün prüfen.
-- [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR #84 auf ready for review setzen.
-- [ ] kontrolliert per Squash mergen.
-- [ ] `main` nach Merge prüfen.
+- [x] finalen Dokumentationsstand erneut auf Node 20 und Node 24 grün geprüft.
+- [x] finalen Dokumentationsstand im Chromium-Gate grün geprüft.
+- [x] finalen Diff gegen `main` geprüft: 27 Commits voraus, 0 hinter, 24 begründete Dateien.
+- [x] PR #84 auf ready for review gesetzt.
+- [x] kontrolliert per Squash gemergt.
+- [x] Merge-SHA `d22a4ba51a970966b8f0242186094fb894e14356` verifiziert.
+- [x] `main` nach Merge auf VERSION, Registry und PRO-Service geprüft.
 
 ## Bewusst nicht Teil von 0.4.2
 
