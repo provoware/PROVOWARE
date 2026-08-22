@@ -9,6 +9,10 @@ import {
   handleProjectDataApi,
   isProtectedProjectDataPath,
 } from "./project-data-service.mjs";
+import {
+  DATA_STUDIO_PRO_RELATIVE_PATH,
+  handleDataStudioProApi,
+} from "./data-studio-pro-service.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HOST = "127.0.0.1";
@@ -61,6 +65,12 @@ export const inhaltstyp = (datei) => ({
   ".txt": "text/plain; charset=utf-8",
 }[path.extname(datei).toLowerCase()] || "application/octet-stream");
 
+export const isProtectedDataStudioProPath = (filePath, root = ROOT) => {
+  const resolved = path.resolve(filePath);
+  const proPath = path.resolve(root, DATA_STUDIO_PRO_RELATIVE_PATH);
+  return resolved === proPath || resolved.startsWith(`${proPath}.tmp-`);
+};
+
 const abhaengigkeitenAufloesen = async () => {
   const paket = JSON.parse(await readFile(path.join(ROOT, "package.json"), "utf8"));
   const abhaengigkeiten = laufzeitAbhaengigkeiten(paket);
@@ -84,6 +94,7 @@ const abhaengigkeitenAufloesen = async () => {
 };
 
 const antworten = async (anfrage, antwort) => {
+  if (await handleDataStudioProApi(anfrage, antwort, { root: ROOT })) return;
   if (await handleProjectDataApi(anfrage, antwort, { root: ROOT })) return;
 
   const datei = anfragepfadAufloesen(anfrage.url);
@@ -91,8 +102,8 @@ const antworten = async (anfrage, antwort) => {
     antwort.writeHead(403).end("Zugriff außerhalb des Projektordners ist nicht erlaubt.");
     return;
   }
-  if (isProtectedProjectDataPath(datei, ROOT)) {
-    antwort.writeHead(403).end("Direkter Zugriff auf die Projekt-Datenbank ist nicht erlaubt.");
+  if (isProtectedProjectDataPath(datei, ROOT) || isProtectedDataStudioProPath(datei, ROOT)) {
+    antwort.writeHead(403).end("Direkter Zugriff auf lokale Projekt-Laufzeitdaten ist nicht erlaubt.");
     return;
   }
   try {
