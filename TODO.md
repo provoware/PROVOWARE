@@ -58,13 +58,13 @@ PR `#81` · Squash-Merge `20546306a0db98c25a003f4cf96f142aac851d6f`
 
 PR `#82` · Squash-Merge `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
-## Aktueller Qualitätsstrang – 0.4.1-E2E Chromium Gate & HTML UI Mirror
+## Abgeschlossen – 0.4.1-E2E Chromium Gate & HTML UI Mirror
 
 Baseline: `7f59c727bcef6b959e3fcc49d7c796b088bc197a`
 
-Arbeitsbranch: `feat/0.4.1-browser-e2e-html-mirror`
-
 Pull Request: `#83`
+
+Squash-Merge: `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
 
 ### A – Chromium-first Browser-E2E
 
@@ -85,7 +85,7 @@ Pull Request: `#83`
 - [x] gemessenen Skalierungsfaktor validieren.
 - [x] vollständigen Mirror-Screenshot und separaten 683 × 450-Spiegel erzeugen.
 - [x] Start-, Datensatz-, Restore- und Import-Screenshots erzeugen.
-- [x] Erfolgsartefakt mit sechs PNGs und JSON-Export tatsächlich entpacken und prüfen.
+- [x] Abschlussartefakt mit sechs PNGs und JSON-Export tatsächlich entpacken und prüfen.
 
 ### C – real gefundener UI-Fehler
 
@@ -95,7 +95,7 @@ Pull Request: `#83`
 - [x] Bedienelemente mit Scroll-Abstand zur sticky Schnellleiste härten.
 - [x] denselben unveränderten Chromium-E2E-Pfad danach vollständig grün ausführen.
 
-### D – aktuelle Evidenz
+### D – Abschluss-Evidenz
 
 - [x] Node 20 Core Quality Gate grün.
 - [x] Node 24 Core Quality Gate grün.
@@ -103,11 +103,11 @@ Pull Request: `#83`
 - [x] Chromium: 2/2 echte Browserprüfungen erfolgreich.
 - [x] HTML-Mirror: PASS, 1366 × 900 intern, Faktor 0,5, Schlüsselgeometrie identisch.
 - [x] Firefox im automatischen Lauf wie vorgesehen übersprungen.
-- [x] Browser-Abnahmeartefakt `9474652501`, SHA-256 `5006875f74dfe91d2fb1c752bc70f540b1573a2170446e260aaba70d124e945c`.
-- [ ] finalen Dokumentationsstand erneut durch Core- und Chromium-Gate prüfen.
-- [ ] finalen Diff gegen `main` prüfen.
-- [ ] PR #83 auf ready for review setzen und kontrolliert squash-mergen.
-- [ ] `main` nach Merge erneut prüfen.
+- [x] finales Browser-Abnahmeartefakt `9474686971`, SHA-256 `0ed384715c715ec78c9bfbabfc283e26f490fc7c83fa66f0355a60340118a8fe`.
+- [x] finaler Dokumentationsstand durch Core- und Chromium-Gate geprüft.
+- [x] finaler Diff: 26 Commits voraus, 0 hinter `main`, 20 begründete Dateien.
+- [x] PR #83 auf ready for review gesetzt und kontrolliert per Squash gemergt.
+- [x] `main` auf Merge-SHA, VERSION, Browserworkflow, Mirror und container-responsiven UI-Fix geprüft.
 
 ## Nächste Funktionsstufe – 0.4.2 Data Studio PRO
 
