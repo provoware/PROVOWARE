@@ -9,7 +9,32 @@
 - Unerwartete interne Fehler der Qualitätsschranke enden kontrolliert mit Ursache und nächstem Prüfschritt statt mit einem technischen Stapelabdruck.
 - Ein automatischer Fehlerfall sichert verständliche Diagnoseausgabe und den Fehler-Exitcode ab.
 
-### 0.3.0-D – Resize State & Calculation Foundation
+### 0.3.0-D2 – Resize DOM Application
+
+#### Hinzugefügt
+
+- `assets/workspace-layout.css` als kleine isolierte Desktop-Darstellungsschicht für gespeicherte Panelgrößen.
+- CSS-Variablen `--panel-spalten` und `--panel-hoehe` als alleinige Übergabe von Workspace-State an die Darstellung.
+- automatische DOM-Tests für gespeicherte Breite, feste Höhe, Rückkehr zu automatischer Höhe und ungültige Darstellungswerte.
+- automatische Prüfung des Desktop-CSS-Vertrags und der lokalen Stylesheet-Ladereihenfolge.
+
+#### Geändert
+
+- `assets/workspace-ui.js` überträgt normalisierte Größenwerte auf CSS-Variablen, ohne `grid-column`, `height` oder Browser-Speicherung direkt zu steuern.
+- ein nicht persistenter Bereitschaftsmarker aktiviert das Desktop-Overlay nur bei gültiger Breite; ohne gültige Größenübergabe bleibt die bewährte Basisdarstellung erhalten.
+- `index.html` lädt das lokale Workspace-Größenstylesheet direkt nach `assets/styles.css`.
+- Tablet- und Mobilregeln bleiben unangetastet, weil das neue Overlay ausschließlich ab 981 px aktiv ist.
+- Entwicklungsmetadaten auf `0.3.0-D Resize DOM Application` fortgeschrieben.
+
+#### Bewusst noch nicht enthalten
+
+- kein Resize-Griff
+- keine Pointer-/Touch-/Stiftsteuerung
+- keine Resize-Tastatursteuerung
+- keine transiente Resize-Vorschau
+- kein Drag & Drop
+
+### 0.3.0-D1 – Resize State & Calculation Foundation
 
 #### Hinzugefügt
 
