@@ -47,13 +47,15 @@ PR: `#81`
 
 Squash-Merge: `20546306a0db98c25a003f4cf96f142aac851d6f`
 
-## Aktuelle Iteration – 0.4.1 Recovery & Migration
+## Abgeschlossen – 0.4.1 Recovery & Migration
 
 Baseline: `a3f6f17d3e9c50bb83392588b6eec17ba8fb9d8f`
 
 Arbeitsbranch: `feat/0.4.1-recovery-migration`
 
 Pull Request: `#82`
+
+Squash-Merge: `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
 ### A – Backup & Rotation
 
@@ -64,86 +66,68 @@ Pull Request: `#82`
 - [x] automatisches Sicherheitsbackup vor Import implementieren.
 - [x] Backup-IDs mit festem Muster statt frei wählbaren Pfaden absichern.
 - [x] SHA-256, Größe, Schema, Revision sowie Vorlagen-/Datensatzanzahl erfassen.
-- [x] Rotation auf maximal 10 Backups begrenzen.
-- [x] Rotation automatisiert testen.
-- [x] Backup-Verzeichnis gegen statische Auslieferung schützen.
-- [x] Backup-Verzeichnis aus Git ausschließen.
+- [x] Rotation auf maximal 10 Backups begrenzen und testen.
+- [x] Backup-Verzeichnis gegen statische Auslieferung schützen und aus Git ausschließen.
 
-### B – Restore
+### B – Restore / Failure Injection
 
-- [x] Restore-Vorschau implementieren.
-- [x] Restore an die SHA-256-Prüfsumme der Vorschau binden.
-- [x] Backup vor Wiederherstellung erneut serverseitig validieren.
+- [x] Restore-Vorschau und SHA-256-Bindung implementieren.
 - [x] Restore unter derselben Mutationssperre wie CRUD ausführen.
 - [x] aktuellen Zustand vor Restore automatisch sichern.
 - [x] atomaren Temp-Datei-zu-Rename-Pfad wiederverwenden.
 - [x] Failpoint direkt vor Rename ergänzen.
 - [x] simulierten Schreibabbruch testen.
-- [x] bei Abbruch unveränderte Live-Daten nachweisen.
+- [x] bei Abbruch bytegenau unveränderte Live-Daten nachweisen.
 - [x] Sicherheitsbackup trotz fehlgeschlagenem Restore nachweisen.
 
 ### C – Export / Import
 
 - [x] validierten JSON-Export implementieren.
-- [x] Importdatei im Browser auswählen und als JSON einlesen.
-- [x] Import-Vorschau serverseitig validieren.
+- [x] Importdatei auswählen und serverseitig prüfen.
 - [x] Schemastand, Inhaltszusammenfassung und SHA-256 vor Import anzeigen.
 - [x] Import an die Vorschau-Prüfsumme binden.
 - [x] aktuellen Rohzustand vor Import automatisch sichern.
 - [x] beschädigte Live-Datei als Rohbytes sichern und danach Recovery-Import erlauben.
-- [x] beschädigtes Import-JSON ablehnen.
-- [x] unbekannte/höhere Schemaversion ablehnen.
-- [x] veraltete Vorschau-Prüfsumme ablehnen.
+- [x] beschädigtes Import-JSON, unbekannte Schemaversion und veraltete Prüfsumme ablehnen.
 
 ### D – Migration
 
 - [x] deterministische Migrationskette `n -> n+1` implementieren.
-- [x] fehlende Migrationsschritte ablehnen.
-- [x] Rückwärtsmigration ablehnen.
+- [x] fehlende Migrationsschritte und Rückwärtsmigration ablehnen.
 - [x] Migrationsplan ohne Mutation beschreibbar machen.
-- [x] isolierte `v1 -> v2`-Testfixture implementieren.
-- [x] deterministisches Migrationsergebnis testen.
+- [x] isolierte `v1 -> v2`-Testfixture implementieren und Determinismus nachweisen.
 - [x] Produktionsschema ausdrücklich bei Version 1 belassen.
 
 ### E – Recovery-UI
 
 - [x] Modul `data-recovery` Version `0.4.1` registrieren.
-- [x] Backup-Liste und `Backup jetzt` integrieren.
-- [x] Restore-Vorschau und explizite Bestätigung integrieren.
-- [x] JSON-Export integrieren.
-- [x] JSON-Dateiauswahl und Import-Vorschau integrieren.
+- [x] Backup-Liste, Backup-Erstellung und Restore-Vorschau integrieren.
+- [x] Restore erst nach expliziter Bestätigung ausführen.
+- [x] JSON-Export, Dateiauswahl und Import-Vorschau integrieren.
 - [x] Import erst nach expliziter Bestätigung ausführen.
 - [x] `file://` kontrolliert in nicht schreibfähigen Modus degradieren.
-- [x] bestehende Project-Data-Stile wiederverwenden statt zweiten UI-Stack aufzubauen.
 
 ### F – Regression / Qualität
 
-- [x] Recovery-Service-Tests ergänzen.
-- [x] Recovery-API-Tests ergänzen.
-- [x] Recovery-UI-/Pflichtdateivertrag testen.
+- [x] Recovery-Service-, API- und UI-Tests ergänzen.
 - [x] Failure-Injection direkt im atomaren Schreibpfad testen.
 - [x] bestehende 0.4.0-, Workspace-, Registry- und Starttests unverändert weiter ausführen.
-- [x] erster GitHub-Actions-Lauf auf Node 20 grün.
-- [x] erster GitHub-Actions-Lauf auf Node 24 grün.
-- [x] erster 0.4.1-Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 81/81 Tests erfolgreich.
-- [ ] finalen CI-Lauf nach vollständiger Dokumentationssynchronisierung grün bestätigen.
+- [x] Recovery als Pflichtbestandteil im zentralen Quality Gate verankern.
+- [x] Runtime-Backups aus Quellcode-/Auto-Fix-Walk ausschließen.
+- [x] `data-recovery` in das Verbot einer zweiten Browser-Persistenz aufnehmen und testen.
+- [x] finaler GitHub-Actions-Lauf auf Node 20 und Node 24 vollständig grün.
+- [x] finaler Gate-Stand: 30 JavaScript-Dateien gelintet, 82 Projektdateien geprüft, 82/82 Tests erfolgreich, 0 fehlgeschlagen.
+- [x] finaler Diff: 21 Commits voraus, 0 hinter `main`, 19 begründete Dateien.
 
 ### G – Dokumentation / Abschluss
 
-- [x] `docs/PLAN_0.4.1_RECOVERY_MIGRATION.md` anlegen.
-- [x] `docs/CHECKPOINT_0.4.1_RECOVERY_MIGRATION.md` anlegen.
-- [x] `docs/CHECKLIST_0.4.1_RECOVERY_MIGRATION.md` anlegen.
-- [x] README auf 0.4.1 aktualisieren.
-- [x] VERSION-Entwicklungsmetadaten auf 0.4.1 aktualisieren; Produktversion bleibt `0.2.0`.
-- [x] TODO auf den realen 0.4.1-Stand synchronisieren.
-- [ ] CHANGELOG aktualisieren.
-- [ ] MANIFEST aktualisieren.
-- [ ] finalen PR-Diff gegen `main` prüfen.
-- [ ] PR #82 auf `ready for review` setzen.
-- [ ] PR #82 kontrolliert per Squash mergen.
-- [ ] `main` nach Merge erneut prüfen.
+- [x] Plan, Checkpoint und Checkliste angelegt.
+- [x] README, TODO, CHANGELOG, MANIFEST und VERSION synchronisiert.
+- [x] PR #82 auf `ready for review` gesetzt.
+- [x] PR #82 kontrolliert per Squash gemergt.
+- [x] `main` nach Merge auf Registry, VERSION und Recovery-Service geprüft.
 
-## Danach – 0.4.2 Data Studio PRO
+## Nächste Funktionsstufe – 0.4.2 Data Studio PRO
 
 - [ ] Filter- und Suchansicht ergänzen.
 - [ ] Vorlagenbibliothek und Vorlagenexport verbessern.
@@ -152,7 +136,7 @@ Pull Request: `#82`
 - [ ] optionalen Storage-Adapter-Vertrag vorbereiten.
 - [ ] SQLite nur bei nachgewiesenem Bedarf hinter demselben Datenservice einführen.
 
-## Danach – Browser-E2E-Hardening
+## Parallel nächstes Qualitätsgate – Browser E2E
 
 - [ ] Firefox-first: Start -> Notiz -> Vorlage -> Datensatz -> Reload -> Edit -> Delete -> Backup -> Restore -> Import automatisieren.
 - [ ] danach Chrome-Kompatibilitätslauf.
