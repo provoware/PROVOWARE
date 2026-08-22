@@ -4,9 +4,26 @@ Modulare, flexible und weiterhin fachlich leere HTML-Oberfläche. Die freigegebe
 
 ## Start für normale Nutzung
 
-1. Projektordner öffnen.
-2. `index.html` doppelklicken oder in Firefox/Chrome öffnen.
-3. Es werden weder Server noch installierte npm-Pakete noch Netzwerkzugriff benötigt.
+### Automatischer Klick-&-Start
+
+Voraussetzung ist Node.js 20 oder neuer. Danach:
+
+- **Windows:** `start.cmd` doppelklicken.
+- **Linux/macOS:** im Projektordner `./start.sh` ausführen.
+
+Die Startroutine prüft die Node-Version und die in `package.json` deklarierten Laufzeitpakete. Fehlende Pakete werden nur dann mit npm installiert, wenn das Projekt tatsächlich welche deklariert. Im aktuellen Stand sind keine Laufzeitpakete nötig, daher findet kein Download statt. Anschließend startet ein ausschließlich an `127.0.0.1` gebundener Server, wählt bei einem belegten Standardport kontrolliert den nächsten freien Port und öffnet die Anwendung im Standardbrowser. Das Startfenster zeigt jeden Schritt und bleibt zum Beenden mit `Strg+C` geöffnet.
+
+Alternativ ist der transparente Konsolenstart möglich:
+
+```bash
+npm start
+```
+
+Für eine Umgebung ohne grafischen Browser kann `npm start -- --no-browser` verwendet werden. Ein fester Port lässt sich beispielsweise mit `npm start -- --port=4200` vorgeben.
+
+### Direkter Offline-Start
+
+`index.html` kann weiterhin direkt in Firefox oder Chrome geöffnet werden. Dafür sind weder Server noch installierte npm-Pakete noch Netzwerkzugriff nötig.
 
 ## Oberfläche
 
@@ -202,6 +219,9 @@ Kurzform:
 - `assets/workspace-resize.js` – D3a-Tastatur-Resize; Pointer folgt in D3b
 - `modules/registry.js` – kanonischer, derzeit leerer Modulkatalog
 - `scripts/quality-check.mjs` – reproduzierbare Qualitätsprüfung und sicherer Auto-Fix
+- `scripts/start.mjs` – lokale Startprüfung, bedarfsgesteuerte Paketauflösung und sicherer Webserver
+- `start.cmd` / `start.sh` – kleine Plattform-Einstiege für Klick beziehungsweise einen Startbefehl
+- `tests/start.test.mjs` – Startoptionen, Voraussetzungen, Pfadsicherheit und Inhaltstypen
 - `tests/module-registry.test.mjs` – Modul-Lebenszyklus
 - `tests/workspace-state.test.mjs` – Workspace-Zustand
 - `tests/workspace-size.test.mjs` – reine Größenberechnung

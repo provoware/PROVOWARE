@@ -2,6 +2,21 @@
 
 ## In Entwicklung – 0.3.0 Flexible Workspace Engine
 
+### Vollautomatischer lokaler Start
+
+#### Hinzugefügt
+
+- plattformnahe Einstiege `start.cmd` und `start.sh` für einen Start ohne manuelle Befehlsfolge.
+- zentrale Startroutine mit Node-20-Prüfung, bedarfsgesteuerter Auflösung deklarierter Laufzeitpakete, lokal gebundenem Webserver, Portausweichlogik und automatischem Browserstart.
+- verständliche Status- und Fehlermeldungen sowie Optionen für einen festen Port und den Start ohne Browser.
+- automatische Tests für Optionen, Laufzeitprüfung, Abhängigkeitsentscheidung, sichere Projektpfade und Inhaltstypen.
+
+#### Sicherheits- und Seiteneffektgrenzen
+
+- der Server bindet ausschließlich an `127.0.0.1` und liefert keine Dateien außerhalb des Projektordners aus.
+- npm wird nur aufgerufen, wenn `package.json` Laufzeitpakete deklariert und diese lokal fehlen; im aktuellen Stand erfolgen weder Installation noch Download.
+- der weiterhin unterstützte direkte Start über `index.html` bleibt unverändert.
+
 ### 0.3.0-D3a – Keyboard Resize Preview
 
 #### Hinzugefügt
