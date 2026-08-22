@@ -178,7 +178,11 @@ export const readProjectDatabase = async (root = ROOT) => {
   }
 };
 
-const writeProjectDatabaseAtomic = async (root, database) => {
+export const writeProjectDatabaseAtomic = async (
+  root,
+  database,
+  { beforeRename = null } = {},
+) => {
   validateStoredDatabase(database);
   const filePath = path.join(root, PROJECT_DATABASE_RELATIVE_PATH);
   await mkdir(path.dirname(filePath), { recursive: true });
@@ -186,6 +190,7 @@ const writeProjectDatabaseAtomic = async (root, database) => {
   const source = `${JSON.stringify(database, null, 2)}\n`;
   try {
     await writeFile(tempPath, source, { encoding: "utf8", flag: "wx" });
+    if (beforeRename) await beforeRename({ tempPath, filePath, database });
     await rename(tempPath, filePath);
   } catch (error) {
     await unlink(tempPath).catch(() => {});
@@ -193,7 +198,7 @@ const writeProjectDatabaseAtomic = async (root, database) => {
   }
 };
 
-const withMutationLock = (task) => {
+export const withMutationLock = (task) => {
   const run = mutationQueue.then(task, task);
   mutationQueue = run.catch(() => {});
   return run;
@@ -463,8 +468,12 @@ export const deleteRecord = async (recordId, { root = ROOT } = {}) => withMutati
   return removed;
 });
 
-export const isProtectedProjectDataPath = (filePath, root = ROOT) =>
-  path.resolve(filePath) === path.resolve(root, PROJECT_DATABASE_RELATIVE_PATH);
+export const isProtectedProjectDataPath = (filePath, root = ROOT) => {
+  const resolved = path.resolve(filePath);
+  const databasePath = path.resolve(root, PROJECT_DATABASE_RELATIVE_PATH);
+  const backupRoot = path.resolve(root, "data/backups/project-data");
+  return resolved === databasePath || resolved.startsWith(`${backupRoot}${path.sep}`);
+};
 
 const readJsonBody = async (request) => {
   const contentType = String(request.headers["content-type"] || "").toLowerCase();
@@ -513,6 +522,11 @@ export const handleProjectDataApi = async (
 
   try {
     checkSameOrigin(request);
+
+    if (url.pathname.startsWith("/api/provoware/project-data/recovery")) {
+      const { handleProjectDataRecoveryApi } = await import("./project-data-recovery.mjs");
+      return handleProjectDataRecoveryApi(request, response, { root, now, uuid });
+    }
 
     if (request.method === "POST" && url.pathname === "/api/provoware/development-notes") {
       const body = await readJsonBody(request);

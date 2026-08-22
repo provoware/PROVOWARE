@@ -7,9 +7,11 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.4.0 Project Data Studio – Integration & Regression Hardening",
-  "development_baseline_commit": "6fd1123122cca0c69fd50bdbf69ef2186cc930d0",
+  "development_phase": "0.4.1 Recovery & Migration – Backup, Restore, Import/Export & Failure Injection",
+  "development_baseline_commit": "a3f6f17d3e9c50bb83392588b6eec17ba8fb9d8f",
   "project_data_schema_version": "1",
   "project_data_store": "data/project-data.json",
+  "project_data_backup_store": "data/backups/project-data/*.pwbak",
+  "project_data_backup_limit": 10,
   "development_notes_file": "data/ENTWICKLUNGSNOTIZEN.txt"
 }

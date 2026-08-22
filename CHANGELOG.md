@@ -1,5 +1,60 @@
 # CHANGELOG
 
+## In Entwicklung – 0.4.1 Recovery & Migration
+
+### Hinzugefügt
+
+- neues Modul `data-recovery` Version `0.4.1` für lokale Backups, Restore-Vorschau, JSON-Export/-Import und Migrationsvorbereitung.
+- neue Recovery-Schicht `scripts/project-data-recovery.mjs`, getrennt von der normalen CRUD-Datenlogik.
+- feste Backup-Ablage `data/backups/project-data/` mit streng validierten Backup-IDs und Dateiendung `.pwbak`.
+- automatische Sicherung des aktuellen Rohzustands vor Restore und Import.
+- Backup-Rotation mit fester Obergrenze von zehn Sicherungen.
+- SHA-256-Prüfsummen und Inhaltszusammenfassung für Backups, Restore- und Import-Vorschauen.
+- zweistufiger Restore: Vorschau und Prüfsumme vor expliziter Bestätigung und atomarem Ersatz.
+- zweistufiger Import: serverseitige Vorschau, Schema-/Inhaltsprüfung, Prüfsumme und explizite Bestätigung.
+- validierter JSON-Export des aktuellen Project-Data-Bestands.
+- Recovery einer beschädigten Live-Datei, wobei deren ursprüngliche Rohbytes vor dem Ersatz als Sicherheitsbackup erhalten bleiben.
+- deterministische Migrationsengine mit ausschließlich aufeinanderfolgenden Schritten `n -> n+1`.
+- isolierte `v1 -> v2`-Migrationsfixture zur Prüfung der Engine; Produktionsschema bleibt Version 1.
+- Plan, Checkpoint und Abnahmecheckliste für 0.4.1.
+- Recovery-Service-, Recovery-API-, Recovery-UI- und Failure-Injection-Tests.
+
+### Geändert
+
+- `scripts/project-data-service.mjs` stellt atomaren Writer und gemeinsame Mutationssperre kontrolliert für Recovery bereit.
+- der atomare Writer besitzt einen injizierbaren Prüfhaken direkt vor `rename`, damit Schreibabbrüche reproduzierbar getestet werden können.
+- Recovery-Routen werden über den bestehenden lokalen Project-Data-Router delegiert.
+- direkte statische Auslieferung schützt nun zusätzlich `data/backups/project-data/`.
+- `data/.gitignore` schließt das gesamte Recovery-Backupverzeichnis aus.
+- `modules/registry.js` enthält `data-recovery` als drittes Fachmodul; Modulvertragsversion bleibt `1`.
+- README, TODO und VERSION-Entwicklungsmetadaten auf 0.4.1 synchronisiert.
+
+### Failure Injection und Datenintegrität
+
+- ein simulierter Fehler nach vollständigem Temp-Schreiben, aber vor dem atomaren Rename, lässt die vorhandene Live-Datenbank bytegenau unverändert.
+- das vor dem fehlgeschlagenen Restore erzeugte Sicherheitsbackup bleibt erhalten.
+- beschädigte Live-Rohbytes werden vor einem Recovery-Import gesichert und nicht still vernichtet.
+- eine veraltete SHA-256-Bestätigung zwischen Vorschau und Ausführung bricht Restore/Import kontrolliert ab.
+- unbekannte beziehungsweise höhere Schemaversionen werden nicht still auf das aktuelle Produktionsschema zurückgeschrieben.
+- Rückwärtsmigrationen und fehlende Migrationsschritte werden ausdrücklich abgelehnt.
+- normale CRUD-Mutationen und Recovery-Aktionen verwenden dieselbe serialisierte Mutationssperre.
+
+### Validiert
+
+- erster vollständiger GitHub-Actions-Lauf auf Node 20 und Node 24 erfolgreich.
+- Projekt-Linter: `30` JavaScript-Dateien geprüft.
+- Quality Gate: `82` Projektdateien geprüft.
+- Testsuite: `81/81` Tests erfolgreich, `0` fehlgeschlagen.
+- bestehende Workspace-, Registry-, Start- und 0.4.0-Regressionen bleiben Bestandteil derselben Testsuite.
+
+### Bewusst noch nicht enthalten
+
+- keine reale Produktionsmigration auf Schema v2; diese wird erst bei einem tatsächlich benötigten neuen Datenvertrag entwickelt.
+- keine relationale Datenbank oder SQLite-Umschaltung.
+- keine echten Firefox-/Chrome-E2E-Tests.
+- keine Cross-OS-CI-Matrix für Windows/macOS.
+- keine Änderungen am parallelen Pointer-/Drag-and-Drop-Workspace-Strang.
+
 ## In Entwicklung – 0.4.0 Project Data Studio
 
 ### Hinzugefügt
