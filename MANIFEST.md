@@ -6,13 +6,13 @@
 
 Freigegebene Produktversion: `0.2.0 – Module Contract & Registry`
 
-Aktuelle interne Entwicklungsstufe: `0.3.0-D – Resize Planning & Contract`
+Aktuelle interne Entwicklungsstufe: `0.3.0-D – Resize State & Calculation`
 
 Modulvertragsversion: `1`
 
 Workspace-Vertragsversion: `1`
 
-## Laufzeitstruktur – unverändert gegenüber 0.3.0-C
+## Laufzeitstruktur
 
 ### Einstieg
 
@@ -23,7 +23,8 @@ Workspace-Vertragsversion: `1`
 - `assets/styles.css` – Dark-/Petrol-Layout, responsive Darstellung, Schnellstarterleiste und Layout-Menü
 - `assets/app.js` – App-Start, Debug-UI und Initialisierung der Subsysteme
 - `assets/module-registry.js` – Modulvertrag und Modul-Lebenszyklus
-- `assets/workspace-state.js` – Workspace-Zustand, Normalisierung, Sichtbarkeitsaktionen, lokale Speicherung und Reset
+- `assets/workspace-state.js` – Workspace-Zustand, Normalisierung, Sichtbarkeits- und Größenaktionen, lokale Speicherung und Reset
+- `assets/workspace-size.js` – reine, DOM-freie Raster-/Höhenberechnung für die spätere Resize-Bedienung
 - `assets/workspace-ui.js` – DOM-/Bedienlogik für Sichtbarkeit, Layout-Menü, Fokus und Nutzerfeedback
 - `modules/registry.js` – zentraler Modulkatalog, aktuell bewusst leer
 
@@ -76,9 +77,9 @@ Nicht gespeichert werden:
 - Zeigerbewegungen
 - Resize-/Drag-Vorschau
 
-Die Resize-Planung führt **keine neuen persistenten Felder** ein. Workspace-Vertragsversion `1` bleibt deshalb unverändert.
+0.3.0-D führt keine neuen persistenten Felder ein. Workspace-Vertragsversion `1` bleibt deshalb unverändert.
 
-## 0.3.0-C – freigegebene interne Funktionsbasis
+## 0.3.0-C – vorhandene Funktionsbasis
 
 Vorhanden:
 
@@ -92,30 +93,40 @@ Vorhanden:
 - Live-Nutzerfeedback
 - Tastatur-/Fokus-Grundlage
 
-## 0.3.0-D – aktueller Planungsstand
+## 0.3.0-D – aktueller technischer Stand
 
-Bestätigte Resize-Option A:
+Bereits implementiert:
 
-- ein Resize-Griff pro sichtbarem Panel
-- Maus/Touch/Stift über gemeinsame Pointer Events
-- derselbe Griff per Tastatur bedienbar
-- Breite: Schritt 1 Rastereinheit
-- Höhe: Schritt 24 px
-- Vorschau während Bewegung nur transient
-- Persistenz erst nach validiertem Ende
-- `Home/Pos1` setzt die einzelne Panelgröße auf Standard zurück
-- Resize in 0.3.0-D aktiv ab 981 px
-- Tablet/Mobil überschreiben keine gespeicherten Desktopgrößen
-- keine zweite vollständige Größensteuerung im Layout-Menü
-- Drag & Drop bleibt bis 0.3.0-E gesperrt
+- `panelGroesseSetzen(id, groesse)` als zentrale State-API für Größenwerte
+- `panelGroesseZuruecksetzen(id)` für den Einzel-Reset eines Panels
+- Erhalt von Sichtbarkeit und Reihenfolge bei Größenänderungen
+- Normalisierung auf individuelle Min-/Max-Grenzen der `PANEL_DEFINITIONEN`
+- `heightPx: null` bleibt als automatische Höhe gültig
+- `assets/workspace-size.js` mit reiner Raster- und Höhenberechnung
+- tatsächlicher Spaltenabstand (`column-gap`) fließt in die Rastermetrik ein
+- symmetrische Rundung horizontaler Bewegungen auf ganze Rastereinheiten
+- Höhe wird in 24-px-Schritten berechnet
+- deterministische Berechnung ohne DOM-, Speicher- oder Logging-Seiteneffekt
+- automatische State- und Größenberechnungstests
 
-## Vorgesehene Verantwortungstrennung für die Resize-Implementierung
+Bewusst noch nicht implementiert:
+
+- gespeicherte Größen auf DOM anwenden
+- sichtbare Resize-Griffe
+- Pointer-/Touch-/Stiftsteuerung
+- Tastatursteuerung für Resize
+- transiente Vorschau im Browser
+- Resize-Nutzerfeedback
+- Drag & Drop
+
+## Verantwortungstrennung für Resize
 
 - `assets/workspace-state.js` – einzige persistente Größenquelle
-- `assets/workspace-ui.js` – gültige gespeicherte Größe auf DOM anwenden
-- neue `assets/workspace-resize.js` – Pointer/Tastatur, transiente Vorschau, Commit/Abbruch
+- `assets/workspace-size.js` – reine Berechnung ohne Seiteneffekt
+- `assets/workspace-ui.js` – später gültige gespeicherte Größe auf DOM anwenden
+- geplante `assets/workspace-resize.js` – Pointer/Tastatur, transiente Vorschau, Commit/Abbruch
 
-Die geplante Resize-Eingabeschicht darf nicht direkt in `localStorage` schreiben.
+Weder Größenberechnung noch spätere Resize-Eingabeschicht dürfen direkt in `localStorage` schreiben.
 
 ## Hauptdokumente
 
@@ -146,7 +157,8 @@ Die geplante Resize-Eingabeschicht darf nicht direkt in `localStorage` schreiben
 - `docs/STATUS_0.3.0.md`
 - `docs/MANIFEST_0.3.0_B.md`
 - `docs/MANIFEST_0.3.0_C.md`
-- `docs/MANIFEST_0.3.0_D_PLAN.md` – aktueller Planungs-Patch
+- `docs/MANIFEST_0.3.0_D_PLAN.md` – Planungs- und Vertrags-Patch
+- `docs/MANIFEST_0.3.0_D_STATE.md` – State- und Berechnungs-Patch
 
 ## Entwicklungs- und Qualitätssicherung
 
@@ -157,17 +169,26 @@ Bestehend:
 - `scripts/quality-check.mjs`
 - `tests/module-registry.test.mjs`
 - `tests/workspace-state.test.mjs`
+- `tests/workspace-size.test.mjs`
 - `tests/workspace-ui.test.mjs`
 - `.github/workflows/quality.yml`
 
-Geplant für den technischen Resize-Patch:
+Bereits abgedeckt:
 
-- Resize-State-Tests
-- reine Raster-/Höhenberechnungstests
+- Modul-Lebenszyklus
+- Workspace-Normalisierung und Speicherung
+- Sichtbarkeit
+- Größen-State-API
+- Rastermetrik inklusive Spaltenabstand
+- Breiten- und Höhenbegrenzung
+- reproduzierbare Größenberechnung
+
+Noch für die sichtbare Resize-Stufe geplant:
+
 - Pointer-Abbruch-/Commit-Tests
 - Tastaturtests
 - Responsive-Tests
-- statische Resize-Vertragsprüfungen im Quality Gate
+- statische Resize-Griff-/Controller-Prüfungen im Quality Gate
 
 ## Kanonische Befehle
 
@@ -185,24 +206,24 @@ npm run verify
 
 ## Aktueller Patchtyp
 
-**Nur Dokumentation und Entwicklungsmetadaten.**
+**State-API + reine Größenberechnung + automatische Tests.**
 
 Keine Änderung an:
 
 - HTML
 - CSS
-- JavaScript-Laufzeit
-- Testcode
-- Quality-Gate-Code
-- Browser-Speicherung
+- sichtbarer Bedienung
+- Modulvertrag
+- Browser-Speicherschlüssel
+- Workspace-Vertragsversion
 
 ## Nächste zwei technischen Schritte
 
-1. State-API + reine Größenberechnung implementieren und testen.
-2. Danach Resize-Griffe + Pointer-/Tastatur-Controller auf diese geprüfte Logik setzen.
+1. Gespeicherte Breite/Höhe zentral auf das DOM anwenden und `heightPx: null` als automatische Höhe erhalten.
+2. Danach genau einen Resize-Griff pro Panel plus entkoppelten Pointer-/Tastatur-Controller ergänzen.
 
 Danach erst `0.3.0-E – Reorder & Drag and Drop`.
 
 ## Status
 
-Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`. Die aktuelle interne Entwicklungsphase ist transparent als `0.3.0-D Resize Planning & Contract` dokumentiert.
+Die Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`. Die interne Entwicklungsphase ist transparent als `0.3.0-D Resize State & Calculation` dokumentiert.
