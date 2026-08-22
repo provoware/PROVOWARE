@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = await readFile(path.join(ROOT, "assets/workspace-size.js"), "utf8");
+const alsStandardObjekt = (wert) => JSON.parse(JSON.stringify(wert));
 
 const laufzeitErstellen = () => {
   const sandbox = { window: {} };
@@ -87,8 +88,8 @@ test("Kombinierte Größenberechnung liefert bei gleicher Eingabe dasselbe Ergeb
     hoechstHoehe: 1200,
   };
 
-  const erstes = api.groesseAusBewegung(eingabe);
-  const zweites = api.groesseAusBewegung(eingabe);
+  const erstes = alsStandardObjekt(api.groesseAusBewegung(eingabe));
+  const zweites = alsStandardObjekt(api.groesseAusBewegung(eingabe));
 
   assert.deepEqual(erstes, { widthUnits: 6, heightPx: 268 });
   assert.deepEqual(zweites, erstes);
