@@ -368,4 +368,12 @@ const main = async () => {
   console.log(`QUALITY GATE: OK (${refreshedFiles.length} Dateien geprüft)`);
 };
 
-await main();
+try {
+  await main();
+} catch (error) {
+  const ursache = error instanceof Error ? error.message : String(error);
+  console.error("QUALITY GATE: INTERNER FEHLER");
+  console.error(`  - Prüfung konnte nicht abgeschlossen werden (${ursache}).`);
+  console.error("  - Nächster Schritt: Dateizugriffe prüfen und 'npm run verify' erneut ausführen.");
+  process.exitCode = 1;
+}
