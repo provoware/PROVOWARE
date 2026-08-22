@@ -48,7 +48,7 @@ Drag & Drop folgt erst nach Workspace-Vertrag, State Foundation, Autosave/Reset,
 
 **Entscheidung:** Die freigegebene Produktversion bleibt bis zur vollständigen Abnahme der Workspace Engine bei `0.2.0`.
 
-**Begründung:** Interne Teilstufen wie 0.3.0-B und 0.3.0-C werden transparent dokumentiert, aber nicht als vollständig freigegebene 0.3.0-Funktion ausgegeben.
+**Begründung:** Interne Teilstufen werden transparent dokumentiert, aber nicht als vollständig freigegebene 0.3.0-Funktion ausgegeben.
 
 ## D-008 – Vollständig ausgeblendeter Workspace
 
@@ -91,3 +91,31 @@ Die kompakte Schnellstarterleiste bleibt auch auf kleinen Displays einzeilig. De
 **Begründung:** Der wichtigste Wiederherstellungsweg bleibt jederzeit sichtbar. Gleichzeitig bleibt die Bedienlogik auf Desktop und Mobil konsistent und benötigt keine separate mobile Aktionsleiste.
 
 **Grenze:** Die Leiste darf nicht zu einer zweiten parallelen Seitennavigation ausgebaut werden. Neue Einträge brauchen einen konkreten, häufigen Nutzen.
+
+## D-012 – Resize-Bedienmodell
+
+**Entscheidung:** Option A.
+
+Jedes sichtbare Workspace-Panel erhält einen klaren Resize-Griff unten rechts. Derselbe fokussierbare Griff unterstützt Maus, Touch/Stift und Tastatur.
+
+Für Maus, Touch und Stift wird eine gemeinsame Pointer-Event-Logik verwendet. Die Tastatur nutzt dieselbe Größenberechnung und denselben Commitpfad.
+
+**Begründung:** Eine gemeinsame Bedienmechanik reduziert doppelte Logik, Synchronisationsfehler und Testaufwand.
+
+**Grenze:** In 0.3.0-D wird keine zweite vollständige Größensteuerung im Layout-Menü eingeführt.
+
+## D-013 – Resize-Raster, Persistenz und Responsive Grenze
+
+**Entscheidung:**
+
+- Breite ändert sich in Schritten von genau `1` Rastereinheit.
+- Höhe ändert sich in Schritten von `24 px`.
+- Während Pointer-/Tastaturbewegungen entsteht nur eine transiente Vorschau.
+- Persistiert wird erst ein validierter Endwert.
+- Resize wird in 0.3.0-D nur ab `981 px` aktiv angeboten.
+- Tablet-/Mobilansichten verändern gespeicherte Desktopgrößen nicht.
+- `Home/Pos1` stellt die Standardgröße des einzelnen Panels wieder her: Standardbreite und `heightPx: null`.
+
+**Begründung:** Die Größenänderung bleibt reproduzierbar, speicherschonend und kompatibel mit den bereits definierten responsive Rückfallregeln.
+
+**Technische Folge:** Workspace-Vertragsversion `1` bleibt unverändert, weil die Felder `widthUnits` und `heightPx` bereits Bestandteil des bestehenden Schemas sind.

@@ -7,6 +7,6 @@
   "entrypoint": "index.html",
   "module_contract_version": "1",
   "workspace_contract_version": "1",
-  "development_phase": "0.3.0-C Visibility Controls & Compact Menu",
-  "development_baseline_commit": "247b584e87f4e041e6f405932328659e895bfbb7"
+  "development_phase": "0.3.0-D Resize Planning & Contract",
+  "development_baseline_commit": "e167226b7f2e1d80c2d16de9964a3a13d1efbfca"
 }
