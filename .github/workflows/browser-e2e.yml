@@ -1,10 +1,6 @@
-name: Browser E2E Gate
+name: Browser E2E Release Gate
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       firefox:
@@ -54,7 +50,7 @@ jobs:
 
   firefox-alternative:
     name: Browser-E2E · Firefox alternativ
-    if: github.event_name == 'workflow_dispatch' && inputs.firefox == true
+    if: inputs.firefox == true
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
