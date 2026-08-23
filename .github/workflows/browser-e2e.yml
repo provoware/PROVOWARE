@@ -50,7 +50,7 @@ jobs:
 
   firefox-alternative:
     name: Browser-E2E · Firefox alternativ
-    if: inputs.firefox == true
+    if: github.event_name == 'workflow_dispatch' && inputs.firefox == true
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
