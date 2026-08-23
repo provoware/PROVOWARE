@@ -65,6 +65,17 @@
         "recovery-journal",
       ],
     },
+    {
+      id: "headquarter-dashboard",
+      name: "PROVOWARE Headquarter 2026",
+      version: "0.4.4",
+      apiVersion: "1",
+      entry: "modules/headquarter-dashboard/index.js",
+      enabledByDefault: true,
+      description: "Dashboard mit echten Tool-Informationen sowie lokalen Audio- und Video-Sitzungsplaylists.",
+      slots: ["overview"],
+      capabilities: ["runtime-dashboard", "local-audio", "local-video", "session-playlist"],
+    },
   ];
 
   Object.defineProperty(window, "PROVOWARE_MODULE_CATALOG", {
