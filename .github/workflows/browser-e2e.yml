@@ -1,10 +1,6 @@
-name: Browser E2E Gate
+name: Browser E2E Release Gate
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       firefox:
