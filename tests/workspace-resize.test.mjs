@@ -517,9 +517,9 @@ test("Pointer-Breitenberechnung verwendet den real gemessenen CSS-Spaltenabstand
   umgebung.grid.columnGap = "40px";
 
   griff.dispatch("pointerdown", { pointerId: 21, clientX: 100, clientY: 100 });
-  griff.dispatch("pointermove", { pointerId: 21, clientX: 202, clientY: 100 });
+  griff.dispatch("pointermove", { pointerId: 21, clientX: 253, clientY: 100 });
 
-  assert.equal(umgebung.previews.at(-1).groesse.widthUnits, 10);
+  assert.equal(umgebung.previews.at(-1).groesse.widthUnits, 9);
   assert.equal(umgebung.commits(), 0);
 });
 
