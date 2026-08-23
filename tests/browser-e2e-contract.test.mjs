@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFile(path.join(ROOT, relativePath), "utf8");
 
-test("Browser-E2E ist Chromium-first und Firefox bleibt alternativer Lauf", async () => {
+test("Browser-E2E bleibt Chromium-first und läuft nur im manuellen Release-Gate", async () => {
   const packageJson = JSON.parse(await read("package.json"));
   assert.equal(
     packageJson.scripts["test:e2e"],
@@ -17,9 +17,12 @@ test("Browser-E2E ist Chromium-first und Firefox bleibt alternativer Lauf", asyn
   assert.equal(packageJson.devDependencies["@playwright/test"], "1.62.1");
 
   const workflow = await read(".github/workflows/browser-e2e.yml");
+  assert.match(workflow, /name: Browser E2E Release Gate/);
   assert.match(workflow, /Browser-E2E · Chromium/);
   assert.match(workflow, /npm run test:e2e:chromium/);
   assert.match(workflow, /workflow_dispatch:/);
+  assert.doesNotMatch(workflow, /^\s*pull_request\s*:/m);
+  assert.doesNotMatch(workflow, /^\s*push\s*:/m);
   assert.match(workflow, /firefox-alternative:/);
   assert.match(workflow, /inputs\.firefox == true/);
 });
