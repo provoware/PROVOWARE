@@ -7,8 +7,13 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = await readFile(path.join(ROOT, "assets/workspace-resize.js"), "utf8");
+const SIZE_SOURCE = await readFile(path.join(ROOT, "assets/workspace-size.js"), "utf8");
 const WORKSPACE_LAYOUT_CSS = await readFile(
   path.join(ROOT, "assets/workspace-layout.css"),
+  "utf8",
+);
+const HEADQUARTER_CSS = await readFile(
+  path.join(ROOT, "assets/headquarter-dashboard.css"),
   "utf8",
 );
 
@@ -40,7 +45,12 @@ class TestElement {
     this.attributes = new Map();
     this.listeners = new Map();
     this.children = [];
+    this.parentElement = null;
     this.renderedHeight = 420;
+    this.renderedWidth = 520;
+    this.columnGap = "0px";
+    this.capturedPointers = new Set();
+    this.focused = false;
   }
 
   addEventListener(type, listener) {
@@ -55,6 +65,12 @@ class TestElement {
       target: this,
       currentTarget: this,
       defaultPrevented: false,
+      pointerId: 1,
+      pointerType: "mouse",
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
       preventDefault() {
         this.defaultPrevented = true;
       },
@@ -65,6 +81,7 @@ class TestElement {
   }
 
   append(element) {
+    element.parentElement = this;
     this.children.push(element);
   }
 
@@ -77,7 +94,23 @@ class TestElement {
   }
 
   getBoundingClientRect() {
-    return { height: this.renderedHeight };
+    return { width: this.renderedWidth, height: this.renderedHeight };
+  }
+
+  setPointerCapture(pointerId) {
+    this.capturedPointers.add(pointerId);
+  }
+
+  releasePointerCapture(pointerId) {
+    this.capturedPointers.delete(pointerId);
+  }
+
+  hasPointerCapture(pointerId) {
+    return this.capturedPointers.has(pointerId);
+  }
+
+  focus() {
+    this.focused = true;
   }
 }
 
@@ -124,11 +157,16 @@ const umgebungErstellen = ({ desktop = true, startzustand = standardzustand() } 
   const media = new TestMedia(desktop);
   const panels = new Map();
   const headings = new Map();
+  const grid = new TestElement("main");
+  grid.renderedWidth = 1200;
+  grid.renderedHeight = 900;
+  grid.columnGap = "16px";
 
   for (const definition of DEFINITIONEN) {
     const panel = new TestElement("section");
     panel.dataset.workspacePanel = definition.id;
     panel.setAttribute("aria-labelledby", `title-${definition.id}`);
+    grid.append(panel);
     panels.set(definition.id, panel);
 
     const heading = new TestElement("h2");
@@ -204,8 +242,16 @@ const umgebungErstellen = ({ desktop = true, startzustand = standardzustand() } 
     window: {
       innerWidth: desktop ? 1280 : 800,
       matchMedia: () => media,
+      getComputedStyle: (element) => ({
+        columnGap: element.columnGap || "0px",
+        gap: element.columnGap || "0px",
+      }),
     },
   };
+  vm.runInNewContext(SIZE_SOURCE, sandbox, {
+    filename: "assets/workspace-size.js",
+    timeout: 1000,
+  });
   vm.runInNewContext(SOURCE, sandbox, {
     filename: "assets/workspace-resize.js",
     timeout: 1000,
@@ -215,7 +261,7 @@ const umgebungErstellen = ({ desktop = true, startzustand = standardzustand() } 
   api.initialisieren({
     workspace,
     ui,
-    groessenLogik: { HOEHEN_SCHRITT_PX: 24 },
+    groessenLogik: sandbox.window.PROVOWARE_WORKSPACE_SIZE,
     logger: (stufe, bereich, nachricht, daten) => logs.push({ stufe, bereich, nachricht, daten }),
   });
 
@@ -229,6 +275,7 @@ const umgebungErstellen = ({ desktop = true, startzustand = standardzustand() } 
     ui,
     document,
     media,
+    grid,
     panels,
     griff,
     previews,
@@ -244,6 +291,7 @@ test("genau ein zugänglicher Resize-Griff pro Panel wird erzeugt", () => {
   const umgebung = umgebungErstellen();
 
   assert.equal(umgebung.api.statusLesen().griffe, 5);
+  assert.equal(umgebung.api.POINTER_START_SCHWELLE_PX, 4);
   for (const definition of DEFINITIONEN) {
     const griff = umgebung.griff(definition.id);
     assert.ok(griff);
@@ -252,6 +300,7 @@ test("genau ein zugänglicher Resize-Griff pro Panel wird erzeugt", () => {
     assert.match(griff.getAttribute("aria-label"), /Größe von/);
     assert.match(griff.getAttribute("aria-keyshortcuts"), /ArrowLeft/);
     assert.match(griff.getAttribute("aria-keyshortcuts"), /Home/);
+    assert.match(griff.getAttribute("aria-description"), /Ziehen/);
   }
 
   umgebung.api.initialisieren({});
@@ -324,7 +373,7 @@ test("Breiten- und Höhengrenzen werden eingehalten", () => {
   assert.equal(umgebung.commits(), 0);
 });
 
-test("Escape verwirft die Vorschau ohne Größen-Commit", () => {
+test("Escape verwirft die Tastaturvorschau ohne Größen-Commit", () => {
   const umgebung = umgebungErstellen();
   const vorher = umgebung.workspace.statusLesen();
 
@@ -360,13 +409,17 @@ test("Home setzt ausschließlich die Größe des aktuellen Panels zurück", () =
   assert.deepEqual(zustand.order, vorherigeReihenfolge);
 });
 
-test("bis 980 px werden Tastaturaktionen ignoriert und Desktopzustand bleibt unverändert", () => {
+test("bis 980 px werden Tastatur- und Pointeraktionen ignoriert", () => {
   const umgebung = umgebungErstellen({ desktop: false });
   const vorher = umgebung.workspace.statusLesen();
+  const griff = umgebung.griff("work");
 
-  const event = umgebung.griff("work").dispatch("keydown", { key: "ArrowRight" });
+  const taste = griff.dispatch("keydown", { key: "ArrowRight" });
+  const pointer = griff.dispatch("pointerdown", { pointerId: 9, clientX: 20, clientY: 20 });
 
-  assert.equal(event.defaultPrevented, false);
+  assert.equal(taste.defaultPrevented, false);
+  assert.equal(pointer.defaultPrevented, false);
+  assert.equal(griff.hasPointerCapture(9), false);
   assert.equal(umgebung.previews.length, 0);
   assert.equal(umgebung.commits(), 0);
   assert.deepEqual(umgebung.workspace.statusLesen(), vorher);
@@ -387,13 +440,161 @@ test("Wechsel auf kleinen Viewport bricht eine aktive Vorschau ohne Commit ab", 
   assert.match(umgebung.meldungen.at(-1), /Fensterbreite/);
 });
 
-test("D3a enthält noch keine Pointer-Ziehlogik und der Griff hat 44-Pixel-Trefferfläche", () => {
-  assert.doesNotMatch(
-    SOURCE,
-    /pointerdown|pointermove|pointerup|pointercancel|setPointerCapture|releasePointerCapture/i,
-  );
+test("Pointerdown erfasst den Zeiger, aber Bewegung unter 4 px verändert nichts", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("work");
+  const vorher = umgebung.workspace.statusLesen();
+
+  const down = griff.dispatch("pointerdown", {
+    pointerId: 7,
+    pointerType: "mouse",
+    clientX: 100,
+    clientY: 100,
+  });
+  griff.dispatch("pointermove", {
+    pointerId: 7,
+    pointerType: "mouse",
+    clientX: 103,
+    clientY: 100,
+  });
+
+  assert.equal(down.defaultPrevented, true);
+  assert.equal(griff.hasPointerCapture(7), true);
+  assert.equal(griff.focused, true);
+  assert.equal(umgebung.previews.length, 0);
+  assert.equal(umgebung.commits(), 0);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung.pointerAktiv, false);
+
+  griff.dispatch("pointerup", { pointerId: 7, pointerType: "mouse", clientX: 103, clientY: 100 });
+
+  assert.equal(griff.hasPointerCapture(7), false);
+  assert.equal(umgebung.commits(), 0);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung, null);
+  assert.deepEqual(umgebung.workspace.statusLesen(), vorher);
+});
+
+test("ab 4 px startet Pointer-Vorschau und Pointerup committet genau einmal", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("work");
+
+  griff.dispatch("pointerdown", {
+    pointerId: 11,
+    pointerType: "touch",
+    clientX: 100,
+    clientY: 100,
+  });
+  griff.dispatch("pointermove", {
+    pointerId: 11,
+    pointerType: "touch",
+    clientX: 205,
+    clientY: 148,
+  });
+
+  assert.equal(umgebung.commits(), 0);
+  assert.equal(umgebung.previews.length, 1);
+  assert.equal(umgebung.previews.at(-1).groesse.widthUnits, 9);
+  assert.equal(umgebung.previews.at(-1).groesse.heightPx, 468);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung.pointerAktiv, true);
+
+  griff.dispatch("pointerup", {
+    pointerId: 11,
+    pointerType: "touch",
+    clientX: 205,
+    clientY: 148,
+  });
+
+  assert.equal(umgebung.commits(), 1);
+  assert.equal(umgebung.workspace.statusLesen().panels.work.widthUnits, 9);
+  assert.equal(umgebung.workspace.statusLesen().panels.work.heightPx, 468);
+  assert.equal(griff.hasPointerCapture(11), false);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung, null);
+});
+
+test("Pointer-Breitenberechnung verwendet den real gemessenen CSS-Spaltenabstand", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("work");
+  umgebung.grid.renderedWidth = 1200;
+  umgebung.grid.columnGap = "40px";
+
+  griff.dispatch("pointerdown", { pointerId: 21, clientX: 100, clientY: 100 });
+  griff.dispatch("pointermove", { pointerId: 21, clientX: 202, clientY: 100 });
+
+  assert.equal(umgebung.previews.at(-1).groesse.widthUnits, 10);
+  assert.equal(umgebung.commits(), 0);
+});
+
+test("Pointercancel verwirft aktive Vorschau und gibt Capture frei", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("modules");
+  const vorher = umgebung.workspace.statusLesen();
+
+  griff.dispatch("pointerdown", { pointerId: 13, pointerType: "pen", clientX: 10, clientY: 10 });
+  griff.dispatch("pointermove", { pointerId: 13, pointerType: "pen", clientX: 120, clientY: 58 });
+  assert.equal(umgebung.previews.length, 1);
+
+  griff.dispatch("pointercancel", { pointerId: 13, pointerType: "pen" });
+
+  assert.equal(umgebung.commits(), 0);
+  assert.equal(griff.hasPointerCapture(13), false);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung, null);
+  assert.deepEqual(umgebung.workspace.statusLesen(), vorher);
+  assert.match(umgebung.meldungen.at(-1), /abgebrochen/);
+});
+
+test("Escape bricht auch eine aktive Pointer-Vorschau ohne Commit ab", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("details");
+  const vorher = umgebung.workspace.statusLesen();
+
+  griff.dispatch("pointerdown", { pointerId: 15, clientX: 100, clientY: 100 });
+  griff.dispatch("pointermove", { pointerId: 15, clientX: 220, clientY: 148 });
+  assert.equal(griff.hasPointerCapture(15), true);
+
+  const event = umgebung.document.dispatch("keydown", { key: "Escape" });
+
+  assert.equal(event.defaultPrevented, true);
+  assert.equal(umgebung.commits(), 0);
+  assert.equal(griff.hasPointerCapture(15), false);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung, null);
+  assert.deepEqual(umgebung.workspace.statusLesen(), vorher);
+});
+
+test("rechte Maustaste und nicht primäre Pointer starten kein Resize", () => {
+  const umgebung = umgebungErstellen();
+  const griff = umgebung.griff("work");
+
+  griff.dispatch("pointerdown", { pointerId: 31, pointerType: "mouse", button: 2 });
+  griff.dispatch("pointerdown", { pointerId: 32, pointerType: "touch", isPrimary: false });
+
+  assert.equal(griff.hasPointerCapture(31), false);
+  assert.equal(griff.hasPointerCapture(32), false);
+  assert.equal(umgebung.api.statusLesen().aktiveSitzung, null);
+  assert.equal(umgebung.previews.length, 0);
+  assert.equal(umgebung.commits(), 0);
+});
+
+test("D3b bleibt speichergetrennt und Visual Balance folgt dem Workspace-Vertrag", () => {
+  assert.doesNotMatch(SOURCE, /localStorage|sessionStorage/);
+  assert.match(SOURCE, /pointerdown/);
+  assert.match(SOURCE, /pointermove/);
+  assert.match(SOURCE, /pointerup/);
+  assert.match(SOURCE, /pointercancel/);
+  assert.match(SOURCE, /setPointerCapture/);
+  assert.match(SOURCE, /POINTER_START_SCHWELLE_PX = 4/);
+
   assert.match(WORKSPACE_LAYOUT_CSS, /width:\s*44px/);
   assert.match(WORKSPACE_LAYOUT_CSS, /height:\s*44px/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /cursor:\s*nwse-resize/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /touch-action:\s*none/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /gap:\s*clamp\(12px, 1\.2vw, 18px\)/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /align-items:\s*start/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /\.panel\s*\{\s*min-height:\s*220px/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /\.panel-wide\s*\{\s*min-height:\s*148px/);
+  assert.match(WORKSPACE_LAYOUT_CSS, /\.panel-feature\s*\{\s*min-height:\s*360px/);
   assert.match(WORKSPACE_LAYOUT_CSS, /@media \(min-width: 981px\)/);
   assert.match(WORKSPACE_LAYOUT_CSS, /data-workspace-resize-preview="true"/);
+
+  assert.match(HEADQUARTER_CSS, /0 0 72px rgba\(74, 221, 207, 0\.12\)/);
+  assert.match(HEADQUARTER_CSS, /\.panel h2/);
+  assert.doesNotMatch(HEADQUARTER_CSS, /animation:/);
 });
