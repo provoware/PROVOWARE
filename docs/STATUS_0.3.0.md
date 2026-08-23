@@ -9,170 +9,141 @@ Abgeschlossen sind:
 - `0.3.0-C – Visibility Controls + kompakte Menüleiste`
 - `0.3.0-D1 – State-API + reine Größenberechnung`
 - `0.3.0-D2 – DOM-Anwendung gespeicherter Größen`
-- **`0.3.0-D3a – Resize-Griff + Tastatur-Vorschau`**
+- `0.3.0-D3a – Resize-Griff + Tastatur-Vorschau`
+- **`0.3.0-D3b – Pointer Resize & Visual Balance`**
 
-Als Nächstes folgt ausschließlich **`0.3.0-D3b – Pointer/Maus/Touch/Stift`**. Drag & Drop bleibt bis zum vollständigen Abschluss von D3b gesperrt.
+Die freigegebene Produktversion bleibt `0.2.0`. `VERSION.json` weist intern `0.3.0-D3b Pointer Resize & Visual Balance` aus. Workspace-Vertragsversion und Speicher-Schlüssel bleiben unverändert bei Version 1.
 
-Die freigegebene Produktversion bleibt bis zur vollständigen Workspace-Abnahme korrekt bei `0.2.0`. `VERSION.json` weist die interne Entwicklungsphase als `0.3.0-D3a Keyboard Resize Preview` aus. Workspace-Vertragsversion und Speicher-Schlüssel bleiben unverändert.
+## D3b – Bedienung
 
-## D3a – Ziel in einfacher Sprache
+Der bereits vorhandene Resize-Griff unterstützt jetzt denselben Größenpfad für:
 
-D3a führt erstmals eine sichtbare Größenbedienung ein, beschränkt sie aber bewusst auf die Tastatur. Dadurch konnte zuerst der kontrollierbare Vorschau-/Speicherpfad geprüft werden, bevor Maus, Touch und Stift hinzukommen.
+- Maus,
+- Touch,
+- Stift,
+- Tastatur.
 
-Verbindliche Kette:
+Maus, Touch und Stift verwenden gemeinsame **Pointer Events**. Dadurch gibt es keine getrennte Maus-, Touch- und Stiftlogik.
+
+### Schutz vor versehentlichem Ziehen
+
+`pointerdown` erfasst den primären Zeiger, verändert aber noch keine Panelgröße. Erst wenn sich der Zeiger mindestens **4 px** vom Startpunkt entfernt, wird eine transiente Vorschau aktiviert.
+
+Damit gilt:
 
 ```text
-Resize-Griff -> workspace-resize.js -> transiente Vorschau -> Workspace-State -> Workspace-UI
+Klick / minimales Zittern < 4 px -> keine Größenänderung
+ab 4 px Bewegung -> Vorschau
+pointerup -> höchstens ein validierter Commit
 ```
 
-Während einer Tastenserie wird ausschließlich die Vorschau verändert. Erst nach der letzten passenden Tastenfreigabe wird höchstens ein validierter Endwert gespeichert.
+Rechte Maustaste und nicht primäre Pointer starten keinen Resize-Vorgang.
 
-## D3a – Implementiert
+## Pointer Capture und Abbruch
 
-### Resize-Griffe
+Während einer aktiven Pointer-Sitzung hält der Griff den Zeiger über **Pointer Capture** fest. Die Bedienung bleibt dadurch stabil, auch wenn der Zeiger beim Ziehen kurz außerhalb des Griffs liegt.
 
-- genau ein dynamisch erzeugter Griff pro Workspace-Panel
-- echte `button`-Elemente statt funktionsloser HTML-Platzhalter
-- verständliche deutsche `aria-label`-Beschriftung
-- `aria-keyshortcuts` für Pfeile, `Home` und `Escape`
-- ungefähr 44 × 44 px Trefferfläche
-- Griff nur ab 981 px sichtbar
-- zusätzlicher unterer Panel-Innenabstand verhindert Überlagerung normaler Inhalte
+Ohne Persistenz abgebrochen wird bei:
 
-### Tastaturmodell
+- `pointercancel`,
+- `Escape`,
+- verlorenem Pointer Capture,
+- Wechsel auf eine Fensterbreite bis einschließlich 980 px.
 
-- `ArrowLeft` → Breite um 1 Rastereinheit kleiner
-- `ArrowRight` → Breite um 1 Rastereinheit größer
-- `ArrowUp` → Höhe um 24 px kleiner
-- `ArrowDown` → Höhe um 24 px größer
-- `Home` → nur aktuelles Panel auf Standardbreite und automatische Höhe zurücksetzen
-- `Escape` → laufende Vorschau verwerfen; gespeicherte Größe bleibt erhalten
+Pointer Capture wird beim Aufräumen freigegeben. Eine aktive Pointer-Sitzung blockiert gleichzeitig den Tastatur-Resize-Pfad, damit beide Eingabearten keinen gemeinsamen Zwischenzustand verändern.
 
-Grenzen stammen weiterhin ausschließlich aus `PANEL_DEFINITIONEN`. Der Höhenschritt wird aus `PROVOWARE_WORKSPACE_SIZE.HOEHEN_SCHRITT_PX` übernommen und nicht parallel dupliziert.
+## Größenberechnung
 
-### Vorschau und Persistenz
+D3b erfindet keine zweite Mathematik. Es verwendet weiterhin `assets/workspace-size.js`.
 
-- `keydown` verändert nur den flüchtigen Vorschauzustand
-- automatisch wiederholte `keydown`-Ereignisse speichern nichts
-- mehrere gleichzeitig gehaltene Resize-Pfeiltasten werden als eine Tastenserie behandelt
-- erst nach Freigabe der letzten aktiven Resize-Pfeiltaste erfolgt höchstens ein Größen-Commit
-- eine Vorschau ohne tatsächliche Wertänderung erzeugt keinen unnötigen Commit
-- `assets/workspace-ui.js` verwendet für Vorschau und gespeicherte Größe denselben CSS-Variablenvertrag
-- erneutes Anwenden des gespeicherten Zustands entfernt den Vorschau-Marker reproduzierbar
-- `assets/workspace-resize.js` schreibt niemals direkt in `localStorage`
+Für die Breite werden zur Laufzeit gelesen:
 
-### Automatische Höhe
+- tatsächlich gerenderte Breite des 12-Spalten-Rasters,
+- tatsächlich berechneter CSS-`column-gap`.
 
-Wenn `heightPx` noch `null` ist, wird für die erste Höhenaktion die tatsächlich gerenderte Panelhöhe gelesen. Danach greift wieder das feste 24-px-Raster und die vorhandene Min-/Max-Begrenzung.
+Der CSS-Abstand ist deshalb **nicht als zweite Konstante in JavaScript kopiert**.
 
-### Responsive Schutz
+Für die Höhe gilt weiterhin:
 
-Bis einschließlich 980 px:
+- Raster: 24 px,
+- individuelle Mindest-/Höchstgrenzen aus `PANEL_DEFINITIONEN`,
+- bei `heightPx: null` wird als Startwert die tatsächlich gerenderte Höhe verwendet.
 
-- Resize-Griffe sind per CSS verborgen
-- Tastaturaktionen werden zusätzlich logisch blockiert
-- ein Wechsel von Desktop auf eine kleine Ansicht verwirft eine laufende Vorschau ohne Größen-Commit
-- gespeicherte Desktopwerte bleiben unverändert
+## Persistenz
 
-## Verantwortungstrennung
+Die Verantwortung bleibt unverändert getrennt:
 
-### Unverändert
+- `assets/workspace-state.js` – einzige persistente Workspace-Quelle,
+- `assets/workspace-size.js` – reine Größenberechnung,
+- `assets/workspace-ui.js` – Anwendung von CSS-Variablen und Vorschau,
+- `assets/workspace-resize.js` – Eingabe, flüchtige Sitzung, Commit/Abbruch.
 
-- `assets/workspace-state.js` – einzige persistente Workspace-Quelle
-- `assets/workspace-size.js` – reine Größenberechnung und zentraler Höhenschritt
+`workspace-resize.js` verwendet weder `localStorage` noch `sessionStorage` direkt. `pointermove` verändert ausschließlich die Vorschau. Erst ein gültiger Abschluss kann über die bestehende State-API einen Endwert speichern.
 
-### Erweitert
+## Erscheinungsbild und Größenverhältnisse
 
-- `assets/workspace-ui.js` – zusätzlich kleine wiederverwendbare Vorschau-Schnittstelle, weiterhin ohne eigene Persistenz
-- `assets/workspace-layout.css` – Griff-, Aktiv- und Vorschau-Darstellung ab 981 px
-- `assets/app.js` – initialisiert Resize erst nach State und UI
-- `index.html` – deterministische Reihenfolge `state -> size -> ui -> resize -> app`
+D3b enthält zusätzlich eine bewusst begrenzte **Visual-Balance-Anpassung**:
 
-### Neu
+- Desktop-Rasterabstände passen sich zwischen 12 und 18 px an,
+- Grid-Elemente werden nicht mehr künstlich auf die Höhe anderer Elemente derselben Zeile gestreckt,
+- Mindesthöhen entsprechen wieder direkt dem Workspace-Vertrag:
+  - Standardpanel: 220 px,
+  - breites Panel: 148 px,
+  - Arbeitsbereich: 360 px,
+- Resize-Griff bleibt 44 × 44 px, erhält aber klareren `nwse-resize`-Cursor und `touch-action: none`,
+- Fokus, aktive Vorschau und Panelkante sind deutlicher erkennbar,
+- Workspace, Schnellleiste und Panels erhalten etwas stärkere statische Cyan-Lichtwirkung,
+- keine neue Daueranimation wurde eingeführt.
 
-- `assets/workspace-resize.js` – Tastatur-Eingabeschicht, flüchtige Sitzung, Commit/Abbruch, Feedback und Logging
-- `tests/workspace-resize.test.mjs`
-- `tests/workspace-resize-load.test.mjs`
-- `docs/PLAN_0.3.0_D3A_KEYBOARD.md`
-- `docs/MANIFEST_0.3.0_D3A_KEYBOARD.md`
+Die Änderungen liegen weiterhin in den bestehenden CSS-Schichten und erzeugen keine neue UI-Zustandslogik.
+
+## Reale D3b-Abnahme
+
+- Ausgangsbaseline: `5ed92c6f749818977d7a90f2e9958df9bdc08868`
+- technischer Pull Request: `#94`
+- technischer Squash-Merge: `bf833fe50acbecc8d7d8e22a2bf8d4434cc0dee4`
+- Branch vor Merge: `0` Commits hinter `main`
+- GitHub Quality Gate: `success`
+- Workflow Run: `32611892780`
+- Node 20.20.2: PASS
+- Node 24: PASS
+- Project Lint: `53` JavaScript-Dateien PASS
+- Quality Gate: `134` Projektdateien PASS
+- Node-Test-Suite: **`147/147` PASS**, `0` Fehler
+
+Die D3b-Tests prüfen unter anderem 4-px-Schwelle, Pointer Capture, Klick ohne Resize, Touch-/Stiftpfad, reale CSS-Gap-Messung, genau einen Commit, Cancel, Escape, Responsive-Abbruch, Eingabetrennung und Visual-Balance-Regeln.
+
+## Browser-Abnahme
+
+In D3b wurde **bewusst kein Browser-E2E ausgeführt**. Die Browser-Suite wurde zuvor aus normalen Pull Requests und `main`-Pushes herausgenommen und steht als manuell gestartetes Release-/Abnahme-Gate bereit.
+
+Damit ist die Aussage sauber getrennt:
+
+- schnelle Logik-/Vertragsabnahme D3b: grün,
+- reale interaktive Chromium-/Firefox-Endabnahme: noch offen und für das spätere Gate vorgesehen.
+
+Insbesondere reales Touch-/Stift-Verhalten und der endgültige visuelle Eindruck auf echten Browsern werden deshalb noch nicht als praktisch abgenommen bezeichnet.
 
 ## Bewusst nicht enthalten
 
-D3a enthält ausdrücklich noch nicht:
+D3b enthält weiterhin nicht:
 
-- `pointerdown`
-- `pointermove`
-- `pointerup`
-- `pointercancel`
-- Pointer Capture
-- Mausziehen
-- Touchziehen
-- Stiftziehen
-- Drag & Drop
-- neue State-API
-- neue persistente Felder
-- neuen Browser-Speicherschlüssel
-- neue Bibliothek
-
-Die Abwesenheit der Pointer-Ziehlogik wird automatisiert geprüft.
-
-## Reale D3a-Abnahme
-
-- technische Ausgangsbaseline: `d5d7022816e3c164f641a39ccd9b05a5722d0db2`
-- technischer Pull Request: `#78`
-- geänderte Dateien im technischen PR: `11`
-- Branch beim finalen Diff-Check: `0` Commits hinter `main`
-- PR vor Merge: mergebar
-- GitHub Quality Gate: `success`
-- statische Projektprüfung: `56` Dateien erfolgreich geprüft
-- automatische Tests: `48/48` erfolgreich
-- fehlgeschlagene Tests: `0`
-- Projektprüfung: Node `20.20.2`
-- Squash-Merge: `5e1db3ff65d034b478f4aec032f36c0c3ffb2300`
-- Main-Stichprobe erfolgreich: `assets/workspace-resize.js`, `index.html`, `VERSION.json`
-
-Die vorhandenen Modul-, Workspace-State-, Größenberechnungs-, Sichtbarkeits- und D2-Darstellungstests blieben ebenfalls grün.
-
-## Änderungsvolumen D3a
-
-Einstufung: **mittel**.
-
-Direkt zur Laufzeit betroffen:
-
-- `assets/workspace-resize.js`
-- `assets/workspace-ui.js`
-- `assets/workspace-layout.css`
-- `assets/app.js`
-- `index.html`
-
-Qualität/Dokumentation betroffen:
-
-- `tests/workspace-resize.test.mjs`
-- `tests/workspace-resize-load.test.mjs`
-- `tests/workspace-ui.test.mjs`
-- `VERSION.json`
-- D3a-Plan und Patchmanifest
-
-Nicht betroffen:
-
-- persistentes Workspace-Schema
-- `assets/workspace-state.js`
-- eigentliche D1-Bewegungsberechnung in `assets/workspace-size.js`
-- Modulvertrag
-- Fachmodule
-- Netzwerk
-
-## Offene technische Grenzen
-
-Eine echte interaktive Firefox-/Chrome-Abnahme wurde in D3a noch nicht durchgeführt. Sie bleibt Teil des Release Gates `0.3.0-G`.
-
-GitHub Actions meldet weiterhin den bekannten nicht blockierenden Hinweis zur auslaufenden internen Node-20-Laufzeit der verwendeten Actions. Das Projekt-Quality-Gate selbst lief erfolgreich mit Node `20.20.2`. Die Workflow-Hygiene bleibt separat für `0.3.0-G`.
+- Drag & Drop,
+- Reorder,
+- eigenen Drag-Griff,
+- freie x/y-Pixelpositionen,
+- neue persistente Felder,
+- neuen Browser-Speicherschlüssel,
+- neue Abhängigkeit,
+- Medien-/Datenbank-/Recovery-Änderungen.
 
 ## Nächste zwei Schritte
 
-1. **0.3.0-D3b – Pointer/Maus/Touch/Stift:** vorhandenen Griff und dieselbe Vorschau-/Commit-Architektur wiederverwenden; `pointermove` darf nur Vorschau verändern, `pointerup` höchstens einmal persistieren und `pointercancel` muss ohne Zustandsverlust abbrechen.
-2. **0.3.0-E – Reorder & Drag and Drop:** erst nach vollständig grüner D3b-Abnahme; Resize-Griff und späterer Drag-Griff bleiben getrennte Mechaniken.
+1. **0.3.0-E – Reorder & Drag and Drop:** eigener Drag-Griff, Resize-Griff bleibt getrennt; persistiert wird ausschließlich die Panel-Reihenfolge.
+2. **0.3.0-G – manuelles Browser-/Accessibility-Release-Gate:** Chromium gebündelt gegen Resize, Reorder, responsive Ansichten, Fokus und Accessibility prüfen; Firefox optional gegenprüfen.
 
-## Empfehlung
+## Stabilitätsprognose
 
-D3b erneut als eigenständigen kleinen Patch behandeln. Keine neue Vorschau-, Größen- oder Persistenzlogik erfinden; stattdessen Pointer Events direkt auf die jetzt geprüfte D3a-Infrastruktur setzen.
+Für die automatisiert geprüfte D3b-Logik ist die Stabilität **hoch**: vorhandene State-, Größen- und UI-Schichten wurden wiederverwendet und die neue Eingabelogik ist durch gezielte Regressionstests abgedeckt.
+
+Für reale Pointer-Hardware und die endgültige Optik bleibt die Prognose bis zum manuellen Browser-Gate **mittel bis hoch**, weil diese Ebene absichtlich noch nicht praktisch im Browser abgenommen wurde.
