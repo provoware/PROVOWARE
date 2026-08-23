@@ -24,14 +24,18 @@ Release-Merge: `64b7f232acd13535133ee5f0a5e3322cbae7e0ba`
 - [x] 0.3.0-D1 – State-API und Größenberechnung.
 - [x] 0.3.0-D2 – DOM-Anwendung über CSS-Variablen.
 - [x] 0.3.0-D3a – Resize-Griff und Tastatur-Vorschau.
+- [x] 0.3.0-D3b – Pointer/Maus/Touch/Stift über denselben Resize-Griff mit 4-px-Bewegungsschwelle.
+- [x] D3b – Pointer Capture, transiente Vorschau, genau ein Commit und sauberer Abbruch automatisiert geprüft.
+- [x] D3b – Desktop-Proportionen, Vertrags-Mindesthöhen, adaptive Abstände und statische Lichtwirkung harmonisiert.
 
-### Offen – 0.3.0-D3b / E / F / G
+D3b: PR `#94` · Squash-Merge `bf833fe50acbecc8d7d8e22a2bf8d4434cc0dee4` · Quality Gate Node 20/24 PASS · `147/147` Node-Tests PASS.
 
-- [ ] Pointer/Maus/Touch/Stift über denselben Resize-Griff ergänzen.
-- [ ] Pointer Capture, Preview, Commit und Abbruch automatisiert testen.
-- [ ] Reorder & Drag and Drop erst nach grünem D3b beginnen.
+### Offen – 0.3.0-E / F / G
+
+- [ ] Reorder & Drag and Drop mit eigenem Drag-Griff entwickeln; Resize-Griff bleibt ausschließlich für Größenänderung zuständig.
+- [ ] Nur die Panel-Reihenfolge persistieren; keine freien x/y-Pixelkoordinaten einführen.
 - [ ] Responsive/Accessibility-Hardening durchführen.
-- [ ] Chromium-first Browserprüfung des Workspace-Pfads ergänzen; Firefox optional gegenprüfen.
+- [ ] Das bereits vorhandene manuelle Browser-E2E-Release-Gate erst zur gebündelten Abnahme ausführen; Chromium primär, Firefox optional.
 
 ## Abgeschlossen – 0.4.0 Project Data Studio
 
@@ -60,13 +64,14 @@ PR `#82` · Squash-Merge `babdc49367a4fe6b07ce64599fedf23c552ab173`
 
 ## Abgeschlossen – 0.4.1-E2E Chromium Gate & HTML UI Mirror
 
-- [x] Chromium als automatischen Primärbrowser festgelegt; Firefox bleibt optional.
+- [x] Chromium als Primärbrowser festgelegt; Firefox bleibt optional.
 - [x] echte CRUD-/Recovery-Kette automatisiert.
 - [x] proportionalen Mirror `1366 × 900 @ 0,5` aufgebaut.
 - [x] Screenshot-/Export-Evidenz eingeführt.
 - [x] realen UI-Überlagerungsfehler gefunden und container-responsiv repariert.
 - [x] finaler Core-Stand: 35 JavaScript-Dateien, 94 Projektdateien, 87/87 Node-Tests.
 - [x] Chromium 2/2, Mirror PASS.
+- [x] Browser-E2E später aus normalen PR-/main-Läufen in ein manuelles Release-/Abnahme-Gate verschoben.
 
 PR `#83` · Squash-Merge `4e0a8fca18e59ff832a79064a91cc3b222e5f4ab`
 
