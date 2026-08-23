@@ -3,6 +3,7 @@
 
   const DESKTOP_MEDIA = "(min-width: 981px)";
   const BREITEN_SCHRITT = 1;
+  const POINTER_START_SCHWELLE_PX = 4;
   const PFEILTASTEN = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
 
   let logger = () => {};
@@ -56,9 +57,33 @@
     else delete panel.dataset.workspaceResizeActive;
   };
 
+  const pointerCaptureFreigeben = (sitzung) => {
+    const zeiger = sitzung?.zeiger;
+    if (!zeiger?.griff || !Number.isInteger(zeiger.pointerId)) return;
+
+    try {
+      if (
+        typeof zeiger.griff.hasPointerCapture === "function"
+        && !zeiger.griff.hasPointerCapture(zeiger.pointerId)
+      ) {
+        return;
+      }
+      zeiger.griff.releasePointerCapture?.(zeiger.pointerId);
+    } catch (fehler) {
+      log(3, "Pointer Capture konnte beim Aufräumen nicht freigegeben werden.", {
+        panelId: sitzung.panelId,
+        pointerId: zeiger.pointerId,
+        ursache: fehler instanceof Error ? fehler.message : String(fehler),
+      });
+    }
+  };
+
   const sitzungLoeschen = () => {
-    if (aktiveSitzung) sitzungMarkieren(aktiveSitzung.panelId, false);
+    const sitzung = aktiveSitzung;
     aktiveSitzung = null;
+    if (!sitzung) return;
+    sitzungMarkieren(sitzung.panelId, false);
+    pointerCaptureFreigeben(sitzung);
   };
 
   const gespeichertenZustandAnwenden = () => {
@@ -81,8 +106,10 @@
     return false;
   };
 
-  const sitzungStarten = (id) => {
-    if (aktiveSitzung?.panelId === id) return aktiveSitzung;
+  const sitzungStarten = (id, eingabeArt) => {
+    if (aktiveSitzung?.panelId === id && aktiveSitzung.eingabeArt === eingabeArt) {
+      return aktiveSitzung;
+    }
     if (aktiveSitzung) aktiveVorschauAbbrechen({ meldung: false });
 
     const definition = definitionLesen(id);
@@ -92,11 +119,13 @@
     aktiveSitzung = {
       panelId: id,
       definition,
+      eingabeArt,
       startBreite: panelZustand.widthUnits,
       startHoehe: panelZustand.heightPx,
       vorschauBreite: panelZustand.widthUnits,
       vorschauHoehe: panelZustand.heightPx,
       aktiveTasten: new Set(),
+      zeiger: null,
     };
     sitzungMarkieren(id, true);
     return aktiveSitzung;
@@ -109,6 +138,25 @@
       throw new RangeError("Gerenderte Panelhöhe ist ungültig.");
     }
     return hoehe;
+  };
+
+  const rasterMessungLesen = (panel) => {
+    const raster = panel.parentElement;
+    if (!raster) throw new Error("Workspace-Raster für Größenberechnung nicht gefunden.");
+
+    const containerBreitePx = raster.getBoundingClientRect().width;
+    const berechnet = window.getComputedStyle?.(raster);
+    const abstandText = berechnet?.columnGap || berechnet?.gap || "0";
+    const spaltenAbstandPx = Number.parseFloat(abstandText);
+
+    if (!Number.isFinite(containerBreitePx) || containerBreitePx <= 0) {
+      throw new RangeError("Gerenderte Rasterbreite ist ungültig.");
+    }
+    if (!Number.isFinite(spaltenAbstandPx) || spaltenAbstandPx < 0) {
+      throw new RangeError("Gerenderter Spaltenabstand ist ungültig.");
+    }
+
+    return { containerBreitePx, spaltenAbstandPx };
   };
 
   const breiteAendern = (sitzung, richtung) => {
@@ -154,12 +202,13 @@
   const vorschauCommitten = () => {
     if (!aktiveSitzung) return false;
     const sitzung = aktiveSitzung;
+    const quelle = sitzung.eingabeArt === "pointer" ? "Pointer" : "Tastatur";
 
     try {
       if (!hatAenderung(sitzung)) {
         gespeichertenZustandAnwenden();
         const name = panelNameLesen(panelLesen(sitzung.panelId), sitzung.panelId);
-        workspaceUi.statusMelden(`${name}: Größe unverändert. Erlaubte Grenze erreicht.`);
+        workspaceUi.statusMelden(`${name}: Größe unverändert.`);
         sitzungLoeschen();
         return false;
       }
@@ -175,14 +224,14 @@
       workspaceUi.statusMelden(
         `${name} auf ${groesseText(endstand.widthUnits, endstand.heightPx)} gesetzt.`,
       );
-      log(2, `Panel ${sitzung.panelId} per Tastaturgröße geändert.`, {
+      log(2, `Panel ${sitzung.panelId} per ${quelle} geändert.`, {
         widthUnits: endstand.widthUnits,
         heightPx: endstand.heightPx,
       });
       sitzungLoeschen();
       return true;
     } catch (fehler) {
-      return fehlerBehandeln("Tastatur-Größenänderung konnte nicht übernommen werden.", fehler);
+      return fehlerBehandeln(`${quelle}-Größenänderung konnte nicht übernommen werden.`, fehler);
     }
   };
 
@@ -220,10 +269,10 @@
   };
 
   const tastaturVorschauAendern = (id, taste) => {
-    if (!desktopAktiv()) return false;
+    if (!desktopAktiv() || aktiveSitzung?.eingabeArt === "pointer") return false;
 
     try {
-      const sitzung = sitzungStarten(id);
+      const sitzung = sitzungStarten(id, "tastatur");
       sitzung.aktiveTasten.add(taste);
 
       if (taste === "ArrowLeft") breiteAendern(sitzung, -1);
@@ -240,7 +289,7 @@
 
   const griffKeydown = (event) => {
     const id = event.currentTarget?.dataset.workspaceResizeHandle;
-    if (!id) return;
+    if (!id || aktiveSitzung?.eingabeArt === "pointer") return;
 
     if (PFEILTASTEN.has(event.key)) {
       if (!desktopAktiv()) return;
@@ -257,8 +306,8 @@
   };
 
   const dokumentKeyup = (event) => {
-    if (!aktiveSitzung || !PFEILTASTEN.has(event.key)) return;
-    if (!aktiveSitzung.aktiveTasten.has(event.key)) return;
+    if (!aktiveSitzung || aktiveSitzung.eingabeArt !== "tastatur") return;
+    if (!PFEILTASTEN.has(event.key) || !aktiveSitzung.aktiveTasten.has(event.key)) return;
 
     aktiveSitzung.aktiveTasten.delete(event.key);
     if (aktiveSitzung.aktiveTasten.size === 0) vorschauCommitten();
@@ -268,6 +317,114 @@
     if (event.key !== "Escape" || !aktiveSitzung) return;
     event.preventDefault();
     aktiveVorschauAbbrechen();
+  };
+
+  const pointerEreignisGueltig = (event) => {
+    if (!Number.isInteger(event.pointerId) || event.isPrimary === false) return false;
+    if (event.pointerType === "mouse" && event.button !== 0) return false;
+    return true;
+  };
+
+  const pointerSitzungLesen = (event) => {
+    if (!aktiveSitzung || aktiveSitzung.eingabeArt !== "pointer") return null;
+    if (aktiveSitzung.zeiger?.pointerId !== event.pointerId) return null;
+    return aktiveSitzung;
+  };
+
+  const griffPointerdown = (event) => {
+    const id = event.currentTarget?.dataset.workspaceResizeHandle;
+    if (!id || !desktopAktiv() || !pointerEreignisGueltig(event)) return;
+
+    try {
+      event.preventDefault();
+      if (aktiveSitzung) aktiveVorschauAbbrechen({ meldung: false });
+
+      const sitzung = sitzungStarten(id, "pointer");
+      const panel = panelLesen(id);
+      const gerenderteHoehe = gerenderteHoeheLesen(sitzung);
+      const raster = rasterMessungLesen(panel);
+      const griff = event.currentTarget;
+
+      griff.setPointerCapture?.(event.pointerId);
+      griff.focus?.();
+      sitzung.zeiger = {
+        pointerId: event.pointerId,
+        griff,
+        startX: event.clientX,
+        startY: event.clientY,
+        startHoehePx: Number.isInteger(sitzung.startHoehe) ? sitzung.startHoehe : gerenderteHoehe,
+        containerBreitePx: raster.containerBreitePx,
+        spaltenAbstandPx: raster.spaltenAbstandPx,
+        aktiv: false,
+      };
+
+      log(3, `Pointer-Resize für Panel ${id} vorbereitet.`, {
+        pointerType: event.pointerType || "unbekannt",
+        containerBreitePx: raster.containerBreitePx,
+        spaltenAbstandPx: raster.spaltenAbstandPx,
+      });
+    } catch (fehler) {
+      fehlerBehandeln("Pointer-Größenänderung konnte nicht gestartet werden.", fehler);
+    }
+  };
+
+  const griffPointermove = (event) => {
+    const sitzung = pointerSitzungLesen(event);
+    if (!sitzung || !desktopAktiv()) return;
+
+    try {
+      const deltaX = event.clientX - sitzung.zeiger.startX;
+      const deltaY = event.clientY - sitzung.zeiger.startY;
+      if (!sitzung.zeiger.aktiv && Math.hypot(deltaX, deltaY) < POINTER_START_SCHWELLE_PX) {
+        return;
+      }
+
+      sitzung.zeiger.aktiv = true;
+      const groesse = groessenLogik.groesseAusBewegung({
+        startBreite: sitzung.startBreite,
+        startHoehePx: sitzung.zeiger.startHoehePx,
+        deltaX,
+        deltaY,
+        containerBreitePx: sitzung.zeiger.containerBreitePx,
+        spaltenAbstandPx: sitzung.zeiger.spaltenAbstandPx,
+        mindestBreite: sitzung.definition.mindestBreite,
+        hoechstBreite: sitzung.definition.hoechstBreite,
+        mindestHoehe: sitzung.definition.mindestHoehe,
+        hoechstHoehe: sitzung.definition.hoechstHoehe,
+      });
+
+      sitzung.vorschauBreite = groesse.widthUnits;
+      sitzung.vorschauHoehe = groesse.heightPx;
+      vorschauAnwenden(sitzung);
+      event.preventDefault();
+    } catch (fehler) {
+      fehlerBehandeln("Pointer-Größenvorschau konnte nicht berechnet werden.", fehler);
+    }
+  };
+
+  const griffPointerup = (event) => {
+    const sitzung = pointerSitzungLesen(event);
+    if (!sitzung) return;
+
+    if (!sitzung.zeiger.aktiv) {
+      sitzungLoeschen();
+      return;
+    }
+
+    event.preventDefault();
+    vorschauCommitten();
+  };
+
+  const griffPointercancel = (event) => {
+    const sitzung = pointerSitzungLesen(event);
+    if (!sitzung) return;
+    aktiveVorschauAbbrechen({ meldung: sitzung.zeiger.aktiv === true });
+  };
+
+  const griffPointerCaptureVerloren = (event) => {
+    const sitzung = pointerSitzungLesen(event);
+    if (!sitzung) return;
+    aktiveVorschauAbbrechen({ meldung: sitzung.zeiger.aktiv === true });
   };
 
   const griffErstellen = (definition) => {
@@ -285,10 +442,15 @@
     );
     griff.setAttribute(
       "aria-description",
-      "Pfeile ändern Breite oder Höhe. Pos1 stellt die Standardgröße wieder her. Escape bricht ab.",
+      "Ziehen ändert Breite und Höhe. Pfeile ändern Breite oder Höhe. Pos1 stellt die Standardgröße wieder her. Escape bricht ab.",
     );
-    griff.title = "Größe ändern: Pfeiltasten · Pos1 Standard · Escape Abbruch";
+    griff.title = "Größe ändern: ziehen · Pfeiltasten · Pos1 Standard · Escape Abbruch";
     griff.addEventListener("keydown", griffKeydown);
+    griff.addEventListener("pointerdown", griffPointerdown);
+    griff.addEventListener("pointermove", griffPointermove);
+    griff.addEventListener("pointerup", griffPointerup);
+    griff.addEventListener("pointercancel", griffPointercancel);
+    griff.addEventListener("lostpointercapture", griffPointerCaptureVerloren);
     panel.append(griff);
     griffe.set(definition.id, griff);
   };
@@ -320,6 +482,9 @@
     if (typeof uiApi?.statusMelden !== "function") fehlend.push("ui.statusMelden");
     if (!Number.isInteger(sizeApi?.HOEHEN_SCHRITT_PX) || sizeApi.HOEHEN_SCHRITT_PX <= 0) {
       fehlend.push("groessenLogik.HOEHEN_SCHRITT_PX");
+    }
+    if (typeof sizeApi?.groesseAusBewegung !== "function") {
+      fehlend.push("groessenLogik.groesseAusBewegung");
     }
 
     if (fehlend.length) {
@@ -359,7 +524,7 @@
     if (!desktopAktiv()) {
       log(2, "Resize ist bis 980 px deaktiviert; gespeicherte Desktopgrößen bleiben erhalten.");
     }
-    log(2, "Tastatur-Resize initialisiert.", { panels: griffe.size });
+    log(2, "Resize für Tastatur und Pointer initialisiert.", { panels: griffe.size });
     return statusLesen();
   };
 
@@ -370,15 +535,19 @@
     aktiveSitzung: aktiveSitzung
       ? {
           panelId: aktiveSitzung.panelId,
+          eingabeArt: aktiveSitzung.eingabeArt,
           widthUnits: aktiveSitzung.vorschauBreite,
           heightPx: aktiveSitzung.vorschauHoehe,
           aktiveTasten: [...aktiveSitzung.aktiveTasten],
+          pointerId: aktiveSitzung.zeiger?.pointerId ?? null,
+          pointerAktiv: aktiveSitzung.zeiger?.aktiv === true,
         }
       : null,
   });
 
   window.PROVOWARE_WORKSPACE_RESIZE = Object.freeze({
     DESKTOP_MEDIA,
+    POINTER_START_SCHWELLE_PX,
     initialisieren,
     statusLesen,
   });
