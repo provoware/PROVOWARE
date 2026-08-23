@@ -8,31 +8,19 @@ const VIDEO_FIXTURE = path.resolve("tests/fixtures/media/test-card.webm");
 const artifactRoot = (projectName) => path.resolve("artifacts", "browser-e2e", projectName);
 
 const medienBereitAbwarten = async (player, { video = false } = {}) => {
-  await expect.poll(async () => player.evaluate((element) => ({
-    readyState: element.readyState,
-    duration: element.duration,
-    videoWidth: element.videoWidth || 0,
-    videoHeight: element.videoHeight || 0,
-  }))).toMatchObject({
-    readyState: expect.any(Number),
-    duration: expect.any(Number),
-  });
+  await expect.poll(async () => player.evaluate((element, istVideo) => {
+    const basisBereit = element.readyState >= 1 && Number.isFinite(element.duration) && element.duration > 0;
+    if (!basisBereit) return false;
+    if (!istVideo) return true;
+    return element.videoWidth > 0 && element.videoHeight > 0;
+  }, video)).toBe(true);
 
-  const status = await player.evaluate((element) => ({
+  return player.evaluate((element) => ({
     readyState: element.readyState,
     duration: element.duration,
     videoWidth: element.videoWidth || 0,
     videoHeight: element.videoHeight || 0,
   }));
-
-  expect(status.readyState).toBeGreaterThanOrEqual(1);
-  expect(Number.isFinite(status.duration)).toBeTruthy();
-  expect(status.duration).toBeGreaterThan(0);
-  if (video) {
-    expect(status.videoWidth).toBeGreaterThan(0);
-    expect(status.videoHeight).toBeGreaterThan(0);
-  }
-  return status;
 };
 
 const echteWiedergabePruefen = async (player) => {
@@ -71,6 +59,7 @@ test("Headquarter spielt echte WAV- und WebM-Fixtures ab und behandelt defekte M
   await audioInput.setInputFiles(AUDIO_FIXTURE);
   await expect(dashboard.locator(".hq-media-track", { hasText: "test-tone.wav" })).toHaveCount(1);
   const audioMetadaten = await medienBereitAbwarten(audio);
+  expect(audioMetadaten.readyState).toBeGreaterThanOrEqual(1);
   expect(audioMetadaten.duration).toBeGreaterThan(0.2);
   const audioPlayback = await echteWiedergabePruefen(audio);
   expect(audioPlayback.currentTime).toBeGreaterThan(0.02);
@@ -78,7 +67,10 @@ test("Headquarter spielt echte WAV- und WebM-Fixtures ab und behandelt defekte M
   await videoInput.setInputFiles(VIDEO_FIXTURE);
   await expect(dashboard.locator(".hq-media-track", { hasText: "test-card.webm" })).toHaveCount(1);
   const videoMetadaten = await medienBereitAbwarten(video, { video: true });
+  expect(videoMetadaten.readyState).toBeGreaterThanOrEqual(1);
   expect(videoMetadaten.duration).toBeGreaterThan(0.5);
+  expect(videoMetadaten.videoWidth).toBeGreaterThan(0);
+  expect(videoMetadaten.videoHeight).toBeGreaterThan(0);
   const videoPlayback = await echteWiedergabePruefen(video);
   expect(videoPlayback.currentTime).toBeGreaterThan(0.02);
 
