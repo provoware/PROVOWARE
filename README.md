@@ -271,7 +271,7 @@ Data Studio PRO und Recovery verwenden denselben Container-Vertrag.
 
 ## Chromium-first Browser-E2E
 
-Browserprüfungen sind bewusst vom schnellen Core-Gate getrennt.
+Browserprüfungen sind bewusst vom schnellen Core-Gate getrennt. Sie laufen **nicht mehr automatisch bei normalen Pull Requests oder `main`-Pushes**. Stattdessen werden sie als gebündeltes Release-/Abnahme-Gate manuell gestartet. Die verbindliche Strategie steht in `docs/BROWSER_TEST_POLICY.md`.
 
 ### Testwerkzeuge installieren
 
@@ -296,7 +296,7 @@ oder explizit:
 npm run test:e2e:chromium
 ```
 
-Chromium ist der automatische Primärlauf bei Pull Requests und `main`-Pushes.
+Chromium bleibt der Primärbrowser. Im GitHub-Workflow wird der Lauf über `workflow_dispatch` gezielt am Release-/Abnahmepunkt gestartet.
 
 ### Firefox nur alternativ
 
@@ -305,16 +305,17 @@ npm run browser:install:firefox
 npm run test:e2e:firefox
 ```
 
-Firefox ist **kein automatischer Primärblocker**. Im GitHub-Workflow wird er nur über einen optionalen manuellen `workflow_dispatch` zugeschaltet.
+Firefox ist **kein automatischer Primärblocker**. Im manuellen GitHub-Release-Gate kann er optional zugeschaltet werden.
 
 ### Reale E2E-Ketten
 
-Chromium führt aktuell vier echte Prüfungen aus:
+Chromium führt aktuell fünf echte Prüfungen aus:
 
-1. `Start -> Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import`
-2. `Vorlage -> Datensätze -> Kategorie -> Zuweisung -> Bibliotheksfilter -> Volltextsuche -> gespeicherte Ansicht -> Anwenden -> Vorlagenexport -> Reload -> Ansicht erneut anwenden`
-3. `Project Data + PRO -> Envelope -> beide Stores verändern -> Envelope-Restore -> Reload -> beide Zustände gemeinsam verifizieren -> Journal leer`
-4. proportionaler HTML-Mirror der echten Oberfläche mit stabilisiertem Recovery-/PRO-Zustand
+1. Headquarter-Medienabnahme mit echten PCM-WAV-/VP8-WebM-Fixtures und kontrolliertem Fehlerpfad.
+2. `Start -> Notiz -> Datei -> Vorlage -> Datensatz -> Reload -> Edit -> Backup -> Änderung -> Restore -> Export -> Delete -> Import`
+3. `Vorlage -> Datensätze -> Kategorie -> Zuweisung -> Bibliotheksfilter -> Volltextsuche -> gespeicherte Ansicht -> Anwenden -> Vorlagenexport -> Reload -> Ansicht erneut anwenden`
+4. `Project Data + PRO -> Envelope -> beide Stores verändern -> Envelope-Restore -> Reload -> beide Zustände gemeinsam verifizieren -> Journal leer`
+5. proportionaler HTML-Mirror der echten Oberfläche mit stabilisiertem Recovery-/PRO-Zustand
 
 Die Testdaten werden in einer temporären Projektkopie erzeugt. Dadurch werden echte Entwicklungsnotizen, Datenbank, PRO-Metadaten und Backups der Arbeitskopie nicht verändert.
 
@@ -329,6 +330,17 @@ Die Testdaten werden in einer temporären Projektkopie erzeugt. Dadurch werden e
 - Browserartefakt: `9481363211`
 - Artefakt-SHA-256: `a4e897f6a594fd126d9c19f5a72bb2416a5b0f7de14ec1ab285afbb231839566`
 - Artefakt tatsächlich geprüft: 11 Dateien
+
+### Final validierter 0.4.4-H1-Medienstand
+
+- Chromium: `5/5` Browserprüfungen PASS
+- echte PCM-WAV-Wiedergabe: PASS
+- echte VP8-WebM-Wiedergabe: PASS
+- defekter Medieninhalt: kontrollierter Format-/Codecfehler PASS
+- HTML-Mirror: PASS
+- Firefox in H1: nicht ausgeführt
+- Browserartefakt: `9485201898`
+- Artefakt-SHA-256: `4c0344c12fdf46f5998120ca66d92ceaf427ebb6bab50930ede071f5fdeea354`
 
 ## HTML UI Mirror Pipeline
 
@@ -400,7 +412,7 @@ Reihenfolge:
 
 `PROJECT LINT -> QUALITY GATE -> NODE TEST RUNNER`
 
-Dieser Pfad bleibt ohne Browserinstallation ausführbar.
+Dieser Pfad bleibt ohne Browserinstallation ausführbar und ist der normale PR-Blocker. Das schwere Browser-E2E wird erst im späteren Release-/Abnahme-Gate ausgeführt.
 
 Final validierter 0.4.3-Core-Stand:
 
@@ -478,7 +490,7 @@ Der Auto-Fix ist kein aggressiver Quellcode-Reformatter. Er normalisiert nur ein
 12. zentraler Quality Gate
 13. Node-Test-Suite auf Node 20 und 24
 14. Ubuntu-/Windows-Persistence-Portability-Gate
-15. echter Chromium-Browser-E2E
+15. echter Chromium-Browser-E2E im gebündelten Release-/Abnahme-Gate
 16. proportionaler stabilisierter HTML-Geometrie-Mirror
 17. Screenshot-/Export-Evidenz
 18. PR-Diff-Gate und Main-Check
@@ -498,6 +510,7 @@ Project Data / Legacy Recovery:
 
 Browser-E2E / Mirror:
 
+- `docs/BROWSER_TEST_POLICY.md`
 - `docs/PLAN_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
 - `docs/CHECKPOINT_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
 - `docs/CHECKLIST_0.4.1_BROWSER_E2E_HTML_MIRROR.md`
