@@ -33,6 +33,13 @@ test("Serverpfade bleiben im Projekt und die Startseite ist index.html", () => {
   assert.equal(anfragepfadAufloesen("/%E0%A4%A"), null);
 });
 
+test("Server verweigert versteckte interne Dateien und Ordner", () => {
+  for (const url of ["/.git/config", "/.env", "/data/.secret", "/%2Egit/config", "/data/%2Esecret"]) {
+    assert.equal(anfragepfadAufloesen(url), null, url);
+  }
+  assert.equal(path.basename(anfragepfadAufloesen("/assets/styles.css")), "styles.css");
+});
+
 test("Lokale Dateien erhalten nachvollziehbare Inhaltstypen", () => {
   assert.equal(inhaltstyp("index.html"), "text/html; charset=utf-8");
   assert.equal(inhaltstyp("assets/app.js"), "text/javascript; charset=utf-8");

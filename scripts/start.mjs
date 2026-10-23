@@ -58,6 +58,8 @@ export const anfragepfadAufloesen = (url = "/") => {
     return null;
   }
   const relativ = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
+  // Versteckte Dateien und Ordner (z. B. .git, .env) nie statisch freigeben.
+  if (relativ.split(/[\\/]/).some((teil) => teil.startsWith("."))) return null;
   const datei = path.resolve(ROOT, relativ);
   return datei === ROOT || datei.startsWith(`${ROOT}${path.sep}`) ? datei : null;
 };
