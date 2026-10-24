@@ -69,17 +69,22 @@ test("Statischer Serverpfad verweigert Symlinks auf externe, versteckte und gesc
   try {
     await mkdir(path.join(root, "assets"));
     await mkdir(path.join(root, "data"));
+    await mkdir(path.join(root, "data", "recovery"));
     const publicFile = path.join(root, "assets", "public.js");
     const externalFile = path.join(external, "private.txt");
     await writeFile(publicFile, "public");
     await writeFile(externalFile, "private");
     await writeFile(path.join(root, ".secret"), "private");
     await writeFile(path.join(root, "data", "project-data.json"), "{}");
+    await writeFile(path.join(root, "data", "data-studio-pro.json"), "{}");
+    await writeFile(path.join(root, "data", "recovery", "recovery-envelope-journal.json"), "{}");
 
     const links = [
       ["external.txt", externalFile],
       ["hidden.txt", path.join(root, ".secret")],
       ["database.json", path.join(root, "data", "project-data.json")],
+      ["pro.json", path.join(root, "data", "data-studio-pro.json")],
+      ["journal.json", path.join(root, "data", "recovery", "recovery-envelope-journal.json")],
       ["public-alias.js", publicFile],
     ];
     try {
@@ -94,7 +99,7 @@ test("Statischer Serverpfad verweigert Symlinks auf externe, versteckte und gesc
       throw error;
     }
 
-    for (const name of ["external.txt", "hidden.txt", "database.json"]) {
+    for (const name of ["external.txt", "hidden.txt", "database.json", "pro.json", "journal.json"]) {
       assert.equal(await statischenDateipfadPruefen(path.join(root, "assets", name), root), null, name);
     }
     assert.equal(
