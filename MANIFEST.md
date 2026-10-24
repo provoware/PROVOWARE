@@ -31,7 +31,7 @@ Produktversion, Workspace-Vertrag, Project-Data-Produktionsschema und Data-Studi
 
 - `index.html` – HTML-Einstieg
 - `start.cmd` / `start.sh` – Plattform-Einstiege
-- `scripts/start.mjs` – lokaler Server, Node-Prüfung, statische Auslieferung, API-Routing und Recovery-Journalprüfung vor `listen()`
+- `scripts/start.mjs` – lokaler Server, Node-Prüfung, statische Auslieferung mit kanonischer Pfadprüfung (Symlink-Ausbruchsschutz), API-Routing und Recovery-Journalprüfung vor `listen()`
 
 ### Oberfläche und Kern
 
