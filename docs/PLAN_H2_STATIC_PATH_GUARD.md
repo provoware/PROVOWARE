@@ -18,11 +18,11 @@ Der lokale HTTP-Server darf eine syntaktisch innerhalb des Projektordners liegen
 
 1. [x] Baseline, Serverpfadprüfung, vorhandene Tests und GitHub-CI lesend geprüft.
 2. [x] Fehler in isoliertem temporären Testordner reproduziert; keine Nutzerdaten berührt.
-3. [ ] Nach der bisherigen URL-/Pfadprüfung den echten Dateipfad auflösen und erneut gegen Projektgrenze, versteckte Segmente und geschützte Laufzeitdateien prüfen.
-4. [ ] Den **geprüften echten Pfad** für `stat` und Auslieferung verwenden; keine zweite Dateiauslieferungslogik einführen.
-5. [ ] Regressionstests: öffentliche Datei, externer Link, verstecktes Ziel, Datenbankziel, öffentlicher interner Link und fremder Direktpfad.
+3. [x] Nach der bisherigen URL-/Pfadprüfung den echten Dateipfad auflösen und erneut gegen Projektgrenze, versteckte Segmente und geschützte Laufzeitdateien prüfen.
+4. [x] Den **geprüften echten Pfad** für `stat` und Auslieferung verwenden; keine zweite Dateiauslieferungslogik einführen.
+5. [x] Regressionstests: öffentliche Datei, externer Link, verstecktes Ziel, Datenbankziel, öffentlicher interner Link und fremder Direktpfad.
 6. [ ] `npm run verify` auf Node 20/24 in GitHub Actions auf dem PR-HEAD abwarten.
-7. [ ] Dokumentation, Pflichtmatrix, Diff, Risiken und Rückweg prüfen.
+7. [x] Dokumentation, Pflichtmatrix, Diff, Risiken und Rückweg prüfen.
 
 **Rückweg:** PR nicht integrieren oder diesen isolierten Patch revertieren. Kein Datenschema betroffen.
 
