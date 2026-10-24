@@ -7,7 +7,8 @@ Kanonische Entwicklungsroadmap. Detailhistorie bleibt über Git, CHANGELOG und d
 - [x] Statische HTTP-Dateipfade auch nach Auflösung symbolischer Links prüfen.
 - [x] Externe, versteckte und geschützte Linkziele sperren; öffentliche Links erhalten.
 - [x] Gezielte Regressionstests im Node-Testpaket ergänzt.
-- [ ] GitHub-CI auf dem finalen PR-HEAD (Node 20/24) bestätigen.
+- [x] GitHub-CI für H2-Code-HEAD `15c96b16` (Node 20/24) erfolgreich: Lauf `40099906839`.
+- [ ] Abschließenden PR-HEAD nach Dokumentationscommits erneut prüfen; PR #97 nur mit grünen Gates integrieren.
 - [ ] Echten HTTP-Integrationstest mit Serverrequest und Symlink-Fixture ergänzen.
 - [ ] Gesamte Release-Pflichtmatrix und übrige Produktfunktionen vollständig abnehmen.
 
