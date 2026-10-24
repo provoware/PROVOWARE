@@ -8,7 +8,8 @@ Kanonische Entwicklungsroadmap. Detailhistorie bleibt über Git, CHANGELOG und d
 - [x] Externe, versteckte und geschützte Linkziele sperren; öffentliche Links erhalten.
 - [x] Gezielte Regressionstests im Node-Testpaket ergänzt.
 - [x] GitHub-CI für H2-Code-HEAD `15c96b16` (Node 20/24) erfolgreich: Lauf `40099906839`.
-- [ ] Abschließenden PR-HEAD nach Dokumentationscommits erneut prüfen; PR #97 nur mit grünen Gates integrieren.
+- [x] Dokumentations-HEAD `16079a09` ebenfalls mit Node 20/24 grün: Lauf `40099959089` (vor abschließender Statusaktualisierung).
+- [ ] PR #97 nur nach erneuter grüner Gesamtprüfung auf dem aktuellen HEAD integrieren.
 - [ ] Echten HTTP-Integrationstest mit Serverrequest und Symlink-Fixture ergänzen.
 - [ ] Gesamte Release-Pflichtmatrix und übrige Produktfunktionen vollständig abnehmen.
 
