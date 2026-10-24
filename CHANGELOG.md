@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-10-24 – H2 HTTP-Pfadschutz (Entwicklungszweig, noch nicht freigegeben)
+
+- Statische Dateiauslieferung prüft den tatsächlichen Pfad nach Auflösung symbolischer Links erneut gegen Projektgrenze, versteckte Pfade und geschützte Laufzeitdateien.
+- Bei gesperrten Zielen HTTP 403; öffentliche interne Verweise bleiben erlaubt.
+- Regressionstests für externe, versteckte und geschützte Linkziele sowie erlaubte Dateien ergänzt.
+- Keine Datenmigration, keine neue Abhängigkeit, keine Änderung des Produktversionsvertrags.
+- GitHub-CI und vollständige Release-Abnahme sind getrennt nachzuweisen.
+
+
 ## 0.4.3 – Recovery Envelope · abgeschlossen
 
 ### Hinzugefügt
