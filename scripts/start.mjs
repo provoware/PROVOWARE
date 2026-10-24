@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
@@ -79,6 +79,27 @@ export const isProtectedDataStudioProPath = (filePath, root = ROOT) => {
   return resolved === proPath || resolved.startsWith(`${proPath}.tmp-`);
 };
 
+// URL-Pfadgrenzen allein reichen nicht: stat() und Streams folgen symbolischen Links.
+export const statischenDateipfadPruefen = async (datei, root = ROOT) => {
+  const angefragt = path.resolve(datei);
+  const projekt = path.resolve(root);
+  if (!angefragt.startsWith(`${projekt}${path.sep}`)) return null;
+
+  const basis = await realpath(projekt);
+  const ziel = await realpath(angefragt);
+  const relativ = path.relative(basis, ziel);
+  if (!relativ || relativ === ".." || relativ.startsWith(`..${path.sep}`) || path.isAbsolute(relativ)) {
+    return null;
+  }
+  if (relativ.split(path.sep).some((teil) => teil.startsWith("."))) return null;
+  if (
+    isProtectedProjectDataPath(ziel, basis)
+    || isProtectedDataStudioProPath(ziel, basis)
+    || isProtectedRecoveryEnvelopePath(ziel, basis)
+  ) return null;
+  return ziel;
+};
+
 const abhaengigkeitenAufloesen = async () => {
   const paket = JSON.parse(await readFile(path.join(ROOT, "package.json"), "utf8"));
   const abhaengigkeiten = laufzeitAbhaengigkeiten(paket);
@@ -120,9 +141,14 @@ const antworten = async (anfrage, antwort) => {
     return;
   }
   try {
-    if (!(await stat(datei)).isFile()) throw new Error("Kein auslieferbarer Dateipfad");
-    antwort.writeHead(200, { "Content-Type": inhaltstyp(datei), "X-Content-Type-Options": "nosniff" });
-    createReadStream(datei).pipe(antwort);
+    const freigegeben = await statischenDateipfadPruefen(datei);
+    if (!freigegeben) {
+      antwort.writeHead(403).end("Der aufgelöste Dateipfad ist nicht öffentlich freigegeben.");
+      return;
+    }
+    if (!(await stat(freigegeben)).isFile()) throw new Error("Kein auslieferbarer Dateipfad");
+    antwort.writeHead(200, { "Content-Type": inhaltstyp(freigegeben), "X-Content-Type-Options": "nosniff" });
+    createReadStream(freigegeben).pipe(antwort);
   } catch {
     antwort.writeHead(404).end("Datei nicht gefunden.");
   }

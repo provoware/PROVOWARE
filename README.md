@@ -27,7 +27,7 @@ npm start -- --no-browser
 npm start -- --port=4200
 ```
 
-Der lokale Server bindet ausschließlich an `127.0.0.1`, prüft die Node-Version und verwendet bei belegtem Port kontrolliert den nächsten freien Port.
+Der lokale Server bindet ausschließlich an `127.0.0.1`, prüft die Node-Version und verwendet bei belegtem Port kontrolliert den nächsten freien Port. Statische Dateianfragen werden vor der Auslieferung auch nach Auflösung symbolischer Links gegen die Projektgrenze, versteckte Pfade und geschützte Laufzeitdaten geprüft. Verweise auf öffentliche Projektdateien bleiben zulässig.
 
 ### Direkter Offline-Start
 

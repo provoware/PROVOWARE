@@ -2,6 +2,19 @@
 
 Kanonische Entwicklungsroadmap. Detailhistorie bleibt über Git, CHANGELOG und die versionsbezogenen Checklisten nachvollziehbar. Diese Datei zeigt den aktuellen Stand und die nächsten realen Gates.
 
+## Aktuelles Sicherheitspaket – H2 (Entwicklungszweig, nicht freigegeben)
+
+- [x] Statische HTTP-Dateipfade auch nach Auflösung symbolischer Links prüfen.
+- [x] Externe, versteckte und geschützte Linkziele sperren; öffentliche Links erhalten.
+- [x] Gezielte Regressionstests im Node-Testpaket ergänzt.
+- [x] GitHub-CI für H2-Code-HEAD `15c96b16` (Node 20/24) erfolgreich: Lauf `40099906839`.
+- [x] Dokumentations-HEAD `16079a09` ebenfalls mit Node 20/24 grün: Lauf `40099959089` (vor abschließender Statusaktualisierung).
+- [ ] PR #97 nur nach erneuter grüner Gesamtprüfung auf dem aktuellen HEAD integrieren.
+- [ ] Echten HTTP-Integrationstest mit Serverrequest und Symlink-Fixture ergänzen.
+- [ ] Gesamte Release-Pflichtmatrix und übrige Produktfunktionen vollständig abnehmen.
+
+Nachweise: `docs/PLAN_H2_STATIC_PATH_GUARD.md` und `docs/RELEASE_PFLICHTMATRIX.md`.
+
 ## Freigegebene Basis
 
 ### 0.1.0 – UI Foundation
