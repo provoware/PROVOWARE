@@ -21,9 +21,11 @@ Der lokale HTTP-Server darf eine syntaktisch innerhalb des Projektordners liegen
 3. [x] Nach der bisherigen URL-/Pfadprüfung den echten Dateipfad auflösen und erneut gegen Projektgrenze, versteckte Segmente und geschützte Laufzeitdateien prüfen.
 4. [x] Den **geprüften echten Pfad** für `stat` und Auslieferung verwenden; keine zweite Dateiauslieferungslogik einführen.
 5. [x] Regressionstests: öffentliche Datei, externer Link, verstecktes Ziel, Datenbankziel, öffentlicher interner Link und fremder Direktpfad.
-6. [ ] `npm run verify` auf Node 20/24 in GitHub Actions auf dem PR-HEAD abwarten.
+6. [x] `npm run verify` auf Node 20/24: beide PASS auf H2-Code-Commit `15c96b16fd3e71b7bc8bdc18513835920a826883` (GitHub-Lauf `40099906839`); nach Dokumentationsabschluss finalen PR-HEAD erneut prüfen.
 7. [x] Dokumentation, Pflichtmatrix, Diff, Risiken und Rückweg prüfen.
 
 **Rückweg:** PR nicht integrieren oder diesen isolierten Patch revertieren. Kein Datenschema betroffen.
+
+**PR:** #97 (Entwurf, kein Merge zum Dokumentationszeitpunkt). **CI:** https://github.com/provoware/PROVOWARE/actions/runs/40099906839
 
 **Danach:** HTTP-Ende-zu-Ende-Test mit tatsächlichem Serverrequest; anschließend responsive Bedienbarkeit bei 800 × 600 und hoher Skalierung prüfen.
